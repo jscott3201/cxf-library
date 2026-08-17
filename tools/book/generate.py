@@ -257,8 +257,18 @@ def main():
     }
 
     # Introduction and schema, links rewritten for the book layout.
+    if (REPO / "assets").is_dir():
+        shutil.copytree(REPO / "assets", SRC / "assets")
     intro = (REPO / "README.md").read_text(encoding="utf-8")
     intro = intro.replace("**`SCHEMA.md`**", "**[`SCHEMA.md`](schema.md)**")
+    # Fault-dir asset links flatten in the book (<ID>/diagram.svg -> <ID>.svg).
+    intro = re.sub(r"\(faults/(\w+)/([A-Z]+-FC-\d+)/diagram\.svg\)",
+                   r"(faults/\1/\2.svg)", intro)
+    # License files are not book pages; point at the repository.
+    for lic in ("LICENSE-APACHE", "LICENSE-MIT"):
+        intro = intro.replace(
+            f"]({lic})",
+            f"](https://github.com/jscott3201/cxf-library/blob/main/{lic})")
     intro += (
         "\n---\n\n*This book is generated from the repository by "
         "`tools/book/generate.py`; the files above are the source of truth.*\n"
