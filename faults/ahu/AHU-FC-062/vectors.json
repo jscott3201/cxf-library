@@ -1,0 +1,107 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 3600 },
+  "scenarios": [
+    {
+      "name": "normal_mixing",
+      "description": "Reference vector: MAT 18 °C sits inside the 5–22 °C envelope",
+      "inputs": { "oat": 5.0, "rat": 22.0, "mat": 18.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "mat_below_both",
+      "description": "Reference vector: MAT 1 °C is 4 °C below min(oat, rat); alarms after alarm_delay (900 s)",
+      "inputs": { "oat": 5.0, "rat": 22.0, "mat": 1.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 960, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "mat_above_both",
+      "description": "Reference vector: MAT 26 °C is 4 °C above max(oat, rat); alarms after alarm_delay",
+      "inputs": { "oat": 5.0, "rat": 22.0, "mat": 26.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 960, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "within_tolerance",
+      "description": "Reference vector: MAT 19 °C is 1 °C below min(oat, rat) — inside sensor_tolerance",
+      "inputs": { "oat": 20.0, "rat": 22.0, "mat": 19.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "edge_gap_equals_tolerance",
+      "description": "Threshold edge: min − mat = 2.0 °C exactly; the comparison is strict, so no fault",
+      "inputs": { "oat": 20.0, "rat": 22.0, "mat": 18.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "edge_gap_just_over_tolerance",
+      "description": "Threshold edge: min − mat = 2.1 °C clears the strict comparison and alarms after alarm_delay",
+      "inputs": { "oat": 20.0, "rat": 22.0, "mat": 17.9 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 960, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "summer_oat_above_rat",
+      "description": "Cooling season, OAT above RAT: MAT 35 °C exceeds max(oat, rat) by 3 °C",
+      "inputs": { "oat": 32.0, "rat": 24.0, "mat": 35.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 960, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "full_outdoor_air_pins_to_bound",
+      "description": "Economizer at 100% OA: MAT tracks OAT and lands 0.5 °C below it — tolerance absorbs it",
+      "inputs": { "oat": 5.0, "rat": 22.0, "mat": 4.5 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "transient_excursion_never_alarms",
+      "description": "MAT dips out of range for 600 s (< alarm_delay) and recovers; persistence timer resets",
+      "inputs": {
+        "oat": 5.0,
+        "rat": 22.0,
+        "mat": [
+          { "t": 0, "value": 18.0 },
+          { "t": 600, "value": 1.0 },
+          { "t": 1200, "value": 18.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "fault_clears_on_recovery",
+      "description": "Sustained excursion alarms at 900 s; the alarm drops on the tick MAT returns inside the envelope",
+      "inputs": {
+        "oat": 5.0,
+        "rat": 22.0,
+        "mat": [
+          { "t": 0, "value": 1.0 },
+          { "t": 1800, "value": 18.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 960, "to_s": 1740, "equals": true },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": false }
+      ]
+    }
+  ]
+}
