@@ -274,7 +274,7 @@ def main():
     for lic in ("LICENSE-APACHE", "LICENSE-MIT"):
         intro = intro.replace(
             f"]({lic})",
-            f"](https://github.com/jscott3201/cxf-library/blob/main/{lic})")
+            f"](https://github.com/jscott3201/open-control-library/blob/main/{lic})")
     intro += (
         "\n---\n\n*This book is generated from the repository by "
         "`tools/book/generate.py`; the files above are the source of truth.*\n"
