@@ -1,0 +1,112 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 5400 },
+  "scenarios": [
+    {
+      "name": "coil_modulating_on_setpoint",
+      "description": "Ordinary mechanical cooling: SAT is on its 13 °C setpoint with the valve at 65%. The loop has reserve in both directions, which is what a healthy cooling coil looks like",
+      "inputs": { "sat": 13.0, "sat_sp": 13.0, "clg_vlv_cmd": 65.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "valve_wide_open_holding_setpoint",
+      "description": "The valve is at 100% and SAT is 0.5 °C high — a coil sized close to its design point on a design day. Half a degree is inside eSAT, so this is a unit at capacity, not a unit that has lost capacity",
+      "inputs": { "sat": 13.5, "sat_sp": 13.0, "clg_vlv_cmd": 100.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "sat_error_exactly_at_threshold",
+      "description": "Threshold edge: SAT − SATSP = 1.0 °C exactly, the whole eSAT allowance, with the valve at 100%. `spMiss` is a strict `>`, so an error sitting precisely on the sensor allowance reads healthy",
+      "inputs": { "sat": 14.0, "sat_sp": 13.0, "clg_vlv_cmd": 100.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "sat_error_just_over_threshold",
+      "description": "Threshold edge, other side: 1.1 °C above setpoint at 100% valve clears the strict comparison, and the alarm asserts one alarm_delay (1800 s) later",
+      "inputs": { "sat": 14.1, "sat_sp": 13.0, "clg_vlv_cmd": 100.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "valve_exactly_at_full_threshold",
+      "description": "Threshold edge: a 5 °C setpoint miss with the valve parked on exactly 99.0%. `clgFull` is a strict `>`, so a command sitting on cc_full_threshold does not count as saturated and the rule stays silent",
+      "inputs": { "sat": 18.0, "sat_sp": 13.0, "clg_vlv_cmd": 99.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "valve_just_over_full_threshold",
+      "description": "Threshold edge, other side: the same 5 °C miss with the valve at 99.5% clears the strict comparison and alarms after alarm_delay",
+      "inputs": { "sat": 18.0, "sat_sp": 13.0, "clg_vlv_cmd": 99.5 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "coil_saturated_and_missing_setpoint",
+      "description": "The valve is wide open and SAT is stuck 5 °C above setpoint — the control loop has asked for everything and the temperature has not moved. Chilled water too warm, a fouled or undersized coil, or a valve that reports open and is not: capacity, supply, or sensor, never tuning",
+      "inputs": { "sat": 18.0, "sat_sp": 13.0, "clg_vlv_cmd": 100.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "morning_pulldown_clears_before_delay",
+      "description": "Transient: the valve pins at 100% and SAT runs 5 °C high while the coil pulls the building down after a warm night, reaching setpoint at t = 1200. A pulldown is shorter than alarm_delay, so nothing alarms",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 18.0 },
+          { "t": 1200, "value": 13.2 }
+        ],
+        "sat_sp": 13.0,
+        "clg_vlv_cmd": 100.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "fault_clears_when_chilled_water_returns",
+      "description": "A saturated valve missing setpoint alarms at 1800 s; the chiller comes back at t = 3000 and SAT reaches setpoint. `TrueDelay` has no off-delay, so the alarm drops on that tick",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 18.0 },
+          { "t": 3000, "value": 13.0 }
+        ],
+        "sat_sp": 13.0,
+        "clg_vlv_cmd": 100.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 2700, "equals": true },
+        { "output": "yFault", "from_s": 3300, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "valve_backs_off_before_delay",
+      "description": "Transient: SAT stays 5 °C high but the valve modulates back to 85% at t = 1200. A loop with reserve left is a loop still working, so persistence restarts and no alarm follows — the saturation half is what makes the setpoint miss evidence of a defect",
+      "inputs": {
+        "sat": 18.0,
+        "sat_sp": 13.0,
+        "clg_vlv_cmd": [
+          { "t": 0, "value": 100.0 },
+          { "t": 1200, "value": 85.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 7200 },
+  "scenarios": [
+    {
+      "name": "mech_cooling_with_mild_oa",
+      "description": "Normal OS#3: 16 °C outdoor air against a 13 °C setpoint. Outdoor air is warmer than the supply target, so the dampers at 100% plus mechanical cooling on top is exactly the right arrangement.",
+      "inputs": { "oat": 16.0, "sat_sp": 13.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "oat_far_below_setpoint",
+      "description": "5 °C outdoor air against a 13 °C setpoint: the gap is 8 °C, well past the 3.0 °C threshold. Free cooling alone would overshoot, so the chiller is removing heat from air that was already cold enough. Alarms after the 30 min delay.",
+      "inputs": { "oat": 5.0, "sat_sp": 13.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "edge_gap_equals_threshold",
+      "description": "Strict boundary, clear side: sat_sp − oat = 3.0 °C exactly. GreaterThreshold is u > t, so sitting precisely on the composed epsilon-plus-fan-heat budget is not a fault.",
+      "inputs": { "oat": 10.0, "sat_sp": 13.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "edge_gap_just_over_threshold",
+      "description": "Strict boundary, fault side: sat_sp − oat = 3.1 °C clears u > t and alarms after the delay. Pins the same edge as edge_gap_equals_threshold from the other direction.",
+      "inputs": { "oat": 9.9, "sat_sp": 13.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "fan_heat_widens_the_band",
+      "description": "Teaching case for the sign of dTSF: a 2.5 °C gap reads healthy because fan heat is added to the epsilon budget (1 + 1 + 1 = 3.0). Outdoor air 2.5 °C below setpoint arrives only 1.5 °C below it after the fan, which mechanical cooling can legitimately still be trimming. An epsilon-only threshold of 2.0 °C would have called this a fault.",
+      "inputs": { "oat": 10.5, "sat_sp": 13.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "setpoint_raised_opens_the_gap",
+      "description": "Outdoor air holds at 11 °C while the setpoint is raised from 13 °C to 15 °C at t = 600 s. Weather did not change; the unit now asks for supply air that free cooling alone would overshoot. The delay runs from the setpoint step, so the alarm lands at 2400 s.",
+      "inputs": {
+        "oat": 11.0,
+        "sat_sp": [
+          { "t": 0, "value": 13.0 },
+          { "t": 600, "value": 15.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2100, "equals": false },
+        { "output": "yFault", "from_s": 2700, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "transient_cold_snap_never_alarms",
+      "description": "A 1200 s excursion to 5 °C — shorter than the 1800 s alarm delay — then back to 16 °C. The persistence timer resets on the first compliant tick and nothing is reported.",
+      "inputs": {
+        "oat": [
+          { "t": 0, "value": 16.0 },
+          { "t": 600, "value": 5.0 },
+          { "t": 1800, "value": 16.0 }
+        ],
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "fault_clears_on_recovery",
+      "description": "Sustained 8 °C gap alarms at 1800 s; outdoor air warms back to 16 °C at 3600 s and the alarm drops on that tick. Recovery has no delay — only the assertion does.",
+      "inputs": {
+        "oat": [
+          { "t": 0, "value": 5.0 },
+          { "t": 3600, "value": 16.0 }
+        ],
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 3300, "equals": true },
+        { "output": "yFault", "from_s": 3900, "to_s": 7200, "equals": false }
+      ]
+    }
+  ]
+}

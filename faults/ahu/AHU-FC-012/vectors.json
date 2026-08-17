@@ -1,0 +1,108 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 5400 },
+  "scenarios": [
+    {
+      "name": "cooling_coil_doing_its_job",
+      "description": "Minimum-OA mechanical cooling on a warm day: a 24 °C mixture leaves the coil at 13 °C. SAT is 11 °C below MAT, the sign the rule expects in every cooling-side state, so there is nothing to report",
+      "inputs": { "sat": 13.0, "mat": 24.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "fan_heat_with_no_cooling_demand",
+      "description": "SAT sits 1.5 °C above MAT with the coil idle — about what the supply fan alone adds (dTSF = 1 °C) plus a fraction of the sensor allowances. The 5 °C threshold is built to absorb exactly this case, so the rule stays silent",
+      "inputs": { "sat": 25.5, "mat": 24.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "gap_exactly_at_threshold",
+      "description": "Threshold edge: SAT − MAT = 5.0 °C exactly, the full eSAT + eMAT + dTSF allowance. `gapBig` is a strict `>`, so a gap sitting precisely on the composed allowance reads healthy",
+      "inputs": { "sat": 29.0, "mat": 24.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "gap_just_over_threshold",
+      "description": "Threshold edge, other side: SAT − MAT = 5.1 °C clears the strict comparison and the alarm asserts one alarm_delay (1800 s) later",
+      "inputs": { "sat": 29.1, "mat": 24.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "heat_stuck_on_during_mechanical_cooling",
+      "description": "The unit is in a cooling state and the air still gains 9 °C crossing the AHU — a gas or electric heating stage stuck on, or a heating valve leaking through. Air cannot warm itself, so this is the CLU-01 waste case: energy added and removed on the same stream",
+      "inputs": { "sat": 31.0, "mat": 22.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "mat_sensor_reading_low",
+      "description": "A plausible SAT of 18 °C against a MAT of 12 °C on a day with no 12 °C air anywhere in the building — the same 6 °C violation, but here the mixed-air sensor is what is wrong. The rule reports the contradiction; it cannot say which of the two sensors is lying",
+      "inputs": { "sat": 18.0, "mat": 12.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "transient_clears_before_alarm_delay",
+      "description": "Transient: the gap holds at 9 °C for 1200 s while a heating stage finishes its off-cycle purge, then SAT drops to 15 °C. Anything shorter than alarm_delay never reaches the operator",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 31.0 },
+          { "t": 1200, "value": 15.0 }
+        ],
+        "mat": 22.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "fault_clears_on_recovery",
+      "description": "A sustained 9 °C gap alarms at 1800 s; the stuck heating stage is switched off at t = 3000 and SAT falls to 14 °C. `TrueDelay` has no off-delay, so the alarm drops on that tick",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 31.0 },
+          { "t": 3000, "value": 14.0 }
+        ],
+        "mat": 22.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 2700, "equals": true },
+        { "output": "yFault", "from_s": 3300, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "oscillating_gap_never_alarms",
+      "description": "A staging heater cycling on a 10-minute period drives the gap between 9 °C and 0 °C. Its mean is well outside the threshold and G36's 5-minute rolling average would report the fault, but persistence restarts on every compliant tick, so this rule stays silent — the limit of substituting TrueDelay for averaging (see Deviations)",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 31.0 },
+          { "t": 600, "value": 22.0 },
+          { "t": 1200, "value": 31.0 },
+          { "t": 1800, "value": 22.0 },
+          { "t": 2400, "value": 31.0 },
+          { "t": 3000, "value": 22.0 },
+          { "t": 3600, "value": 31.0 },
+          { "t": 4200, "value": 22.0 },
+          { "t": 4800, "value": 31.0 }
+        ],
+        "mat": 22.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    }
+  ]
+}
