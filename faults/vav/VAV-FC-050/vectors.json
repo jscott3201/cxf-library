@@ -1,0 +1,95 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 9000 },
+  "scenarios": [
+    {
+      "name": "normal_minimum",
+      "description": "Reference vector: minimum airflow setpoint 95 L/s against a 70 L/s ventilation requirement, reheat valve at 40%. 95 sits below the 105 L/s trip point (70 × 1.5), so the reheat is heating air the zone is required to receive and nothing fires.",
+      "inputs": { "zone_airflow_sp_min": 95.0, "rht_vlv_cmd": 40.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false }
+      ]
+    },
+    {
+      "name": "excessive_minimum",
+      "description": "Reference vector: minimum airflow setpoint 235 L/s — 3.4× the ventilation requirement — with the reheat valve at 40%. The box is pushing cold air the zone does not need and paying the boiler to warm it back up. Both terms hold from t=0, so delayOnInit makes the alarm land one alarm_delay in.",
+      "inputs": { "zone_airflow_sp_min": 235.0, "rht_vlv_cmd": 40.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 9000, "equals": true }
+      ]
+    },
+    {
+      "name": "high_min_no_reheat",
+      "description": "Reference vector: the same oversized 235 L/s minimum with the reheat valve shut. The setpoint is still wrong, but no heat is being spent against it — this rule reports live energy waste, not a configuration audit, so it stays silent.",
+      "inputs": { "zone_airflow_sp_min": 235.0, "rht_vlv_cmd": 0.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false }
+      ]
+    },
+    {
+      "name": "min_sp_exactly_at_multiple",
+      "description": "Boundary: the minimum setpoint sits exactly on ventilation_requirement × min_flow_multiplier (70.0 × 1.5 = 105.0) with reheat well open. The comparison is strict `>`, so a box configured precisely at the allowance clears.",
+      "inputs": { "zone_airflow_sp_min": 105.0, "rht_vlv_cmd": 40.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false }
+      ]
+    },
+    {
+      "name": "min_sp_just_above_multiple",
+      "description": "Boundary from the other side: 105.1 L/s, one tenth of a litre per second over the allowance, with the same reheat. The setpoint test now passes and the alarm lands after alarm_delay.",
+      "inputs": { "zone_airflow_sp_min": 105.1, "rht_vlv_cmd": 40.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 9000, "equals": true }
+      ]
+    },
+    {
+      "name": "reheat_exactly_at_threshold",
+      "description": "Boundary on the reheat term: an oversized minimum with the valve reported at exactly reheat_active_threshold (10.0%). Strict `>` again, so a valve parked on the threshold — typical of a leak-by allowance or a quantized command — does not count as active.",
+      "inputs": { "zone_airflow_sp_min": 235.0, "rht_vlv_cmd": 10.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false }
+      ]
+    },
+    {
+      "name": "reheat_just_above_threshold",
+      "description": "Boundary from the other side: the same oversized minimum with the valve at 10.1%. Both terms hold and the alarm lands after alarm_delay.",
+      "inputs": { "zone_airflow_sp_min": 235.0, "rht_vlv_cmd": 10.1 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 9000, "equals": true }
+      ]
+    },
+    {
+      "name": "transient_reheat_pulse",
+      "description": "The oversized minimum is present all along, but reheat only runs for the first 3000 s — a morning warm-up burst that ends 600 s short of the 3600 s alarm_delay. The timer resets when the valve shuts and no alarm is ever raised.",
+      "inputs": {
+        "zone_airflow_sp_min": 235.0,
+        "rht_vlv_cmd": [
+          { "t": 0, "value": 40.0 },
+          { "t": 3000, "value": 0.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false }
+      ]
+    },
+    {
+      "name": "alarm_clears_after_minimum_lowered",
+      "description": "Recovery: the alarm asserts at 3600 s, then the technician retunes the box minimum from 235 L/s down to 100 L/s at t=5400 s (playbook step 2.1). yFault drops on that same tick — TrueDelay only delays the rising edge — even though the reheat valve is still modulating.",
+      "inputs": {
+        "zone_airflow_sp_min": [
+          { "t": 0, "value": 235.0 },
+          { "t": 5400, "value": 100.0 }
+        ],
+        "rht_vlv_cmd": 40.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 5100, "equals": true },
+        { "output": "yFault", "from_s": 5700, "to_s": 9000, "equals": false }
+      ]
+    }
+  ]
+}

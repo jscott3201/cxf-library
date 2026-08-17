@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | AHU-FC-054, AHU-FC-014, AHU-FC-015 |
+| **Applies to** | AHU-FC-054, AHU-FC-014, AHU-FC-015, VAV-FC-053 |
 | **Fix complexity** | On-site service required |
 | **Typical time** | 1–4 h on-site |
 | **Typical cost** | $200–$1,200 (actuator + labor) |

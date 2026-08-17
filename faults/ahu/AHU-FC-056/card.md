@@ -17,7 +17,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [AHU-FC-004]
+related: [AHU-FC-004, VAV-FC-054]
 playbooks: []
 operating_states: "all (fan running)"
 preconditions: "Supply fan running — SAT scatter means nothing in a dead air stream. No verdict within long_window (2 h) of engine start: both moving averages divide by elapsed time while their windows fill, so the baseline is not yet established and the ratio test can be satisfied by a warmup artifact — the host reports NO_EVAL for that period. SAT sensor integrity is a precondition, not a conclusion: a sensor that flatlines and then jumps produces this same scatter signature (diagnosis 4), so sensor checks clear first. When any gate is unmet the verdict is NO_EVAL, not healthy."

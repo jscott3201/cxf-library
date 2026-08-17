@@ -1,0 +1,124 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 5400 },
+  "scenarios": [
+    {
+      "name": "zone_satisfied_no_reheat",
+      "description": "Reference vector: zone at 22 °C between a 21 °C heating and 23 °C cooling setpoint, reheat valve shut. The zone is satisfied and nothing is being spent on it.",
+      "inputs": { "rht_vlv_cmd": 0.0, "zone_temp": 22.0, "zone_temp_sp_htg": 21.0, "zone_temp_sp_clg": 23.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "zone_satisfied_reheat_on",
+      "description": "Reference vector: the same satisfied 22 °C zone with the reheat valve at 30%. Every kilowatt through that coil is waste. Both terms hold from t=0, so delayOnInit makes the alarm land one alarm_delay in.",
+      "inputs": { "rht_vlv_cmd": 30.0, "zone_temp": 22.0, "zone_temp_sp_htg": 21.0, "zone_temp_sp_clg": 23.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "zone_cold_reheat_on",
+      "description": "Reference vector: zone at 19 °C, 2 °C below its heating setpoint, reheat at 30%. The coil is doing exactly what it is for — the lower band bound fails and the rule stays silent.",
+      "inputs": { "rht_vlv_cmd": 30.0, "zone_temp": 19.0, "zone_temp_sp_htg": 21.0, "zone_temp_sp_clg": 23.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "zone_hot_reheat_on",
+      "description": "The other side of the band: zone at 24 °C, a full degree above the cooling setpoint, with reheat at 30%. This is a worse fault than the one being tested — reheat during a call for cooling — but it is VAV-FC-055's, not this rule's: `satisfied` fails on the upper bound and yFault stays clear.",
+      "inputs": { "rht_vlv_cmd": 30.0, "zone_temp": 24.0, "zone_temp_sp_htg": 21.0, "zone_temp_sp_clg": 23.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "zone_at_lower_band_edge",
+      "description": "Boundary: zone exactly at zone_temp_sp_htg − zone_deadband (21.0 − 0.5 = 20.5 °C) with reheat at 30%. The gap is exactly 0.5 and `aboveHtg` tests `< 0.5`, so the zone reads as still calling for heat and the rule stays silent — the reference's `>=` would have called it satisfied.",
+      "inputs": { "rht_vlv_cmd": 30.0, "zone_temp": 20.5, "zone_temp_sp_htg": 21.0, "zone_temp_sp_clg": 23.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "zone_just_inside_lower_band_edge",
+      "description": "Boundary from the other side: 20.6 °C, one tenth of a degree inside the band, same 30% reheat. The zone now reads satisfied and the alarm lands after alarm_delay.",
+      "inputs": { "rht_vlv_cmd": 30.0, "zone_temp": 20.6, "zone_temp_sp_htg": 21.0, "zone_temp_sp_clg": 23.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "zone_at_upper_band_edge",
+      "description": "Boundary: zone exactly at zone_temp_sp_clg + zone_deadband (23.0 + 0.5 = 23.5 °C) with reheat at 30%. `belowClg` tests `< 0.5` on a gap of exactly 0.5, so the zone reads as outside the band and the rule stays silent — the mirror of the lower-edge deviation.",
+      "inputs": { "rht_vlv_cmd": 30.0, "zone_temp": 23.5, "zone_temp_sp_htg": 21.0, "zone_temp_sp_clg": 23.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "zone_just_inside_upper_band_edge",
+      "description": "Boundary from the other side: 23.4 °C, one tenth of a degree inside the upper bound, same 30% reheat. Both band bounds hold and the alarm lands after alarm_delay.",
+      "inputs": { "rht_vlv_cmd": 30.0, "zone_temp": 23.4, "zone_temp_sp_htg": 21.0, "zone_temp_sp_clg": 23.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "reheat_exactly_at_threshold",
+      "description": "Boundary on the valve term: satisfied zone with the valve reported at exactly reheat_open_threshold (15.0%). Strict `>`, so a valve sitting on the threshold does not raise the alarm.",
+      "inputs": { "rht_vlv_cmd": 15.0, "zone_temp": 22.0, "zone_temp_sp_htg": 21.0, "zone_temp_sp_clg": 23.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "reheat_just_above_threshold",
+      "description": "Boundary from the other side: the same satisfied zone with the valve at 15.1%. The valve test passes and the alarm lands after alarm_delay.",
+      "inputs": { "rht_vlv_cmd": 15.1, "zone_temp": 22.0, "zone_temp_sp_htg": 21.0, "zone_temp_sp_clg": 23.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "transient_reheat_pulse",
+      "description": "The zone is satisfied throughout, but reheat runs only for the first 1500 s — a control loop overshooting past setpoint before it releases the coil — which is 300 s short of the 1800 s alarm_delay. The timer resets and no alarm is raised.",
+      "inputs": {
+        "rht_vlv_cmd": [
+          { "t": 0, "value": 30.0 },
+          { "t": 1500, "value": 0.0 }
+        ],
+        "zone_temp": 22.0,
+        "zone_temp_sp_htg": 21.0,
+        "zone_temp_sp_clg": 23.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "alarm_clears_when_valve_closes",
+      "description": "Recovery: the alarm asserts at 1800 s, then the valve is commanded shut at t=3000 s (playbook step 2.2 — the discriminator between a stuck valve and a sequence bug) and it obeys. yFault drops on that same tick, since TrueDelay only delays the rising edge.",
+      "inputs": {
+        "rht_vlv_cmd": [
+          { "t": 0, "value": 30.0 },
+          { "t": 3000, "value": 0.0 }
+        ],
+        "zone_temp": 22.0,
+        "zone_temp_sp_htg": 21.0,
+        "zone_temp_sp_clg": 23.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 2700, "equals": true },
+        { "output": "yFault", "from_s": 3300, "to_s": 5400, "equals": false }
+      ]
+    }
+  ]
+}

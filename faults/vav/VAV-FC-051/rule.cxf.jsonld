@@ -1,0 +1,286 @@
+{
+  "@context": {
+    "S231": "http://data.ashrae.org/S231P#",
+    "base": "urn:cxf-library:vav-fc-051#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051",
+      "@type": "S231:Block",
+      "S231:label": "vav_fc_051",
+      "S231:containsBlock": [
+        {
+          "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.reqMax"
+        },
+        {
+          "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.mostHappy"
+        },
+        {
+          "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.both"
+        },
+        {
+          "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.rogue"
+        },
+        {
+          "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.persist"
+        }
+      ],
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.zone_clg_request"
+        },
+        {
+          "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.satisfied_zone_fraction"
+        }
+      ],
+      "S231:hasOutput": [
+        {
+          "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.yFault"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.reqMax",
+      "@type": "urn:cxf-library:vav-fc-051#Buildings.Controls.OBC.CDL.Reals.GreaterThreshold",
+      "S231:label": "reqMax",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.reqMax.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.reqMax.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.reqMax.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.reqMax.t",
+      "S231:value": {
+        "@value": "99.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.reqMax.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.reqMax.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.both.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.mostHappy",
+      "@type": "urn:cxf-library:vav-fc-051#Buildings.Controls.OBC.CDL.Reals.GreaterThreshold",
+      "S231:label": "mostHappy",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.mostHappy.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.mostHappy.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.mostHappy.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.mostHappy.t",
+      "S231:value": {
+        "@value": "0.8",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.mostHappy.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.mostHappy.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.both.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.both",
+      "@type": "urn:cxf-library:vav-fc-051#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "both",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.both.u1"
+        },
+        {
+          "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.both.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.both.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.both.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.both.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.both.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.rogue.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.rogue",
+      "@type": "urn:cxf-library:vav-fc-051#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "rogue",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.rogue.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.rogue.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.rogue.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.rogue.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.rogue.delayTime",
+      "S231:value": {
+        "@value": "3600.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.rogue.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.rogue.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.rogue.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.persist.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.persist",
+      "@type": "urn:cxf-library:vav-fc-051#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "persist",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.persist.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.persist.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.persist.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.persist.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.persist.delayTime",
+      "S231:value": {
+        "@value": "1800.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.persist.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.persist.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.persist.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.yFault"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.zone_clg_request",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.reqMax.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.satisfied_zone_fraction",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.mostHappy.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:vav-fc-051#vav_fc_051.yFault",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    }
+  ]
+}

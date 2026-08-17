@@ -1,0 +1,121 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 21600 },
+  "scenarios": [
+    {
+      "name": "normal_cooling_no_reheat",
+      "description": "Reference vector: 25 °C outside, damper at 60%, reheat valve shut. The box is cooling in cooling weather — exactly what it is for.",
+      "inputs": { "rht_vlv_cmd": 0.0, "zone_dmpr_pos": 60.0, "oat": 25.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 21600, "equals": false }
+      ]
+    },
+    {
+      "name": "reheat_at_minimum_flow_cooling_season",
+      "description": "Reference vector: 28 °C outside, damper parked at 20% (its minimum), reheat valve at 40%, held for 90 min. The box is heating air the chiller just cooled, at the lowest flow it is allowed to pass. Alarms at eval_duration (3600 s) + alarm_delay (900 s) = 4500 s.",
+      "inputs": { "rht_vlv_cmd": 40.0, "zone_dmpr_pos": 20.0, "oat": 28.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 4200, "equals": false },
+        { "output": "yFault", "from_s": 4800, "to_s": 21600, "equals": true }
+      ]
+    },
+    {
+      "name": "reheat_in_heating_season",
+      "description": "Reference vector: the same 40% reheat at a 20% damper, but 5 °C outside. The season term holds yFault false — and false here means unevaluable, not healthy. The reference expects NO_EVAL for this case and the host reports it from the same OAT the rule reads; reheat in January is the reheat coil doing its job.",
+      "inputs": { "rht_vlv_cmd": 40.0, "zone_dmpr_pos": 20.0, "oat": 5.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 21600, "equals": false }
+      ]
+    },
+    {
+      "name": "reheat_with_damper_open",
+      "description": "The damper term earning its place: 40% reheat at 28 °C outside, but the damper is at 60% and modulating. The box is passing well above minimum flow, so it is answering a real heating load rather than tempering excess cold air. That is a diagnosis for the air handler, not waste at this box.",
+      "inputs": { "rht_vlv_cmd": 40.0, "zone_dmpr_pos": 60.0, "oat": 28.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 21600, "equals": false }
+      ]
+    },
+    {
+      "name": "thresholds_exactly_at_edges",
+      "description": "Boundary: reheat exactly at reheat_active_threshold (10.0%), OAT exactly at cooling_season_oat (18.0 °C), damper exactly at damper_at_minimum_margin (35.0%). All three tests are strict, so a signal sitting on any edge fails its term and nothing fires.",
+      "inputs": { "rht_vlv_cmd": 10.0, "zone_dmpr_pos": 35.0, "oat": 18.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 21600, "equals": false }
+      ]
+    },
+    {
+      "name": "thresholds_just_inside_edges",
+      "description": "Boundary from the other side: reheat 10.1%, OAT 18.1 °C, damper 34.9%. Every term is now inside its threshold by a tenth and the alarm lands on the same 4500 s schedule.",
+      "inputs": { "rht_vlv_cmd": 10.1, "zone_dmpr_pos": 34.9, "oat": 18.1 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 4200, "equals": false },
+        { "output": "yFault", "from_s": 4800, "to_s": 21600, "equals": true }
+      ]
+    },
+    {
+      "name": "morning_reheat_burst_clears",
+      "description": "Transient: a warm-up reheat burst on a 28 °C day at minimum flow ends when the valve closes at t=3000 s, 600 s short of eval_duration. The hold timer discards the elapsed time, so a morning burst never alarms.",
+      "inputs": {
+        "rht_vlv_cmd": [
+          { "t": 0, "value": 40.0 },
+          { "t": 3000, "value": 0.0 }
+        ],
+        "zone_dmpr_pos": 20.0,
+        "oat": 28.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 21600, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_opens_mid_hold",
+      "description": "Transient: reheat and weather hold, but the damper opens to 60% at t=3900 s — a real load arrives — and falls back to 20% at t=4500 s. The interruption drops both timers; the alarm restarts from 4500 s and lands at 9000 s rather than 4500 s.",
+      "inputs": {
+        "rht_vlv_cmd": 40.0,
+        "zone_dmpr_pos": [
+          { "t": 0, "value": 20.0 },
+          { "t": 3900, "value": 60.0 },
+          { "t": 4500, "value": 20.0 }
+        ],
+        "oat": 28.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 8700, "equals": false },
+        { "output": "yFault", "from_s": 9300, "to_s": 21600, "equals": true }
+      ]
+    },
+    {
+      "name": "oat_crosses_into_cooling_season",
+      "description": "The season term as a gate on live weather: reheat at 40% and the damper at minimum from t=0, but a 15 °C morning only crosses cooling_season_oat at t=3600 s (22 °C). The clock starts at the crossing, so the alarm lands at 8100 s.",
+      "inputs": {
+        "rht_vlv_cmd": 40.0,
+        "zone_dmpr_pos": 20.0,
+        "oat": [
+          { "t": 0, "value": 15.0 },
+          { "t": 3600, "value": 22.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7800, "equals": false },
+        { "output": "yFault", "from_s": 8400, "to_s": 21600, "equals": true }
+      ]
+    },
+    {
+      "name": "reheat_waste_alarms_then_clears",
+      "description": "Recovery: the alarm asserts at 4500 s, then a summer reheat lockout is enabled at t=10800 s and drives the valve shut. yFault drops on that tick, since TrueDelay only delays the rising edge.",
+      "inputs": {
+        "rht_vlv_cmd": [
+          { "t": 0, "value": 40.0 },
+          { "t": 10800, "value": 0.0 }
+        ],
+        "zone_dmpr_pos": 20.0,
+        "oat": 28.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 4200, "equals": false },
+        { "output": "yFault", "from_s": 4800, "to_s": 10500, "equals": true },
+        { "output": "yFault", "from_s": 11100, "to_s": 21600, "equals": false }
+      ]
+    }
+  ]
+}
