@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1230 200" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <rect x="12" y="60" width="86" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="55" y="79" text-anchor="middle" fill="#1e3a8a">sat</text>
+
+  <rect x="12" y="130" width="86" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="55" y="149" text-anchor="middle" fill="#1e3a8a">mat</text>
+
+  <!-- rawDev -->
+  <rect x="160" y="80" width="170" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="245" y="102" text-anchor="middle" fill="#24292f" font-weight="bold">rawDev</text>
+  <text x="245" y="120" text-anchor="middle" fill="#57606a" font-size="11">Subtract · sat − mat</text>
+
+  <!-- fanConst -->
+  <rect x="160" y="10" width="270" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="295" y="30" text-anchor="middle" fill="#24292f" font-weight="bold">fanConst</text>
+  <text x="295" y="48" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 1.0 °C</text>
+
+  <!-- dev -->
+  <rect x="470" y="80" width="180" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="560" y="102" text-anchor="middle" fill="#24292f" font-weight="bold">dev</text>
+  <text x="560" y="120" text-anchor="middle" fill="#57606a" font-size="11">Subtract · − dTSF</text>
+
+  <!-- absDev -->
+  <rect x="690" y="80" width="110" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="745" y="102" text-anchor="middle" fill="#24292f" font-weight="bold">absDev</text>
+  <text x="745" y="120" text-anchor="middle" fill="#57606a" font-size="11">Reals.Abs</text>
+
+  <!-- devBig -->
+  <rect x="840" y="80" width="230" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="955" y="102" text-anchor="middle" fill="#24292f" font-weight="bold">devBig</text>
+  <text x="955" y="120" text-anchor="middle" fill="#57606a" font-size="11">GreaterThreshold · t = 3.1623 °C</text>
+
+  <!-- persist -->
+  <rect x="1090" y="80" width="86" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1133" y="99" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1133" y="115" text-anchor="middle" fill="#57606a" font-size="10">TrueDelay</text>
+  <text x="1133" y="128" text-anchor="middle" fill="#57606a" font-size="10">1800 s</text>
+
+  <!-- boundary output -->
+  <rect x="1148" y="155" width="70" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1183" y="174" text-anchor="middle" fill="#7f1d1d" font-size="11">yFault</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 98 75 H 128 V 95 H 158"/>
+    <path d="M 98 145 H 128 V 119 H 158"/>
+    <path d="M 330 107 H 400 V 95 H 468"/>
+    <path d="M 430 35 H 445 V 119 H 468"/>
+    <path d="M 650 107 H 688"/>
+    <path d="M 800 107 H 838"/>
+    <path d="M 1070 107 H 1088"/>
+    <path d="M 1176 107 H 1196 V 153"/>
+  </g>
+
+  <text x="143" y="90" text-anchor="middle" fill="#57606a" font-size="10">u1</text>
+  <text x="143" y="145" text-anchor="middle" fill="#57606a" font-size="10">u2</text>
+  <text x="453" y="90" text-anchor="middle" fill="#57606a" font-size="10">u1</text>
+  <text x="453" y="145" text-anchor="middle" fill="#57606a" font-size="10">u2</text>
+</svg>

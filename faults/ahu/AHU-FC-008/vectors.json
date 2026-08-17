@@ -1,0 +1,105 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 7200 },
+  "scenarios": [
+    {
+      "name": "sat_is_mat_plus_fan_rise",
+      "description": "Textbook OS#2: 13.0 °C mixed air arrives at the supply sensor as 14.0 °C, the whole difference being the 1 °C the supply fan puts in. dev = sat − mat − dTSF = 0 exactly, which is what the fanConst term exists to produce. No coil is doing anything and neither sensor is lying.",
+      "inputs": { "sat": 14.0, "mat": 13.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "sat_equals_mat_no_fan_rise",
+      "description": "SAT and MAT read identically, so dev = −1.0 °C: the fan heat G36 expects is missing. That is well inside the 3.1623 °C root-sum-square band — a fan that adds less than its nameplate rise, or a pair of sensors each off by half a degree, is not a fault.",
+      "inputs": { "sat": 13.0, "mat": 13.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "heating_valve_leaking_sat_too_warm",
+      "description": "13.0 °C mixed air leaves at 18.0 °C: dev = +4.0 °C, past the threshold. In OS#2 the heating coil is commanded shut, so the only ways air gains four degrees more than fan heat are hot water leaking through a closed valve or a sensor reading wrong. Alarms once the 30 min delay expires.",
+      "inputs": { "sat": 18.0, "mat": 13.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "cooling_valve_leaking_sat_too_cold",
+      "description": "14.0 °C mixed air leaves at 10.0 °C: dev = −5.0 °C. Negative disagreement pins the Abs — without it the rule would only see air that got too warm. Physically this is chilled water leaking through a closed valve, cooling nobody asked for and nobody is paying attention to, since the valve command reads 0.",
+      "inputs": { "sat": 10.0, "mat": 14.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "edge_positive_dev_equals_threshold",
+      "description": "Strict boundary, clear side: sat − mat − 1.0 = 3.1623 °C exactly, the full root-sum-square of eSAT and eMAT. GreaterThreshold is u > t, so a unit sitting precisely on its combined sensor budget reads healthy.",
+      "inputs": { "sat": 17.2623, "mat": 13.1 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "edge_positive_dev_just_over_threshold",
+      "description": "Strict boundary, fault side: the same mixed air with SAT 0.04 °C warmer puts dev at 3.2 °C, which clears u > t and alarms after the delay. Pins the edge from the other direction.",
+      "inputs": { "sat": 17.3, "mat": 13.1 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "edge_negative_dev_equals_threshold",
+      "description": "Same boundary on the cold side: dev = −3.1623 °C exactly, |dev| = t, clear. Together with the positive edge this shows the band is symmetric about the fan-heat-corrected zero rather than about zero itself.",
+      "inputs": { "sat": 10.8377, "mat": 13.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "edge_negative_dev_just_over_threshold",
+      "description": "Cold side, fault: dev = −3.2 °C. |dev| clears the threshold and the alarm asserts after 30 min, at the same magnitude the positive case does.",
+      "inputs": { "sat": 10.8, "mat": 13.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "transient_disagreement_never_alarms",
+      "description": "SAT jumps to 18 °C for 1200 s — shorter than the 1800 s alarm delay — then returns. A damper stroke or a load step moves the mixed-air stream past the SAT sensor before the MAT sensor settles, and the timer resets on the first compliant tick, so nothing is reported.",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 14.0 },
+          { "t": 600, "value": 18.0 },
+          { "t": 1800, "value": 14.0 }
+        ],
+        "mat": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "fault_clears_when_valve_seats",
+      "description": "A leaking heating valve holds SAT at 18 °C, the alarm asserts at 1800 s, and at 3600 s the valve seats and SAT falls back to 14 °C. The alarm drops on that tick: assertion waits out the delay, recovery does not.",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 18.0 },
+          { "t": 3600, "value": 14.0 }
+        ],
+        "mat": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 3300, "equals": true },
+        { "output": "yFault", "from_s": 3900, "to_s": 7200, "equals": false }
+      ]
+    }
+  ]
+}
