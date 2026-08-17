@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1262 292" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1322 292" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
       <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
@@ -24,9 +24,9 @@
   <text x="485" y="58" text-anchor="middle" fill="#24292f" font-weight="bold">lowGap</text>
   <text x="485" y="76" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
 
-  <rect x="600" y="36" width="180" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
-  <text x="690" y="58" text-anchor="middle" fill="#24292f" font-weight="bold">belowMin</text>
-  <text x="690" y="76" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 2 °C</text>
+  <rect x="600" y="36" width="240" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="720" y="58" text-anchor="middle" fill="#24292f" font-weight="bold">belowMin</text>
+  <text x="720" y="76" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 2 °C</text>
 
   <!-- high branch: mat - max(oat,rat) > tol -->
   <rect x="250" y="206" width="120" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
@@ -37,22 +37,22 @@
   <text x="485" y="228" text-anchor="middle" fill="#24292f" font-weight="bold">highGap</text>
   <text x="485" y="246" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
 
-  <rect x="600" y="206" width="180" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
-  <text x="690" y="228" text-anchor="middle" fill="#24292f" font-weight="bold">aboveMax</text>
-  <text x="690" y="246" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 2 °C</text>
+  <rect x="600" y="206" width="240" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="720" y="228" text-anchor="middle" fill="#24292f" font-weight="bold">aboveMax</text>
+  <text x="720" y="246" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 2 °C</text>
 
   <!-- combine and persist -->
-  <rect x="830" y="121" width="110" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
-  <text x="885" y="143" text-anchor="middle" fill="#24292f" font-weight="bold">outOfRange</text>
-  <text x="885" y="161" text-anchor="middle" fill="#57606a" font-size="11">Logical.Or</text>
+  <rect x="890" y="121" width="110" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="945" y="143" text-anchor="middle" fill="#24292f" font-weight="bold">outOfRange</text>
+  <text x="945" y="161" text-anchor="middle" fill="#57606a" font-size="11">Logical.Or</text>
 
-  <rect x="990" y="121" width="150" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
-  <text x="1065" y="143" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
-  <text x="1065" y="161" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 900 s</text>
+  <rect x="1050" y="121" width="150" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1125" y="143" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1125" y="161" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 900 s</text>
 
   <!-- boundary output -->
-  <rect x="1180" y="133" width="70" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
-  <text x="1215" y="152" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1240" y="133" width="70" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1275" y="152" text-anchor="middle" fill="#7f1d1d">yFault</text>
 
   <!-- wires -->
   <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
@@ -66,9 +66,9 @@
     <path d="M 370 233 H 385 V 244 H 418"/>
     <path d="M 550 63 H 598"/>
     <path d="M 550 233 H 598"/>
-    <path d="M 780 63 H 805 V 139 H 828"/>
-    <path d="M 780 233 H 805 V 159 H 828"/>
-    <path d="M 940 148 H 988"/>
-    <path d="M 1140 148 H 1178"/>
+    <path d="M 840 63 H 865 V 139 H 888"/>
+    <path d="M 840 233 H 865 V 159 H 888"/>
+    <path d="M 1000 148 H 1048"/>
+    <path d="M 1200 148 H 1238"/>
   </g>
 </svg>

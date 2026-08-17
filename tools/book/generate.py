@@ -106,7 +106,10 @@ def render_fault_page(fid: str, fdir: Path, fm: dict, body: str, known: set) -> 
             )
         out.append("")
 
-    # Body: fix diagram and playbook links for the book layout.
+    # Body: fix diagram and playbook links for the book layout. Diagram
+    # images become links to themselves so wide graphs open full-size.
+    body = re.sub(r"!\[([^\]]*)\]\(diagram\.svg\)",
+                  rf"[![\1]({fid}.svg)]({fid}.svg)", body)
     body = body.replace("](diagram.svg)", f"]({fid}.svg)")
     body = body.replace("](../../../playbooks/", "](../../playbooks/")
     out.append(body.rstrip() + "\n")
@@ -261,7 +264,10 @@ def main():
         shutil.copytree(REPO / "assets", SRC / "assets")
     intro = (REPO / "README.md").read_text(encoding="utf-8")
     intro = intro.replace("**`SCHEMA.md`**", "**[`SCHEMA.md`](schema.md)**")
-    # Fault-dir asset links flatten in the book (<ID>/diagram.svg -> <ID>.svg).
+    # Fault-dir asset links flatten in the book (<ID>/diagram.svg -> <ID>.svg)
+    # and embed as self-links so wide graphs open full-size.
+    intro = re.sub(r"!\[([^\]]*)\]\(faults/(\w+)/([A-Z]+-FC-\d+)/diagram\.svg\)",
+                   r"[![\1](faults/\2/\3.svg)](faults/\2/\3.svg)", intro)
     intro = re.sub(r"\(faults/(\w+)/([A-Z]+-FC-\d+)/diagram\.svg\)",
                    r"(faults/\1/\2.svg)", intro)
     # License files are not book pages; point at the repository.
