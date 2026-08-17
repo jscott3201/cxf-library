@@ -1,0 +1,149 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 3600 },
+  "scenarios": [
+    {
+      "name": "cooling_mode_supply_air_cold",
+      "description": "Healthy cooling: the unit is commanded to COOLING (mode_command = 2) and the discharge reads 10 °C, well under sat_cooling_max. The reversing valve is where it was told to be.",
+      "inputs": { "mode_command": 2, "sat": 10.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "heating_mode_supply_air_warm",
+      "description": "Healthy heating: mode_command = 1 with the discharge at 38 °C, well above sat_heating_min.",
+      "inputs": { "mode_command": 1, "sat": 38.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "cooling_mode_valve_did_not_shift",
+      "description": "The unit is commanded to COOLING and the discharge sits at 24 °C — warmer than the space it is supposed to be cooling. The mode selector settles at t=600 s and the alarm lands one alarm_delay later, at t=1500 s.",
+      "inputs": { "mode_command": 2, "sat": 24.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1440, "equals": false },
+        { "output": "yFault", "from_s": 1560, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "heating_mode_valve_did_not_shift",
+      "description": "The mirror case: commanded to HEATING with the discharge at 14 °C, so the unit is air-conditioning a building that asked for heat.",
+      "inputs": { "mode_command": 1, "sat": 14.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1440, "equals": false },
+        { "output": "yFault", "from_s": 1560, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "cooling_sat_exactly_at_max",
+      "description": "Boundary: COOLING with the discharge at exactly sat_cooling_max (18.0 °C). CDL Reals has no GreaterEqual, so the comparison is strict and a discharge sitting precisely on the limit is not a fault.",
+      "inputs": { "mode_command": 2, "sat": 18.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "cooling_sat_just_above_max",
+      "description": "Boundary from the other side: 18.1 °C in COOLING clears the strict comparison and alarms on the same schedule as the stuck-valve case.",
+      "inputs": { "mode_command": 2, "sat": 18.1 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1440, "equals": false },
+        { "output": "yFault", "from_s": 1560, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "heating_sat_exactly_at_min",
+      "description": "Boundary on the heating branch: HEATING with the discharge at exactly sat_heating_min (28.0 °C). The LessThreshold is strict, so the limit itself reads healthy.",
+      "inputs": { "mode_command": 1, "sat": 28.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "heating_sat_just_below_min",
+      "description": "Boundary from the other side: 27.9 °C in HEATING trips the comparison and alarms after the settle and persistence delays.",
+      "inputs": { "mode_command": 1, "sat": 27.9 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1440, "equals": false },
+        { "output": "yFault", "from_s": 1560, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "mode_chatter_never_settles",
+      "description": "The unit flips between HEATING and COOLING every 540 s while the discharge holds 24 °C — a temperature that is too warm for cooling AND too cool for heating, so an unsettled rule would alarm continuously. Neither selector ever holds long enough to satisfy mode_switch_settle_time, so nothing is ever judged.",
+      "inputs": {
+        "mode_command": [
+          { "t": 0, "value": 2 },
+          { "t": 540, "value": 1 },
+          { "t": 1080, "value": 2 },
+          { "t": 1620, "value": 1 },
+          { "t": 2160, "value": 2 },
+          { "t": 2700, "value": 1 },
+          { "t": 3240, "value": 2 }
+        ],
+        "sat": 24.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "settled_after_mode_switch",
+      "description": "Settle edge from the long side: the unit runs HEATING until t=600 s (never settling, so the heating branch is never judged) and then switches to COOLING with the discharge holding 24 °C. The cooling selector settles 600 s after the switch and the alarm follows one alarm_delay after that.",
+      "inputs": {
+        "mode_command": [
+          { "t": 0, "value": 1 },
+          { "t": 600, "value": 2 }
+        ],
+        "sat": 24.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2040, "equals": false },
+        { "output": "yFault", "from_s": 2160, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "settle_window_masks_pulldown",
+      "description": "The reason the settle delay exists: the unit switches from HEATING to COOLING at t=300 s with 30 °C air still in the duct, and the coil pulls it down to 12 °C by t=840 s. The cooling selector does not settle until t=900 s, by which point the discharge is where cooling wants it, so the changeover transient raises nothing.",
+      "inputs": {
+        "mode_command": [
+          { "t": 0, "value": 1 },
+          { "t": 300, "value": 2 }
+        ],
+        "sat": [
+          { "t": 0, "value": 30.0 },
+          { "t": 840, "value": 12.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "unmapped_mode_code_is_silent",
+      "description": "mode_command = 3 (a host code this rule does not encode — off, auto, or defrost) with the discharge at 24 °C, which would fault in either mapped mode. Both selectors are false, so the rule is structurally silent: that silence is NO_EVAL, not a health claim, and the host must treat it that way.",
+      "inputs": { "mode_command": 3, "sat": 24.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "alarm_clears_when_valve_shifts",
+      "description": "Recovery: the stuck-in-heating alarm asserts, then the technician frees the reversing valve at t=2400 s and the discharge drops to 12 °C. TrueDelay passes falling edges immediately, so yFault clears on that tick without waiting out another delay.",
+      "inputs": {
+        "mode_command": 2,
+        "sat": [
+          { "t": 0, "value": 24.0 },
+          { "t": 2400, "value": 12.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1440, "equals": false },
+        { "output": "yFault", "from_s": 1560, "to_s": 2340, "equals": true },
+        { "output": "yFault", "from_s": 2460, "to_s": 3600, "equals": false }
+      ]
+    }
+  ]
+}

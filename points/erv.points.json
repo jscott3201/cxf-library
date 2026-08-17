@@ -1,0 +1,139 @@
+{
+  "schema": "cxf-library/points/v1",
+  "equipment": "erv",
+  "namespaces": {
+    "brick": {
+      "iri": "https://brickschema.org/schema/Brick#",
+      "verified_version": "1.4.4"
+    },
+    "s223": {
+      "iri": "http://data.ashrae.org/standard223#",
+      "verified_version": "v1.0.0-2026"
+    },
+    "s223_g36": {
+      "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#",
+      "verified_version": "v1.0.0-2026"
+    },
+    "quantitykind": {
+      "iri": "http://qudt.org/vocab/quantitykind/",
+      "verified_version": "QUDT 3.1.4"
+    },
+    "unit": {
+      "iri": "http://qudt.org/vocab/unit/",
+      "verified_version": "QUDT 3.1.4"
+    }
+  },
+  "notes": "Energy recovery ventilator point dictionary. Exhaust-side verified in Brick 1.4.4; the post-recovery outdoor-air temperature has no Brick class and is provisional. The sensible-effectiveness computation (ERV-FC-050) uses the three ERV-local temperatures; oat is the site sensor used by frost protection (ERV-FC-051) and typically coincides with erv_oa_entering_temp when the ERV inlet sensor is the site sensor.",
+  "points": [
+    {
+      "name": "erv_oa_entering_temp",
+      "description": "Outdoor air temperature entering the ERV (upstream of recovery)",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": "Outside_Air_Temperature_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty at the ERV outdoor-air inlet via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "brick:Outside_Air_Temperature_Sensor (verified via the AHU oat entry); position it upstream of the wheel/exchanger. The effectiveness denominator is (erv_exhaust_temp - this), so its accuracy bounds ERV-FC-050 directly."
+    },
+    {
+      "name": "erv_oa_leaving_temp",
+      "description": "Outdoor air temperature leaving the ERV (downstream of recovery, before coils)",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty at the ERV outdoor-air outlet via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "No Brick 1.4.4 class names the post-recovery OA temperature (heat-exchanger entering/leaving classes exist only for water); tag the generic air-temperature sensor pattern on the ERV supply outlet. This is the effectiveness numerator's moving term."
+    },
+    {
+      "name": "erv_exhaust_temp",
+      "description": "Exhaust air temperature entering the ERV from the building",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": "Exhaust_Air_Temperature_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty at the ERV exhaust inlet via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "brick:Exhaust_Air_Temperature_Sensor grep-verified in Brick 1.4.4. Bind the building-side (entering) exhaust temperature, not the discharge after recovery."
+    },
+    {
+      "name": "oat",
+      "description": "Outdoor air temperature",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": "Outside_Air_Temperature_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty at the outdoor-air intake",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Air",
+        "aspects": [
+          "Role-OutdoorAirIntake"
+        ]
+      },
+      "provisional": false,
+      "notes": "Brick spelling is Outside_ (Outdoor_Air_Temperature_Sensor does not exist). Role-OutdoorAirIntake is 223P's only outdoor role; used by reference instance oa-temp. [ERV dictionary] Brick class and 223P pattern carried over (equipment-independent); consumed by ERV-FC-051's frost test; on many units the same physical sensor as erv_oa_entering_temp."
+    },
+    {
+      "name": "erv_frost_prot",
+      "description": "Frost protection active (true while the frost sequence is engaged)",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": null,
+      "s223": {
+        "pattern": "EnumeratedObservableProperty (Binary-OnOff) on the frost-protection sequence",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "No Brick 1.4.4 class; bind the BAS frost-protection status (preheat stage, wheel speed reduction, or bypass modulation — whichever the unit uses)."
+    },
+    {
+      "name": "erv_enabled",
+      "description": "ERV enabled/commanded on",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Enable_Status",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty (Binary-OnOff) on the ERV via hasProperty",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "brick:Enable_Status grep-verified in Brick 1.4.4."
+    }
+  ]
+}

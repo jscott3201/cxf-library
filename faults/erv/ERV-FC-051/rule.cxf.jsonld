@@ -1,0 +1,279 @@
+{
+  "@context": {
+    "S231": "http://data.ashrae.org/S231P#",
+    "base": "urn:cxf-library:erv-fc-051#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051",
+      "@type": "S231:Block",
+      "S231:label": "erv_fc_051",
+      "S231:containsBlock": [
+        {
+          "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.coldOat"
+        },
+        {
+          "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.noFrost"
+        },
+        {
+          "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.unprotected"
+        },
+        {
+          "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.armed"
+        },
+        {
+          "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.persist"
+        }
+      ],
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.oat"
+        },
+        {
+          "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.erv_frost_prot"
+        },
+        {
+          "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.erv_enabled"
+        }
+      ],
+      "S231:hasOutput": [
+        {
+          "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.yFault"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.coldOat",
+      "@type": "urn:cxf-library:erv-fc-051#Buildings.Controls.OBC.CDL.Reals.LessThreshold",
+      "S231:label": "coldOat",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.coldOat.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.coldOat.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.coldOat.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.coldOat.t",
+      "S231:value": {
+        "@value": "-10.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.coldOat.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.coldOat.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.unprotected.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.noFrost",
+      "@type": "urn:cxf-library:erv-fc-051#Buildings.Controls.OBC.CDL.Logical.Not",
+      "S231:label": "noFrost",
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.noFrost.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.noFrost.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.noFrost.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.noFrost.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.unprotected.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.unprotected",
+      "@type": "urn:cxf-library:erv-fc-051#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "unprotected",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.unprotected.u1"
+        },
+        {
+          "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.unprotected.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.unprotected.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.unprotected.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.unprotected.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.unprotected.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.armed.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.armed",
+      "@type": "urn:cxf-library:erv-fc-051#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "armed",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.armed.u1"
+        },
+        {
+          "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.armed.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.armed.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.armed.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.armed.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.armed.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.persist.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.persist",
+      "@type": "urn:cxf-library:erv-fc-051#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "persist",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.persist.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.persist.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.persist.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.persist.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.persist.delayTime",
+      "S231:value": {
+        "@value": "300.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.persist.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.persist.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.persist.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.yFault"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.oat",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.coldOat.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.erv_frost_prot",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.noFrost.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.erv_enabled",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.armed.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:erv-fc-051#erv_fc_051.yFault",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    }
+  ]
+}

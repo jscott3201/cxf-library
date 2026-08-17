@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 430" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <rect x="12" y="45" width="98" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="61" y="64" text-anchor="middle" fill="#1e3a8a">vfd_speed</text>
+  <rect x="12" y="285" width="161" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="92.5" y="304" text-anchor="middle" fill="#1e3a8a">vfd_process_value</text>
+  <rect x="12" y="365" width="138" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="81" y="384" text-anchor="middle" fill="#1e3a8a">vfd_process_sp</text>
+  <rect x="200" y="111" width="243" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="321.5" y="133" text-anchor="middle" fill="#24292f" font-weight="bold">minSpd</text>
+  <text x="321.5" y="151" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 20 %</text>
+  <rect x="200" y="186" width="236" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="318" y="208" text-anchor="middle" fill="#24292f" font-weight="bold">tol</text>
+  <text x="318" y="226" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 3 %</text>
+  <rect x="500" y="148" width="102" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="551" y="170" text-anchor="middle" fill="#24292f" font-weight="bold">speedFloor</text>
+  <text x="551" y="188" text-anchor="middle" fill="#57606a" font-size="11">Reals.Add</text>
+  <rect x="660" y="45" width="90" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="705" y="67" text-anchor="middle" fill="#24292f" font-weight="bold">atMin</text>
+  <text x="705" y="85" text-anchor="middle" fill="#57606a" font-size="11">Reals.Less</text>
+  <rect x="250" y="291" width="117" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="308.5" y="313" text-anchor="middle" fill="#24292f" font-weight="bold">err</text>
+  <text x="308.5" y="331" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="420" y="291" width="84" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="462" y="313" text-anchor="middle" fill="#24292f" font-weight="bold">absErr</text>
+  <text x="462" y="331" text-anchor="middle" fill="#57606a" font-size="11">Reals.Abs</text>
+  <rect x="570" y="291" width="229" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="684.5" y="313" text-anchor="middle" fill="#24292f" font-weight="bold">pvOff</text>
+  <text x="684.5" y="331" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 10</text>
+  <rect x="830" y="168" width="97" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="878.5" y="190" text-anchor="middle" fill="#24292f" font-weight="bold">both</text>
+  <text x="878.5" y="208" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="980" y="168" width="137" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1048.5" y="190" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1048.5" y="208" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 900 s</text>
+  <rect x="1170" y="182" width="75" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1207.5" y="201" text-anchor="middle" fill="#7f1d1d">yFault</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 110 60 H 656"/>
+    <path d="M 443 140 H 470 V 163 H 496"/>
+    <path d="M 436 215 H 482 V 191 H 496"/>
+    <path d="M 602 177 H 622 V 88 H 656"/>
+    <path d="M 173 300 H 200 V 306 H 246"/>
+    <path d="M 150 380 H 212 V 334 H 246"/>
+    <path d="M 367 320 H 416"/>
+    <path d="M 504 320 H 566"/>
+    <path d="M 750 74 H 780 V 183 H 826"/>
+    <path d="M 799 320 H 812 V 211 H 826"/>
+    <path d="M 927 197 H 976"/>
+    <path d="M 1117 197 H 1166"/>
+  </g>
+  <text x="118" y="42" fill="#7d8590" font-size="10">Real</text>
+  <text x="181" y="282" fill="#7d8590" font-size="10">Real</text>
+  <text x="758" y="66" fill="#7d8590" font-size="10">Bool</text>
+  <text x="819" y="342" fill="#7d8590" font-size="10">Bool</text>
+  <text x="666" y="56" fill="#7d8590" font-size="9">u1</text>
+  <text x="666" y="100" fill="#7d8590" font-size="9">u2</text>
+  <text x="256" y="302" fill="#7d8590" font-size="9">u1</text>
+  <text x="256" y="346" fill="#7d8590" font-size="9">u2</text>
+  <text x="506" y="159" fill="#7d8590" font-size="9">u1</text>
+  <text x="506" y="203" fill="#7d8590" font-size="9">u2</text>
+</svg>

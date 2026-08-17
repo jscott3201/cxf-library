@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 320" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <rect x="12" y="45" width="51" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="37.5" y="64" text-anchor="middle" fill="#1e3a8a">oat</text>
+  <rect x="12" y="135" width="138" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="81" y="154" text-anchor="middle" fill="#1e3a8a">erv_frost_prot</text>
+  <rect x="12" y="245" width="114" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="69" y="264" text-anchor="middle" fill="#1e3a8a">erv_enabled</text>
+  <rect x="200" y="31" width="236" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="318" y="53" text-anchor="middle" fill="#24292f" font-weight="bold">coldOat</text>
+  <text x="318" y="71" text-anchor="middle" fill="#57606a" font-size="11">Reals.LessThreshold · t = -10 °C</text>
+  <rect x="200" y="121" width="97" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="248.5" y="143" text-anchor="middle" fill="#24292f" font-weight="bold">noFrost</text>
+  <text x="248.5" y="161" text-anchor="middle" fill="#57606a" font-size="11">Logical.Not</text>
+  <rect x="480" y="76" width="110" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="535" y="98" text-anchor="middle" fill="#24292f" font-weight="bold">unprotected</text>
+  <text x="535" y="116" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="640" y="151" width="97" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="688.5" y="173" text-anchor="middle" fill="#24292f" font-weight="bold">armed</text>
+  <text x="688.5" y="191" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="790" y="151" width="137" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="858.5" y="173" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="858.5" y="191" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 300 s</text>
+  <rect x="980" y="165" width="75" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1017.5" y="184" text-anchor="middle" fill="#7f1d1d">yFault</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 63 60 H 196"/>
+    <path d="M 150 150 H 196"/>
+    <path d="M 436 60 H 450 V 91 H 476"/>
+    <path d="M 297 150 H 462 V 119 H 476"/>
+    <path d="M 590 105 H 608 V 166 H 636"/>
+    <path d="M 126 260 H 596 V 194 H 636"/>
+    <path d="M 737 180 H 786"/>
+    <path d="M 927 180 H 976"/>
+  </g>
+  <text x="71" y="42" fill="#7d8590" font-size="10">Real</text>
+  <text x="158" y="132" fill="#7d8590" font-size="10">Bool</text>
+  <text x="134" y="242" fill="#7d8590" font-size="10">Bool</text>
+  <text x="444" y="52" fill="#7d8590" font-size="10">Bool</text>
+</svg>

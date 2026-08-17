@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | VFD-FC-050, PMP-FC-050, PMP-FC-051 |
+| **Applies to** | VFD-FC-050, VFD-FC-051 (library addition — the reference's line names only VFD-FC-050 and the pump rules), PMP-FC-050, PMP-FC-051 |
 | **Fix complexity** | On-site service required |
 | **Typical time** | 2–4 h |
 | **Typical cost** | $200–$2,000 |

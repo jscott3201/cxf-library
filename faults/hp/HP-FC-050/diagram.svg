@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1704 400" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+  <rect x="12" y="40" width="136" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="80" y="59" text-anchor="middle" fill="#1e3a8a">thermal_power</text>
+  <rect x="12" y="100" width="112" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="68" y="119" text-anchor="middle" fill="#1e3a8a">elec_power</text>
+  <rect x="12" y="294" width="57" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="40.5" y="313" text-anchor="middle" fill="#1e3a8a">oat</text>
+  <rect x="200" y="40" width="107" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="253.5" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">cop</text>
+  <text x="253.5" y="80" text-anchor="middle" fill="#57606a" font-size="11">Reals.Divide</text>
+  <rect x="200" y="160" width="260" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="330" y="182" text-anchor="middle" fill="#24292f" font-weight="bold">pwrOk</text>
+  <text x="330" y="200" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 0.5 kW</text>
+  <rect x="200" y="280" width="266" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="333" y="302" text-anchor="middle" fill="#24292f" font-weight="bold">oatSlope</text>
+  <text x="333" y="320" text-anchor="middle" fill="#57606a" font-size="11">Reals.MultiplyByParameter · k = 0.08</text>
+  <rect x="516" y="280" width="213" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="622.5" y="302" text-anchor="middle" fill="#24292f" font-weight="bold">expected</text>
+  <text x="622.5" y="320" text-anchor="middle" fill="#57606a" font-size="11">Reals.AddParameter · p = 2.7</text>
+  <rect x="779" y="280" width="266" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="912" y="302" text-anchor="middle" fill="#24292f" font-weight="bold">allowed</text>
+  <text x="912" y="320" text-anchor="middle" fill="#57606a" font-size="11">Reals.MultiplyByParameter · k = 0.85</text>
+  <rect x="1095" y="160" width="94" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1142" y="182" text-anchor="middle" fill="#24292f" font-weight="bold">copLow</text>
+  <text x="1142" y="200" text-anchor="middle" fill="#57606a" font-size="11">Reals.Less</text>
+  <rect x="1239" y="160" width="101" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1289.5" y="182" text-anchor="middle" fill="#24292f" font-weight="bold">gate</text>
+  <text x="1289.5" y="200" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="1390" y="160" width="147" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1463.5" y="182" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1463.5" y="200" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 3600 s</text>
+  <rect x="1587" y="174" width="81" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1627.5" y="193" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1587" y="345" width="97" height="30" rx="15" fill="#fef3c7" stroke="#d97706"/>
+  <text x="1635.5" y="364" text-anchor="middle" fill="#78350f">yPowerOk</text>
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 148 55 H 196"/>
+    <path d="M 148 115 H 170 V 83 H 196"/>
+    <path d="M 148 115 H 170 V 189 H 196"/>
+    <path d="M 148 309 H 196"/>
+    <path d="M 466 309 H 512"/>
+    <path d="M 729 309 H 775"/>
+    <path d="M 307 69 H 1075 V 175 H 1091"/>
+    <path d="M 1045 309 H 1063 V 203 H 1091"/>
+    <path d="M 1189 189 H 1215 V 175 H 1235"/>
+    <path d="M 460 189 H 480 V 360 H 1223 V 203 H 1235"/>
+    <path d="M 460 189 H 480 V 360 H 1583"/>
+    <path d="M 1340 189 H 1386"/>
+    <path d="M 1537 189 H 1583"/>
+  </g>
+  <text x="154" y="48" fill="#7d8590" font-size="10">Real</text>
+  <text x="154" y="108" fill="#7d8590" font-size="10">Real</text>
+  <text x="154" y="302" fill="#7d8590" font-size="10">Real</text>
+  <text x="313" y="62" fill="#7d8590" font-size="10">Real</text>
+  <text x="1051" y="302" fill="#7d8590" font-size="10">Real</text>
+  <text x="1195" y="182" fill="#7d8590" font-size="10">Bool</text>
+  <text x="466" y="182" fill="#7d8590" font-size="10">Bool</text>
+  <text x="1587" y="392" fill="#7d8590" font-size="11">false ⇒ NO_EVAL</text>
+</svg>

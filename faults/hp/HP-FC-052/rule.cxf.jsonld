@@ -1,0 +1,583 @@
+{
+  "@context": {
+    "S231": "http://data.ashrae.org/S231P#",
+    "base": "urn:cxf-library:hp-fc-052#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052",
+      "@type": "S231:Block",
+      "S231:label": "hp_fc_052",
+      "S231:containsBlock": [
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.kHeat"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.kCool"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isHeat"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isCool"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatSettled"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolSettled"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satLow"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satHigh"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatBad"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolBad"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.anyBad"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.persist"
+        }
+      ],
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.mode_command"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.sat"
+        }
+      ],
+      "S231:hasOutput": [
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.yFault"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.kHeat",
+      "@type": "urn:cxf-library:hp-fc-052#Buildings.Controls.OBC.CDL.Integers.Sources.Constant",
+      "S231:label": "kHeat",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.kHeat.k"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.kHeat.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.kHeat.k",
+      "S231:value": {
+        "@value": "1",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.kHeat.y",
+      "@type": "S231:IntegerOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Integer"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isHeat.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.kCool",
+      "@type": "urn:cxf-library:hp-fc-052#Buildings.Controls.OBC.CDL.Integers.Sources.Constant",
+      "S231:label": "kCool",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.kCool.k"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.kCool.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.kCool.k",
+      "S231:value": {
+        "@value": "2",
+        "@type": "http://www.w3.org/2001/XMLSchema#integer"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.kCool.y",
+      "@type": "S231:IntegerOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Integer"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isCool.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isHeat",
+      "@type": "urn:cxf-library:hp-fc-052#Buildings.Controls.OBC.CDL.Integers.Equal",
+      "S231:label": "isHeat",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isHeat.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isHeat.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isHeat.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isHeat.u1",
+      "@type": "S231:IntegerInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Integer"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isHeat.u2",
+      "@type": "S231:IntegerInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Integer"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isHeat.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatSettled.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isCool",
+      "@type": "urn:cxf-library:hp-fc-052#Buildings.Controls.OBC.CDL.Integers.Equal",
+      "S231:label": "isCool",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isCool.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isCool.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isCool.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isCool.u1",
+      "@type": "S231:IntegerInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Integer"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isCool.u2",
+      "@type": "S231:IntegerInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Integer"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isCool.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolSettled.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatSettled",
+      "@type": "urn:cxf-library:hp-fc-052#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "heatSettled",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatSettled.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatSettled.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatSettled.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatSettled.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatSettled.delayTime",
+      "S231:value": {
+        "@value": "600.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatSettled.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatSettled.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatSettled.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatBad.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolSettled",
+      "@type": "urn:cxf-library:hp-fc-052#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "coolSettled",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolSettled.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolSettled.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolSettled.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolSettled.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolSettled.delayTime",
+      "S231:value": {
+        "@value": "600.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolSettled.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolSettled.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolSettled.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolBad.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satLow",
+      "@type": "urn:cxf-library:hp-fc-052#Buildings.Controls.OBC.CDL.Reals.LessThreshold",
+      "S231:label": "satLow",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satLow.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satLow.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satLow.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satLow.t",
+      "S231:value": {
+        "@value": "28.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satLow.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satLow.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatBad.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satHigh",
+      "@type": "urn:cxf-library:hp-fc-052#Buildings.Controls.OBC.CDL.Reals.GreaterThreshold",
+      "S231:label": "satHigh",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satHigh.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satHigh.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satHigh.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satHigh.t",
+      "S231:value": {
+        "@value": "18.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satHigh.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satHigh.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolBad.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatBad",
+      "@type": "urn:cxf-library:hp-fc-052#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "heatBad",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatBad.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatBad.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatBad.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatBad.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatBad.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.heatBad.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.anyBad.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolBad",
+      "@type": "urn:cxf-library:hp-fc-052#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "coolBad",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolBad.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolBad.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolBad.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolBad.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolBad.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.coolBad.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.anyBad.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.anyBad",
+      "@type": "urn:cxf-library:hp-fc-052#Buildings.Controls.OBC.CDL.Logical.Or",
+      "S231:label": "anyBad",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.anyBad.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.anyBad.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.anyBad.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.anyBad.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.anyBad.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.anyBad.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.persist.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.persist",
+      "@type": "urn:cxf-library:hp-fc-052#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "persist",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.persist.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.persist.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.persist.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.persist.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.persist.delayTime",
+      "S231:value": {
+        "@value": "900.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.persist.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.persist.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.persist.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.yFault"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.mode_command",
+      "@type": "S231:IntegerInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Integer"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isHeat.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.isCool.u1"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.sat",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satLow.u"
+        },
+        {
+          "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.satHigh.u"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hp-fc-052#hp_fc_052.yFault",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    }
+  ]
+}

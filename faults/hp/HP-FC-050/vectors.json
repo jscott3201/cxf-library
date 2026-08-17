@@ -1,0 +1,151 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 9000 },
+  "scenarios": [
+    {
+      "name": "on_the_baseline_line",
+      "description": "oat 10 °C puts the fitted baseline at 0.08 × 10 + 2.7 = 3.5. The unit delivers 7.0 kW thermal for 2.0 kW electrical, so measured COP is exactly 3.5 — no degradation at all, and the compressor is well above the evaluability floor.",
+      "inputs": { "oat": 10.0, "thermal_power": 7.0, "elec_power": 2.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false },
+        { "output": "yPowerOk", "from_s": 0, "to_s": 9000, "equals": true }
+      ]
+    },
+    {
+      "name": "degraded_at_mild_oat",
+      "description": "Same 10 °C day, same 2.0 kW draw, but only 5.6 kW of heat delivered: COP 2.8 against a 3.5 baseline is a 20% shortfall, past the 15% the reference allows. Both terms hold from t=0, so delayOnInit puts the alarm one alarm_delay in.",
+      "inputs": { "oat": 10.0, "thermal_power": 5.6, "elec_power": 2.0 },
+      "expect": [
+        { "output": "yPowerOk", "from_s": 0, "to_s": 9000, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 9000, "equals": true }
+      ]
+    },
+    {
+      "name": "same_cop_is_healthy_on_a_cold_day",
+      "description": "Baseline slope, low side: the identical COP 2.8 at oat −5 °C sits against a 2.3 baseline and is 22% ABOVE it. A heat pump is supposed to do worse when it is cold, and the fitted line is what says how much worse. Pairs with degraded_at_mild_oat — wire the slope backwards and one of the two flips.",
+      "inputs": { "oat": -5.0, "thermal_power": 5.6, "elec_power": 2.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false }
+      ]
+    },
+    {
+      "name": "same_cop_is_a_fault_on_a_warm_day",
+      "description": "Baseline slope, high side: COP 3.5 was exactly on the line at 10 °C and is a fault at 20 °C, where the baseline has risen to 4.3 and the allowance to 3.655. Same two power readings, opposite verdicts, because the outdoor temperature moved.",
+      "inputs": { "oat": 20.0, "thermal_power": 7.0, "elec_power": 2.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 9000, "equals": true }
+      ]
+    },
+    {
+      "name": "cold_day_genuinely_degraded",
+      "description": "A real cold-weather fault: at oat −5 °C the baseline is 2.3 and the allowance 1.955, and the unit manages COP 1.8 (3.6 kW out of 2.0 kW in) — 22% below the line. Degradation is judged against the cold-weather expectation, not against a nameplate rating.",
+      "inputs": { "oat": -5.0, "thermal_power": 3.6, "elec_power": 2.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 9000, "equals": true }
+      ]
+    },
+    {
+      "name": "cop_exactly_at_the_allowance",
+      "description": "Threshold edge: 5.95 kW over 2.0 kW is COP 2.975, exactly cop_ratio_threshold × expected (0.85 × 3.5). The comparison is a strict `<`, so a unit sitting precisely on the allowance reads healthy. Both operands are binary-exact here, so this is a true boundary pin and not a near miss.",
+      "inputs": { "oat": 10.0, "thermal_power": 5.95, "elec_power": 2.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false }
+      ]
+    },
+    {
+      "name": "cop_just_below_the_allowance",
+      "description": "Threshold edge from the other side: 5.93 kW gives COP 2.965, one hundredth under the allowance, and the alarm lands after alarm_delay.",
+      "inputs": { "oat": 10.0, "thermal_power": 5.93, "elec_power": 2.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 9000, "equals": true }
+      ]
+    },
+    {
+      "name": "elec_power_exactly_at_the_floor",
+      "description": "Evaluability edge: the compressor draws exactly elec_power_min (0.5 kW) and delivers nothing, which reads as COP 0 — total degradation. The floor test is a strict `>`, so yPowerOk is false and yFault stays down: the host must report NO_EVAL, not a healthy heat pump.",
+      "inputs": { "oat": 10.0, "thermal_power": 0.0, "elec_power": 0.5 },
+      "expect": [
+        { "output": "yPowerOk", "from_s": 0, "to_s": 9000, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false }
+      ]
+    },
+    {
+      "name": "elec_power_just_above_the_floor",
+      "description": "Evaluability edge from the other side: 0.51 kW clears the floor, so the same COP 0 is now a verdict the rule is willing to issue and the alarm matures. The two scenarios differ by 10 W of compressor draw and disagree completely — which is the point of publishing yPowerOk rather than burying the test.",
+      "inputs": { "oat": 10.0, "thermal_power": 0.0, "elec_power": 0.51 },
+      "expect": [
+        { "output": "yPowerOk", "from_s": 0, "to_s": 9000, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 9000, "equals": true }
+      ]
+    },
+    {
+      "name": "compressor_off_divide_by_zero",
+      "description": "The case the floor exists for: the unit is off, both meters read 0.0, and the quotient is 0/0 = NaN. yPowerOk is false and yFault never asserts. Without the floor this rule would spend every idle hour reporting a catastrophically degraded heat pump.",
+      "inputs": { "oat": 10.0, "thermal_power": 0.0, "elec_power": 0.0 },
+      "expect": [
+        { "output": "yPowerOk", "from_s": 0, "to_s": 9000, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false }
+      ]
+    },
+    {
+      "name": "transient_dip_never_alarms",
+      "description": "Thermal output drops to 5.6 kW for 1800 s — a defrost cycle, or a load step the capacity control has not caught up with — and recovers 1800 s short of alarm_delay. The timer resets on the recovery and nothing is reported.",
+      "inputs": {
+        "oat": 10.0,
+        "elec_power": 2.0,
+        "thermal_power": [
+          { "t": 0, "value": 7.0 },
+          { "t": 900, "value": 5.6 },
+          { "t": 2700, "value": 7.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false }
+      ]
+    },
+    {
+      "name": "alarm_clears_after_charge_restored",
+      "description": "Recovery: a 20% shortfall alarms at 3600 s, the technician tops up the refrigerant charge at t = 5400 s (playbook step 2.1.1), and thermal output returns to 7.0 kW. yFault drops on that same tick — TrueDelay only delays the rising edge.",
+      "inputs": {
+        "oat": 10.0,
+        "elec_power": 2.0,
+        "thermal_power": [
+          { "t": 0, "value": 5.6 },
+          { "t": 5400, "value": 7.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 5100, "equals": true },
+        { "output": "yFault", "from_s": 5700, "to_s": 9000, "equals": false }
+      ]
+    },
+    {
+      "name": "compressor_stop_forces_no_eval",
+      "description": "A matured fault is not reported as repaired when the compressor stops: at t = 5400 s both meters fall to standby, yPowerOk goes false and yFault drops with it. The distinction between this scenario and alarm_clears_after_charge_restored is invisible in yFault alone and is exactly what yPowerOk carries.",
+      "inputs": {
+        "oat": 10.0,
+        "thermal_power": [
+          { "t": 0, "value": 5.6 },
+          { "t": 5400, "value": 0.0 }
+        ],
+        "elec_power": [
+          { "t": 0, "value": 2.0 },
+          { "t": 5400, "value": 0.2 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 5100, "equals": true },
+        { "output": "yPowerOk", "from_s": 0, "to_s": 5100, "equals": true },
+        { "output": "yPowerOk", "from_s": 5400, "to_s": 9000, "equals": false },
+        { "output": "yFault", "from_s": 5700, "to_s": 9000, "equals": false }
+      ]
+    }
+  ]
+}

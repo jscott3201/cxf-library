@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1770 470" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <rect x="12" y="160" width="130" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="77" y="179" text-anchor="middle" fill="#1e3a8a">mode_command</text>
+  <rect x="12" y="250" width="130" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="77" y="269" text-anchor="middle" fill="#1e3a8a">sat</text>
+
+  <!-- mode decode -->
+  <rect x="190" y="30" width="250" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="315" y="50" text-anchor="middle" fill="#24292f" font-weight="bold">kHeat</text>
+  <text x="315" y="68" text-anchor="middle" fill="#57606a" font-size="11">Integers.Sources.Constant · k = 1</text>
+  <rect x="190" y="290" width="250" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="315" y="310" text-anchor="middle" fill="#24292f" font-weight="bold">kCool</text>
+  <text x="315" y="328" text-anchor="middle" fill="#57606a" font-size="11">Integers.Sources.Constant · k = 2</text>
+  <rect x="500" y="30" width="140" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="570" y="50" text-anchor="middle" fill="#24292f" font-weight="bold">isHeat</text>
+  <text x="570" y="68" text-anchor="middle" fill="#57606a" font-size="11">Integers.Equal</text>
+  <rect x="500" y="290" width="140" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="570" y="310" text-anchor="middle" fill="#24292f" font-weight="bold">isCool</text>
+  <text x="570" y="328" text-anchor="middle" fill="#57606a" font-size="11">Integers.Equal</text>
+
+  <!-- mode must settle before the discharge is judged -->
+  <rect x="730" y="30" width="150" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="805" y="50" text-anchor="middle" fill="#24292f" font-weight="bold">heatSettled</text>
+  <text x="805" y="68" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 600 s</text>
+  <rect x="730" y="290" width="150" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="805" y="310" text-anchor="middle" fill="#24292f" font-weight="bold">coolSettled</text>
+  <text x="805" y="328" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 600 s</text>
+
+  <!-- discharge temperature tests -->
+  <rect x="190" y="120" width="260" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="320" y="140" text-anchor="middle" fill="#24292f" font-weight="bold">satLow</text>
+  <text x="320" y="158" text-anchor="middle" fill="#57606a" font-size="11">Reals.LessThreshold · t = 28 °C</text>
+  <rect x="190" y="380" width="260" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="320" y="400" text-anchor="middle" fill="#24292f" font-weight="bold">satHigh</text>
+  <text x="320" y="418" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 18 °C</text>
+
+  <!-- per-mode contradiction, then persistence -->
+  <rect x="990" y="75" width="140" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1060" y="95" text-anchor="middle" fill="#24292f" font-weight="bold">heatBad</text>
+  <text x="1060" y="113" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="990" y="335" width="140" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1060" y="355" text-anchor="middle" fill="#24292f" font-weight="bold">coolBad</text>
+  <text x="1060" y="373" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="1210" y="205" width="140" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1280" y="225" text-anchor="middle" fill="#24292f" font-weight="bold">anyBad</text>
+  <text x="1280" y="243" text-anchor="middle" fill="#57606a" font-size="11">Logical.Or</text>
+  <rect x="1420" y="205" width="150" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1495" y="225" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1495" y="243" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 900 s</text>
+
+  <!-- boundary output -->
+  <rect x="1660" y="215" width="80" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1700" y="234" text-anchor="middle" fill="#7f1d1d">yFault</text>
+
+  <!-- fan-out trunks -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none">
+    <path d="M 142 175 H 160"/>
+    <path d="M 142 265 H 172"/>
+  </g>
+  <circle cx="160" cy="175" r="3" fill="#7d8590"/>
+  <circle cx="172" cy="265" r="3" fill="#7d8590"/>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 160 175 V 18 H 470 V 43 H 498"/>
+    <path d="M 160 175 V 278 H 470 V 303 H 498"/>
+    <path d="M 440 55 H 470 V 67 H 498"/>
+    <path d="M 440 315 H 470 V 327 H 498"/>
+    <path d="M 640 55 H 728"/>
+    <path d="M 640 315 H 728"/>
+    <path d="M 172 265 V 145 H 188"/>
+    <path d="M 172 265 V 405 H 188"/>
+    <path d="M 880 55 H 950 V 88 H 988"/>
+    <path d="M 880 315 H 950 V 348 H 988"/>
+    <path d="M 450 145 H 960 V 112 H 988"/>
+    <path d="M 450 405 H 960 V 372 H 988"/>
+    <path d="M 1130 100 H 1175 V 218 H 1208"/>
+    <path d="M 1130 360 H 1185 V 242 H 1208"/>
+    <path d="M 1350 230 H 1418"/>
+    <path d="M 1570 230 H 1658"/>
+  </g>
+
+  <!-- annotations -->
+  <text x="742" y="22" fill="#7d8590" font-size="11">mode has held 600 s</text>
+  <text x="742" y="282" fill="#7d8590" font-size="11">mode has held 600 s</text>
+  <text x="1422" y="197" fill="#7d8590" font-size="11">15 min of contradiction</text>
+</svg>

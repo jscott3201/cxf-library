@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1406 540" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+  <rect x="12" y="54" width="144" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="84" y="73" text-anchor="middle" fill="#1e3a8a">defrost_status</text>
+  <rect x="12" y="474" width="57" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="40.5" y="493" text-anchor="middle" fill="#1e3a8a">oat</text>
+  <rect x="200" y="40" width="107" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="253.5" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">dfStart</text>
+  <text x="253.5" y="80" text-anchor="middle" fill="#57606a" font-size="11">Logical.Edge</text>
+  <rect x="358" y="40" width="213" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="464.5" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">pulseInt</text>
+  <text x="464.5" y="80" text-anchor="middle" fill="#57606a" font-size="11">Conversions.BooleanToInteger</text>
+  <rect x="621" y="40" width="194" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="718" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">pulseReal</text>
+  <text x="718" y="80" text-anchor="middle" fill="#57606a" font-size="11">Conversions.IntegerToReal</text>
+  <rect x="865" y="40" width="266" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="998" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">rate</text>
+  <text x="998" y="80" text-anchor="middle" fill="#57606a" font-size="11">Reals.MovingAverage · delta = 3600 s</text>
+  <rect x="200" y="220" width="253" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="326.5" y="242" text-anchor="middle" fill="#24292f" font-weight="bold">count</text>
+  <text x="326.5" y="260" text-anchor="middle" fill="#57606a" font-size="11">Reals.MultiplyByParameter · k = 12</text>
+  <rect x="503" y="220" width="240" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="623" y="242" text-anchor="middle" fill="#24292f" font-weight="bold">freqHigh</text>
+  <text x="623" y="260" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 4/h</text>
+  <rect x="200" y="340" width="141" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="270.5" y="362" text-anchor="middle" fill="#24292f" font-weight="bold">tooLong</text>
+  <text x="270.5" y="380" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 900 s</text>
+  <rect x="200" y="460" width="247" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="323.5" y="482" text-anchor="middle" fill="#24292f" font-weight="bold">mildOat</text>
+  <text x="323.5" y="500" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 7 °C</text>
+  <rect x="497" y="460" width="101" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="547.5" y="482" text-anchor="middle" fill="#24292f" font-weight="bold">needless</text>
+  <text x="547.5" y="500" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="820" y="280" width="98" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="869" y="302" text-anchor="middle" fill="#24292f" font-weight="bold">anyDefect</text>
+  <text x="869" y="320" text-anchor="middle" fill="#57606a" font-size="11">Logical.Or</text>
+  <rect x="964" y="340" width="94" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1011" y="362" text-anchor="middle" fill="#24292f" font-weight="bold">anyFault</text>
+  <text x="1011" y="380" text-anchor="middle" fill="#57606a" font-size="11">Logical.Or</text>
+  <rect x="1108" y="340" width="147" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1181.5" y="362" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1181.5" y="380" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 1800 s</text>
+  <rect x="1305" y="354" width="81" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1345.5" y="373" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 156 69 H 196"/>
+    <path d="M 156 69 H 162 V 369 H 196"/>
+    <path d="M 156 69 H 162 V 430 H 467 V 475 H 493"/>
+    <path d="M 156 489 H 196"/>
+    <path d="M 307 69 H 354"/>
+    <path d="M 571 69 H 617"/>
+    <path d="M 815 69 H 861"/>
+    <path d="M 1131 69 H 1159 V 159 H 176 V 249 H 196"/>
+    <path d="M 453 249 H 499"/>
+    <path d="M 743 249 H 790 V 295 H 816"/>
+    <path d="M 341 369 H 804 V 323 H 816"/>
+    <path d="M 447 489 H 481 V 503 H 493"/>
+    <path d="M 918 309 H 940 V 355 H 960"/>
+    <path d="M 598 489 H 948 V 383 H 960"/>
+    <path d="M 1058 369 H 1104"/>
+    <path d="M 1255 369 H 1301"/>
+  </g>
+  <text x="162" y="62" fill="#7d8590" font-size="10">Bool</text>
+  <text x="162" y="482" fill="#7d8590" font-size="10">Real</text>
+  <text x="313" y="62" fill="#7d8590" font-size="10">Bool</text>
+  <text x="577" y="62" fill="#7d8590" font-size="10">Int</text>
+  <text x="821" y="62" fill="#7d8590" font-size="10">Real</text>
+  <text x="459" y="242" fill="#7d8590" font-size="10">Real</text>
+  <text x="749" y="242" fill="#7d8590" font-size="10">Bool</text>
+  <text x="668" y="152" text-anchor="middle" fill="#7d8590" font-size="11">rolling mean of the defrost-start pulse train (starts per second) continues below</text>
+</svg>
