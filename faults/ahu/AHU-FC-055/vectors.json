@@ -1,0 +1,86 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 3600 },
+  "scenarios": [
+    {
+      "name": "normal_ventilation",
+      "description": "Reference vector: OAF 0.18 against a 0.25 alarm point (oat 2 °C, rat 22 °C, mat 18.4 °C) — design minimum plus normal spread",
+      "inputs": { "mat": 18.4, "rat": 22.0, "oat": 2.0 },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "excess_outdoor_air",
+      "description": "Reference vector: OAF 0.40 (oat 2 °C, rat 22 °C, mat 14.0 °C) — 0.25 above design; alarms after alarm_delay (1800 s)",
+      "inputs": { "mat": 14.0, "rat": 22.0, "oat": 2.0 },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "margin_exactly_at_threshold",
+      "description": "Edge case: OAF 0.25 exactly (mat 17.0 °C), so the margin equals oaf_threshold — the strict `>` means no fault",
+      "inputs": { "mat": 17.0, "rat": 22.0, "oat": 2.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "margin_just_over_threshold",
+      "description": "Edge case: OAF 0.26 (mat 16.8 °C) clears the strict comparison and alarms after alarm_delay",
+      "inputs": { "mat": 16.8, "rat": 22.0, "oat": 2.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "small_delta_not_evaluable",
+      "description": "NO_EVAL: |oat − rat| = 2 °C (oat 20 °C, rat 22 °C) with mat 14 °C, so the raw fraction reads 4.0 — an ungated rule would alarm; yTempDeltaOk stays false and holds yFault down",
+      "inputs": { "mat": 14.0, "rat": 22.0, "oat": 20.0 },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "delta_exactly_at_threshold",
+      "description": "Edge case: |oat − rat| = 6.0 °C exactly (oat 16 °C, rat 22 °C) with OAF 0.50 — the strict `>` leaves the rule not evaluable",
+      "inputs": { "mat": 19.0, "rat": 22.0, "oat": 16.0 },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "transient_excess_clears_before_delay",
+      "description": "Transient: OAF jumps to 0.40 at t=600 and falls back to 0.18 at t=1800 — 1200 s of excess, short of alarm_delay, so no alarm",
+      "inputs": {
+        "mat": [
+          { "t": 0, "value": 18.4 },
+          { "t": 600, "value": 14.0 },
+          { "t": 1800, "value": 18.4 }
+        ],
+        "rat": 22.0,
+        "oat": 2.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "summer_excess_oat_above_rat",
+      "description": "Sign case: outdoor air warmer than return (oat 35 °C, rat 24 °C, mat 28.4 °C) — the fraction still reads 0.40 and the rule alarms after alarm_delay",
+      "inputs": { "mat": 28.4, "rat": 24.0, "oat": 35.0 },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    }
+  ]
+}

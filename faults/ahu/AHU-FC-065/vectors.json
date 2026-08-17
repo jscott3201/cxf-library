@@ -1,0 +1,108 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 5400 },
+  "scenarios": [
+    {
+      "name": "pressure_below_high_band",
+      "description": "Reference vector: 350 Pa against a 400 Pa setpoint (scaled band 380 Pa) with the highest damper at 85% — pressure is not pinned high, nothing to report",
+      "inputs": { "dsp": 350.0, "dsp_sp": 400.0, "zone_dmpr_pos_max": 85.0, "sf_status": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "high_pressure_low_demand",
+      "description": "Reference vector: 390 Pa against a 400 Pa setpoint with the highest damper at 35% — pressure held at the top of the band while no zone needs air; alarms after alarm_delay (1800 s)",
+      "inputs": { "dsp": 390.0, "dsp_sp": 400.0, "zone_dmpr_pos_max": 35.0, "sf_status": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "high_pressure_high_demand",
+      "description": "Reference vector: 390 Pa against a 400 Pa setpoint with the highest damper at 95% — the pressure is being asked for, so no fault",
+      "inputs": { "dsp": 390.0, "dsp_sp": 400.0, "zone_dmpr_pos_max": 95.0, "sf_status": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "pressure_exactly_at_scaled_setpoint",
+      "description": "Edge case: dsp sits exactly on dsp_sp × high_sp_fraction (380 Pa) with dampers at 35% — the strict `>` keeps the boundary out of the alarm",
+      "inputs": { "dsp": 380.0, "dsp_sp": 400.0, "zone_dmpr_pos_max": 35.0, "sf_status": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_exactly_at_threshold",
+      "description": "Edge case: the highest damper sits exactly on low_demand_damper_threshold (50%) with pressure pinned at 390 Pa — the strict `<` means demand must be below the threshold, not at it",
+      "inputs": { "dsp": 390.0, "dsp_sp": 400.0, "zone_dmpr_pos_max": 50.0, "sf_status": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "fan_off_stale_pressure",
+      "description": "Gate: the fan is off while the pressure and damper readings still show the fault pattern — sf_status suppresses the rule outright",
+      "inputs": { "dsp": 390.0, "dsp_sp": 400.0, "zone_dmpr_pos_max": 35.0, "sf_status": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "fan_cycle_restarts_persistence",
+      "description": "Transient: the fan stops at t=600 and restarts at t=900 with the pressure pattern otherwise unchanged — persistence restarts from the restart, so the alarm lands at 2700 s, not 1800 s",
+      "inputs": {
+        "dsp": 390.0,
+        "dsp_sp": 400.0,
+        "zone_dmpr_pos_max": 35.0,
+        "sf_status": [
+          { "t": 0, "value": true },
+          { "t": 600, "value": false },
+          { "t": 900, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2640, "equals": false },
+        { "output": "yFault", "from_s": 2760, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "reset_trims_pressure_before_delay",
+      "description": "Transient: trim-and-respond drops the setpoint to 300 Pa at t=1200 and the fan follows to 280 Pa — the condition clears inside alarm_delay, so a working reset never alarms",
+      "inputs": {
+        "dsp": [
+          { "t": 0, "value": 390.0 },
+          { "t": 1200, "value": 280.0 }
+        ],
+        "dsp_sp": [
+          { "t": 0, "value": 400.0 },
+          { "t": 1200, "value": 300.0 }
+        ],
+        "zone_dmpr_pos_max": 35.0,
+        "sf_status": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "dampers_open_before_delay",
+      "description": "Transient: a zone opens up at t=1200 and takes the highest damper to 80% while pressure stays pinned — demand appears before the timer expires, so no alarm",
+      "inputs": {
+        "dsp": 390.0,
+        "dsp_sp": 400.0,
+        "zone_dmpr_pos_max": [
+          { "t": 0, "value": 35.0 },
+          { "t": 1200, "value": 80.0 }
+        ],
+        "sf_status": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    }
+  ]
+}

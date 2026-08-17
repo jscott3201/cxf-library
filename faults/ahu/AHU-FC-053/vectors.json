@@ -1,0 +1,91 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 7200 },
+  "scenarios": [
+    {
+      "name": "setpoint_above_limit_light_reheat",
+      "description": "Reference vector: SAT setpoint 14 °C with 20% of zones reheating — setpoint above the low limit, nothing to report",
+      "inputs": { "sat_sp": 14.0, "zone_reheat_fraction": 0.20 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "setpoint_low_but_reheat_light",
+      "description": "Reference vector: SAT setpoint 10 °C with only 30% of zones reheating — a cold setpoint the zones are not fighting, so no fault",
+      "inputs": { "sat_sp": 10.0, "zone_reheat_fraction": 0.30 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "setpoint_low_with_widespread_reheat",
+      "description": "Reference vector: SAT setpoint 10 °C with 65% of zones reheating — over-cooling paid for by reheat; alarms after alarm_delay (3600 s)",
+      "inputs": { "sat_sp": 10.0, "zone_reheat_fraction": 0.65 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3660, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "setpoint_exactly_at_low_limit",
+      "description": "Edge case: SAT setpoint sits exactly on sat_sp_low_limit (12 °C) with 65% of zones reheating — the strict `<` keeps it out of the alarm",
+      "inputs": { "sat_sp": 12.0, "zone_reheat_fraction": 0.65 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "reheat_exactly_at_threshold",
+      "description": "Edge case: exactly half the zones reheating (0.5) against a 10 °C setpoint — the strict `>` means the fraction must exceed the threshold",
+      "inputs": { "sat_sp": 10.0, "zone_reheat_fraction": 0.5 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "reheat_burst_clears_before_delay",
+      "description": "Transient: a morning reheat burst at 0.65 falls back to 0.30 at t=1800 — the condition clears inside alarm_delay, so no alarm",
+      "inputs": {
+        "sat_sp": 10.0,
+        "zone_reheat_fraction": [
+          { "t": 0, "value": 0.65 },
+          { "t": 1800, "value": 0.30 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "reset_raises_setpoint_before_delay",
+      "description": "Transient: reheat stays at 0.65 but a working SAT reset walks the setpoint from 10 °C to 13.5 °C at t=1800 — the fault condition ends before it can alarm",
+      "inputs": {
+        "sat_sp": [
+          { "t": 0, "value": 10.0 },
+          { "t": 1800, "value": 13.5 }
+        ],
+        "zone_reheat_fraction": 0.65
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "reheat_dip_restarts_persistence",
+      "description": "Transient: reheat dips to 0.40 at t=900 and returns to 0.65 at t=1200 against a 10 °C setpoint — persistence restarts from the return, so the alarm lands at 4800 s, not 3600 s",
+      "inputs": {
+        "sat_sp": 10.0,
+        "zone_reheat_fraction": [
+          { "t": 0, "value": 0.65 },
+          { "t": 900, "value": 0.40 },
+          { "t": 1200, "value": 0.65 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 4740, "equals": false },
+        { "output": "yFault", "from_s": 4860, "to_s": 7200, "equals": true }
+      ]
+    }
+  ]
+}

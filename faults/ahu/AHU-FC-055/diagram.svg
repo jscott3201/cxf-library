@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 460" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <rect x="12" y="60" width="120" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="72" y="79" text-anchor="middle" fill="#1e3a8a">mat</text>
+  <rect x="12" y="180" width="120" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="72" y="199" text-anchor="middle" fill="#1e3a8a">oat</text>
+  <rect x="12" y="300" width="120" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="72" y="319" text-anchor="middle" fill="#1e3a8a">rat</text>
+
+  <!-- outdoor air fraction chain -->
+  <rect x="180" y="50" width="150" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="255" y="70" text-anchor="middle" fill="#24292f" font-weight="bold">matRat</text>
+  <text x="255" y="88" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+
+  <rect x="180" y="210" width="150" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="255" y="230" text-anchor="middle" fill="#24292f" font-weight="bold">oatRat</text>
+  <text x="255" y="248" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+
+  <rect x="390" y="130" width="150" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="465" y="150" text-anchor="middle" fill="#24292f" font-weight="bold">oaf</text>
+  <text x="465" y="168" text-anchor="middle" fill="#57606a" font-size="11">Reals.Divide</text>
+
+  <rect x="350" y="10" width="250" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="475" y="30" text-anchor="middle" fill="#24292f" font-weight="bold">designConst</text>
+  <text x="475" y="48" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 0.15</text>
+
+  <rect x="650" y="130" width="150" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="725" y="150" text-anchor="middle" fill="#24292f" font-weight="bold">margin</text>
+  <text x="725" y="168" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+
+  <rect x="850" y="130" width="240" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="970" y="150" text-anchor="middle" fill="#24292f" font-weight="bold">marginHigh</text>
+  <text x="970" y="168" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 0.10</text>
+
+  <!-- evaluability chain -->
+  <rect x="390" y="300" width="110" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="445" y="320" text-anchor="middle" fill="#24292f" font-weight="bold">absDelta</text>
+  <text x="445" y="338" text-anchor="middle" fill="#57606a" font-size="11">Reals.Abs</text>
+
+  <rect x="560" y="300" width="250" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="685" y="320" text-anchor="middle" fill="#24292f" font-weight="bold">deltaOk</text>
+  <text x="685" y="338" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 6 °C</text>
+
+  <!-- conjunction + persistence -->
+  <rect x="1140" y="215" width="110" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1195" y="235" text-anchor="middle" fill="#24292f" font-weight="bold">gate</text>
+  <text x="1195" y="253" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <rect x="1300" y="215" width="160" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1380" y="235" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1380" y="253" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 1800 s</text>
+
+  <!-- boundary outputs -->
+  <rect x="1500" y="225" width="80" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1540" y="244" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1140" y="400" width="160" height="30" rx="15" fill="#fef3c7" stroke="#d97706"/>
+  <text x="1220" y="419" text-anchor="middle" fill="#78350f">yTempDeltaOk</text>
+
+  <!-- fan-out trunks -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none">
+    <path d="M 132 315 H 155"/>
+    <path d="M 330 235 H 355"/>
+    <path d="M 810 325 H 850"/>
+  </g>
+  <circle cx="155" cy="315" r="3" fill="#7d8590"/>
+  <circle cx="355" cy="235" r="3" fill="#7d8590"/>
+  <circle cx="850" cy="325" r="3" fill="#7d8590"/>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 132 75 H 155 V 63 H 178"/>
+    <path d="M 155 315 V 88 H 178"/>
+    <path d="M 132 195 H 165 V 223 H 178"/>
+    <path d="M 155 315 V 248 H 178"/>
+
+    <path d="M 330 75 H 355 V 143 H 388"/>
+    <path d="M 355 235 V 168 H 388"/>
+    <path d="M 355 235 V 325 H 388"/>
+
+    <path d="M 540 155 H 620 V 143 H 648"/>
+    <path d="M 600 35 H 630 V 168 H 648"/>
+    <path d="M 800 155 H 848"/>
+    <path d="M 500 325 H 558"/>
+
+    <path d="M 1090 155 H 1110 V 228 H 1138"/>
+    <path d="M 850 325 H 1122 V 253 H 1138"/>
+    <path d="M 850 325 V 415 H 1138"/>
+
+    <path d="M 1250 240 H 1298"/>
+    <path d="M 1460 240 H 1498"/>
+  </g>
+
+  <!-- annotation -->
+  <text x="1320" y="420" fill="#7d8590" font-size="11">false ⇒ NO_EVAL</text>
+</svg>

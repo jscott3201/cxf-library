@@ -26,11 +26,11 @@ Point dictionary: [`points/ahu.points.json`](../../points/ahu.points.json).
 | AHU-FC-014 | Inactive cooling coil temperature drop | 2 | rule | planned |
 | AHU-FC-015 | Inactive heating coil temperature rise | 2 | rule | planned |
 | AHU-FC-050 | Simultaneous heating and cooling | 2 | rule | **verified** |
-| AHU-FC-051 | Economizer not operational when favorable | 3 | rule | planned |
+| AHU-FC-051 | Economizer not operational when favorable | 3 | rule | **verified** |
 | AHU-FC-052 | Unoccupied override — running during off-hours | 3 | rule | **verified** |
-| AHU-FC-053 | SAT setpoint too low (over-cooling) | 3 | rule | planned |
-| AHU-FC-054 | Stuck actuator | 2 | rule | planned |
-| AHU-FC-055 | Excess outdoor air while occupied | 2 | rule | planned |
+| AHU-FC-053 | SAT setpoint too low (over-cooling) | 3 | rule | **verified** |
+| AHU-FC-054 | Stuck actuator | 2 | rule | **verified** |
+| AHU-FC-055 | Excess outdoor air while occupied | 3 | rule | **verified** |
 | AHU-FC-056 | SAT hunting | 4 | rule | planned |
 | AHU-FC-057 | SAT reset missing | 3 | statistical | **verified** |
 | AHU-FC-058 | DSP reset missing | 3 | statistical | **verified** |
@@ -39,8 +39,8 @@ Point dictionary: [`points/ahu.points.json`](../../points/ahu.points.json).
 | AHU-FC-061 | Manual override active | 4 | rule | **verified** |
 | AHU-FC-062 | Mixing box damper fault | 3 | rule | **verified** |
 | AHU-FC-063 | Operating mode mismatch | 2 | rule | planned |
-| AHU-FC-064 | Excess OA during heating | 2 | rule | planned |
-| AHU-FC-065 | Fan at excess static pressure | 3 | rule | planned |
+| AHU-FC-064 | Excess OA during heating | 3 | rule | **verified** |
+| AHU-FC-065 | Fan at excess static pressure | 3 | rule | **verified** |
 
 Reference note: the FDD Reference's index (§5.8.1) lists 31 AHU codes while its
 ch.9 header claims "20 fully specified" — some 0xx cards in the reference are

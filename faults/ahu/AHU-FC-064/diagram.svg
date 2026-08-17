@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1780 620" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <rect x="12" y="60" width="140" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="82" y="79" text-anchor="middle" fill="#1e3a8a">mat</text>
+  <rect x="12" y="180" width="140" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="82" y="199" text-anchor="middle" fill="#1e3a8a">oat</text>
+  <rect x="12" y="240" width="140" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="82" y="259" text-anchor="middle" fill="#1e3a8a">rat</text>
+  <rect x="12" y="310" width="140" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="82" y="329" text-anchor="middle" fill="#1e3a8a">htg_vlv_cmd</text>
+
+  <!-- outdoor air fraction chain -->
+  <rect x="200" y="50" width="150" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="275" y="70" text-anchor="middle" fill="#24292f" font-weight="bold">matRat</text>
+  <text x="275" y="88" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+
+  <rect x="200" y="210" width="150" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="275" y="230" text-anchor="middle" fill="#24292f" font-weight="bold">oatRat</text>
+  <text x="275" y="248" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+
+  <rect x="410" y="130" width="150" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="485" y="150" text-anchor="middle" fill="#24292f" font-weight="bold">oaf</text>
+  <text x="485" y="168" text-anchor="middle" fill="#57606a" font-size="11">Reals.Divide</text>
+
+  <rect x="370" y="10" width="250" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="495" y="30" text-anchor="middle" fill="#24292f" font-weight="bold">designConst</text>
+  <text x="495" y="48" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 0.15</text>
+
+  <rect x="670" y="130" width="150" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="745" y="150" text-anchor="middle" fill="#24292f" font-weight="bold">margin</text>
+  <text x="745" y="168" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+
+  <rect x="870" y="130" width="240" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="990" y="150" text-anchor="middle" fill="#24292f" font-weight="bold">marginHigh</text>
+  <text x="990" y="168" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 0.15</text>
+
+  <!-- heating operation -->
+  <rect x="410" y="300" width="240" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="530" y="320" text-anchor="middle" fill="#24292f" font-weight="bold">htgOn</text>
+  <text x="530" y="338" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 5 %</text>
+
+  <!-- evaluability chain -->
+  <rect x="450" y="460" width="110" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="505" y="480" text-anchor="middle" fill="#24292f" font-weight="bold">absDelta</text>
+  <text x="505" y="498" text-anchor="middle" fill="#57606a" font-size="11">Reals.Abs</text>
+
+  <rect x="620" y="460" width="250" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="745" y="480" text-anchor="middle" fill="#24292f" font-weight="bold">deltaOk</text>
+  <text x="745" y="498" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 6 °C</text>
+
+  <!-- conjunctions + persistence -->
+  <rect x="1160" y="215" width="110" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1215" y="235" text-anchor="middle" fill="#24292f" font-weight="bold">and1</text>
+  <text x="1215" y="253" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <rect x="1320" y="215" width="110" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1375" y="235" text-anchor="middle" fill="#24292f" font-weight="bold">and2</text>
+  <text x="1375" y="253" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <rect x="1480" y="215" width="160" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1560" y="235" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1560" y="253" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 1800 s</text>
+
+  <!-- boundary outputs -->
+  <rect x="1680" y="225" width="80" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1720" y="244" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1160" y="550" width="160" height="30" rx="15" fill="#fef3c7" stroke="#d97706"/>
+  <text x="1240" y="569" text-anchor="middle" fill="#78350f">yTempDeltaOk</text>
+
+  <!-- fan-out trunks -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none">
+    <path d="M 152 255 H 178"/>
+    <path d="M 350 235 H 375"/>
+    <path d="M 870 485 H 900"/>
+  </g>
+  <circle cx="178" cy="255" r="3" fill="#7d8590"/>
+  <circle cx="375" cy="235" r="3" fill="#7d8590"/>
+  <circle cx="900" cy="485" r="3" fill="#7d8590"/>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 152 75 H 175 V 63 H 198"/>
+    <path d="M 178 255 V 88 H 198"/>
+    <path d="M 152 195 H 165 V 223 H 198"/>
+    <path d="M 178 255 V 248 H 198"/>
+    <path d="M 152 325 H 408"/>
+
+    <path d="M 350 75 H 375 V 143 H 408"/>
+    <path d="M 375 235 V 168 H 408"/>
+    <path d="M 375 235 V 485 H 448"/>
+
+    <path d="M 560 155 H 640 V 143 H 668"/>
+    <path d="M 620 35 H 645 V 168 H 668"/>
+    <path d="M 820 155 H 868"/>
+    <path d="M 560 485 H 618"/>
+
+    <path d="M 1110 155 H 1130 V 228 H 1158"/>
+    <path d="M 650 325 H 1145 V 253 H 1158"/>
+    <path d="M 1270 240 H 1300 V 228 H 1318"/>
+    <path d="M 900 485 H 1285 V 253 H 1318"/>
+    <path d="M 900 485 V 565 H 1158"/>
+
+    <path d="M 1430 240 H 1478"/>
+    <path d="M 1640 240 H 1678"/>
+  </g>
+
+  <!-- annotation -->
+  <text x="1340" y="570" fill="#7d8590" font-size="11">false ⇒ NO_EVAL</text>
+</svg>
