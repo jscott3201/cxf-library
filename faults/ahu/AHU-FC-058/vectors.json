@@ -1,0 +1,189 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 300,
+    "horizon_s": 432000
+  },
+  "scenarios": [
+    {
+      "name": "reset_working",
+      "description": "Reference vector: DSP_SP modulates 100 Pa with demand; no fault",
+      "inputs": {
+        "dsp_sp": [
+          {
+            "t": 0,
+            "value": 350.0
+          },
+          {
+            "t": 21600,
+            "value": 450.0
+          },
+          {
+            "t": 43200,
+            "value": 350.0
+          },
+          {
+            "t": 64800,
+            "value": 450.0
+          },
+          {
+            "t": 86400,
+            "value": 350.0
+          },
+          {
+            "t": 108000,
+            "value": 450.0
+          },
+          {
+            "t": 129600,
+            "value": 350.0
+          },
+          {
+            "t": 151200,
+            "value": 450.0
+          },
+          {
+            "t": 172800,
+            "value": 350.0
+          },
+          {
+            "t": 194400,
+            "value": 450.0
+          },
+          {
+            "t": 216000,
+            "value": 350.0
+          },
+          {
+            "t": 237600,
+            "value": 450.0
+          },
+          {
+            "t": 259200,
+            "value": 350.0
+          },
+          {
+            "t": 280800,
+            "value": 450.0
+          },
+          {
+            "t": 302400,
+            "value": 350.0
+          },
+          {
+            "t": 324000,
+            "value": 450.0
+          },
+          {
+            "t": 345600,
+            "value": 350.0
+          },
+          {
+            "t": 367200,
+            "value": 450.0
+          },
+          {
+            "t": 388800,
+            "value": 350.0
+          },
+          {
+            "t": 410400,
+            "value": 450.0
+          },
+          {
+            "t": 432000,
+            "value": 350.0
+          }
+        ],
+        "zone_dmpr_pos_max": 85.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "fixed_sp_low_demand",
+      "description": "Reference vector: DSP_SP pinned while dampers well below 70%; fault after evaluation_window (3d) + alarm_delay (24h)",
+      "inputs": {
+        "dsp_sp": 400.0,
+        "zone_dmpr_pos_max": 45.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 343200,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 348000,
+          "to_s": 432000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "fixed_sp_high_demand",
+      "description": "Reference vector: DSP_SP pinned but dampers near max \u2014 setpoint cannot drop, no fault",
+      "inputs": {
+        "dsp_sp": 400.0,
+        "zone_dmpr_pos_max": 95.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "demand_rises_resets",
+      "description": "Low demand for 2.3 days, then dampers open past threshold before the window completes; dwell resets, never alarms",
+      "inputs": {
+        "dsp_sp": 400.0,
+        "zone_dmpr_pos_max": [
+          {
+            "t": 0,
+            "value": 45.0
+          },
+          {
+            "t": 200000,
+            "value": 95.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "damper_at_threshold",
+      "description": "Max damper exactly at high_damper_threshold is not low demand (strict < comparison)",
+      "inputs": {
+        "dsp_sp": 400.0,
+        "zone_dmpr_pos_max": 70.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

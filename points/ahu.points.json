@@ -247,6 +247,18 @@
       "notes": "Neither ontology has a schedule concept. Brick three-way choice by point direction: Occupancy_Command (schedule output driving the unit — our reading), Occupied_Mode_Status (mode read-back), Occupancy_Status (physical room occupancy — wrong here). 223P occupancy enumeration verified from the g36:Zone SHACL shape (Occupied-True/Occupied-False)."
     },
     {
+      "name": "zone_dmpr_pos_max",
+      "description": "Highest zone damper position across all zones served by this AHU (host-derived aggregate of zone damper feedback)",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "derived": true,
+      "brick": null,
+      "s223": null,
+      "provisional": true,
+      "notes": "Aggregate point, not a physical sensor: the host computes max() over the zone damper positions. Semantic tags belong on the underlying per-zone points (VAV damper position feedback) and will be grounded with the VAV dictionary; tagging the aggregate itself is deferred."
+    },
+    {
       "name": "override_active",
       "description": "Manual override active flag",
       "kind": "bool",
