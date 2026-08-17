@@ -357,6 +357,18 @@
       "s223": null,
       "provisional": true,
       "notes": "First integer point in the dictionary (AHU-FC-063). The mode enumeration is this library's convention for the derived point, ordered cold-to-hot along the G36 supply-air sequence; neither ontology defines these composite AHU modes, and G36 Section 5.16 states the sequence without numbering it. Hosts map their own mode enum (or compute the mode from scratch) when binding; the three code constants are exposed as rule parameters so a host with a different enum can rebind without editing the graph. Semantic grounding deferred with the other derived aggregates."
+    },
+    {
+      "name": "operating_state",
+      "description": "Current AHU operating state as reported by the control sequence (host-derived integer). Recommended binding: G36 Section 5.16.14's operating-state index OS#1-OS#5; any stable enumeration works, because the only in-library consumer (AHU-FC-004) counts transitions and never interprets specific values",
+      "kind": "int",
+      "unit": "1",
+      "qudt_unit": "UNITLESS",
+      "derived": true,
+      "brick": null,
+      "s223": null,
+      "provisional": true,
+      "notes": "Distinct from expected_mode: that point is what the mode SHOULD be given conditions (AHU-FC-063 compares actuators against it); this one is what the sequence says the state IS (AHU-FC-004 counts how often it changes). Hosts typically read it from the BAS mode/state enum or derive it per G36 Section 5.16.14. Value-level semantics are deliberately unspecified here since only transitions are consumed; a host must simply keep the encoding stable, as any re-mapping mid-stream registers as a spurious transition."
     }
   ]
 }

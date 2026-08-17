@@ -10,10 +10,10 @@ Point dictionary: [`points/ahu.points.json`](../../points/ahu.points.json).
 
 | ID | Name | Sev | Method | Status |
 |---|---|---|---|---|
-| AHU-FC-001 | Duct static pressure too low at full fan speed | 3 | rule | planned |
-| AHU-FC-002 | Mixed air temperature too low | 3 | rule | planned |
-| AHU-FC-003 | Mixed air temperature too high | 3 | rule | planned |
-| AHU-FC-004 | Excessive operating state changes per hour | 3 | rule | planned |
+| AHU-FC-001 | Duct static pressure too low at full fan speed | 3 | rule | **verified** |
+| AHU-FC-002 | Mixed air temperature too low | 3 | rule | **verified** |
+| AHU-FC-003 | Mixed air temperature too high | 3 | rule | **verified** |
+| AHU-FC-004 | Excessive operating state changes per hour | 3 | rule | **verified** |
 | AHU-FC-005 | SAT too low vs MAT in heating | 3 | rule | planned |
 | AHU-FC-006 | OA fraction deviation | 3 | rule | planned |
 | AHU-FC-007 | SAT too low at full heating | 3 | rule | planned |

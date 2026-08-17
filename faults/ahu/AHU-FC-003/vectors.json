@@ -1,0 +1,98 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 7200 },
+  "scenarios": [
+    {
+      "name": "normal_mixing",
+      "description": "Reference vector: MAT 18 °C with OAT 5 / RAT 22 sits 4 °C below the high bound; nothing to report",
+      "inputs": { "oat": 5.0, "rat": 22.0, "mat": 18.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "mat_above_envelope",
+      "description": "Reference vector: MAT 28 °C is 6 °C above max(oat, rat) = 22 °C; alarms at alarm_delay (1800 s)",
+      "inputs": { "oat": 5.0, "rat": 22.0, "mat": 28.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "within_tolerance",
+      "description": "Mirror of the FC#2 within-tolerance vector: MAT 23 °C is 1 °C above the high bound — inside eps_MAT",
+      "inputs": { "oat": 5.0, "rat": 22.0, "mat": 23.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "edge_gap_equals_tolerance",
+      "description": "Threshold edge: mat − max(oat, rat) = 2.0 °C exactly; the comparison is strict, so this is healthy",
+      "inputs": { "oat": 5.0, "rat": 22.0, "mat": 24.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "edge_gap_just_over_tolerance",
+      "description": "Threshold edge, other side: a gap of 2.1 °C clears the strict comparison and alarms at alarm_delay",
+      "inputs": { "oat": 5.0, "rat": 22.0, "mat": 24.1 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "summer_oat_above_rat",
+      "description": "Cooling season with OAT above RAT: OAT 30 °C is now the high bound and MAT 34 °C sits 4 °C over it",
+      "inputs": { "oat": 30.0, "rat": 24.0, "mat": 34.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "low_excursion_is_not_this_fault",
+      "description": "MAT 1 °C is 4 °C below the envelope — a real violation, but the low side belongs to AHU-FC-002",
+      "inputs": { "oat": 5.0, "rat": 22.0, "mat": 1.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "transient_excursion_never_alarms",
+      "description": "MAT rises above the bound for 1200 s (< alarm_delay) during a damper stroke and recovers; the timer resets unfired",
+      "inputs": {
+        "oat": 5.0,
+        "rat": 22.0,
+        "mat": [
+          { "t": 0, "value": 18.0 },
+          { "t": 900, "value": 28.0 },
+          { "t": 2100, "value": 18.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "fault_clears_on_recovery",
+      "description": "Sustained high excursion alarms at 1800 s; recalibration at 3600 s drops the alarm on the same tick",
+      "inputs": {
+        "oat": 5.0,
+        "rat": 22.0,
+        "mat": [
+          { "t": 0, "value": 28.0 },
+          { "t": 3600, "value": 18.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 3300, "equals": true },
+        { "output": "yFault", "from_s": 3900, "to_s": 7200, "equals": false }
+      ]
+    }
+  ]
+}

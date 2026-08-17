@@ -1,0 +1,112 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 5400 },
+  "scenarios": [
+    {
+      "name": "normal_part_speed_operation",
+      "description": "Reference vector: 350 Pa against a 375 Pa setpoint with the fan at 60% — the fan still has headroom, and the 25 Pa gap does not clear the strict threshold either; nothing to report",
+      "inputs": { "dsp": 350.0, "dsp_sp": 375.0, "sf_speed": 60.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "at_full_speed_holding_setpoint",
+      "description": "Reference vector: 370 Pa against a 375 Pa setpoint with the fan at 100% — the fan is maxed out but the duct is only 5 Pa short, well inside dsp_error_threshold, so the system is simply sized close to its design point",
+      "inputs": { "dsp": 370.0, "dsp_sp": 375.0, "sf_speed": 100.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "underpressure_at_full_speed",
+      "description": "Reference vector: 300 Pa against a 375 Pa setpoint with the fan at 100% — a 75 Pa deficit with no speed left to give; the alarm asserts one alarm_delay (1800 s) after the condition appears",
+      "inputs": { "dsp": 300.0, "dsp_sp": 375.0, "sf_speed": 100.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "gap_exactly_at_threshold",
+      "description": "Threshold edge: dsp_sp − dsp = 25.0 Pa exactly with the fan at 100% — gapBig is a strict `>`, so a deficit sitting precisely on dsp_error_threshold reads healthy",
+      "inputs": { "dsp": 350.0, "dsp_sp": 375.0, "sf_speed": 100.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "gap_just_over_threshold",
+      "description": "Threshold edge, other side: dsp_sp − dsp = 25.1 Pa with the fan at 100% clears the strict comparison and alarms after alarm_delay",
+      "inputs": { "dsp": 349.9, "dsp_sp": 375.0, "sf_speed": 100.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "speed_exactly_at_threshold",
+      "description": "Threshold edge: the fan sits exactly on speed_full_threshold (99.0%) with a 75 Pa deficit — spdFull is a strict `>`, so a feedback parked on 99.000% does not count as full speed and the rule stays silent",
+      "inputs": { "dsp": 300.0, "dsp_sp": 375.0, "sf_speed": 99.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "speed_just_over_threshold",
+      "description": "Threshold edge, other side: 99.5% clears the strict comparison, so the same 75 Pa deficit alarms after alarm_delay",
+      "inputs": { "dsp": 300.0, "dsp_sp": 375.0, "sf_speed": 99.5 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "startup_ramp_clears_before_delay",
+      "description": "Transient: the fan pins at 100% and runs 75 Pa short while the system comes up, then pressure recovers to 370 Pa at t=1200 — a morning start-up is shorter than alarm_delay, so nothing alarms",
+      "inputs": {
+        "dsp": [
+          { "t": 0, "value": 300.0 },
+          { "t": 1200, "value": 370.0 }
+        ],
+        "dsp_sp": 375.0,
+        "sf_speed": 100.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "fault_clears_on_recovery",
+      "description": "A sustained deficit alarms at 1800 s; a closed fire/smoke damper reopens at t=3000, pressure recovers to 370 Pa, and the alarm drops on that tick — TrueDelay has no off-delay",
+      "inputs": {
+        "dsp": [
+          { "t": 0, "value": 300.0 },
+          { "t": 3000, "value": 370.0 }
+        ],
+        "dsp_sp": 375.0,
+        "sf_speed": 100.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 2700, "equals": true },
+        { "output": "yFault", "from_s": 3300, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "speed_backs_off_before_delay",
+      "description": "Transient: the deficit holds but the fan drops to 92% at t=1200 as zone demand falls — the rule needs both halves at once, so persistence restarts and no alarm follows",
+      "inputs": {
+        "dsp": 300.0,
+        "dsp_sp": 375.0,
+        "sf_speed": [
+          { "t": 0, "value": 100.0 },
+          { "t": 1200, "value": 92.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    }
+  ]
+}
