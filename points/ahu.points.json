@@ -1,7 +1,14 @@
 {
   "schema": "cxf-library/points/v1",
   "equipment": "ahu",
-  "notes": "brick/s223 fields pending ontology-verified grounding; provisional until checked against the formal ASHRAE 223 standard text.",
+  "namespaces": {
+    "brick": { "iri": "https://brickschema.org/schema/Brick#", "verified_version": "1.4.4" },
+    "s223": { "iri": "http://data.ashrae.org/standard223#", "verified_version": "v1.0.0-2026" },
+    "s223_g36": { "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#", "verified_version": "v1.0.0-2026" },
+    "quantitykind": { "iri": "http://qudt.org/vocab/quantitykind/", "verified_version": "QUDT 3.1.4" },
+    "unit": { "iri": "http://qudt.org/vocab/unit/", "verified_version": "QUDT 3.1.4" }
+  },
+  "notes": "All brick/s223 terms grep-verified against the published ontology files (Brick 1.4.4; ASHRAE 223 v1.0.0-2026 incl. its G36 extension) and, where noted, the official 223P G36 reference model guideline36-2021-A-9 (github.com/open223/models.open223.info). provisional=true marks mappings with genuine ambiguity or unattested 223P patterns; every s223 entry additionally awaits confirmation against the formal ASHRAE 223 standard text, which we do not yet hold.",
   "points": [
     {
       "name": "sat",
@@ -9,9 +16,17 @@
       "kind": "real",
       "unit": "°C",
       "qudt_unit": "DEG_C",
-      "brick": null,
-      "s223": null,
-      "provisional": true
+      "brick": "Supply_Air_Temperature_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty attached to the AHU supply-air OutletConnectionPoint",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Air",
+        "aspects": ["Role-Supply"]
+      },
+      "provisional": false,
+      "notes": "Brick Discharge_Air_Temperature_Sensor is brick:aliasOf this class. 223P pattern verbatim from reference instance MultipleZoneAhu-sa-temp; medium comes from hasMedium on the owning ConnectionPoint."
     },
     {
       "name": "sat_sp",
@@ -19,9 +34,17 @@
       "kind": "real",
       "unit": "°C",
       "qudt_unit": "DEG_C",
-      "brick": null,
-      "s223": null,
-      "provisional": true
+      "brick": "Supply_Air_Temperature_Setpoint",
+      "s223": {
+        "pattern": "QuantifiableActuatableProperty linked from the observed property via hasSetpoint",
+        "property_class": "QuantifiableActuatableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Air",
+        "aspects": ["Aspect-Setpoint"]
+      },
+      "provisional": false,
+      "notes": "Aspect-Setpoint is inferred by the SHACL rule on QuantifiablePropertyShape when hasSetpoint targets the property; asserting it explicitly is safe but redundant under a reasoner."
     },
     {
       "name": "mat",
@@ -29,9 +52,17 @@
       "kind": "real",
       "unit": "°C",
       "qudt_unit": "DEG_C",
-      "brick": null,
-      "s223": null,
-      "provisional": true
+      "brick": "Mixed_Air_Temperature_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty located topologically downstream of the OA/RA mixing junction via hasObservationLocation",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Air",
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "223P has no mixed-air role or aspect (EnumerationKind-Role has 21 members, none mixed-air); the reference model disambiguates purely by observation location. A property-only export loses the 'mixed' semantics — topology must accompany it."
     },
     {
       "name": "oat",
@@ -39,9 +70,17 @@
       "kind": "real",
       "unit": "°C",
       "qudt_unit": "DEG_C",
-      "brick": null,
-      "s223": null,
-      "provisional": true
+      "brick": "Outside_Air_Temperature_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty at the outdoor-air intake",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Air",
+        "aspects": ["Role-OutdoorAirIntake"]
+      },
+      "provisional": false,
+      "notes": "Brick spelling is Outside_ (Outdoor_Air_Temperature_Sensor does not exist). Role-OutdoorAirIntake is 223P's only outdoor role; used by reference instance oa-temp."
     },
     {
       "name": "rat",
@@ -49,9 +88,17 @@
       "kind": "real",
       "unit": "°C",
       "qudt_unit": "DEG_C",
-      "brick": null,
-      "s223": null,
-      "provisional": true
+      "brick": "Return_Air_Temperature_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty at the AHU return-air InletConnectionPoint",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Air",
+        "aspects": ["Role-Return"]
+      },
+      "provisional": false,
+      "notes": "Verbatim from reference instance MultipleZoneAhu-ra-temp."
     },
     {
       "name": "htg_vlv_cmd",
@@ -59,9 +106,17 @@
       "kind": "real",
       "unit": "%",
       "qudt_unit": "PERCENT",
-      "brick": null,
-      "s223": null,
-      "provisional": true
+      "brick": "Valve_Position_Command",
+      "s223": {
+        "pattern": "QuantifiableActuatableProperty on the hot-water Valve via hasProperty; Actuator actuatedByProperty this command and actuates the valve",
+        "property_class": "QuantifiableActuatableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
+        "medium": null,
+        "aspects": ["Binary-Position"]
+      },
+      "provisional": true,
+      "notes": "Brick has no Heating_Valve_Command; attach Valve_Position_Command via isPointOf to a brick:Heating_Valve / Hot_Water_Valve (coil carries s223 hasRole Role-Heating). Provisional only for the class choice: brick:Heating_Command is the alternative if the point is abstract heating demand rather than physical valve position. 223P side verified at g36:HotWaterValveOrShape1; Binary-Position as an aspect on an analog command is counterintuitive but attested."
     },
     {
       "name": "clg_vlv_cmd",
@@ -69,9 +124,17 @@
       "kind": "real",
       "unit": "%",
       "qudt_unit": "PERCENT",
-      "brick": null,
-      "s223": null,
-      "provisional": true
+      "brick": "Valve_Position_Command",
+      "s223": {
+        "pattern": "QuantifiableActuatableProperty on the chilled-water Valve via hasProperty",
+        "property_class": "QuantifiableActuatableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
+        "medium": null,
+        "aspects": ["Binary-Position"]
+      },
+      "provisional": true,
+      "notes": "Attach via isPointOf to brick:Cooling_Valve / Chilled_Water_Valve (coil: s223 hasRole Role-Cooling). Same class-choice caveat as htg_vlv_cmd (brick:Cooling_Command for abstract demand). 223P verified at g36:ChilledWaterValveOrShape1 and instance MultipleZoneAhu-clg-coil-valve-command."
     },
     {
       "name": "oa_dmpr_cmd",
@@ -79,9 +142,17 @@
       "kind": "real",
       "unit": "%",
       "qudt_unit": "PERCENT",
-      "brick": null,
-      "s223": null,
-      "provisional": true
+      "brick": "Damper_Position_Command",
+      "s223": {
+        "pattern": "QuantifiableActuatableProperty on the Damper via hasProperty; Actuator actuates the damper",
+        "property_class": "QuantifiableActuatableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
+        "medium": null,
+        "aspects": ["Binary-Position"]
+      },
+      "provisional": false,
+      "notes": "Attach via isPointOf to brick:Outside_Damper or Economizer_Damper. In the 223P reference model the damper equipment carries hasRole Role-Economizer (Role-OutdoorAirIntake for a non-economizer minimum-OA damper). Verified at g36:DamperOrShape1 and instance MultipleZoneAhu-economizer-oa-damper-command."
     },
     {
       "name": "sf_status",
@@ -89,9 +160,18 @@
       "kind": "bool",
       "unit": "bool",
       "qudt_unit": null,
-      "brick": null,
-      "s223": null,
-      "provisional": true
+      "brick": "Fan_On_Off_Status",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty on the Fan via hasProperty",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": false,
+      "notes": "Attach via isPointOf to brick:Supply_Fan. Deliberately not brick:Run_Status — its inherited definition routes equipment run status to the On/Off branch. 223P: hasEnumerationKind Binary-OnOff (OnOff-On/OnOff-Off), verified at instance MultipleZoneAhu-sa-fan-start-status; fan carries hasRole Role-Supply."
     },
     {
       "name": "sf_speed",
@@ -99,9 +179,17 @@
       "kind": "real",
       "unit": "%",
       "qudt_unit": "PERCENT",
-      "brick": null,
-      "s223": null,
-      "provisional": true
+      "brick": "Speed_Sensor",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the Fan via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "Brick unit conflict: Speed_Status is deprecated (1.4.0) in favor of Speed_Sensor, but brick:Speed's applicable units exclude PERCENT, so a %-valued instance fails unit validation; brick:Fan_Speed_Sensor does not exist. Use Fan_Speed_Command if the tag is a commanded-speed readback. 223P side is exact (reference instance MultipleZoneAhu-sa-fan-speed-status: DimensionlessRatio/PERCENT)."
     },
     {
       "name": "dsp",
@@ -109,9 +197,17 @@
       "kind": "real",
       "unit": "Pa",
       "qudt_unit": "PA",
-      "brick": null,
-      "s223": null,
-      "provisional": true
+      "brick": "Supply_Air_Static_Pressure_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty on the supply duct Connection/ConnectionPoint",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Pressure",
+        "unit": "PA",
+        "medium": "Fluid-Air",
+        "aspects": ["Role-Supply"]
+      },
+      "provisional": true,
+      "notes": "Brick Discharge_Air_Static_Pressure_Sensor is an alias. 223P quantitykind is contested: the reference model asserts plain quantitykind:Pressure, while s223:GaugePressureSensor's SHACL shape (GaugePressure + isDeltaQuantity true) arguably describes duct static better. Following the reference model; confirm against the formal standard text."
     },
     {
       "name": "dsp_sp",
@@ -119,9 +215,17 @@
       "kind": "real",
       "unit": "Pa",
       "qudt_unit": "PA",
-      "brick": null,
-      "s223": null,
-      "provisional": true
+      "brick": "Supply_Air_Static_Pressure_Setpoint",
+      "s223": {
+        "pattern": "QuantifiableActuatableProperty on the supply duct ConnectionPoint, linked via hasSetpoint from dsp",
+        "property_class": "QuantifiableActuatableProperty",
+        "quantitykind": "Pressure",
+        "unit": "PA",
+        "medium": "Fluid-Air",
+        "aspects": ["Aspect-Setpoint"]
+      },
+      "provisional": true,
+      "notes": "Judgment call vs brick:Duct_Air_Static_Pressure_Setpoint (literally closer name but disconnected from the Supply/Discharge alias pair); chose the Supply form for interoperability. Same Aspect-Setpoint inference caveat as sat_sp."
     },
     {
       "name": "occ_schedule",
@@ -129,9 +233,18 @@
       "kind": "bool",
       "unit": "bool",
       "qudt_unit": null,
-      "brick": null,
-      "s223": null,
-      "provisional": true
+      "brick": "Occupancy_Command",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty (EnumeratedActuatableProperty if the schedule writes to the controller) on the Zone or AHU",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Occupancy-Occupied"
+      },
+      "provisional": true,
+      "notes": "Neither ontology has a schedule concept. Brick three-way choice by point direction: Occupancy_Command (schedule output driving the unit — our reading), Occupied_Mode_Status (mode read-back), Occupancy_Status (physical room occupancy — wrong here). 223P occupancy enumeration verified from the g36:Zone SHACL shape (Occupied-True/Occupied-False)."
     },
     {
       "name": "override_active",
@@ -139,9 +252,18 @@
       "kind": "bool",
       "unit": "bool",
       "qudt_unit": null,
-      "brick": null,
-      "s223": null,
-      "provisional": true
+      "brick": "Overridden_Status",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty with hasEnumerationKind Binary-Logical on the overridden Equipment",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": ["Aspect-OperatingMode"],
+        "enumerationkind": "Binary-Logical"
+      },
+      "provisional": true,
+      "notes": "Brick exact (Overridden_Status; Override_Command is the write side). 223P has no override vocabulary at all — this pattern is assembled from verified primitives (Binary-Logical + Aspect-OperatingMode) but unattested in the standard or reference models. Highest-priority item for the formal 223 text review."
     }
   ]
 }

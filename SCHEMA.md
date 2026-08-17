@@ -183,13 +183,20 @@ Target dialect: the open-control engine's composite subset
 
 - `name` is the library-wide canonical identifier (snake_case; suffixes: none =
   measured, `_sp` setpoint, `_cmd` command, `_status` status, `_fbk` feedback).
+- A top-level `namespaces` map records the exact ontology IRIs and the versions
+  the terms were verified against.
 - `brick`: verified Brick class local name (namespace
   `https://brickschema.org/schema/Brick#`).
 - `s223`: object `{pattern, property_class, quantitykind, unit, medium,
-  aspects}` using verified ASHRAE 223P terms.
-- `provisional: true` marks entries not yet checked against the formal ASHRAE
-  223 standard text (we currently verify against the published ontology files
-  only). Clear the flag when the formal copy is reviewed.
+  aspects, enumerationkind?}` using verified ASHRAE 223P terms
+  (`enumerationkind` for enumerated properties). See
+  `_research/223p-point-modeling.md` for the modeling pattern.
+- Every term must be verified against the published ontology files — never
+  from memory. `provisional: true` additionally marks entries with genuine
+  ambiguity (class-choice judgment calls, unit conflicts, or patterns
+  unattested in the standard's reference models); the per-point `notes` field
+  records the specifics. All s223 entries also await confirmation against the
+  formal ASHRAE 223 standard text once obtained.
 
 ## `clusters/clusters.json` (`cxf-library/clusters/v1`)
 
