@@ -1,0 +1,69 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 3600 },
+  "scenarios": [
+    {
+      "name": "normal_occupied",
+      "description": "Reference vector: fan on during scheduled occupancy",
+      "inputs": { "sf_status": true, "occ_schedule": true, "override_active": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "normal_unoccupied",
+      "description": "Reference vector: fan off while unoccupied",
+      "inputs": { "sf_status": false, "occ_schedule": false, "override_active": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "running_after_hours",
+      "description": "Reference vector: fan on, unoccupied, no override; alarms after grace_period (1800 s) + alarm_delay (900 s)",
+      "inputs": { "sf_status": true, "occ_schedule": false, "override_active": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2640, "equals": false },
+        { "output": "yFault", "from_s": 2760, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "override_justifies_run",
+      "description": "Reference vector: fan on, unoccupied, but an active override justifies it",
+      "inputs": { "sf_status": true, "occ_schedule": false, "override_active": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "fan_stops_within_grace",
+      "description": "Fan shuts down before the grace period elapses; never alarms",
+      "inputs": {
+        "sf_status": [
+          { "t": 0, "value": true },
+          { "t": 1500, "value": false }
+        ],
+        "occ_schedule": false,
+        "override_active": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "reoccupied_resets_persistence",
+      "description": "Occupancy resumes after grace elapsed but before alarm_delay completes; timers reset, never alarms",
+      "inputs": {
+        "sf_status": true,
+        "occ_schedule": [
+          { "t": 0, "value": false },
+          { "t": 2000, "value": true }
+        ],
+        "override_active": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    }
+  ]
+}

@@ -27,7 +27,7 @@ Point dictionary: [`points/ahu.points.json`](../../points/ahu.points.json).
 | AHU-FC-015 | Inactive heating coil temperature rise | 2 | rule | planned |
 | AHU-FC-050 | Simultaneous heating and cooling | 2 | rule | **verified** |
 | AHU-FC-051 | Economizer not operational when favorable | 3 | rule | planned |
-| AHU-FC-052 | Unoccupied override — running during off-hours | 3 | rule | planned |
+| AHU-FC-052 | Unoccupied override — running during off-hours | 3 | rule | **verified** |
 | AHU-FC-053 | SAT setpoint too low (over-cooling) | 3 | rule | planned |
 | AHU-FC-054 | Stuck actuator | 2 | rule | planned |
 | AHU-FC-055 | Excess outdoor air while occupied | 2 | rule | planned |
