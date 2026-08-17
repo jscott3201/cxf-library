@@ -17,7 +17,7 @@ source:
   - "Gunay 2023"
 g36: null
 clusters: [CLU-09]
-suppresses: [AHU-FC-002, AHU-FC-003, AHU-FC-005, AHU-FC-006, AHU-FC-008, AHU-FC-010, AHU-FC-012, AHU-FC-014, AHU-FC-015, AHU-FC-055, AHU-FC-064]
+suppresses: [AHU-FC-002, AHU-FC-003, AHU-FC-005, AHU-FC-006, AHU-FC-008, AHU-FC-010, AHU-FC-012, AHU-FC-014, AHU-FC-015, AHU-FC-055, AHU-FC-064, RTU-FC-054, RTU-FC-055]
 suppressed_by: []
 related: [AHU-FC-002, AHU-FC-003]
 playbooks: [sensor-drift]
@@ -167,8 +167,10 @@ basis: N/A.
 ## Notes
 
 The suppression contract matters more than the fault itself. While `yFault`
-is true the host must silence every rule that consumes MAT — the eleven
-rules in `suppresses` above, spanning the envelope singles, the SAT-vs-MAT
+is true the host must silence every rule that consumes MAT — the thirteen
+rules in `suppresses` above (including the RTU outdoor-air-fraction pair,
+which the reference gates behind this rule instantiated on the RTU's own
+mat/oat/rat points; the graph is equipment-agnostic), spanning the envelope singles, the SAT-vs-MAT
 comparisons, the approximate-equality checks, the inactive-coil signatures,
 and the outdoor-air-fraction family — the fraction is a ratio
 of temperature differences, so a MAT outside its envelope moves it directly —

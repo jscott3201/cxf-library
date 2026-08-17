@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | AHU-FC-006, AHU-FC-009, AHU-FC-011, AHU-FC-051, AHU-FC-055, AHU-FC-064, RTU-FC-053, CLU-03 |
+| **Applies to** | AHU-FC-006, AHU-FC-009, AHU-FC-011, AHU-FC-051, AHU-FC-055, AHU-FC-064, RTU-FC-053, RTU-FC-054, RTU-FC-055, CLU-03 |
 | **Fix complexity** | Remote fix (40%) · Remote + on-site (40%) · On-site only (20%) |
 | **Typical time** | 30 min remote / 1–3 h on-site |
 | **Typical cost** | $0 remote / $100–$400 linkage repair / $500–$1,200 actuator |

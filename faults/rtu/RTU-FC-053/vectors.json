@@ -1,0 +1,149 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 7200 },
+  "scenarios": [
+    {
+      "name": "economizing_when_favorable",
+      "description": "Reference vector: 15 °C outdoor air, damper at 80%, compressor running. Outdoor air is well below the lockout, so branch 1 is armed, but the damper is nowhere near minimum — the economizer is doing its job and the compressor is trimming what free cooling cannot cover. Clear on both branches",
+      "inputs": {
+        "oat": 15.0,
+        "oa_dmpr_cmd": 80.0,
+        "comp_status": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_at_minimum_when_favorable",
+      "description": "Reference vector: 15 °C outdoor air, damper at 10%, compressor running — the classic stuck-at-minimum economizer. Branch 1 (oat < econ_lockout_temp AND comp_status AND oa_dmpr_cmd < min_oa_margin) is true from t=0, and yFault asserts one alarm_delay later at t=1800",
+      "inputs": {
+        "oat": 15.0,
+        "oa_dmpr_cmd": 10.0,
+        "comp_status": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 1980, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "locked_out_damper_at_minimum",
+      "description": "Reference vector: 30 °C outdoor air, damper at 10%, compressor running. Outdoor air is above the relock temperature, so bringing it in would add load; the damper sitting at its ventilation minimum is exactly right. Clear on both branches",
+      "inputs": {
+        "oat": 30.0,
+        "oa_dmpr_cmd": 10.0,
+        "comp_status": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "locked_out_damper_open",
+      "description": "Reference vector: 30 °C outdoor air, damper at 75%, compressor running — the economizer failed open, or never locked out, and the compressor is cooling 75% outdoor air on a hot day. Branch 2 (oat > econ_relock_temp AND comp_status AND oa_dmpr_cmd > min_oa_margin) is true from t=0, and yFault asserts at t=1800",
+      "inputs": {
+        "oat": 30.0,
+        "oa_dmpr_cmd": 75.0,
+        "comp_status": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 1980, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "changeover_band_is_silent",
+      "description": "Deadband pin. At 21.5 °C the outdoor air is above econ_lockout_temp and below econ_relock_temp, so neither branch's temperature test is true and the rule has no opinion about the damper. The damper is parked at minimum for the first hour and wide open for the second — a damper position that would trip branch 1 below 21 °C and branch 2 above 22 °C, and trips neither here",
+      "inputs": {
+        "oat": 21.5,
+        "oa_dmpr_cmd": [
+          { "t": 0, "value": 10.0 },
+          { "t": 3600, "value": 80.0 }
+        ],
+        "comp_status": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_at_margin_is_silent",
+      "description": "Damper boundary pin, both sides. The damper sits exactly on min_oa_margin (25%), which satisfies neither `< 25` nor `> 25`. Outdoor air runs at 15 °C for the first hour (branch 1 armed) and 30 °C for the second (branch 2 armed), and both stay clear",
+      "inputs": {
+        "oat": [
+          { "t": 0, "value": 15.0 },
+          { "t": 3600, "value": 30.0 }
+        ],
+        "oa_dmpr_cmd": 25.0,
+        "comp_status": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "lockout_setpoints_are_silent",
+      "description": "Temperature boundary pin, both sides. First hour: oat exactly 21.0 with the damper at minimum — `oat < 21` is false, so branch 1 does not fire on a unit sitting precisely on its lockout. Second hour: oat exactly 22.0 with the damper at 80% — `oat > 22` is false, so branch 2 does not fire on a unit sitting precisely on its relock point",
+      "inputs": {
+        "oat": [
+          { "t": 0, "value": 21.0 },
+          { "t": 3600, "value": 22.0 }
+        ],
+        "oa_dmpr_cmd": [
+          { "t": 0, "value": 10.0 },
+          { "t": 3600, "value": 80.0 }
+        ],
+        "comp_status": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "compressor_off_no_verdict",
+      "description": "Cooling-call gate. Favorable outdoor air and a damper at minimum, but no compressor running: there is no mechanical cooling being wasted, so there is nothing to report. comp_status gates both branches in-graph, and a false yFault here means the rule has no verdict rather than that the economizer is healthy",
+      "inputs": {
+        "oat": 15.0,
+        "oa_dmpr_cmd": 10.0,
+        "comp_status": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "transient_shorter_than_alarm_delay",
+      "description": "Transient. The damper drops to minimum at t=600 and returns to 80% at t=1800 — 20 minutes at minimum with the compressor running, the shape of a mixed-air loop resetting or an operator overriding the damper briefly. Branch 1 holds for 1200 s against a 1800 s alarm_delay, so nothing asserts",
+      "inputs": {
+        "oat": 15.0,
+        "oa_dmpr_cmd": [
+          { "t": 0, "value": 80.0 },
+          { "t": 600, "value": 10.0 },
+          { "t": 1800, "value": 80.0 }
+        ],
+        "comp_status": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_recovers_after_alarm",
+      "description": "Recovery. The stuck-at-minimum case asserts at t=1800; at t=3600 the linkage is reconnected and the damper strokes to 60%. Branch 1 goes false on that tick and yFault follows immediately — TrueDelay has no off-delay, so a fixed economizer clears the alarm at the next evaluation rather than one alarm_delay later",
+      "inputs": {
+        "oat": 15.0,
+        "oa_dmpr_cmd": [
+          { "t": 0, "value": 10.0 },
+          { "t": 3600, "value": 60.0 }
+        ],
+        "comp_status": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 1980, "to_s": 3300, "equals": true },
+        { "output": "yFault", "from_s": 3900, "to_s": 7200, "equals": false }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 340" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary input -->
+  <rect x="12" y="54" width="150" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="87" y="73" text-anchor="middle" fill="#1e3a8a">comp_status</text>
+
+  <!-- row 1: start detection and rolling mean -->
+  <g>
+    <rect x="200" y="40" width="200" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="300" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">start</text>
+    <text x="300" y="80" text-anchor="middle" fill="#57606a" font-size="11">Logical.Edge · pre_u_start = false</text>
+
+    <rect x="430" y="40" width="200" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="530" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">pulseInt</text>
+    <text x="530" y="80" text-anchor="middle" fill="#57606a" font-size="11">Conversions.BooleanToInteger</text>
+
+    <rect x="660" y="40" width="200" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="760" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">pulseReal</text>
+    <text x="760" y="80" text-anchor="middle" fill="#57606a" font-size="11">Conversions.IntegerToReal</text>
+
+    <rect x="890" y="40" width="230" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="1005" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">rate</text>
+    <text x="1005" y="80" text-anchor="middle" fill="#57606a" font-size="11">Reals.MovingAverage · delta = 3600 s</text>
+  </g>
+
+  <!-- row 2: rescale, threshold, persistence -->
+  <g>
+    <rect x="200" y="220" width="230" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="315" y="242" text-anchor="middle" fill="#24292f" font-weight="bold">count</text>
+    <text x="315" y="260" text-anchor="middle" fill="#57606a" font-size="11">Reals.MultiplyByParameter · k = 60</text>
+
+    <rect x="460" y="220" width="230" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="575" y="242" text-anchor="middle" fill="#24292f" font-weight="bold">cntHigh</text>
+    <text x="575" y="260" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 6</text>
+
+    <rect x="720" y="220" width="200" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="820" y="242" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+    <text x="820" y="260" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 900 s</text>
+  </g>
+
+  <!-- boundary output -->
+  <rect x="950" y="234" width="68" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="984" y="253" text-anchor="middle" fill="#7f1d1d">yFault</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 162 69 H 196"/>
+    <path d="M 400 69 H 426"/>
+    <path d="M 630 69 H 656"/>
+    <path d="M 860 69 H 886"/>
+
+    <path d="M 1120 69 H 1148 V 159 H 170 V 249 H 196"/>
+
+    <path d="M 430 249 H 456"/>
+    <path d="M 690 249 H 716"/>
+    <path d="M 920 249 H 946"/>
+  </g>
+
+  <!-- signal type hints -->
+  <text x="168" y="60" fill="#7d8590" font-size="10">Bool</text>
+  <text x="404" y="60" fill="#7d8590" font-size="10">Bool</text>
+  <text x="634" y="60" fill="#7d8590" font-size="10">Int</text>
+  <text x="864" y="60" fill="#7d8590" font-size="10">Real</text>
+  <text x="176" y="240" fill="#7d8590" font-size="10">Real</text>
+  <text x="694" y="240" fill="#7d8590" font-size="10">Bool</text>
+
+  <!-- wrap annotation -->
+  <text x="660" y="152" text-anchor="middle" fill="#7d8590" font-size="11">rolling mean of the start pulses (starts per second) continues below</text>
+</svg>
