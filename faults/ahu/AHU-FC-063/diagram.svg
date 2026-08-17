@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1660 620" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <g>
+    <rect x="12" y="135" width="150" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="87" y="154" text-anchor="middle" fill="#1e3a8a">expected_mode</text>
+    <rect x="12" y="385" width="150" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="87" y="404" text-anchor="middle" fill="#1e3a8a">clg_vlv_cmd</text>
+    <rect x="12" y="465" width="150" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="87" y="484" text-anchor="middle" fill="#1e3a8a">htg_vlv_cmd</text>
+    <rect x="12" y="545" width="150" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="87" y="564" text-anchor="middle" fill="#1e3a8a">oa_dmpr_cmd</text>
+  </g>
+
+  <!-- mode code constants -->
+  <g>
+    <rect x="190" y="45" width="250" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="315" y="65" text-anchor="middle" fill="#24292f" font-weight="bold">kHeat</text>
+    <text x="315" y="83" text-anchor="middle" fill="#57606a" font-size="11">Integers.Sources.Constant · k = 1</text>
+
+    <rect x="190" y="165" width="250" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="315" y="185" text-anchor="middle" fill="#24292f" font-weight="bold">kMech</text>
+    <text x="315" y="203" text-anchor="middle" fill="#57606a" font-size="11">Integers.Sources.Constant · k = 3</text>
+
+    <rect x="190" y="285" width="250" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="315" y="305" text-anchor="middle" fill="#24292f" font-weight="bold">kEcon</text>
+    <text x="315" y="323" text-anchor="middle" fill="#57606a" font-size="11">Integers.Sources.Constant · k = 2</text>
+  </g>
+
+  <!-- mode decode -->
+  <g>
+    <rect x="480" y="18" width="150" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="555" y="38" text-anchor="middle" fill="#24292f" font-weight="bold">isHeat</text>
+    <text x="555" y="56" text-anchor="middle" fill="#57606a" font-size="11">Integers.Equal</text>
+
+    <rect x="480" y="138" width="150" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="555" y="158" text-anchor="middle" fill="#24292f" font-weight="bold">isMech</text>
+    <text x="555" y="176" text-anchor="middle" fill="#57606a" font-size="11">Integers.Equal</text>
+
+    <rect x="480" y="258" width="150" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="555" y="278" text-anchor="middle" fill="#24292f" font-weight="bold">isEcon</text>
+    <text x="555" y="296" text-anchor="middle" fill="#57606a" font-size="11">Integers.Equal</text>
+  </g>
+
+  <!-- actuator position tests -->
+  <g>
+    <rect x="250" y="375" width="230" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="365" y="395" text-anchor="middle" fill="#24292f" font-weight="bold">clgOpen</text>
+    <text x="365" y="413" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 5 %</text>
+
+    <rect x="250" y="455" width="230" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="365" y="475" text-anchor="middle" fill="#24292f" font-weight="bold">htgOpen</text>
+    <text x="365" y="493" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 5 %</text>
+
+    <rect x="250" y="535" width="230" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="365" y="555" text-anchor="middle" fill="#24292f" font-weight="bold">dmprEcon</text>
+    <text x="365" y="573" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 30 %</text>
+  </g>
+
+  <!-- wrong-actuator disjunction per mode -->
+  <g>
+    <rect x="560" y="375" width="130" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="625" y="395" text-anchor="middle" fill="#24292f" font-weight="bold">heatBad</text>
+    <text x="625" y="413" text-anchor="middle" fill="#57606a" font-size="11">Logical.Or</text>
+
+    <rect x="560" y="455" width="130" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="625" y="475" text-anchor="middle" fill="#24292f" font-weight="bold">mechBad</text>
+    <text x="625" y="493" text-anchor="middle" fill="#57606a" font-size="11">Logical.Or</text>
+
+    <rect x="560" y="535" width="130" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="625" y="555" text-anchor="middle" fill="#24292f" font-weight="bold">econBad</text>
+    <text x="625" y="573" text-anchor="middle" fill="#57606a" font-size="11">Logical.Or</text>
+  </g>
+
+  <!-- mode gate -->
+  <g>
+    <rect x="770" y="30" width="130" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="835" y="50" text-anchor="middle" fill="#24292f" font-weight="bold">heatViol</text>
+    <text x="835" y="68" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+    <rect x="770" y="150" width="130" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="835" y="170" text-anchor="middle" fill="#24292f" font-weight="bold">mechViol</text>
+    <text x="835" y="188" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+    <rect x="770" y="270" width="130" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="835" y="290" text-anchor="middle" fill="#24292f" font-weight="bold">econViol</text>
+    <text x="835" y="308" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  </g>
+
+  <!-- collect -->
+  <rect x="960" y="90" width="120" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1020" y="110" text-anchor="middle" fill="#24292f" font-weight="bold">hmViol</text>
+  <text x="1020" y="128" text-anchor="middle" fill="#57606a" font-size="11">Logical.Or</text>
+
+  <rect x="1140" y="180" width="120" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1200" y="200" text-anchor="middle" fill="#24292f" font-weight="bold">anyViol</text>
+  <text x="1200" y="218" text-anchor="middle" fill="#57606a" font-size="11">Logical.Or</text>
+
+  <!-- persistence -->
+  <rect x="1320" y="180" width="170" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1405" y="200" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1405" y="218" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 1800 s</text>
+
+  <!-- boundary output -->
+  <rect x="1550" y="190" width="90" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1595" y="209" text-anchor="middle" fill="#7f1d1d">yFault</text>
+
+  <!-- fan-out trunks -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none">
+    <path d="M 162 150 H 175"/>
+    <path d="M 480 400 H 505"/>
+    <path d="M 480 480 H 515"/>
+    <path d="M 480 560 H 525"/>
+  </g>
+  <circle cx="175" cy="150" r="3" fill="#7d8590"/>
+  <circle cx="505" cy="400" r="3" fill="#7d8590"/>
+  <circle cx="515" cy="480" r="3" fill="#7d8590"/>
+  <circle cx="525" cy="560" r="3" fill="#7d8590"/>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <!-- expected_mode into every Equal -->
+    <path d="M 175 150 V 30 H 476"/>
+    <path d="M 175 150 H 476"/>
+    <path d="M 175 150 V 270 H 476"/>
+
+    <!-- mode codes into every Equal -->
+    <path d="M 440 70 H 452 V 56 H 476"/>
+    <path d="M 440 190 H 452 V 176 H 476"/>
+    <path d="M 440 310 H 452 V 296 H 476"/>
+
+    <!-- commands into the position tests -->
+    <path d="M 162 400 H 246"/>
+    <path d="M 162 480 H 246"/>
+    <path d="M 162 560 H 246"/>
+
+    <!-- position tests into the per-mode disjunctions -->
+    <path d="M 505 400 V 388 H 556"/>
+    <path d="M 505 400 V 548 H 556"/>
+    <path d="M 515 480 V 468 H 556"/>
+    <path d="M 515 480 V 572 H 556"/>
+    <path d="M 525 560 V 412 H 556"/>
+    <path d="M 525 560 V 492 H 556"/>
+
+    <!-- decode and disjunction into the mode gates -->
+    <path d="M 630 43 H 766"/>
+    <path d="M 630 163 H 766"/>
+    <path d="M 630 283 H 766"/>
+    <path d="M 690 400 H 730 V 67 H 766"/>
+    <path d="M 690 480 H 740 V 187 H 766"/>
+    <path d="M 690 560 H 750 V 307 H 766"/>
+
+    <!-- collect and persist -->
+    <path d="M 900 55 H 930 V 103 H 956"/>
+    <path d="M 900 175 H 930 V 127 H 956"/>
+    <path d="M 1080 115 H 1110 V 193 H 1136"/>
+    <path d="M 900 295 H 1110 V 217 H 1136"/>
+    <path d="M 1260 205 H 1316"/>
+    <path d="M 1490 205 H 1546"/>
+  </g>
+
+  <!-- signal type hints -->
+  <text x="170" y="128" fill="#7d8590" font-size="10">Int</text>
+  <text x="170" y="378" fill="#7d8590" font-size="10">Real</text>
+  <text x="642" y="36" fill="#7d8590" font-size="10">Bool</text>
+</svg>

@@ -345,6 +345,18 @@
       "s223": null,
       "provisional": true,
       "notes": "Aggregate point like zone_dmpr_pos_max: the host computes the fraction over per-zone reheat valve commands (reference point rht_vlv_cmd_all, AHU-FC-053). Value range 0-1. Semantic tags belong on the underlying per-zone points (VAV reheat valve command) and will be grounded with the VAV dictionary. The reheat-active counting threshold (typically >5%) is host configuration, not part of this dictionary."
+    },
+    {
+      "name": "expected_mode",
+      "description": "Expected AHU operating mode for current conditions (host-derived: determine_g36_mode over oat, zone demands, and the occupancy schedule, per G36 Section 5.16). Integer encoding defined by this library: 1 = HEATING, 2 = ECONOMIZER, 3 = MECHANICAL_COOLING_MIN_OA",
+      "kind": "int",
+      "unit": "1",
+      "qudt_unit": "UNITLESS",
+      "derived": true,
+      "brick": null,
+      "s223": null,
+      "provisional": true,
+      "notes": "First integer point in the dictionary (AHU-FC-063). The mode enumeration is this library's convention for the derived point, ordered cold-to-hot along the G36 supply-air sequence; neither ontology defines these composite AHU modes, and G36 Section 5.16 states the sequence without numbering it. Hosts map their own mode enum (or compute the mode from scratch) when binding; the three code constants are exposed as rule parameters so a host with a different enum can rebind without editing the graph. Semantic grounding deferred with the other derived aggregates."
     }
   ]
 }
