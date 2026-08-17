@@ -1,0 +1,3914 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 10800
+  },
+  "scenarios": [
+    {
+      "name": "stable_position",
+      "description": "A damper parked at 50% for the whole run \u2014 a zone whose load has not moved. The only crossing in the entire trace is an artifact of the statistic: while the window fills, muS runs a hair under the constant input, so `above` is true; at t=1800 s the window is full, muS reads exactly 50.0, the strict comparison goes false and Logical.Change emits one pulse. The count reads 1.0 against a threshold of 10 for one window and ages back to zero at t=3600 s; mad stays at zero throughout. This is the baseline every other scenario departs from.",
+      "inputs": {
+        "zone_dmpr_pos": 50.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "stable_control",
+      "description": "Reference vector 1 (3 reversals per 30 min, 5% amplitude). A 20-minute square wave of +/-2.5% about 50% \u2014 a damper following a slow load swing, which is what control is supposed to look like. Two crossings per cycle gives a steady count of exactly 3.0 and mad settles at 2.42; both tests fail and nothing is reported.",
+      "inputs": {
+        "zone_dmpr_pos": [
+          {
+            "t": 0,
+            "value": 52.5
+          },
+          {
+            "t": 600,
+            "value": 47.5
+          },
+          {
+            "t": 1200,
+            "value": 52.5
+          },
+          {
+            "t": 1800,
+            "value": 47.5
+          },
+          {
+            "t": 2400,
+            "value": 52.5
+          },
+          {
+            "t": 3000,
+            "value": 47.5
+          },
+          {
+            "t": 3600,
+            "value": 52.5
+          },
+          {
+            "t": 4200,
+            "value": 47.5
+          },
+          {
+            "t": 4800,
+            "value": 52.5
+          },
+          {
+            "t": 5400,
+            "value": 47.5
+          },
+          {
+            "t": 6000,
+            "value": 52.5
+          },
+          {
+            "t": 6600,
+            "value": 47.5
+          },
+          {
+            "t": 7200,
+            "value": 52.5
+          },
+          {
+            "t": 7800,
+            "value": 47.5
+          },
+          {
+            "t": 8400,
+            "value": 52.5
+          },
+          {
+            "t": 9000,
+            "value": 47.5
+          },
+          {
+            "t": 9600,
+            "value": 52.5
+          },
+          {
+            "t": 10200,
+            "value": 47.5
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mild_hunting",
+      "description": "Reference vector 2 (8 reversals per 30 min, 8% amplitude). An 8-minute square wave of +/-4% about 50%. The window holds 3.75 cycles, so the rolling count alternates between 7.0 and 8.0 \u2014 the reference's 8 reversals, as close as a symmetric wave can be placed on a 60 s grid \u2014 and mad settles at 4.06. Both tests fail, and either one alone would be enough.",
+      "inputs": {
+        "zone_dmpr_pos": [
+          {
+            "t": 0,
+            "value": 54.0
+          },
+          {
+            "t": 240,
+            "value": 46.0
+          },
+          {
+            "t": 480,
+            "value": 54.0
+          },
+          {
+            "t": 720,
+            "value": 46.0
+          },
+          {
+            "t": 960,
+            "value": 54.0
+          },
+          {
+            "t": 1200,
+            "value": 46.0
+          },
+          {
+            "t": 1440,
+            "value": 54.0
+          },
+          {
+            "t": 1680,
+            "value": 46.0
+          },
+          {
+            "t": 1920,
+            "value": 54.0
+          },
+          {
+            "t": 2160,
+            "value": 46.0
+          },
+          {
+            "t": 2400,
+            "value": 54.0
+          },
+          {
+            "t": 2640,
+            "value": 46.0
+          },
+          {
+            "t": 2880,
+            "value": 54.0
+          },
+          {
+            "t": 3120,
+            "value": 46.0
+          },
+          {
+            "t": 3360,
+            "value": 54.0
+          },
+          {
+            "t": 3600,
+            "value": 46.0
+          },
+          {
+            "t": 3840,
+            "value": 54.0
+          },
+          {
+            "t": 4080,
+            "value": 46.0
+          },
+          {
+            "t": 4320,
+            "value": 54.0
+          },
+          {
+            "t": 4560,
+            "value": 46.0
+          },
+          {
+            "t": 4800,
+            "value": 54.0
+          },
+          {
+            "t": 5040,
+            "value": 46.0
+          },
+          {
+            "t": 5280,
+            "value": 54.0
+          },
+          {
+            "t": 5520,
+            "value": 46.0
+          },
+          {
+            "t": 5760,
+            "value": 54.0
+          },
+          {
+            "t": 6000,
+            "value": 46.0
+          },
+          {
+            "t": 6240,
+            "value": 54.0
+          },
+          {
+            "t": 6480,
+            "value": 46.0
+          },
+          {
+            "t": 6720,
+            "value": 54.0
+          },
+          {
+            "t": 6960,
+            "value": 46.0
+          },
+          {
+            "t": 7200,
+            "value": 54.0
+          },
+          {
+            "t": 7440,
+            "value": 46.0
+          },
+          {
+            "t": 7680,
+            "value": 54.0
+          },
+          {
+            "t": 7920,
+            "value": 46.0
+          },
+          {
+            "t": 8160,
+            "value": 54.0
+          },
+          {
+            "t": 8400,
+            "value": 46.0
+          },
+          {
+            "t": 8640,
+            "value": 54.0
+          },
+          {
+            "t": 8880,
+            "value": 46.0
+          },
+          {
+            "t": 9120,
+            "value": 54.0
+          },
+          {
+            "t": 9360,
+            "value": 46.0
+          },
+          {
+            "t": 9600,
+            "value": 54.0
+          },
+          {
+            "t": 9840,
+            "value": 46.0
+          },
+          {
+            "t": 10080,
+            "value": 54.0
+          },
+          {
+            "t": 10320,
+            "value": 46.0
+          },
+          {
+            "t": 10560,
+            "value": 54.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "severe_hunting",
+      "description": "Reference vector 3 (15 reversals per 30 min, 20% amplitude). A 4-minute square wave of +/-10% about 50% \u2014 a proportional gain far too high for the box's damper authority, stroking the actuator every two ticks. The count settles at exactly 15.0 and mad at 9.67 (the 0.33 shortfall from 10 is the mean wobbling by +/-0.67 across the window's 7.5 cycles). Both conditions latch at t=240 s and yFault asserts one alarm_delay later at t=1140 s. Note this is inside the host's warm-up NO_EVAL window, but unlike warmup_burst_asserts the verdict survives the window filling: the fault stays asserted for the rest of the horizon.",
+      "inputs": {
+        "zone_dmpr_pos": [
+          {
+            "t": 0,
+            "value": 60.0
+          },
+          {
+            "t": 120,
+            "value": 40.0
+          },
+          {
+            "t": 240,
+            "value": 60.0
+          },
+          {
+            "t": 360,
+            "value": 40.0
+          },
+          {
+            "t": 480,
+            "value": 60.0
+          },
+          {
+            "t": 600,
+            "value": 40.0
+          },
+          {
+            "t": 720,
+            "value": 60.0
+          },
+          {
+            "t": 840,
+            "value": 40.0
+          },
+          {
+            "t": 960,
+            "value": 60.0
+          },
+          {
+            "t": 1080,
+            "value": 40.0
+          },
+          {
+            "t": 1200,
+            "value": 60.0
+          },
+          {
+            "t": 1320,
+            "value": 40.0
+          },
+          {
+            "t": 1440,
+            "value": 60.0
+          },
+          {
+            "t": 1560,
+            "value": 40.0
+          },
+          {
+            "t": 1680,
+            "value": 60.0
+          },
+          {
+            "t": 1800,
+            "value": 40.0
+          },
+          {
+            "t": 1920,
+            "value": 60.0
+          },
+          {
+            "t": 2040,
+            "value": 40.0
+          },
+          {
+            "t": 2160,
+            "value": 60.0
+          },
+          {
+            "t": 2280,
+            "value": 40.0
+          },
+          {
+            "t": 2400,
+            "value": 60.0
+          },
+          {
+            "t": 2520,
+            "value": 40.0
+          },
+          {
+            "t": 2640,
+            "value": 60.0
+          },
+          {
+            "t": 2760,
+            "value": 40.0
+          },
+          {
+            "t": 2880,
+            "value": 60.0
+          },
+          {
+            "t": 3000,
+            "value": 40.0
+          },
+          {
+            "t": 3120,
+            "value": 60.0
+          },
+          {
+            "t": 3240,
+            "value": 40.0
+          },
+          {
+            "t": 3360,
+            "value": 60.0
+          },
+          {
+            "t": 3480,
+            "value": 40.0
+          },
+          {
+            "t": 3600,
+            "value": 60.0
+          },
+          {
+            "t": 3720,
+            "value": 40.0
+          },
+          {
+            "t": 3840,
+            "value": 60.0
+          },
+          {
+            "t": 3960,
+            "value": 40.0
+          },
+          {
+            "t": 4080,
+            "value": 60.0
+          },
+          {
+            "t": 4200,
+            "value": 40.0
+          },
+          {
+            "t": 4320,
+            "value": 60.0
+          },
+          {
+            "t": 4440,
+            "value": 40.0
+          },
+          {
+            "t": 4560,
+            "value": 60.0
+          },
+          {
+            "t": 4680,
+            "value": 40.0
+          },
+          {
+            "t": 4800,
+            "value": 60.0
+          },
+          {
+            "t": 4920,
+            "value": 40.0
+          },
+          {
+            "t": 5040,
+            "value": 60.0
+          },
+          {
+            "t": 5160,
+            "value": 40.0
+          },
+          {
+            "t": 5280,
+            "value": 60.0
+          },
+          {
+            "t": 5400,
+            "value": 40.0
+          },
+          {
+            "t": 5520,
+            "value": 60.0
+          },
+          {
+            "t": 5640,
+            "value": 40.0
+          },
+          {
+            "t": 5760,
+            "value": 60.0
+          },
+          {
+            "t": 5880,
+            "value": 40.0
+          },
+          {
+            "t": 6000,
+            "value": 60.0
+          },
+          {
+            "t": 6120,
+            "value": 40.0
+          },
+          {
+            "t": 6240,
+            "value": 60.0
+          },
+          {
+            "t": 6360,
+            "value": 40.0
+          },
+          {
+            "t": 6480,
+            "value": 60.0
+          },
+          {
+            "t": 6600,
+            "value": 40.0
+          },
+          {
+            "t": 6720,
+            "value": 60.0
+          },
+          {
+            "t": 6840,
+            "value": 40.0
+          },
+          {
+            "t": 6960,
+            "value": 60.0
+          },
+          {
+            "t": 7080,
+            "value": 40.0
+          },
+          {
+            "t": 7200,
+            "value": 60.0
+          },
+          {
+            "t": 7320,
+            "value": 40.0
+          },
+          {
+            "t": 7440,
+            "value": 60.0
+          },
+          {
+            "t": 7560,
+            "value": 40.0
+          },
+          {
+            "t": 7680,
+            "value": 60.0
+          },
+          {
+            "t": 7800,
+            "value": 40.0
+          },
+          {
+            "t": 7920,
+            "value": 60.0
+          },
+          {
+            "t": 8040,
+            "value": 40.0
+          },
+          {
+            "t": 8160,
+            "value": 60.0
+          },
+          {
+            "t": 8280,
+            "value": 40.0
+          },
+          {
+            "t": 8400,
+            "value": 60.0
+          },
+          {
+            "t": 8520,
+            "value": 40.0
+          },
+          {
+            "t": 8640,
+            "value": 60.0
+          },
+          {
+            "t": 8760,
+            "value": 40.0
+          },
+          {
+            "t": 8880,
+            "value": 60.0
+          },
+          {
+            "t": 9000,
+            "value": 40.0
+          },
+          {
+            "t": 9120,
+            "value": 60.0
+          },
+          {
+            "t": 9240,
+            "value": 40.0
+          },
+          {
+            "t": 9360,
+            "value": 60.0
+          },
+          {
+            "t": 9480,
+            "value": 40.0
+          },
+          {
+            "t": 9600,
+            "value": 60.0
+          },
+          {
+            "t": 9720,
+            "value": 40.0
+          },
+          {
+            "t": 9840,
+            "value": 60.0
+          },
+          {
+            "t": 9960,
+            "value": 40.0
+          },
+          {
+            "t": 10080,
+            "value": 60.0
+          },
+          {
+            "t": 10200,
+            "value": 40.0
+          },
+          {
+            "t": 10320,
+            "value": 60.0
+          },
+          {
+            "t": 10440,
+            "value": 40.0
+          },
+          {
+            "t": 10560,
+            "value": 60.0
+          },
+          {
+            "t": 10680,
+            "value": 40.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1020,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1260,
+          "to_s": 10800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "fast_but_shallow",
+      "description": "Count without amplitude: the damper alternates +/-2% every tick, 30 crossings per window \u2014 the fastest this rule can observe at a 60 s tick and three times the threshold. mad is 2.0, under min_oscillation_amplitude, so nothing is reported. A hair of dither on a position feedback is not hunting, and this vector pins that the `And` is load-bearing.",
+      "inputs": {
+        "zone_dmpr_pos": [
+          {
+            "t": 0,
+            "value": 52.0
+          },
+          {
+            "t": 60,
+            "value": 48.0
+          },
+          {
+            "t": 120,
+            "value": 52.0
+          },
+          {
+            "t": 180,
+            "value": 48.0
+          },
+          {
+            "t": 240,
+            "value": 52.0
+          },
+          {
+            "t": 300,
+            "value": 48.0
+          },
+          {
+            "t": 360,
+            "value": 52.0
+          },
+          {
+            "t": 420,
+            "value": 48.0
+          },
+          {
+            "t": 480,
+            "value": 52.0
+          },
+          {
+            "t": 540,
+            "value": 48.0
+          },
+          {
+            "t": 600,
+            "value": 52.0
+          },
+          {
+            "t": 660,
+            "value": 48.0
+          },
+          {
+            "t": 720,
+            "value": 52.0
+          },
+          {
+            "t": 780,
+            "value": 48.0
+          },
+          {
+            "t": 840,
+            "value": 52.0
+          },
+          {
+            "t": 900,
+            "value": 48.0
+          },
+          {
+            "t": 960,
+            "value": 52.0
+          },
+          {
+            "t": 1020,
+            "value": 48.0
+          },
+          {
+            "t": 1080,
+            "value": 52.0
+          },
+          {
+            "t": 1140,
+            "value": 48.0
+          },
+          {
+            "t": 1200,
+            "value": 52.0
+          },
+          {
+            "t": 1260,
+            "value": 48.0
+          },
+          {
+            "t": 1320,
+            "value": 52.0
+          },
+          {
+            "t": 1380,
+            "value": 48.0
+          },
+          {
+            "t": 1440,
+            "value": 52.0
+          },
+          {
+            "t": 1500,
+            "value": 48.0
+          },
+          {
+            "t": 1560,
+            "value": 52.0
+          },
+          {
+            "t": 1620,
+            "value": 48.0
+          },
+          {
+            "t": 1680,
+            "value": 52.0
+          },
+          {
+            "t": 1740,
+            "value": 48.0
+          },
+          {
+            "t": 1800,
+            "value": 52.0
+          },
+          {
+            "t": 1860,
+            "value": 48.0
+          },
+          {
+            "t": 1920,
+            "value": 52.0
+          },
+          {
+            "t": 1980,
+            "value": 48.0
+          },
+          {
+            "t": 2040,
+            "value": 52.0
+          },
+          {
+            "t": 2100,
+            "value": 48.0
+          },
+          {
+            "t": 2160,
+            "value": 52.0
+          },
+          {
+            "t": 2220,
+            "value": 48.0
+          },
+          {
+            "t": 2280,
+            "value": 52.0
+          },
+          {
+            "t": 2340,
+            "value": 48.0
+          },
+          {
+            "t": 2400,
+            "value": 52.0
+          },
+          {
+            "t": 2460,
+            "value": 48.0
+          },
+          {
+            "t": 2520,
+            "value": 52.0
+          },
+          {
+            "t": 2580,
+            "value": 48.0
+          },
+          {
+            "t": 2640,
+            "value": 52.0
+          },
+          {
+            "t": 2700,
+            "value": 48.0
+          },
+          {
+            "t": 2760,
+            "value": 52.0
+          },
+          {
+            "t": 2820,
+            "value": 48.0
+          },
+          {
+            "t": 2880,
+            "value": 52.0
+          },
+          {
+            "t": 2940,
+            "value": 48.0
+          },
+          {
+            "t": 3000,
+            "value": 52.0
+          },
+          {
+            "t": 3060,
+            "value": 48.0
+          },
+          {
+            "t": 3120,
+            "value": 52.0
+          },
+          {
+            "t": 3180,
+            "value": 48.0
+          },
+          {
+            "t": 3240,
+            "value": 52.0
+          },
+          {
+            "t": 3300,
+            "value": 48.0
+          },
+          {
+            "t": 3360,
+            "value": 52.0
+          },
+          {
+            "t": 3420,
+            "value": 48.0
+          },
+          {
+            "t": 3480,
+            "value": 52.0
+          },
+          {
+            "t": 3540,
+            "value": 48.0
+          },
+          {
+            "t": 3600,
+            "value": 52.0
+          },
+          {
+            "t": 3660,
+            "value": 48.0
+          },
+          {
+            "t": 3720,
+            "value": 52.0
+          },
+          {
+            "t": 3780,
+            "value": 48.0
+          },
+          {
+            "t": 3840,
+            "value": 52.0
+          },
+          {
+            "t": 3900,
+            "value": 48.0
+          },
+          {
+            "t": 3960,
+            "value": 52.0
+          },
+          {
+            "t": 4020,
+            "value": 48.0
+          },
+          {
+            "t": 4080,
+            "value": 52.0
+          },
+          {
+            "t": 4140,
+            "value": 48.0
+          },
+          {
+            "t": 4200,
+            "value": 52.0
+          },
+          {
+            "t": 4260,
+            "value": 48.0
+          },
+          {
+            "t": 4320,
+            "value": 52.0
+          },
+          {
+            "t": 4380,
+            "value": 48.0
+          },
+          {
+            "t": 4440,
+            "value": 52.0
+          },
+          {
+            "t": 4500,
+            "value": 48.0
+          },
+          {
+            "t": 4560,
+            "value": 52.0
+          },
+          {
+            "t": 4620,
+            "value": 48.0
+          },
+          {
+            "t": 4680,
+            "value": 52.0
+          },
+          {
+            "t": 4740,
+            "value": 48.0
+          },
+          {
+            "t": 4800,
+            "value": 52.0
+          },
+          {
+            "t": 4860,
+            "value": 48.0
+          },
+          {
+            "t": 4920,
+            "value": 52.0
+          },
+          {
+            "t": 4980,
+            "value": 48.0
+          },
+          {
+            "t": 5040,
+            "value": 52.0
+          },
+          {
+            "t": 5100,
+            "value": 48.0
+          },
+          {
+            "t": 5160,
+            "value": 52.0
+          },
+          {
+            "t": 5220,
+            "value": 48.0
+          },
+          {
+            "t": 5280,
+            "value": 52.0
+          },
+          {
+            "t": 5340,
+            "value": 48.0
+          },
+          {
+            "t": 5400,
+            "value": 52.0
+          },
+          {
+            "t": 5460,
+            "value": 48.0
+          },
+          {
+            "t": 5520,
+            "value": 52.0
+          },
+          {
+            "t": 5580,
+            "value": 48.0
+          },
+          {
+            "t": 5640,
+            "value": 52.0
+          },
+          {
+            "t": 5700,
+            "value": 48.0
+          },
+          {
+            "t": 5760,
+            "value": 52.0
+          },
+          {
+            "t": 5820,
+            "value": 48.0
+          },
+          {
+            "t": 5880,
+            "value": 52.0
+          },
+          {
+            "t": 5940,
+            "value": 48.0
+          },
+          {
+            "t": 6000,
+            "value": 52.0
+          },
+          {
+            "t": 6060,
+            "value": 48.0
+          },
+          {
+            "t": 6120,
+            "value": 52.0
+          },
+          {
+            "t": 6180,
+            "value": 48.0
+          },
+          {
+            "t": 6240,
+            "value": 52.0
+          },
+          {
+            "t": 6300,
+            "value": 48.0
+          },
+          {
+            "t": 6360,
+            "value": 52.0
+          },
+          {
+            "t": 6420,
+            "value": 48.0
+          },
+          {
+            "t": 6480,
+            "value": 52.0
+          },
+          {
+            "t": 6540,
+            "value": 48.0
+          },
+          {
+            "t": 6600,
+            "value": 52.0
+          },
+          {
+            "t": 6660,
+            "value": 48.0
+          },
+          {
+            "t": 6720,
+            "value": 52.0
+          },
+          {
+            "t": 6780,
+            "value": 48.0
+          },
+          {
+            "t": 6840,
+            "value": 52.0
+          },
+          {
+            "t": 6900,
+            "value": 48.0
+          },
+          {
+            "t": 6960,
+            "value": 52.0
+          },
+          {
+            "t": 7020,
+            "value": 48.0
+          },
+          {
+            "t": 7080,
+            "value": 52.0
+          },
+          {
+            "t": 7140,
+            "value": 48.0
+          },
+          {
+            "t": 7200,
+            "value": 52.0
+          },
+          {
+            "t": 7260,
+            "value": 48.0
+          },
+          {
+            "t": 7320,
+            "value": 52.0
+          },
+          {
+            "t": 7380,
+            "value": 48.0
+          },
+          {
+            "t": 7440,
+            "value": 52.0
+          },
+          {
+            "t": 7500,
+            "value": 48.0
+          },
+          {
+            "t": 7560,
+            "value": 52.0
+          },
+          {
+            "t": 7620,
+            "value": 48.0
+          },
+          {
+            "t": 7680,
+            "value": 52.0
+          },
+          {
+            "t": 7740,
+            "value": 48.0
+          },
+          {
+            "t": 7800,
+            "value": 52.0
+          },
+          {
+            "t": 7860,
+            "value": 48.0
+          },
+          {
+            "t": 7920,
+            "value": 52.0
+          },
+          {
+            "t": 7980,
+            "value": 48.0
+          },
+          {
+            "t": 8040,
+            "value": 52.0
+          },
+          {
+            "t": 8100,
+            "value": 48.0
+          },
+          {
+            "t": 8160,
+            "value": 52.0
+          },
+          {
+            "t": 8220,
+            "value": 48.0
+          },
+          {
+            "t": 8280,
+            "value": 52.0
+          },
+          {
+            "t": 8340,
+            "value": 48.0
+          },
+          {
+            "t": 8400,
+            "value": 52.0
+          },
+          {
+            "t": 8460,
+            "value": 48.0
+          },
+          {
+            "t": 8520,
+            "value": 52.0
+          },
+          {
+            "t": 8580,
+            "value": 48.0
+          },
+          {
+            "t": 8640,
+            "value": 52.0
+          },
+          {
+            "t": 8700,
+            "value": 48.0
+          },
+          {
+            "t": 8760,
+            "value": 52.0
+          },
+          {
+            "t": 8820,
+            "value": 48.0
+          },
+          {
+            "t": 8880,
+            "value": 52.0
+          },
+          {
+            "t": 8940,
+            "value": 48.0
+          },
+          {
+            "t": 9000,
+            "value": 52.0
+          },
+          {
+            "t": 9060,
+            "value": 48.0
+          },
+          {
+            "t": 9120,
+            "value": 52.0
+          },
+          {
+            "t": 9180,
+            "value": 48.0
+          },
+          {
+            "t": 9240,
+            "value": 52.0
+          },
+          {
+            "t": 9300,
+            "value": 48.0
+          },
+          {
+            "t": 9360,
+            "value": 52.0
+          },
+          {
+            "t": 9420,
+            "value": 48.0
+          },
+          {
+            "t": 9480,
+            "value": 52.0
+          },
+          {
+            "t": 9540,
+            "value": 48.0
+          },
+          {
+            "t": 9600,
+            "value": 52.0
+          },
+          {
+            "t": 9660,
+            "value": 48.0
+          },
+          {
+            "t": 9720,
+            "value": 52.0
+          },
+          {
+            "t": 9780,
+            "value": 48.0
+          },
+          {
+            "t": 9840,
+            "value": 52.0
+          },
+          {
+            "t": 9900,
+            "value": 48.0
+          },
+          {
+            "t": 9960,
+            "value": 52.0
+          },
+          {
+            "t": 10020,
+            "value": 48.0
+          },
+          {
+            "t": 10080,
+            "value": 52.0
+          },
+          {
+            "t": 10140,
+            "value": 48.0
+          },
+          {
+            "t": 10200,
+            "value": 52.0
+          },
+          {
+            "t": 10260,
+            "value": 48.0
+          },
+          {
+            "t": 10320,
+            "value": 52.0
+          },
+          {
+            "t": 10380,
+            "value": 48.0
+          },
+          {
+            "t": 10440,
+            "value": 52.0
+          },
+          {
+            "t": 10500,
+            "value": 48.0
+          },
+          {
+            "t": 10560,
+            "value": 52.0
+          },
+          {
+            "t": 10620,
+            "value": 48.0
+          },
+          {
+            "t": 10680,
+            "value": 52.0
+          },
+          {
+            "t": 10740,
+            "value": 48.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "slow_and_deep",
+      "description": "Amplitude without count, the mirror of fast_but_shallow: a 20-minute +/-15% swing gives mad 14.5 \u2014 three times the amplitude threshold \u2014 on a count of exactly 3.0. A damper making large slow moves is tracking a load, not hunting, and the count test blocks the fault.",
+      "inputs": {
+        "zone_dmpr_pos": [
+          {
+            "t": 0,
+            "value": 65.0
+          },
+          {
+            "t": 600,
+            "value": 35.0
+          },
+          {
+            "t": 1200,
+            "value": 65.0
+          },
+          {
+            "t": 1800,
+            "value": 35.0
+          },
+          {
+            "t": 2400,
+            "value": 65.0
+          },
+          {
+            "t": 3000,
+            "value": 35.0
+          },
+          {
+            "t": 3600,
+            "value": 65.0
+          },
+          {
+            "t": 4200,
+            "value": 35.0
+          },
+          {
+            "t": 4800,
+            "value": 65.0
+          },
+          {
+            "t": 5400,
+            "value": 35.0
+          },
+          {
+            "t": 6000,
+            "value": 65.0
+          },
+          {
+            "t": 6600,
+            "value": 35.0
+          },
+          {
+            "t": 7200,
+            "value": 65.0
+          },
+          {
+            "t": 7800,
+            "value": 35.0
+          },
+          {
+            "t": 8400,
+            "value": 65.0
+          },
+          {
+            "t": 9000,
+            "value": 35.0
+          },
+          {
+            "t": 9600,
+            "value": 65.0
+          },
+          {
+            "t": 10200,
+            "value": 35.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "amplitude_exactly_at_threshold",
+      "description": "Amplitude edge, low side. A tick-rate square wave of +/-5% about 50%: the window holds 15 whole cycles, so muS is exactly 50.0, every deviation is exactly 5.0, and mad reads exactly 5.000000 with no rounding. madHigh is strict, so scatter sitting exactly on min_oscillation_amplitude reads clear even with the count at its 30-crossing ceiling.",
+      "inputs": {
+        "zone_dmpr_pos": [
+          {
+            "t": 0,
+            "value": 55.0
+          },
+          {
+            "t": 60,
+            "value": 45.0
+          },
+          {
+            "t": 120,
+            "value": 55.0
+          },
+          {
+            "t": 180,
+            "value": 45.0
+          },
+          {
+            "t": 240,
+            "value": 55.0
+          },
+          {
+            "t": 300,
+            "value": 45.0
+          },
+          {
+            "t": 360,
+            "value": 55.0
+          },
+          {
+            "t": 420,
+            "value": 45.0
+          },
+          {
+            "t": 480,
+            "value": 55.0
+          },
+          {
+            "t": 540,
+            "value": 45.0
+          },
+          {
+            "t": 600,
+            "value": 55.0
+          },
+          {
+            "t": 660,
+            "value": 45.0
+          },
+          {
+            "t": 720,
+            "value": 55.0
+          },
+          {
+            "t": 780,
+            "value": 45.0
+          },
+          {
+            "t": 840,
+            "value": 55.0
+          },
+          {
+            "t": 900,
+            "value": 45.0
+          },
+          {
+            "t": 960,
+            "value": 55.0
+          },
+          {
+            "t": 1020,
+            "value": 45.0
+          },
+          {
+            "t": 1080,
+            "value": 55.0
+          },
+          {
+            "t": 1140,
+            "value": 45.0
+          },
+          {
+            "t": 1200,
+            "value": 55.0
+          },
+          {
+            "t": 1260,
+            "value": 45.0
+          },
+          {
+            "t": 1320,
+            "value": 55.0
+          },
+          {
+            "t": 1380,
+            "value": 45.0
+          },
+          {
+            "t": 1440,
+            "value": 55.0
+          },
+          {
+            "t": 1500,
+            "value": 45.0
+          },
+          {
+            "t": 1560,
+            "value": 55.0
+          },
+          {
+            "t": 1620,
+            "value": 45.0
+          },
+          {
+            "t": 1680,
+            "value": 55.0
+          },
+          {
+            "t": 1740,
+            "value": 45.0
+          },
+          {
+            "t": 1800,
+            "value": 55.0
+          },
+          {
+            "t": 1860,
+            "value": 45.0
+          },
+          {
+            "t": 1920,
+            "value": 55.0
+          },
+          {
+            "t": 1980,
+            "value": 45.0
+          },
+          {
+            "t": 2040,
+            "value": 55.0
+          },
+          {
+            "t": 2100,
+            "value": 45.0
+          },
+          {
+            "t": 2160,
+            "value": 55.0
+          },
+          {
+            "t": 2220,
+            "value": 45.0
+          },
+          {
+            "t": 2280,
+            "value": 55.0
+          },
+          {
+            "t": 2340,
+            "value": 45.0
+          },
+          {
+            "t": 2400,
+            "value": 55.0
+          },
+          {
+            "t": 2460,
+            "value": 45.0
+          },
+          {
+            "t": 2520,
+            "value": 55.0
+          },
+          {
+            "t": 2580,
+            "value": 45.0
+          },
+          {
+            "t": 2640,
+            "value": 55.0
+          },
+          {
+            "t": 2700,
+            "value": 45.0
+          },
+          {
+            "t": 2760,
+            "value": 55.0
+          },
+          {
+            "t": 2820,
+            "value": 45.0
+          },
+          {
+            "t": 2880,
+            "value": 55.0
+          },
+          {
+            "t": 2940,
+            "value": 45.0
+          },
+          {
+            "t": 3000,
+            "value": 55.0
+          },
+          {
+            "t": 3060,
+            "value": 45.0
+          },
+          {
+            "t": 3120,
+            "value": 55.0
+          },
+          {
+            "t": 3180,
+            "value": 45.0
+          },
+          {
+            "t": 3240,
+            "value": 55.0
+          },
+          {
+            "t": 3300,
+            "value": 45.0
+          },
+          {
+            "t": 3360,
+            "value": 55.0
+          },
+          {
+            "t": 3420,
+            "value": 45.0
+          },
+          {
+            "t": 3480,
+            "value": 55.0
+          },
+          {
+            "t": 3540,
+            "value": 45.0
+          },
+          {
+            "t": 3600,
+            "value": 55.0
+          },
+          {
+            "t": 3660,
+            "value": 45.0
+          },
+          {
+            "t": 3720,
+            "value": 55.0
+          },
+          {
+            "t": 3780,
+            "value": 45.0
+          },
+          {
+            "t": 3840,
+            "value": 55.0
+          },
+          {
+            "t": 3900,
+            "value": 45.0
+          },
+          {
+            "t": 3960,
+            "value": 55.0
+          },
+          {
+            "t": 4020,
+            "value": 45.0
+          },
+          {
+            "t": 4080,
+            "value": 55.0
+          },
+          {
+            "t": 4140,
+            "value": 45.0
+          },
+          {
+            "t": 4200,
+            "value": 55.0
+          },
+          {
+            "t": 4260,
+            "value": 45.0
+          },
+          {
+            "t": 4320,
+            "value": 55.0
+          },
+          {
+            "t": 4380,
+            "value": 45.0
+          },
+          {
+            "t": 4440,
+            "value": 55.0
+          },
+          {
+            "t": 4500,
+            "value": 45.0
+          },
+          {
+            "t": 4560,
+            "value": 55.0
+          },
+          {
+            "t": 4620,
+            "value": 45.0
+          },
+          {
+            "t": 4680,
+            "value": 55.0
+          },
+          {
+            "t": 4740,
+            "value": 45.0
+          },
+          {
+            "t": 4800,
+            "value": 55.0
+          },
+          {
+            "t": 4860,
+            "value": 45.0
+          },
+          {
+            "t": 4920,
+            "value": 55.0
+          },
+          {
+            "t": 4980,
+            "value": 45.0
+          },
+          {
+            "t": 5040,
+            "value": 55.0
+          },
+          {
+            "t": 5100,
+            "value": 45.0
+          },
+          {
+            "t": 5160,
+            "value": 55.0
+          },
+          {
+            "t": 5220,
+            "value": 45.0
+          },
+          {
+            "t": 5280,
+            "value": 55.0
+          },
+          {
+            "t": 5340,
+            "value": 45.0
+          },
+          {
+            "t": 5400,
+            "value": 55.0
+          },
+          {
+            "t": 5460,
+            "value": 45.0
+          },
+          {
+            "t": 5520,
+            "value": 55.0
+          },
+          {
+            "t": 5580,
+            "value": 45.0
+          },
+          {
+            "t": 5640,
+            "value": 55.0
+          },
+          {
+            "t": 5700,
+            "value": 45.0
+          },
+          {
+            "t": 5760,
+            "value": 55.0
+          },
+          {
+            "t": 5820,
+            "value": 45.0
+          },
+          {
+            "t": 5880,
+            "value": 55.0
+          },
+          {
+            "t": 5940,
+            "value": 45.0
+          },
+          {
+            "t": 6000,
+            "value": 55.0
+          },
+          {
+            "t": 6060,
+            "value": 45.0
+          },
+          {
+            "t": 6120,
+            "value": 55.0
+          },
+          {
+            "t": 6180,
+            "value": 45.0
+          },
+          {
+            "t": 6240,
+            "value": 55.0
+          },
+          {
+            "t": 6300,
+            "value": 45.0
+          },
+          {
+            "t": 6360,
+            "value": 55.0
+          },
+          {
+            "t": 6420,
+            "value": 45.0
+          },
+          {
+            "t": 6480,
+            "value": 55.0
+          },
+          {
+            "t": 6540,
+            "value": 45.0
+          },
+          {
+            "t": 6600,
+            "value": 55.0
+          },
+          {
+            "t": 6660,
+            "value": 45.0
+          },
+          {
+            "t": 6720,
+            "value": 55.0
+          },
+          {
+            "t": 6780,
+            "value": 45.0
+          },
+          {
+            "t": 6840,
+            "value": 55.0
+          },
+          {
+            "t": 6900,
+            "value": 45.0
+          },
+          {
+            "t": 6960,
+            "value": 55.0
+          },
+          {
+            "t": 7020,
+            "value": 45.0
+          },
+          {
+            "t": 7080,
+            "value": 55.0
+          },
+          {
+            "t": 7140,
+            "value": 45.0
+          },
+          {
+            "t": 7200,
+            "value": 55.0
+          },
+          {
+            "t": 7260,
+            "value": 45.0
+          },
+          {
+            "t": 7320,
+            "value": 55.0
+          },
+          {
+            "t": 7380,
+            "value": 45.0
+          },
+          {
+            "t": 7440,
+            "value": 55.0
+          },
+          {
+            "t": 7500,
+            "value": 45.0
+          },
+          {
+            "t": 7560,
+            "value": 55.0
+          },
+          {
+            "t": 7620,
+            "value": 45.0
+          },
+          {
+            "t": 7680,
+            "value": 55.0
+          },
+          {
+            "t": 7740,
+            "value": 45.0
+          },
+          {
+            "t": 7800,
+            "value": 55.0
+          },
+          {
+            "t": 7860,
+            "value": 45.0
+          },
+          {
+            "t": 7920,
+            "value": 55.0
+          },
+          {
+            "t": 7980,
+            "value": 45.0
+          },
+          {
+            "t": 8040,
+            "value": 55.0
+          },
+          {
+            "t": 8100,
+            "value": 45.0
+          },
+          {
+            "t": 8160,
+            "value": 55.0
+          },
+          {
+            "t": 8220,
+            "value": 45.0
+          },
+          {
+            "t": 8280,
+            "value": 55.0
+          },
+          {
+            "t": 8340,
+            "value": 45.0
+          },
+          {
+            "t": 8400,
+            "value": 55.0
+          },
+          {
+            "t": 8460,
+            "value": 45.0
+          },
+          {
+            "t": 8520,
+            "value": 55.0
+          },
+          {
+            "t": 8580,
+            "value": 45.0
+          },
+          {
+            "t": 8640,
+            "value": 55.0
+          },
+          {
+            "t": 8700,
+            "value": 45.0
+          },
+          {
+            "t": 8760,
+            "value": 55.0
+          },
+          {
+            "t": 8820,
+            "value": 45.0
+          },
+          {
+            "t": 8880,
+            "value": 55.0
+          },
+          {
+            "t": 8940,
+            "value": 45.0
+          },
+          {
+            "t": 9000,
+            "value": 55.0
+          },
+          {
+            "t": 9060,
+            "value": 45.0
+          },
+          {
+            "t": 9120,
+            "value": 55.0
+          },
+          {
+            "t": 9180,
+            "value": 45.0
+          },
+          {
+            "t": 9240,
+            "value": 55.0
+          },
+          {
+            "t": 9300,
+            "value": 45.0
+          },
+          {
+            "t": 9360,
+            "value": 55.0
+          },
+          {
+            "t": 9420,
+            "value": 45.0
+          },
+          {
+            "t": 9480,
+            "value": 55.0
+          },
+          {
+            "t": 9540,
+            "value": 45.0
+          },
+          {
+            "t": 9600,
+            "value": 55.0
+          },
+          {
+            "t": 9660,
+            "value": 45.0
+          },
+          {
+            "t": 9720,
+            "value": 55.0
+          },
+          {
+            "t": 9780,
+            "value": 45.0
+          },
+          {
+            "t": 9840,
+            "value": 55.0
+          },
+          {
+            "t": 9900,
+            "value": 45.0
+          },
+          {
+            "t": 9960,
+            "value": 55.0
+          },
+          {
+            "t": 10020,
+            "value": 45.0
+          },
+          {
+            "t": 10080,
+            "value": 55.0
+          },
+          {
+            "t": 10140,
+            "value": 45.0
+          },
+          {
+            "t": 10200,
+            "value": 55.0
+          },
+          {
+            "t": 10260,
+            "value": 45.0
+          },
+          {
+            "t": 10320,
+            "value": 55.0
+          },
+          {
+            "t": 10380,
+            "value": 45.0
+          },
+          {
+            "t": 10440,
+            "value": 55.0
+          },
+          {
+            "t": 10500,
+            "value": 45.0
+          },
+          {
+            "t": 10560,
+            "value": 55.0
+          },
+          {
+            "t": 10620,
+            "value": 45.0
+          },
+          {
+            "t": 10680,
+            "value": 55.0
+          },
+          {
+            "t": 10740,
+            "value": 45.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "amplitude_just_over_threshold",
+      "description": "Amplitude edge, high side: the same wave at +/-5.5%, half a percent past the previous scenario. mad climbs past 5.0 at t=1500 s \u2014 still inside the warm-up, where both averaging stages are working on partial windows \u2014 and yFault asserts one alarm_delay later at t=2400 s; the settled reading is exactly 5.5 once the deviation average has flushed the warm-up at t=3600 s. The pair brackets min_oscillation_amplitude from both sides.",
+      "inputs": {
+        "zone_dmpr_pos": [
+          {
+            "t": 0,
+            "value": 55.5
+          },
+          {
+            "t": 60,
+            "value": 44.5
+          },
+          {
+            "t": 120,
+            "value": 55.5
+          },
+          {
+            "t": 180,
+            "value": 44.5
+          },
+          {
+            "t": 240,
+            "value": 55.5
+          },
+          {
+            "t": 300,
+            "value": 44.5
+          },
+          {
+            "t": 360,
+            "value": 55.5
+          },
+          {
+            "t": 420,
+            "value": 44.5
+          },
+          {
+            "t": 480,
+            "value": 55.5
+          },
+          {
+            "t": 540,
+            "value": 44.5
+          },
+          {
+            "t": 600,
+            "value": 55.5
+          },
+          {
+            "t": 660,
+            "value": 44.5
+          },
+          {
+            "t": 720,
+            "value": 55.5
+          },
+          {
+            "t": 780,
+            "value": 44.5
+          },
+          {
+            "t": 840,
+            "value": 55.5
+          },
+          {
+            "t": 900,
+            "value": 44.5
+          },
+          {
+            "t": 960,
+            "value": 55.5
+          },
+          {
+            "t": 1020,
+            "value": 44.5
+          },
+          {
+            "t": 1080,
+            "value": 55.5
+          },
+          {
+            "t": 1140,
+            "value": 44.5
+          },
+          {
+            "t": 1200,
+            "value": 55.5
+          },
+          {
+            "t": 1260,
+            "value": 44.5
+          },
+          {
+            "t": 1320,
+            "value": 55.5
+          },
+          {
+            "t": 1380,
+            "value": 44.5
+          },
+          {
+            "t": 1440,
+            "value": 55.5
+          },
+          {
+            "t": 1500,
+            "value": 44.5
+          },
+          {
+            "t": 1560,
+            "value": 55.5
+          },
+          {
+            "t": 1620,
+            "value": 44.5
+          },
+          {
+            "t": 1680,
+            "value": 55.5
+          },
+          {
+            "t": 1740,
+            "value": 44.5
+          },
+          {
+            "t": 1800,
+            "value": 55.5
+          },
+          {
+            "t": 1860,
+            "value": 44.5
+          },
+          {
+            "t": 1920,
+            "value": 55.5
+          },
+          {
+            "t": 1980,
+            "value": 44.5
+          },
+          {
+            "t": 2040,
+            "value": 55.5
+          },
+          {
+            "t": 2100,
+            "value": 44.5
+          },
+          {
+            "t": 2160,
+            "value": 55.5
+          },
+          {
+            "t": 2220,
+            "value": 44.5
+          },
+          {
+            "t": 2280,
+            "value": 55.5
+          },
+          {
+            "t": 2340,
+            "value": 44.5
+          },
+          {
+            "t": 2400,
+            "value": 55.5
+          },
+          {
+            "t": 2460,
+            "value": 44.5
+          },
+          {
+            "t": 2520,
+            "value": 55.5
+          },
+          {
+            "t": 2580,
+            "value": 44.5
+          },
+          {
+            "t": 2640,
+            "value": 55.5
+          },
+          {
+            "t": 2700,
+            "value": 44.5
+          },
+          {
+            "t": 2760,
+            "value": 55.5
+          },
+          {
+            "t": 2820,
+            "value": 44.5
+          },
+          {
+            "t": 2880,
+            "value": 55.5
+          },
+          {
+            "t": 2940,
+            "value": 44.5
+          },
+          {
+            "t": 3000,
+            "value": 55.5
+          },
+          {
+            "t": 3060,
+            "value": 44.5
+          },
+          {
+            "t": 3120,
+            "value": 55.5
+          },
+          {
+            "t": 3180,
+            "value": 44.5
+          },
+          {
+            "t": 3240,
+            "value": 55.5
+          },
+          {
+            "t": 3300,
+            "value": 44.5
+          },
+          {
+            "t": 3360,
+            "value": 55.5
+          },
+          {
+            "t": 3420,
+            "value": 44.5
+          },
+          {
+            "t": 3480,
+            "value": 55.5
+          },
+          {
+            "t": 3540,
+            "value": 44.5
+          },
+          {
+            "t": 3600,
+            "value": 55.5
+          },
+          {
+            "t": 3660,
+            "value": 44.5
+          },
+          {
+            "t": 3720,
+            "value": 55.5
+          },
+          {
+            "t": 3780,
+            "value": 44.5
+          },
+          {
+            "t": 3840,
+            "value": 55.5
+          },
+          {
+            "t": 3900,
+            "value": 44.5
+          },
+          {
+            "t": 3960,
+            "value": 55.5
+          },
+          {
+            "t": 4020,
+            "value": 44.5
+          },
+          {
+            "t": 4080,
+            "value": 55.5
+          },
+          {
+            "t": 4140,
+            "value": 44.5
+          },
+          {
+            "t": 4200,
+            "value": 55.5
+          },
+          {
+            "t": 4260,
+            "value": 44.5
+          },
+          {
+            "t": 4320,
+            "value": 55.5
+          },
+          {
+            "t": 4380,
+            "value": 44.5
+          },
+          {
+            "t": 4440,
+            "value": 55.5
+          },
+          {
+            "t": 4500,
+            "value": 44.5
+          },
+          {
+            "t": 4560,
+            "value": 55.5
+          },
+          {
+            "t": 4620,
+            "value": 44.5
+          },
+          {
+            "t": 4680,
+            "value": 55.5
+          },
+          {
+            "t": 4740,
+            "value": 44.5
+          },
+          {
+            "t": 4800,
+            "value": 55.5
+          },
+          {
+            "t": 4860,
+            "value": 44.5
+          },
+          {
+            "t": 4920,
+            "value": 55.5
+          },
+          {
+            "t": 4980,
+            "value": 44.5
+          },
+          {
+            "t": 5040,
+            "value": 55.5
+          },
+          {
+            "t": 5100,
+            "value": 44.5
+          },
+          {
+            "t": 5160,
+            "value": 55.5
+          },
+          {
+            "t": 5220,
+            "value": 44.5
+          },
+          {
+            "t": 5280,
+            "value": 55.5
+          },
+          {
+            "t": 5340,
+            "value": 44.5
+          },
+          {
+            "t": 5400,
+            "value": 55.5
+          },
+          {
+            "t": 5460,
+            "value": 44.5
+          },
+          {
+            "t": 5520,
+            "value": 55.5
+          },
+          {
+            "t": 5580,
+            "value": 44.5
+          },
+          {
+            "t": 5640,
+            "value": 55.5
+          },
+          {
+            "t": 5700,
+            "value": 44.5
+          },
+          {
+            "t": 5760,
+            "value": 55.5
+          },
+          {
+            "t": 5820,
+            "value": 44.5
+          },
+          {
+            "t": 5880,
+            "value": 55.5
+          },
+          {
+            "t": 5940,
+            "value": 44.5
+          },
+          {
+            "t": 6000,
+            "value": 55.5
+          },
+          {
+            "t": 6060,
+            "value": 44.5
+          },
+          {
+            "t": 6120,
+            "value": 55.5
+          },
+          {
+            "t": 6180,
+            "value": 44.5
+          },
+          {
+            "t": 6240,
+            "value": 55.5
+          },
+          {
+            "t": 6300,
+            "value": 44.5
+          },
+          {
+            "t": 6360,
+            "value": 55.5
+          },
+          {
+            "t": 6420,
+            "value": 44.5
+          },
+          {
+            "t": 6480,
+            "value": 55.5
+          },
+          {
+            "t": 6540,
+            "value": 44.5
+          },
+          {
+            "t": 6600,
+            "value": 55.5
+          },
+          {
+            "t": 6660,
+            "value": 44.5
+          },
+          {
+            "t": 6720,
+            "value": 55.5
+          },
+          {
+            "t": 6780,
+            "value": 44.5
+          },
+          {
+            "t": 6840,
+            "value": 55.5
+          },
+          {
+            "t": 6900,
+            "value": 44.5
+          },
+          {
+            "t": 6960,
+            "value": 55.5
+          },
+          {
+            "t": 7020,
+            "value": 44.5
+          },
+          {
+            "t": 7080,
+            "value": 55.5
+          },
+          {
+            "t": 7140,
+            "value": 44.5
+          },
+          {
+            "t": 7200,
+            "value": 55.5
+          },
+          {
+            "t": 7260,
+            "value": 44.5
+          },
+          {
+            "t": 7320,
+            "value": 55.5
+          },
+          {
+            "t": 7380,
+            "value": 44.5
+          },
+          {
+            "t": 7440,
+            "value": 55.5
+          },
+          {
+            "t": 7500,
+            "value": 44.5
+          },
+          {
+            "t": 7560,
+            "value": 55.5
+          },
+          {
+            "t": 7620,
+            "value": 44.5
+          },
+          {
+            "t": 7680,
+            "value": 55.5
+          },
+          {
+            "t": 7740,
+            "value": 44.5
+          },
+          {
+            "t": 7800,
+            "value": 55.5
+          },
+          {
+            "t": 7860,
+            "value": 44.5
+          },
+          {
+            "t": 7920,
+            "value": 55.5
+          },
+          {
+            "t": 7980,
+            "value": 44.5
+          },
+          {
+            "t": 8040,
+            "value": 55.5
+          },
+          {
+            "t": 8100,
+            "value": 44.5
+          },
+          {
+            "t": 8160,
+            "value": 55.5
+          },
+          {
+            "t": 8220,
+            "value": 44.5
+          },
+          {
+            "t": 8280,
+            "value": 55.5
+          },
+          {
+            "t": 8340,
+            "value": 44.5
+          },
+          {
+            "t": 8400,
+            "value": 55.5
+          },
+          {
+            "t": 8460,
+            "value": 44.5
+          },
+          {
+            "t": 8520,
+            "value": 55.5
+          },
+          {
+            "t": 8580,
+            "value": 44.5
+          },
+          {
+            "t": 8640,
+            "value": 55.5
+          },
+          {
+            "t": 8700,
+            "value": 44.5
+          },
+          {
+            "t": 8760,
+            "value": 55.5
+          },
+          {
+            "t": 8820,
+            "value": 44.5
+          },
+          {
+            "t": 8880,
+            "value": 55.5
+          },
+          {
+            "t": 8940,
+            "value": 44.5
+          },
+          {
+            "t": 9000,
+            "value": 55.5
+          },
+          {
+            "t": 9060,
+            "value": 44.5
+          },
+          {
+            "t": 9120,
+            "value": 55.5
+          },
+          {
+            "t": 9180,
+            "value": 44.5
+          },
+          {
+            "t": 9240,
+            "value": 55.5
+          },
+          {
+            "t": 9300,
+            "value": 44.5
+          },
+          {
+            "t": 9360,
+            "value": 55.5
+          },
+          {
+            "t": 9420,
+            "value": 44.5
+          },
+          {
+            "t": 9480,
+            "value": 55.5
+          },
+          {
+            "t": 9540,
+            "value": 44.5
+          },
+          {
+            "t": 9600,
+            "value": 55.5
+          },
+          {
+            "t": 9660,
+            "value": 44.5
+          },
+          {
+            "t": 9720,
+            "value": 55.5
+          },
+          {
+            "t": 9780,
+            "value": 44.5
+          },
+          {
+            "t": 9840,
+            "value": 55.5
+          },
+          {
+            "t": 9900,
+            "value": 44.5
+          },
+          {
+            "t": 9960,
+            "value": 55.5
+          },
+          {
+            "t": 10020,
+            "value": 44.5
+          },
+          {
+            "t": 10080,
+            "value": 55.5
+          },
+          {
+            "t": 10140,
+            "value": 44.5
+          },
+          {
+            "t": 10200,
+            "value": 55.5
+          },
+          {
+            "t": 10260,
+            "value": 44.5
+          },
+          {
+            "t": 10320,
+            "value": 55.5
+          },
+          {
+            "t": 10380,
+            "value": 44.5
+          },
+          {
+            "t": 10440,
+            "value": 55.5
+          },
+          {
+            "t": 10500,
+            "value": 44.5
+          },
+          {
+            "t": 10560,
+            "value": 55.5
+          },
+          {
+            "t": 10620,
+            "value": 44.5
+          },
+          {
+            "t": 10680,
+            "value": 55.5
+          },
+          {
+            "t": 10740,
+            "value": 44.5
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2280,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 2520,
+          "to_s": 10800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "count_exactly_at_threshold",
+      "description": "Count edge, low side. A 6-minute square wave of +/-15% about 50%: five whole cycles per window, so every rolling window holds exactly 10 crossings and xCount lands on exactly 10.000000 (the pulse integral is 600 s of area against an 1800 s window, times a count_scale of 30, all exact in IEEE-754). xHigh is strict, so ten crossings reads clear. mad is 14.7, far above its threshold, so the count test is the only thing blocking the fault.",
+      "inputs": {
+        "zone_dmpr_pos": [
+          {
+            "t": 0,
+            "value": 65.0
+          },
+          {
+            "t": 180,
+            "value": 35.0
+          },
+          {
+            "t": 360,
+            "value": 65.0
+          },
+          {
+            "t": 540,
+            "value": 35.0
+          },
+          {
+            "t": 720,
+            "value": 65.0
+          },
+          {
+            "t": 900,
+            "value": 35.0
+          },
+          {
+            "t": 1080,
+            "value": 65.0
+          },
+          {
+            "t": 1260,
+            "value": 35.0
+          },
+          {
+            "t": 1440,
+            "value": 65.0
+          },
+          {
+            "t": 1620,
+            "value": 35.0
+          },
+          {
+            "t": 1800,
+            "value": 65.0
+          },
+          {
+            "t": 1980,
+            "value": 35.0
+          },
+          {
+            "t": 2160,
+            "value": 65.0
+          },
+          {
+            "t": 2340,
+            "value": 35.0
+          },
+          {
+            "t": 2520,
+            "value": 65.0
+          },
+          {
+            "t": 2700,
+            "value": 35.0
+          },
+          {
+            "t": 2880,
+            "value": 65.0
+          },
+          {
+            "t": 3060,
+            "value": 35.0
+          },
+          {
+            "t": 3240,
+            "value": 65.0
+          },
+          {
+            "t": 3420,
+            "value": 35.0
+          },
+          {
+            "t": 3600,
+            "value": 65.0
+          },
+          {
+            "t": 3780,
+            "value": 35.0
+          },
+          {
+            "t": 3960,
+            "value": 65.0
+          },
+          {
+            "t": 4140,
+            "value": 35.0
+          },
+          {
+            "t": 4320,
+            "value": 65.0
+          },
+          {
+            "t": 4500,
+            "value": 35.0
+          },
+          {
+            "t": 4680,
+            "value": 65.0
+          },
+          {
+            "t": 4860,
+            "value": 35.0
+          },
+          {
+            "t": 5040,
+            "value": 65.0
+          },
+          {
+            "t": 5220,
+            "value": 35.0
+          },
+          {
+            "t": 5400,
+            "value": 65.0
+          },
+          {
+            "t": 5580,
+            "value": 35.0
+          },
+          {
+            "t": 5760,
+            "value": 65.0
+          },
+          {
+            "t": 5940,
+            "value": 35.0
+          },
+          {
+            "t": 6120,
+            "value": 65.0
+          },
+          {
+            "t": 6300,
+            "value": 35.0
+          },
+          {
+            "t": 6480,
+            "value": 65.0
+          },
+          {
+            "t": 6660,
+            "value": 35.0
+          },
+          {
+            "t": 6840,
+            "value": 65.0
+          },
+          {
+            "t": 7020,
+            "value": 35.0
+          },
+          {
+            "t": 7200,
+            "value": 65.0
+          },
+          {
+            "t": 7380,
+            "value": 35.0
+          },
+          {
+            "t": 7560,
+            "value": 65.0
+          },
+          {
+            "t": 7740,
+            "value": 35.0
+          },
+          {
+            "t": 7920,
+            "value": 65.0
+          },
+          {
+            "t": 8100,
+            "value": 35.0
+          },
+          {
+            "t": 8280,
+            "value": 65.0
+          },
+          {
+            "t": 8460,
+            "value": 35.0
+          },
+          {
+            "t": 8640,
+            "value": 65.0
+          },
+          {
+            "t": 8820,
+            "value": 35.0
+          },
+          {
+            "t": 9000,
+            "value": 65.0
+          },
+          {
+            "t": 9180,
+            "value": 35.0
+          },
+          {
+            "t": 9360,
+            "value": 65.0
+          },
+          {
+            "t": 9540,
+            "value": 35.0
+          },
+          {
+            "t": 9720,
+            "value": 65.0
+          },
+          {
+            "t": 9900,
+            "value": 35.0
+          },
+          {
+            "t": 10080,
+            "value": 65.0
+          },
+          {
+            "t": 10260,
+            "value": 35.0
+          },
+          {
+            "t": 10440,
+            "value": 65.0
+          },
+          {
+            "t": 10620,
+            "value": 35.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "count_just_over_threshold",
+      "description": "Count edge, high side. A 5-minute asymmetric cycle \u2014 one tick at 90%, four at 45% \u2014 puts 12 crossings in every window at mad 14.4. A symmetric wave cannot place 11 or 12 crossings on a 60 s grid (the available periods jump from 10 crossings at 360 s to 15 at 240 s), so the duty cycle is skewed instead; the mean sits at 54%, above the low value and below the high one, and each cycle still crosses it twice. yFault asserts at t=2760 s.",
+      "inputs": {
+        "zone_dmpr_pos": [
+          {
+            "t": 0,
+            "value": 90.0
+          },
+          {
+            "t": 60,
+            "value": 45.0
+          },
+          {
+            "t": 300,
+            "value": 90.0
+          },
+          {
+            "t": 360,
+            "value": 45.0
+          },
+          {
+            "t": 600,
+            "value": 90.0
+          },
+          {
+            "t": 660,
+            "value": 45.0
+          },
+          {
+            "t": 900,
+            "value": 90.0
+          },
+          {
+            "t": 960,
+            "value": 45.0
+          },
+          {
+            "t": 1200,
+            "value": 90.0
+          },
+          {
+            "t": 1260,
+            "value": 45.0
+          },
+          {
+            "t": 1500,
+            "value": 90.0
+          },
+          {
+            "t": 1560,
+            "value": 45.0
+          },
+          {
+            "t": 1800,
+            "value": 90.0
+          },
+          {
+            "t": 1860,
+            "value": 45.0
+          },
+          {
+            "t": 2100,
+            "value": 90.0
+          },
+          {
+            "t": 2160,
+            "value": 45.0
+          },
+          {
+            "t": 2400,
+            "value": 90.0
+          },
+          {
+            "t": 2460,
+            "value": 45.0
+          },
+          {
+            "t": 2700,
+            "value": 90.0
+          },
+          {
+            "t": 2760,
+            "value": 45.0
+          },
+          {
+            "t": 3000,
+            "value": 90.0
+          },
+          {
+            "t": 3060,
+            "value": 45.0
+          },
+          {
+            "t": 3300,
+            "value": 90.0
+          },
+          {
+            "t": 3360,
+            "value": 45.0
+          },
+          {
+            "t": 3600,
+            "value": 90.0
+          },
+          {
+            "t": 3660,
+            "value": 45.0
+          },
+          {
+            "t": 3900,
+            "value": 90.0
+          },
+          {
+            "t": 3960,
+            "value": 45.0
+          },
+          {
+            "t": 4200,
+            "value": 90.0
+          },
+          {
+            "t": 4260,
+            "value": 45.0
+          },
+          {
+            "t": 4500,
+            "value": 90.0
+          },
+          {
+            "t": 4560,
+            "value": 45.0
+          },
+          {
+            "t": 4800,
+            "value": 90.0
+          },
+          {
+            "t": 4860,
+            "value": 45.0
+          },
+          {
+            "t": 5100,
+            "value": 90.0
+          },
+          {
+            "t": 5160,
+            "value": 45.0
+          },
+          {
+            "t": 5400,
+            "value": 90.0
+          },
+          {
+            "t": 5460,
+            "value": 45.0
+          },
+          {
+            "t": 5700,
+            "value": 90.0
+          },
+          {
+            "t": 5760,
+            "value": 45.0
+          },
+          {
+            "t": 6000,
+            "value": 90.0
+          },
+          {
+            "t": 6060,
+            "value": 45.0
+          },
+          {
+            "t": 6300,
+            "value": 90.0
+          },
+          {
+            "t": 6360,
+            "value": 45.0
+          },
+          {
+            "t": 6600,
+            "value": 90.0
+          },
+          {
+            "t": 6660,
+            "value": 45.0
+          },
+          {
+            "t": 6900,
+            "value": 90.0
+          },
+          {
+            "t": 6960,
+            "value": 45.0
+          },
+          {
+            "t": 7200,
+            "value": 90.0
+          },
+          {
+            "t": 7260,
+            "value": 45.0
+          },
+          {
+            "t": 7500,
+            "value": 90.0
+          },
+          {
+            "t": 7560,
+            "value": 45.0
+          },
+          {
+            "t": 7800,
+            "value": 90.0
+          },
+          {
+            "t": 7860,
+            "value": 45.0
+          },
+          {
+            "t": 8100,
+            "value": 90.0
+          },
+          {
+            "t": 8160,
+            "value": 45.0
+          },
+          {
+            "t": 8400,
+            "value": 90.0
+          },
+          {
+            "t": 8460,
+            "value": 45.0
+          },
+          {
+            "t": 8700,
+            "value": 90.0
+          },
+          {
+            "t": 8760,
+            "value": 45.0
+          },
+          {
+            "t": 9000,
+            "value": 90.0
+          },
+          {
+            "t": 9060,
+            "value": 45.0
+          },
+          {
+            "t": 9300,
+            "value": 90.0
+          },
+          {
+            "t": 9360,
+            "value": 45.0
+          },
+          {
+            "t": 9600,
+            "value": 90.0
+          },
+          {
+            "t": 9660,
+            "value": 45.0
+          },
+          {
+            "t": 9900,
+            "value": 90.0
+          },
+          {
+            "t": 9960,
+            "value": 45.0
+          },
+          {
+            "t": 10200,
+            "value": 90.0
+          },
+          {
+            "t": 10260,
+            "value": 45.0
+          },
+          {
+            "t": 10500,
+            "value": 90.0
+          },
+          {
+            "t": 10560,
+            "value": 45.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2640,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 2880,
+          "to_s": 10800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "hunting_stops_before_delay",
+      "description": "Transient: 22 minutes of hard hunting (+/-10%, 4-minute period) starting at t=1800 s, after the windows have filled, then the damper settles. The eleventh crossing lands at t=3120 s and lifts the count over the threshold just as the oscillation ends; the count falls back to exactly 10.0 at t=3720 s as the first crossing ages out of the trailing window. `both` holds for 540 s against a 900 s alarm_delay, so one disturbance rejection does not report.",
+      "inputs": {
+        "zone_dmpr_pos": [
+          {
+            "t": 0,
+            "value": 50.0
+          },
+          {
+            "t": 1800,
+            "value": 60.0
+          },
+          {
+            "t": 1920,
+            "value": 40.0
+          },
+          {
+            "t": 2040,
+            "value": 60.0
+          },
+          {
+            "t": 2160,
+            "value": 40.0
+          },
+          {
+            "t": 2280,
+            "value": 60.0
+          },
+          {
+            "t": 2400,
+            "value": 40.0
+          },
+          {
+            "t": 2520,
+            "value": 60.0
+          },
+          {
+            "t": 2640,
+            "value": 40.0
+          },
+          {
+            "t": 2760,
+            "value": 60.0
+          },
+          {
+            "t": 2880,
+            "value": 40.0
+          },
+          {
+            "t": 3000,
+            "value": 60.0
+          },
+          {
+            "t": 3120,
+            "value": 50.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "recovery_clears",
+      "description": "Recovery: the same hunting starts at t=1800 s and runs for 90 minutes before a technician retunes the loop at t=7200 s. yFault asserts at t=4020 s and clears at t=7800 s \u2014 600 s after the last swing, the time five of the fifteen crossings in the window need to age out and bring the count back to exactly 10.0. Neither statistic drops when the hunting stops; both decay across the trailing window, and here the count reaches its threshold first (mad does not fall under 5.0 until t=8040 s).",
+      "inputs": {
+        "zone_dmpr_pos": [
+          {
+            "t": 0,
+            "value": 50.0
+          },
+          {
+            "t": 1800,
+            "value": 60.0
+          },
+          {
+            "t": 1920,
+            "value": 40.0
+          },
+          {
+            "t": 2040,
+            "value": 60.0
+          },
+          {
+            "t": 2160,
+            "value": 40.0
+          },
+          {
+            "t": 2280,
+            "value": 60.0
+          },
+          {
+            "t": 2400,
+            "value": 40.0
+          },
+          {
+            "t": 2520,
+            "value": 60.0
+          },
+          {
+            "t": 2640,
+            "value": 40.0
+          },
+          {
+            "t": 2760,
+            "value": 60.0
+          },
+          {
+            "t": 2880,
+            "value": 40.0
+          },
+          {
+            "t": 3000,
+            "value": 60.0
+          },
+          {
+            "t": 3120,
+            "value": 40.0
+          },
+          {
+            "t": 3240,
+            "value": 60.0
+          },
+          {
+            "t": 3360,
+            "value": 40.0
+          },
+          {
+            "t": 3480,
+            "value": 60.0
+          },
+          {
+            "t": 3600,
+            "value": 40.0
+          },
+          {
+            "t": 3720,
+            "value": 60.0
+          },
+          {
+            "t": 3840,
+            "value": 40.0
+          },
+          {
+            "t": 3960,
+            "value": 60.0
+          },
+          {
+            "t": 4080,
+            "value": 40.0
+          },
+          {
+            "t": 4200,
+            "value": 60.0
+          },
+          {
+            "t": 4320,
+            "value": 40.0
+          },
+          {
+            "t": 4440,
+            "value": 60.0
+          },
+          {
+            "t": 4560,
+            "value": 40.0
+          },
+          {
+            "t": 4680,
+            "value": 60.0
+          },
+          {
+            "t": 4800,
+            "value": 40.0
+          },
+          {
+            "t": 4920,
+            "value": 60.0
+          },
+          {
+            "t": 5040,
+            "value": 40.0
+          },
+          {
+            "t": 5160,
+            "value": 60.0
+          },
+          {
+            "t": 5280,
+            "value": 40.0
+          },
+          {
+            "t": 5400,
+            "value": 60.0
+          },
+          {
+            "t": 5520,
+            "value": 40.0
+          },
+          {
+            "t": 5640,
+            "value": 60.0
+          },
+          {
+            "t": 5760,
+            "value": 40.0
+          },
+          {
+            "t": 5880,
+            "value": 60.0
+          },
+          {
+            "t": 6000,
+            "value": 40.0
+          },
+          {
+            "t": 6120,
+            "value": 60.0
+          },
+          {
+            "t": 6240,
+            "value": 40.0
+          },
+          {
+            "t": 6360,
+            "value": 60.0
+          },
+          {
+            "t": 6480,
+            "value": 40.0
+          },
+          {
+            "t": 6600,
+            "value": 60.0
+          },
+          {
+            "t": 6720,
+            "value": 40.0
+          },
+          {
+            "t": 6840,
+            "value": 60.0
+          },
+          {
+            "t": 6960,
+            "value": 40.0
+          },
+          {
+            "t": 7080,
+            "value": 60.0
+          },
+          {
+            "t": 7200,
+            "value": 50.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3900,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 4140,
+          "to_s": 7620,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 7860,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "warmup_burst_asserts",
+      "description": "The warm-up artifact, and why the host NO_EVAL precondition is load-bearing. Ten minutes of tick-rate +/-20% swinging at engine start produces 8 crossings, and 8 crossings per 30 minutes is the reference's own NO_FAULT vector. But while the window is filling, xRate divides by elapsed time rather than by eval_window, so those 8 crossings read as a count of 24 at t=600 s and stay above 10 until t=1440 s. mad is inflated the same way. Both hold long enough for yFault to assert at t=1140 s; it clears at t=1440 s as the divisor grows, and the settled count after the window fills is 8. alarm_delay (900 s) is half of eval_window (1800 s) and cannot cover this \u2014 only the host gate can.",
+      "inputs": {
+        "zone_dmpr_pos": [
+          {
+            "t": 0,
+            "value": 70.0
+          },
+          {
+            "t": 60,
+            "value": 30.0
+          },
+          {
+            "t": 120,
+            "value": 70.0
+          },
+          {
+            "t": 180,
+            "value": 30.0
+          },
+          {
+            "t": 240,
+            "value": 70.0
+          },
+          {
+            "t": 300,
+            "value": 30.0
+          },
+          {
+            "t": 360,
+            "value": 70.0
+          },
+          {
+            "t": 420,
+            "value": 30.0
+          },
+          {
+            "t": 480,
+            "value": 70.0
+          },
+          {
+            "t": 540,
+            "value": 30.0
+          },
+          {
+            "t": 600,
+            "value": 50.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1020,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1200,
+          "to_s": 1320,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1500,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

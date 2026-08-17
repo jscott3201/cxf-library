@@ -1,0 +1,148 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 7200 },
+  "scenarios": [
+    {
+      "name": "tracking_normally",
+      "description": "Reference vector 1: 180 L/s measured against a 200 L/s setpoint. The 10% error is ordinary damper trim — a VAV box modulating against a moving branch pressure never sits exactly on setpoint. ratio holds at 0.10, well under the 0.30 threshold, so neither delay ever starts and the setpoint is evaluable throughout.",
+      "inputs": {
+        "zone_airflow": 180.0,
+        "zone_airflow_sp": 200.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "ySetpointOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "sustained_tracking_error",
+      "description": "Reference vector 2: 100 L/s delivered against a 200 L/s setpoint — a 50% shortfall, the signature of a damper stuck near minimum while the loop calls for more. ratio is 0.50 from the first tick, so track satisfies tracking_duration at t=900 s and persist adds alarm_delay for an assertion at t=1200 s, matching the reference's 20-minute sustained-error vector exactly.",
+      "inputs": {
+        "zone_airflow": 100.0,
+        "zone_airflow_sp": 200.0
+      },
+      "expect": [
+        { "output": "ySetpointOk", "from_s": 0, "to_s": 7200, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 900, "equals": false },
+        { "output": "yFault", "from_s": 1500, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "setpoint_below_minimum",
+      "description": "Reference vector 3, the NO_EVAL case: 20 L/s against a 30 L/s setpoint is a 33% error on paper, but a 30 L/s setpoint is below min_evaluable_setpoint — at that flow the box's differential-pressure sensor is reading a few pascals and the fraction is sensor noise, not tracking. ySetpointOk stays false for the whole run and yFault is held down with it; false yFault here means unknown, not healthy.",
+      "inputs": {
+        "zone_airflow": 20.0,
+        "zone_airflow_sp": 30.0
+      },
+      "expect": [
+        { "output": "ySetpointOk", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "error_exactly_at_threshold",
+      "description": "Threshold edge, low side: 140 L/s against 200 L/s is 60/200 = 0.30 exactly in IEEE-754, the same double the threshold parameter carries. ratioHigh is a strict comparison, so an error sitting exactly on tracking_error_threshold reads clear and no timer starts.",
+      "inputs": {
+        "zone_airflow": 140.0,
+        "zone_airflow_sp": 200.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "ySetpointOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "error_just_over_threshold",
+      "description": "Threshold edge, high side: 139 L/s against 200 L/s is 0.305, one L/s past the previous scenario. The pair brackets tracking_error_threshold from both sides. The alarm follows the same 900 + 300 s chain and asserts at t=1200 s.",
+      "inputs": {
+        "zone_airflow": 139.0,
+        "zone_airflow_sp": 200.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 900, "equals": false },
+        { "output": "yFault", "from_s": 1500, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "setpoint_exactly_at_minimum",
+      "description": "Evaluability edge, low side: a 50.0 L/s setpoint with 200 L/s measured is a 300% error, and the rule still refuses to judge it. spOk is strict, so a setpoint sitting exactly on min_evaluable_setpoint is not evaluable; ySetpointOk stays false and the gate holds yFault down for the whole run.",
+      "inputs": {
+        "zone_airflow": 200.0,
+        "zone_airflow_sp": 50.0
+      },
+      "expect": [
+        { "output": "ySetpointOk", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "setpoint_just_above_minimum",
+      "description": "Evaluability edge, high side: a 51 L/s setpoint with the box delivering nothing — a disconnected actuator on a small zone. One L/s of setpoint separates this from the previous scenario: ySetpointOk is true, the 100% error clears the ratio test, and yFault asserts at t=1200 s.",
+      "inputs": {
+        "zone_airflow": 0.0,
+        "zone_airflow_sp": 51.0
+      },
+      "expect": [
+        { "output": "ySetpointOk", "from_s": 0, "to_s": 7200, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 900, "equals": false },
+        { "output": "yFault", "from_s": 1500, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "over_delivery",
+      "description": "300 L/s against a 200 L/s setpoint — a damper stuck open, or branch pressure high enough that the box cannot throttle down to setpoint. The absolute value makes the test symmetric, so a 50% overshoot alarms on the same schedule as the 50% shortfall in sustained_tracking_error. This is the case the card's over-delivery runtime estimate prices.",
+      "inputs": {
+        "zone_airflow": 300.0,
+        "zone_airflow_sp": 200.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 900, "equals": false },
+        { "output": "yFault", "from_s": 1500, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "error_clears_between_delays",
+      "description": "Transient across the two-timer boundary: a 50% error runs from t=0 and clears at t=1000 s, after track has satisfied tracking_duration (t=900 s) but before persist has served its 300 s alarm_delay. The gate drops at t=1200 s, both timers discard their accumulated time, and nothing is reported. The duration condition alone is not a fault.",
+      "inputs": {
+        "zone_airflow": [
+          { "t": 0, "value": 100.0 },
+          { "t": 1000, "value": 200.0 }
+        ],
+        "zone_airflow_sp": 200.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "brief_excursion",
+      "description": "Transient shorter than tracking_duration: the box loses flow for 700 s — a branch-pressure dip while a neighbouring zone opens up — and recovers. The gate is true for three ticks, short of the 900 s track needs, so no timer survives and no alarm is raised.",
+      "inputs": {
+        "zone_airflow": [
+          { "t": 0, "value": 100.0 },
+          { "t": 700, "value": 200.0 }
+        ],
+        "zone_airflow_sp": 200.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "recovery_clears",
+      "description": "Recovery: the same 50% shortfall asserts at t=1200 s, then flow is restored at t=3000 s — a technician reseats the actuator coupling. TrueDelay has no off-delay, so the gate falling drops yFault on the same tick the error clears.",
+      "inputs": {
+        "zone_airflow": [
+          { "t": 0, "value": 100.0 },
+          { "t": 3000, "value": 200.0 }
+        ],
+        "zone_airflow_sp": 200.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 900, "equals": false },
+        { "output": "yFault", "from_s": 1500, "to_s": 2700, "equals": true },
+        { "output": "yFault", "from_s": 3300, "to_s": 7200, "equals": false }
+      ]
+    }
+  ]
+}

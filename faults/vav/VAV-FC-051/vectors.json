@@ -1,0 +1,111 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 21600 },
+  "scenarios": [
+    {
+      "name": "normal_diversity",
+      "description": "Reference vector: the zone asks for 80% cooling while 70% of its siblings are satisfied. A box working partway up its request range is the system doing its job — normal load diversity, no rogue.",
+      "inputs": { "zone_clg_request": 80.0, "satisfied_zone_fraction": 0.70 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 21600, "equals": false }
+      ]
+    },
+    {
+      "name": "rogue_zone_others_satisfied",
+      "description": "Reference vector: the zone pins its request at 100% while 90% of the building is satisfied, held for 90 min. One box is dragging the AHU reset for everyone; the alarm lands at rogue_duration (3600 s) + alarm_delay (1800 s) = 5400 s.",
+      "inputs": { "zone_clg_request": 100.0, "satisfied_zone_fraction": 0.90 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5100, "equals": false },
+        { "output": "yFault", "from_s": 5700, "to_s": 21600, "equals": true }
+      ]
+    },
+    {
+      "name": "many_zones_unsatisfied",
+      "description": "Reference vector: the same saturated request, but only 50% of zones are satisfied. Half the building is hot — the AHU should be resetting its setpoint down, and the zone asking for it is right. A building-wide cooling shortfall is an AHU or plant finding, not a rogue zone.",
+      "inputs": { "zone_clg_request": 100.0, "satisfied_zone_fraction": 0.50 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 21600, "equals": false }
+      ]
+    },
+    {
+      "name": "request_exactly_at_threshold",
+      "description": "Boundary: the request sits exactly on request_max_threshold (99.0%) with 90% of zones satisfied. The test is strict `>`, so a request one count short of the adopted ceiling is not saturation and nothing fires.",
+      "inputs": { "zone_clg_request": 99.0, "satisfied_zone_fraction": 0.90 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 21600, "equals": false }
+      ]
+    },
+    {
+      "name": "quantized_request_just_above_threshold",
+      "description": "Boundary from the other side: a box reporting 99.2% — a scaled 16-bit request that never renders as exactly 100 — clears the 99.0 threshold and alarms on the same 5400 s schedule as a clean 100%. This is why the threshold is 99.0 rather than 100.0.",
+      "inputs": { "zone_clg_request": 99.2, "satisfied_zone_fraction": 0.90 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5100, "equals": false },
+        { "output": "yFault", "from_s": 5700, "to_s": 21600, "equals": true }
+      ]
+    },
+    {
+      "name": "satisfaction_exactly_at_threshold",
+      "description": "Boundary: exactly 80% of zones satisfied — satisfied_threshold on the nose — against a saturated request. The reference writes `>`, so the fraction must exceed the threshold and a four-in-five split stays clear.",
+      "inputs": { "zone_clg_request": 100.0, "satisfied_zone_fraction": 0.80 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 21600, "equals": false }
+      ]
+    },
+    {
+      "name": "satisfaction_just_above_threshold",
+      "description": "Boundary from the other side: 81% satisfied with the request saturated crosses satisfied_threshold and alarms at 5400 s.",
+      "inputs": { "zone_clg_request": 100.0, "satisfied_zone_fraction": 0.81 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5100, "equals": false },
+        { "output": "yFault", "from_s": 5700, "to_s": 21600, "equals": true }
+      ]
+    },
+    {
+      "name": "request_released_before_rogue_duration",
+      "description": "Transient: the zone rides at maximum request for 50 min after a warm morning and then falls back to 60% at t=3000 s, 600 s short of rogue_duration. A zone that recovers on its own was tracking real load, so the duration timer discards the accumulated time and nothing is ever raised.",
+      "inputs": {
+        "zone_clg_request": [
+          { "t": 0, "value": 100.0 },
+          { "t": 3000, "value": 60.0 }
+        ],
+        "satisfied_zone_fraction": 0.90
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 21600, "equals": false }
+      ]
+    },
+    {
+      "name": "satisfaction_drops_mid_hold",
+      "description": "Transient: the request stays pinned, but the rest of the building loses ground at t=4200 s (0.90 to 0.60) and recovers at t=4800 s. rogue_duration had already elapsed and the alarm delay was running; the interruption drops both timers, so the alarm restarts from 4800 s and lands at 10200 s rather than 5400 s.",
+      "inputs": {
+        "zone_clg_request": 100.0,
+        "satisfied_zone_fraction": [
+          { "t": 0, "value": 0.90 },
+          { "t": 4200, "value": 0.60 },
+          { "t": 4800, "value": 0.90 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 9900, "equals": false },
+        { "output": "yFault", "from_s": 10500, "to_s": 21600, "equals": true }
+      ]
+    },
+    {
+      "name": "rogue_zone_alarms_then_clears",
+      "description": "Recovery: the alarm asserts at 5400 s, then the zone is fixed at t=10800 s — the thermostat is re-sited out of the sun and the request falls to 40%. yFault drops on that tick, since TrueDelay only delays the rising edge.",
+      "inputs": {
+        "zone_clg_request": [
+          { "t": 0, "value": 100.0 },
+          { "t": 10800, "value": 40.0 }
+        ],
+        "satisfied_zone_fraction": 0.90
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5100, "equals": false },
+        { "output": "yFault", "from_s": 5700, "to_s": 10500, "equals": true },
+        { "output": "yFault", "from_s": 11100, "to_s": 21600, "equals": false }
+      ]
+    }
+  ]
+}

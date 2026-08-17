@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1560 340" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <g>
+    <rect x="12" y="44" width="190" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="107" y="63" text-anchor="middle" fill="#1e3a8a">zone_airflow_sp_min</text>
+    <rect x="12" y="254" width="190" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="107" y="273" text-anchor="middle" fill="#1e3a8a">rht_vlv_cmd</text>
+  </g>
+
+  <!-- ventilation allowance -->
+  <rect x="240" y="140" width="230" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="355" y="162" text-anchor="middle" fill="#24292f" font-weight="bold">ventReq</text>
+  <text x="355" y="180" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 70 L/s</text>
+
+  <rect x="510" y="140" width="250" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="635" y="162" text-anchor="middle" fill="#24292f" font-weight="bold">scaled</text>
+  <text x="635" y="180" text-anchor="middle" fill="#57606a" font-size="11">Reals.MultiplyByParameter · k = 1.5</text>
+
+  <!-- comparisons -->
+  <rect x="800" y="45" width="160" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="880" y="67" text-anchor="middle" fill="#24292f" font-weight="bold">spHigh</text>
+  <text x="880" y="85" text-anchor="middle" fill="#57606a" font-size="11">Reals.Greater</text>
+
+  <rect x="510" y="240" width="260" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="640" y="262" text-anchor="middle" fill="#24292f" font-weight="bold">rhtOn</text>
+  <text x="640" y="280" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 10 %</text>
+
+  <!-- conjunction -->
+  <rect x="1010" y="150" width="130" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1075" y="172" text-anchor="middle" fill="#24292f" font-weight="bold">both</text>
+  <text x="1075" y="190" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <!-- persistence -->
+  <rect x="1190" y="150" width="180" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1280" y="172" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1280" y="190" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 3600 s</text>
+
+  <!-- boundary output -->
+  <rect x="1420" y="164" width="80" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1460" y="183" text-anchor="middle" fill="#7f1d1d">yFault</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 202 59 H 796"/>
+    <path d="M 470 169 H 506"/>
+    <path d="M 760 169 H 780 V 89 H 796"/>
+    <path d="M 202 269 H 506"/>
+
+    <path d="M 960 74 H 985 V 164 H 1006"/>
+    <path d="M 770 269 H 985 V 194 H 1006"/>
+
+    <path d="M 1140 179 H 1186"/>
+    <path d="M 1370 179 H 1416"/>
+  </g>
+
+  <!-- signal type hints -->
+  <text x="210" y="38" fill="#7d8590" font-size="10">Real</text>
+  <text x="210" y="248" fill="#7d8590" font-size="10">Real</text>
+  <text x="970" y="68" fill="#7d8590" font-size="10">Bool</text>
+  <text x="780" y="263" fill="#7d8590" font-size="10">Bool</text>
+</svg>
