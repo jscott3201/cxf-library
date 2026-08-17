@@ -1,0 +1,23 @@
+[book]
+title = "cxf-library — CDL Fault Rule Library"
+authors = ["Justin Scott"]
+description = "Engine-verified CDL fault detection rules for the open-control engine, grounded in ASHRAE Guideline 36 and the HVAC FDD Reference."
+src = "src"
+language = "en"
+
+[build]
+create-missing = false
+
+[output.html]
+default-theme = "rust"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/jscott3201/cxf-library"
+site-url = "/cxf-library/"
+
+[output.html.search]
+enable = true
+limit-results = 20
+
+[output.html.fold]
+enable = true
+level = 1
