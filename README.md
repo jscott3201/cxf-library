@@ -1,7 +1,11 @@
 # cxf-library
 
-Private library of CXF JSON control programs and CDL-based fault detection
-rules for the [open-control engine](https://github.com/jscott3201/open-control-engine).
+An engine-verified library of CXF JSON control programs and CDL-based fault
+detection rules for the [open-control engine](https://github.com/jscott3201/open-control-engine).
+
+> **Status: early access.** Shared for review ahead of a broader release;
+> content and contracts may still change. No open-source license has been
+> granted yet — all rights reserved until a LICENSE file lands.
 
 Each fault rule is a CDL composite block stored as CXF JSON-LD the engine loads
 directly, paired with a human/machine fault card and executable test vectors.
