@@ -1,0 +1,179 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 5400 },
+  "scenarios": [
+    {
+      "name": "idle_consistent",
+      "description": "Reference vector: nothing running, sat 22 °C equals mat 22 °C — air passes through the unit unchanged",
+      "inputs": { "sat": 22.0, "mat": 22.0, "comp_status": false, "htg_status": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "idle_inconsistent",
+      "description": "Reference vector: nothing running but sat 22 °C sits 6 °C below mat 28 °C — no heat transfer surface is active, so one of the two sensors is wrong",
+      "inputs": { "sat": 22.0, "mat": 28.0, "comp_status": false, "htg_status": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "cooling_consistent",
+      "description": "Reference vector: compressor on, sat 13 °C is 12 °C below mat 25 °C — the evaporator is doing exactly what it should",
+      "inputs": { "sat": 13.0, "mat": 25.0, "comp_status": true, "htg_status": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "cooling_inconsistent",
+      "description": "Reference vector: compressor on but sat 27 °C is 2 °C ABOVE mat 25 °C — the coil is adding heat while nominally cooling (lost charge, failed compressor, or a swapped sensor)",
+      "inputs": { "sat": 27.0, "mat": 25.0, "comp_status": true, "htg_status": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "heating_consistent",
+      "description": "Heating branch, healthy: burner on, sat 35 °C is 15 °C above mat 20 °C",
+      "inputs": { "sat": 35.0, "mat": 20.0, "comp_status": false, "htg_status": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "heating_inconsistent",
+      "description": "Heating branch, faulted: burner energized but sat 18 °C is 4 °C below mat 22 °C — heat is called for and none arrives (failed ignition, tripped limit, or no gas)",
+      "inputs": { "sat": 18.0, "mat": 22.0, "comp_status": false, "htg_status": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "edge_idle_deviation_equals_threshold",
+      "description": "Threshold edge: |sat − mat| = 3.0 °C exactly while idle; the comparison is strict, so no fault",
+      "inputs": { "sat": 22.0, "mat": 25.0, "comp_status": false, "htg_status": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "edge_idle_deviation_just_over_threshold",
+      "description": "Threshold edge: |sat − mat| = 3.1 °C while idle clears the strict comparison and alarms after alarm_delay",
+      "inputs": { "sat": 22.0, "mat": 25.1, "comp_status": false, "htg_status": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "edge_cooling_deviation_equals_threshold",
+      "description": "Threshold edge: sat − mat = 1.0 °C exactly with the compressor on; strict comparison, no fault",
+      "inputs": { "sat": 26.0, "mat": 25.0, "comp_status": true, "htg_status": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "edge_cooling_deviation_just_over_threshold",
+      "description": "Threshold edge: sat − mat = 1.1 °C with the compressor on alarms after alarm_delay",
+      "inputs": { "sat": 26.1, "mat": 25.0, "comp_status": true, "htg_status": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "edge_heating_deviation_equals_threshold",
+      "description": "Threshold edge: mat − sat = 1.0 °C exactly with the burner on; strict comparison, no fault",
+      "inputs": { "sat": 21.0, "mat": 22.0, "comp_status": false, "htg_status": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "edge_heating_deviation_just_over_threshold",
+      "description": "Threshold edge: mat − sat = 1.1 °C with the burner on alarms after alarm_delay",
+      "inputs": { "sat": 20.9, "mat": 22.0, "comp_status": false, "htg_status": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "idle_threshold_not_applied_while_cooling",
+      "description": "Mode conditionality: the same 12 °C spread that would be a gross idle violation is normal cooling, and the idle branch is held off by comp_status",
+      "inputs": { "sat": 13.0, "mat": 25.0, "comp_status": true, "htg_status": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "simultaneous_heating_and_cooling",
+      "description": "Compressor and burner both on with sat 30 °C above mat 25 °C: the heating branch is satisfied, the cooling branch is contradicted, and the rule reports the contradiction rather than refereeing the mode",
+      "inputs": { "sat": 30.0, "mat": 25.0, "comp_status": true, "htg_status": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "transient_inconsistency_never_alarms",
+      "description": "Idle inconsistency lasts 1200 s — shorter than alarm_delay — then clears; the persistence timer resets and no alarm is raised",
+      "inputs": {
+        "sat": 22.0,
+        "mat": [
+          { "t": 0, "value": 22.0 },
+          { "t": 600, "value": 28.0 },
+          { "t": 1800, "value": 22.0 }
+        ],
+        "comp_status": false,
+        "htg_status": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "stage_start_resets_persistence",
+      "description": "An idle inconsistency accumulates for 900 s, then the compressor starts and the temperatures become consistent for cooling; the idle branch drops out and the timer restarts, so the earlier violation never matures into an alarm",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 22.0 },
+          { "t": 900, "value": 13.0 }
+        ],
+        "mat": 28.0,
+        "comp_status": [
+          { "t": 0, "value": false },
+          { "t": 900, "value": true }
+        ],
+        "htg_status": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "fault_clears_on_recovery",
+      "description": "Sustained idle inconsistency alarms after 1800 s; the alarm drops on the tick the sensors agree again (mat recalibrated at t = 3600 s)",
+      "inputs": {
+        "sat": 22.0,
+        "mat": [
+          { "t": 0, "value": 28.0 },
+          { "t": 3600, "value": 22.0 }
+        ],
+        "comp_status": false,
+        "htg_status": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 3300, "equals": true },
+        { "output": "yFault", "from_s": 3900, "to_s": 5400, "equals": false }
+      ]
+    }
+  ]
+}

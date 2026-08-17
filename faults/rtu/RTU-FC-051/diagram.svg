@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2030 700" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <rect x="12" y="60" width="120" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="72" y="79" text-anchor="middle" fill="#1e3a8a">rat</text>
+  <rect x="12" y="130" width="120" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="72" y="149" text-anchor="middle" fill="#1e3a8a">sat</text>
+  <rect x="12" y="330" width="120" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="72" y="349" text-anchor="middle" fill="#1e3a8a">comp_stage</text>
+
+  <!-- measured split -->
+  <rect x="190" y="65" width="150" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="265" y="85" text-anchor="middle" fill="#24292f" font-weight="bold">split</text>
+  <text x="265" y="103" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+
+  <!-- per-stage baseline selection -->
+  <rect x="190" y="170" width="250" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="315" y="190" text-anchor="middle" fill="#24292f" font-weight="bold">base2</text>
+  <text x="315" y="208" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 12 °C</text>
+
+  <rect x="190" y="250" width="250" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="315" y="270" text-anchor="middle" fill="#24292f" font-weight="bold">base1</text>
+  <text x="315" y="288" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 8 °C</text>
+
+  <rect x="190" y="400" width="250" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="315" y="420" text-anchor="middle" fill="#24292f" font-weight="bold">kTwo</text>
+  <text x="315" y="438" text-anchor="middle" fill="#57606a" font-size="11">Integers.Sources.Constant · k = 2</text>
+
+  <rect x="500" y="400" width="170" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="585" y="420" text-anchor="middle" fill="#24292f" font-weight="bold">isStage2</text>
+  <text x="585" y="438" text-anchor="middle" fill="#57606a" font-size="11">Integers.Equal</text>
+
+  <rect x="730" y="190" width="150" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="805" y="210" text-anchor="middle" fill="#24292f" font-weight="bold">expected</text>
+  <text x="805" y="228" text-anchor="middle" fill="#57606a" font-size="11">Reals.Switch</text>
+
+  <!-- degradation ratio -->
+  <rect x="920" y="65" width="140" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="990" y="85" text-anchor="middle" fill="#24292f" font-weight="bold">degr</text>
+  <text x="990" y="103" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+
+  <rect x="1100" y="65" width="130" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1165" y="85" text-anchor="middle" fill="#24292f" font-weight="bold">ratio</text>
+  <text x="1165" y="103" text-anchor="middle" fill="#57606a" font-size="11">Reals.Divide</text>
+
+  <rect x="1270" y="65" width="230" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1385" y="85" text-anchor="middle" fill="#24292f" font-weight="bold">ratioHigh</text>
+  <text x="1385" y="103" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 0.25</text>
+
+  <!-- stage evaluability -->
+  <rect x="500" y="490" width="290" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="645" y="510" text-anchor="middle" fill="#24292f" font-weight="bold">stagePos</text>
+  <text x="645" y="528" text-anchor="middle" fill="#57606a" font-size="11">Integers.GreaterThreshold · t = 0</text>
+
+  <rect x="500" y="570" width="290" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="645" y="590" text-anchor="middle" fill="#24292f" font-weight="bold">stageKnown</text>
+  <text x="645" y="608" text-anchor="middle" fill="#57606a" font-size="11">Integers.LessEqualThreshold · t = 2</text>
+
+  <rect x="880" y="530" width="150" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="955" y="550" text-anchor="middle" fill="#24292f" font-weight="bold">stageOk</text>
+  <text x="955" y="568" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <!-- gate + persistence -->
+  <rect x="1550" y="530" width="110" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1605" y="550" text-anchor="middle" fill="#24292f" font-weight="bold">gate</text>
+  <text x="1605" y="568" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <rect x="1710" y="530" width="160" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1790" y="550" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1790" y="568" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 3600 s</text>
+
+  <!-- boundary outputs -->
+  <rect x="1910" y="540" width="80" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1950" y="559" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1080" y="630" width="140" height="30" rx="15" fill="#fef3c7" stroke="#d97706"/>
+  <text x="1150" y="649" text-anchor="middle" fill="#78350f">yStageOk</text>
+
+  <!-- fan-out trunks -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none">
+    <path d="M 132 345 H 165"/>
+    <path d="M 880 215 H 900"/>
+    <path d="M 1030 555 H 1070"/>
+  </g>
+  <circle cx="165" cy="345" r="3" fill="#7d8590"/>
+  <circle cx="900" cy="215" r="3" fill="#7d8590"/>
+  <circle cx="1070" cy="555" r="3" fill="#7d8590"/>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 132 75 H 160 V 78 H 188"/>
+    <path d="M 132 145 H 160 V 102 H 188"/>
+
+    <path d="M 165 345 V 413 H 498"/>
+    <path d="M 165 345 V 515 H 498"/>
+    <path d="M 165 345 V 595 H 498"/>
+
+    <path d="M 440 425 H 470 V 437 H 498"/>
+    <path d="M 670 425 H 715 V 215 H 728"/>
+    <path d="M 440 195 H 695 V 203 H 728"/>
+    <path d="M 440 275 H 705 V 227 H 728"/>
+
+    <path d="M 340 90 H 890 V 102 H 918"/>
+    <path d="M 900 215 V 78 H 918"/>
+    <path d="M 900 215 H 1085 V 102 H 1098"/>
+    <path d="M 1060 90 H 1075 V 78 H 1098"/>
+    <path d="M 1230 90 H 1268"/>
+
+    <path d="M 790 515 H 830 V 543 H 878"/>
+    <path d="M 790 595 H 850 V 567 H 878"/>
+
+    <path d="M 1500 90 H 1520 V 543 H 1548"/>
+    <path d="M 1070 555 H 1530 V 567 H 1548"/>
+    <path d="M 1070 555 V 645 H 1078"/>
+
+    <path d="M 1660 555 H 1708"/>
+    <path d="M 1870 555 H 1908"/>
+  </g>
+
+  <!-- annotations -->
+  <text x="348" y="60" fill="#7d8590" font-size="11">rat − sat</text>
+  <text x="895" y="185" fill="#7d8590" font-size="11">expected split</text>
+  <text x="1240" y="649" fill="#7d8590" font-size="11">false ⇒ NO_EVAL</text>
+</svg>

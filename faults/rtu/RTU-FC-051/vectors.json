@@ -1,0 +1,155 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 9000 },
+  "scenarios": [
+    {
+      "name": "stage1_healthy",
+      "description": "Stage 1 at its 8 °C baseline split (rat 24 → sat 16): zero degradation, evaluable",
+      "inputs": { "rat": 24.0, "sat": 16.0, "comp_stage": 1 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false },
+        { "output": "yStageOk", "from_s": 0, "to_s": 9000, "equals": true }
+      ]
+    },
+    {
+      "name": "stage1_fouled",
+      "description": "Stage 1 split collapsed to 5.5 °C (rat 24 → sat 18.5) = 31% below baseline; alarms after alarm_delay",
+      "inputs": { "rat": 24.0, "sat": 18.5, "comp_stage": 1 },
+      "expect": [
+        { "output": "yStageOk", "from_s": 0, "to_s": 9000, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 9000, "equals": true }
+      ]
+    },
+    {
+      "name": "stage2_healthy",
+      "description": "Stage 2 at its 12 °C baseline split (rat 26 → sat 14): zero degradation",
+      "inputs": { "rat": 26.0, "sat": 14.0, "comp_stage": 2 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false },
+        { "output": "yStageOk", "from_s": 0, "to_s": 9000, "equals": true }
+      ]
+    },
+    {
+      "name": "stage1_split_7_is_healthy",
+      "description": "Baseline selection, low side: a 7 °C split at stage 1 is 12.5% below the 8 °C baseline and clears. Against the stage-2 baseline the same split would read 42% degraded, so this pins that the Switch took the stage-1 leg",
+      "inputs": { "rat": 24.0, "sat": 17.0, "comp_stage": 1 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false }
+      ]
+    },
+    {
+      "name": "stage2_split_7_is_fouled",
+      "description": "Baseline selection, high side: the identical 7 °C split at stage 2 is 42% below the 12 °C baseline and alarms — two compressors' worth of capacity producing one stage's worth of cooling",
+      "inputs": { "rat": 24.0, "sat": 17.0, "comp_stage": 2 },
+      "expect": [
+        { "output": "yStageOk", "from_s": 0, "to_s": 9000, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 9000, "equals": true }
+      ]
+    },
+    {
+      "name": "stage0_not_evaluable",
+      "description": "Compressor off: rat and sat are equal because no coil is running, which reads as 100% degradation against the stage-1 baseline. yStageOk is false, so yFault stays down and the host reports NO_EVAL rather than healthy",
+      "inputs": { "rat": 24.0, "sat": 24.0, "comp_stage": 0 },
+      "expect": [
+        { "output": "yStageOk", "from_s": 0, "to_s": 9000, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false }
+      ]
+    },
+    {
+      "name": "stage3_not_evaluable",
+      "description": "A third stage on a unit this rule has no baseline for: the split (4 °C) looks badly degraded against the stage-1 constant, but comp_stage > 2 is outside the rule's calibration, so yStageOk is false and no verdict is issued",
+      "inputs": { "rat": 24.0, "sat": 20.0, "comp_stage": 3 },
+      "expect": [
+        { "output": "yStageOk", "from_s": 0, "to_s": 9000, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false }
+      ]
+    },
+    {
+      "name": "edge_degradation_equals_threshold",
+      "description": "Threshold edge: a 6 °C split at stage 1 is exactly 25% below baseline; the comparison is strict, so no fault",
+      "inputs": { "rat": 24.0, "sat": 18.0, "comp_stage": 1 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false }
+      ]
+    },
+    {
+      "name": "edge_degradation_just_over_threshold",
+      "description": "Threshold edge: a 5.9 °C split at stage 1 is 26.25% below baseline and clears the strict comparison, alarming after alarm_delay",
+      "inputs": { "rat": 24.0, "sat": 18.1, "comp_stage": 1 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 9000, "equals": true }
+      ]
+    },
+    {
+      "name": "transient_low_split_never_alarms",
+      "description": "The split dips to 5.5 °C for 1800 s — a brief capacity loss such as a head-pressure control step or a momentary airflow disturbance — and recovers before alarm_delay elapses; the timer resets",
+      "inputs": {
+        "rat": 24.0,
+        "sat": [
+          { "t": 0, "value": 16.0 },
+          { "t": 900, "value": 18.5 },
+          { "t": 2700, "value": 16.0 }
+        ],
+        "comp_stage": 1
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 9000, "equals": false }
+      ]
+    },
+    {
+      "name": "stage_change_restarts_persistence",
+      "description": "A 7 °C split that is healthy on stage 1 becomes a fault the moment the unit stages up at t = 1800 s; the full 60 min runs from the stage change, not from the start of the low split",
+      "inputs": {
+        "rat": 24.0,
+        "sat": 17.0,
+        "comp_stage": [
+          { "t": 0, "value": 1 },
+          { "t": 1800, "value": 2 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5100, "equals": false },
+        { "output": "yFault", "from_s": 5700, "to_s": 9000, "equals": true }
+      ]
+    },
+    {
+      "name": "fault_clears_after_coil_cleaning",
+      "description": "Stage-1 fouling alarms at 3600 s; the split returns to 8 °C at t = 5400 s (filter changed, coil washed) and the alarm drops on that tick",
+      "inputs": {
+        "rat": 24.0,
+        "sat": [
+          { "t": 0, "value": 18.5 },
+          { "t": 5400, "value": 16.0 }
+        ],
+        "comp_stage": 1
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 5100, "equals": true },
+        { "output": "yFault", "from_s": 5700, "to_s": 9000, "equals": false }
+      ]
+    },
+    {
+      "name": "compressor_stop_forces_no_eval",
+      "description": "A matured stage-1 fault is not reported as cleared when the compressor stops: yStageOk goes false at t = 5400 s and yFault drops with it, which is NO_EVAL, not a repair",
+      "inputs": {
+        "rat": 24.0,
+        "sat": 18.5,
+        "comp_stage": [
+          { "t": 0, "value": 1 },
+          { "t": 5400, "value": 0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 5100, "equals": true },
+        { "output": "yStageOk", "from_s": 0, "to_s": 5100, "equals": true },
+        { "output": "yStageOk", "from_s": 5400, "to_s": 9000, "equals": false },
+        { "output": "yFault", "from_s": 5700, "to_s": 9000, "equals": false }
+      ]
+    }
+  ]
+}

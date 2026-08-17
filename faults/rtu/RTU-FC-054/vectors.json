@@ -1,0 +1,114 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 5400 },
+  "scenarios": [
+    {
+      "name": "normal_minimum_ventilation",
+      "description": "OAF 0.18 against a 0.30 alarm point (oat 2 °C, rat 22 °C, mat 18.4 °C) — design minimum plus the spread a real damper holds",
+      "inputs": { "oat": 2.0, "rat": 22.0, "mat": 18.4 },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 5400, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "excess_outdoor_air",
+      "description": "OAF 0.40 (oat 2 °C, rat 22 °C, mat 14.0 °C) — 0.25 above design, so 0.10 past the margin; alarms after alarm_delay (1800 s)",
+      "inputs": { "oat": 2.0, "rat": 22.0, "mat": 14.0 },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 5400, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "summer_excess_oat_above_rat",
+      "description": "Sign case: outdoor air warmer than return (oat 35 °C, rat 24 °C, mat 28.4 °C) — both differences flip sign, the quotient still reads 0.40, and the rule alarms exactly as it does in winter",
+      "inputs": { "oat": 35.0, "rat": 24.0, "mat": 28.4 },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 5400, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "small_delta_not_evaluable",
+      "description": "NO_EVAL with the gate doing work: |oat − rat| = 2 °C (oat 20 °C, rat 22 °C) and mat 21 °C, so the raw fraction reads 0.50 and marginHigh is true — an ungated rule would alarm; yTempDeltaOk stays false and holds yFault down",
+      "inputs": { "oat": 20.0, "rat": 22.0, "mat": 21.0 },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 5400, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "delta_exactly_at_threshold",
+      "description": "Edge case: |oat − rat| = 6.0 °C exactly (oat 16 °C, rat 22 °C) with OAF 0.50 (mat 19 °C) — the strict `>` leaves the rule not evaluable, so a fraction well past the alarm point still reports NO_EVAL",
+      "inputs": { "oat": 16.0, "rat": 22.0, "mat": 19.0 },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 5400, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "delta_just_over_threshold",
+      "description": "Edge case, other side: |oat − rat| = 6.5 °C (oat 15.5 °C, rat 22 °C) with OAF 0.40 (mat 19.4 °C) — evaluable, and the excess alarms after alarm_delay",
+      "inputs": { "oat": 15.5, "rat": 22.0, "mat": 19.4 },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 5400, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "margin_exactly_at_threshold",
+      "description": "Edge case: OAF 0.30 exactly (oat 2 °C, rat 22 °C, mat 16 °C), so the margin equals oa_excess_margin — the strict `>` means no fault",
+      "inputs": { "oat": 2.0, "rat": 22.0, "mat": 16.0 },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 5400, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "margin_just_over_threshold",
+      "description": "Edge case, other side: OAF 0.31 (mat 15.8 °C) clears the strict comparison by one hundredth and alarms after alarm_delay",
+      "inputs": { "oat": 2.0, "rat": 22.0, "mat": 15.8 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "transient_excess_clears_before_delay",
+      "description": "Transient: OAF jumps to 0.40 at t=600 and falls back to 0.18 at t=1800 — 1200 s of excess, short of alarm_delay, so the damper stroke never becomes an alarm",
+      "inputs": {
+        "oat": 2.0,
+        "rat": 22.0,
+        "mat": [
+          { "t": 0, "value": 18.4 },
+          { "t": 600, "value": 14.0 },
+          { "t": 1800, "value": 18.4 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "recovery_clears_alarm",
+      "description": "Recovery: OAF 0.40 alarms after alarm_delay, then the damper returns to minimum at t=3000 (OAF 0.18) — yFault drops on that tick, with no hold-off",
+      "inputs": {
+        "oat": 2.0,
+        "rat": 22.0,
+        "mat": [
+          { "t": 0, "value": 14.0 },
+          { "t": 3000, "value": 18.4 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 2700, "equals": true },
+        { "output": "yFault", "from_s": 3000, "to_s": 5400, "equals": false }
+      ]
+    }
+  ]
+}
