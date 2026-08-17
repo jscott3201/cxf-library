@@ -83,7 +83,10 @@ Conventions:
   mechanical for every consumer.
 - `params.*.cxf` is the parameter's CXF path relative to the root block
   (`<instance>.<param>`, e.g. `persist.delayTime`) so hosts can retune deployed
-  rules via `set_param` without re-authoring.
+  rules via `set_param` without re-authoring. It may be a list of paths when
+  one card parameter binds several block parameters (e.g. an evaluation
+  window driving sampler periods and dwell times); hosts must set every
+  listed path together.
 - Signal units are those declared in the point dictionary (°C, Pa, %, bool).
   Hosts must feed those units; rules do no unit conversion in v1.
 - `verified.engine_rev` is the open-control git rev the vectors last passed
@@ -122,7 +125,11 @@ Target dialect: the open-control engine's composite subset
   referenced from `S231:hasParameter`. Set only non-default values.
 - Fault outputs are `BooleanOutput`s; primary output is named `yFault` (true
   while the fault condition persists). Additional outputs allowed (e.g.
-  sub-condition flags) and must be listed in the card's `outputs`.
+  sub-condition flags) and must be listed in the card's `outputs`. When the
+  reference semantics include an in-rule evaluability condition (a NO_EVAL
+  test vector), expose it as an additional boolean output (`y…` name); the
+  card documents that false means NO_EVAL — the host must consult it before
+  interpreting `yFault`.
 - No semantic annotations in v1 (see design stance). No `oce.*` class aliases.
 
 ## `vectors.json` contract (`cxf-library/vectors/v1`)
