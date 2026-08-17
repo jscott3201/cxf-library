@@ -17,7 +17,7 @@ source:
   - "Gunay 2023"
 g36: null
 clusters: [CLU-09]
-suppresses: [AHU-FC-002, AHU-FC-003]
+suppresses: [AHU-FC-002, AHU-FC-003, AHU-FC-055, AHU-FC-064]
 suppressed_by: []
 related: [AHU-FC-002, AHU-FC-003]
 playbooks: [sensor-drift]
@@ -167,9 +167,11 @@ basis: N/A.
 ## Notes
 
 The suppression contract matters more than the fault itself. While `yFault`
-is true the host must silence AHU-FC-002 and AHU-FC-003, and per CLU-09
-report every MAT-derived verdict as NO_EVAL rather than healthy — silence is
-not a clean bill of health. Both halves are necessary: a rule that fires on
+is true the host must silence AHU-FC-002 and AHU-FC-003 along with the
+outdoor-air-fraction pair AHU-FC-055 and AHU-FC-064 — the fraction is a ratio
+of temperature differences, so a MAT outside its envelope moves it directly —
+and per CLU-09 report every MAT-derived verdict as NO_EVAL rather than
+healthy; silence is not a clean bill of health. Both halves are necessary: a rule that fires on
 garbage sensor data produces noise that erodes operator trust in the whole
 FDD system, and a rule that reports "no fault" from the same garbage hides
 real problems. This is the rationale behind Step 1.3 of the

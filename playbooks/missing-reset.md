@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | AHU-FC-057 (SAT reset), AHU-FC-058 (DSP reset), CLU-02 |
+| **Applies to** | AHU-FC-057 (SAT reset), AHU-FC-058 (DSP reset), AHU-FC-053 (SAT SP too low), AHU-FC-065 (excess static pressure), CLU-02 |
 | **Fix complexity** | Remote fix (90%) · Controller upgrade (10%) |
 | **Typical time** | 1–4 h remote (sequence programming) |
 | **Typical cost** | $0 remote / $2,000–$5,000 if controller upgrade needed |

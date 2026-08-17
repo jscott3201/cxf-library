@@ -1,0 +1,110 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 3600 },
+  "scenarios": [
+    {
+      "name": "tracking_normally",
+      "description": "Reference vector: command 50%, feedback 48% — a 2% tracking error, inside the allowance",
+      "inputs": { "actuator_cmd": 50.0, "actuator_pos": 48.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "briefly_stuck_then_recovers",
+      "description": "Reference vector: command 80% against feedback 20% for 10 min, then the actuator catches up — the 60% error never reaches stuck_duration",
+      "inputs": {
+        "actuator_cmd": 80.0,
+        "actuator_pos": [
+          { "t": 0, "value": 20.0 },
+          { "t": 600, "value": 80.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "stuck_sustained",
+      "description": "Reference vector: command 80% against feedback 20% held past 45 min — the alarm lands at stuck_duration + alarm_delay = 2100 s, well before the reference's 2700 s observation point",
+      "inputs": { "actuator_cmd": 80.0, "actuator_pos": 20.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2040, "equals": false },
+        { "output": "yFault", "from_s": 2160, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "error_exactly_at_threshold",
+      "description": "Edge case: command 50%, feedback 40% — a delta of exactly position_error_threshold (10%); the strict `>` keeps it healthy",
+      "inputs": { "actuator_cmd": 50.0, "actuator_pos": 40.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "error_just_over_threshold",
+      "description": "Edge case: command 50%, feedback 39.5% — a 10.5% delta clears the threshold and alarms at 2100 s",
+      "inputs": { "actuator_cmd": 50.0, "actuator_pos": 39.5 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2040, "equals": false },
+        { "output": "yFault", "from_s": 2160, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "reverse_error_is_symmetric",
+      "description": "Feedback above command (20% commanded, 80% reported) — `absErr` makes the test direction-blind, so an over-travelled or reverse-wired actuator alarms on the same 2100 s schedule",
+      "inputs": { "actuator_cmd": 20.0, "actuator_pos": 80.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2040, "equals": false },
+        { "output": "yFault", "from_s": 2160, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "normal_stroke_lag",
+      "description": "Transient: the command steps 20% → 80% at t=600 and the actuator takes 300 s to arrive — a 60% error for the length of the stroke, far short of stuck_duration",
+      "inputs": {
+        "actuator_cmd": [
+          { "t": 0, "value": 20.0 },
+          { "t": 600, "value": 80.0 }
+        ],
+        "actuator_pos": [
+          { "t": 0, "value": 20.0 },
+          { "t": 900, "value": 80.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "error_clears_during_debounce",
+      "description": "Transient: the error survives stuck_duration (timer satisfied at 1800 s) but the actuator frees itself at 1920 s, inside the 300 s debounce — no alarm ever asserts",
+      "inputs": {
+        "actuator_cmd": 80.0,
+        "actuator_pos": [
+          { "t": 0, "value": 20.0 },
+          { "t": 1920, "value": 80.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "error_returns_restarts_stuck_timer",
+      "description": "Transient: the actuator tracks briefly at t=600 and jams again at t=900 — the stuck timer restarts from the second jam, pushing the alarm to 900 + 2100 = 3000 s",
+      "inputs": {
+        "actuator_cmd": 80.0,
+        "actuator_pos": [
+          { "t": 0, "value": 20.0 },
+          { "t": 600, "value": 80.0 },
+          { "t": 900, "value": 20.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2940, "equals": false },
+        { "output": "yFault", "from_s": 3060, "to_s": 3600, "equals": true }
+      ]
+    }
+  ]
+}

@@ -2,11 +2,26 @@
   "schema": "cxf-library/points/v1",
   "equipment": "ahu",
   "namespaces": {
-    "brick": { "iri": "https://brickschema.org/schema/Brick#", "verified_version": "1.4.4" },
-    "s223": { "iri": "http://data.ashrae.org/standard223#", "verified_version": "v1.0.0-2026" },
-    "s223_g36": { "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#", "verified_version": "v1.0.0-2026" },
-    "quantitykind": { "iri": "http://qudt.org/vocab/quantitykind/", "verified_version": "QUDT 3.1.4" },
-    "unit": { "iri": "http://qudt.org/vocab/unit/", "verified_version": "QUDT 3.1.4" }
+    "brick": {
+      "iri": "https://brickschema.org/schema/Brick#",
+      "verified_version": "1.4.4"
+    },
+    "s223": {
+      "iri": "http://data.ashrae.org/standard223#",
+      "verified_version": "v1.0.0-2026"
+    },
+    "s223_g36": {
+      "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#",
+      "verified_version": "v1.0.0-2026"
+    },
+    "quantitykind": {
+      "iri": "http://qudt.org/vocab/quantitykind/",
+      "verified_version": "QUDT 3.1.4"
+    },
+    "unit": {
+      "iri": "http://qudt.org/vocab/unit/",
+      "verified_version": "QUDT 3.1.4"
+    }
   },
   "notes": "All brick/s223 terms grep-verified against the published ontology files (Brick 1.4.4; ASHRAE 223 v1.0.0-2026 incl. its G36 extension) and, where noted, the official 223P G36 reference model guideline36-2021-A-9 (github.com/open223/models.open223.info). provisional=true marks mappings with genuine ambiguity or unattested 223P patterns; every s223 entry additionally awaits confirmation against the formal ASHRAE 223 standard text, which we do not yet hold.",
   "points": [
@@ -23,7 +38,9 @@
         "quantitykind": "Temperature",
         "unit": "DEG_C",
         "medium": "Fluid-Air",
-        "aspects": ["Role-Supply"]
+        "aspects": [
+          "Role-Supply"
+        ]
       },
       "provisional": false,
       "notes": "Brick Discharge_Air_Temperature_Sensor is brick:aliasOf this class. 223P pattern verbatim from reference instance MultipleZoneAhu-sa-temp; medium comes from hasMedium on the owning ConnectionPoint."
@@ -41,7 +58,9 @@
         "quantitykind": "Temperature",
         "unit": "DEG_C",
         "medium": "Fluid-Air",
-        "aspects": ["Aspect-Setpoint"]
+        "aspects": [
+          "Aspect-Setpoint"
+        ]
       },
       "provisional": false,
       "notes": "Aspect-Setpoint is inferred by the SHACL rule on QuantifiablePropertyShape when hasSetpoint targets the property; asserting it explicitly is safe but redundant under a reasoner."
@@ -77,7 +96,9 @@
         "quantitykind": "Temperature",
         "unit": "DEG_C",
         "medium": "Fluid-Air",
-        "aspects": ["Role-OutdoorAirIntake"]
+        "aspects": [
+          "Role-OutdoorAirIntake"
+        ]
       },
       "provisional": false,
       "notes": "Brick spelling is Outside_ (Outdoor_Air_Temperature_Sensor does not exist). Role-OutdoorAirIntake is 223P's only outdoor role; used by reference instance oa-temp."
@@ -95,7 +116,9 @@
         "quantitykind": "Temperature",
         "unit": "DEG_C",
         "medium": "Fluid-Air",
-        "aspects": ["Role-Return"]
+        "aspects": [
+          "Role-Return"
+        ]
       },
       "provisional": false,
       "notes": "Verbatim from reference instance MultipleZoneAhu-ra-temp."
@@ -113,7 +136,9 @@
         "quantitykind": "DimensionlessRatio",
         "unit": "PERCENT",
         "medium": null,
-        "aspects": ["Binary-Position"]
+        "aspects": [
+          "Binary-Position"
+        ]
       },
       "provisional": true,
       "notes": "Brick has no Heating_Valve_Command; attach Valve_Position_Command via isPointOf to a brick:Heating_Valve / Hot_Water_Valve (coil carries s223 hasRole Role-Heating). Provisional only for the class choice: brick:Heating_Command is the alternative if the point is abstract heating demand rather than physical valve position. 223P side verified at g36:HotWaterValveOrShape1; Binary-Position as an aspect on an analog command is counterintuitive but attested."
@@ -131,7 +156,9 @@
         "quantitykind": "DimensionlessRatio",
         "unit": "PERCENT",
         "medium": null,
-        "aspects": ["Binary-Position"]
+        "aspects": [
+          "Binary-Position"
+        ]
       },
       "provisional": true,
       "notes": "Attach via isPointOf to brick:Cooling_Valve / Chilled_Water_Valve (coil: s223 hasRole Role-Cooling). Same class-choice caveat as htg_vlv_cmd (brick:Cooling_Command for abstract demand). 223P verified at g36:ChilledWaterValveOrShape1 and instance MultipleZoneAhu-clg-coil-valve-command."
@@ -149,7 +176,9 @@
         "quantitykind": "DimensionlessRatio",
         "unit": "PERCENT",
         "medium": null,
-        "aspects": ["Binary-Position"]
+        "aspects": [
+          "Binary-Position"
+        ]
       },
       "provisional": false,
       "notes": "Attach via isPointOf to brick:Outside_Damper or Economizer_Damper. In the 223P reference model the damper equipment carries hasRole Role-Economizer (Role-OutdoorAirIntake for a non-economizer minimum-OA damper). Verified at g36:DamperOrShape1 and instance MultipleZoneAhu-economizer-oa-damper-command."
@@ -204,7 +233,9 @@
         "quantitykind": "Pressure",
         "unit": "PA",
         "medium": "Fluid-Air",
-        "aspects": ["Role-Supply"]
+        "aspects": [
+          "Role-Supply"
+        ]
       },
       "provisional": true,
       "notes": "Brick Discharge_Air_Static_Pressure_Sensor is an alias. 223P quantitykind is contested: the reference model asserts plain quantitykind:Pressure, while s223:GaugePressureSensor's SHACL shape (GaugePressure + isDeltaQuantity true) arguably describes duct static better. Following the reference model; confirm against the formal standard text."
@@ -222,7 +253,9 @@
         "quantitykind": "Pressure",
         "unit": "PA",
         "medium": "Fluid-Air",
-        "aspects": ["Aspect-Setpoint"]
+        "aspects": [
+          "Aspect-Setpoint"
+        ]
       },
       "provisional": true,
       "notes": "Judgment call vs brick:Duct_Air_Static_Pressure_Setpoint (literally closer name but disconnected from the Supply/Discharge alias pair); chose the Supply form for interoperability. Same Aspect-Setpoint inference caveat as sat_sp."
@@ -271,11 +304,47 @@
         "quantitykind": null,
         "unit": null,
         "medium": null,
-        "aspects": ["Aspect-OperatingMode"],
+        "aspects": [
+          "Aspect-OperatingMode"
+        ],
         "enumerationkind": "Binary-Logical"
       },
       "provisional": true,
       "notes": "Brick exact (Overridden_Status; Override_Command is the write side). 223P has no override vocabulary at all — this pattern is assembled from verified primitives (Binary-Logical + Aspect-OperatingMode) but unattested in the standard or reference models. Highest-priority item for the formal 223 text review."
+    },
+    {
+      "name": "actuator_cmd",
+      "description": "Actuator command for the bound valve or damper (0 = closed, 100 = full open) — template point, one instance bound per monitored actuator",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": null,
+      "s223": null,
+      "provisional": true,
+      "notes": "Template point (HVAC FDD Reference AHU-FC-054): the rule instantiates once per actuated device, binding this to the device's own command point (oa_dmpr_cmd, htg_vlv_cmd, ...). Semantic tags live on the bound instance (e.g. Brick Damper_Position_Command vs Valve_Position_Command), so the template itself carries none by design."
+    },
+    {
+      "name": "actuator_pos",
+      "description": "Actuator position feedback for the bound valve or damper (0 = closed, 100 = full open) — template point, paired with actuator_cmd",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": null,
+      "s223": null,
+      "provisional": true,
+      "notes": "Template point paired with actuator_cmd; binds the measured position feedback of the same device. Semantic tags live on the bound instance (e.g. Brick Damper_Position_Sensor vs Valve_Position_Sensor), so the template itself carries none by design. No role suffix: position is a measured quantity per the dictionary's suffix convention."
+    },
+    {
+      "name": "zone_reheat_fraction",
+      "description": "Fraction of zones served by this AHU with active reheat (host-derived: zones whose reheat valve command exceeds the host's reheat-active threshold, over total zones reporting)",
+      "kind": "real",
+      "unit": "1",
+      "qudt_unit": "UNITLESS",
+      "derived": true,
+      "brick": null,
+      "s223": null,
+      "provisional": true,
+      "notes": "Aggregate point like zone_dmpr_pos_max: the host computes the fraction over per-zone reheat valve commands (reference point rht_vlv_cmd_all, AHU-FC-053). Value range 0-1. Semantic tags belong on the underlying per-zone points (VAV reheat valve command) and will be grounded with the VAV dictionary. The reheat-active counting threshold (typically >5%) is host configuration, not part of this dictionary."
     }
   ]
 }

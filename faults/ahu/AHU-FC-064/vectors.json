@@ -1,0 +1,75 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 3600 },
+  "scenarios": [
+    {
+      "name": "normal_heating_ventilation",
+      "description": "Reference vector: OAF 0.148 with the heating valve at 50% (oat −5 °C, rat 22 °C, mat 18 °C) — at design minimum, no excess",
+      "inputs": { "oat": -5.0, "rat": 22.0, "mat": 18.0, "htg_vlv_cmd": 50.0 },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "excess_oa_while_heating",
+      "description": "Reference vector: OAF 0.444 with the heating valve at 80% (oat −5 °C, rat 22 °C, mat 10 °C); alarms after alarm_delay (1800 s)",
+      "inputs": { "oat": -5.0, "rat": 22.0, "mat": 10.0, "htg_vlv_cmd": 80.0 },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "small_delta_not_evaluable",
+      "description": "Reference vector: |oat − rat| = 2 °C (oat 20 °C, rat 22 °C, mat 21 °C, valve 20%) — the raw fraction reads 0.50, so an ungated rule would alarm; yTempDeltaOk stays false and holds yFault down",
+      "inputs": { "oat": 20.0, "rat": 22.0, "mat": 21.0, "htg_vlv_cmd": 20.0 },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "valve_exactly_at_threshold",
+      "description": "Edge case: heating valve sits exactly at valve_open_threshold (5%) with OAF 0.444 — the strict `>` means the coil does not count as heating",
+      "inputs": { "oat": -5.0, "rat": 22.0, "mat": 10.0, "htg_vlv_cmd": 5.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "margin_exactly_at_threshold",
+      "description": "Edge case: OAF 0.30 exactly (oat 2 °C, rat 22 °C, mat 16 °C), so the margin equals oa_excess_margin — the strict `>` means no fault",
+      "inputs": { "oat": 2.0, "rat": 22.0, "mat": 16.0, "htg_vlv_cmd": 50.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "margin_just_over_threshold",
+      "description": "Edge case: OAF 0.31 (mat 15.8 °C) clears the strict comparison and alarms after alarm_delay",
+      "inputs": { "oat": 2.0, "rat": 22.0, "mat": 15.8, "htg_vlv_cmd": 50.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "valve_closes_before_delay",
+      "description": "Transient: OAF stays at 0.444 but the heating valve closes at t=1200 — 1200 s of heating, short of alarm_delay, so no alarm",
+      "inputs": {
+        "oat": -5.0,
+        "rat": 22.0,
+        "mat": 10.0,
+        "htg_vlv_cmd": [
+          { "t": 0, "value": 80.0 },
+          { "t": 1200, "value": 0.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    }
+  ]
+}
