@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | AHU-FC-052, SYS-FC-052, SYS-FC-053, CLU-04, CLU-08 |
+| **Applies to** | AHU-FC-052, AHU-FC-060, AHU-FC-061, SYS-FC-052, SYS-FC-053, CLU-04, CLU-08 |
 | **Fix complexity** | Remote fix (95%) · On-site (5%) |
 | **Typical time** | 15–30 min remote |
 | **Typical cost** | $0 |

@@ -1,0 +1,103 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 3600 },
+  "scenarios": [
+    {
+      "name": "unoccupied_damper_open",
+      "description": "Reference vector: fan on, damper 30%, unoccupied; alarms after alarm_delay (900 s)",
+      "inputs": { "sf_status": true, "oa_dmpr_cmd": 30.0, "occ_schedule": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 960, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "unoccupied_damper_closed",
+      "description": "Reference vector: fan on unoccupied with the OA damper commanded shut — the intended night sequence",
+      "inputs": { "sf_status": true, "oa_dmpr_cmd": 0.0, "occ_schedule": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "occupied_damper_open",
+      "description": "Reference vector: fan on, damper 30%, occupied — minimum OA is required",
+      "inputs": { "sf_status": true, "oa_dmpr_cmd": 30.0, "occ_schedule": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "fan_off_damper_open",
+      "description": "Damper left open unoccupied but the fan is off; no air is being drawn, so no ventilation waste",
+      "inputs": { "sf_status": false, "oa_dmpr_cmd": 30.0, "occ_schedule": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_at_threshold",
+      "description": "Threshold edge: damper exactly at oa_closed_threshold (5%); the comparison is strict, so leakage-band positions do not alarm",
+      "inputs": { "sf_status": true, "oa_dmpr_cmd": 5.0, "occ_schedule": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_just_above_threshold",
+      "description": "Threshold edge: damper 0.1% above oa_closed_threshold alarms on the same schedule as a wide-open damper",
+      "inputs": { "sf_status": true, "oa_dmpr_cmd": 5.1, "occ_schedule": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 960, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "damper_closes_within_alarm_delay",
+      "description": "Transient: the unoccupied sequence drives the damper shut at t=600 s, before alarm_delay completes; never alarms",
+      "inputs": {
+        "sf_status": true,
+        "oa_dmpr_cmd": [
+          { "t": 0, "value": 30.0 },
+          { "t": 600, "value": 0.0 }
+        ],
+        "occ_schedule": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_reopens_restarts_persistence",
+      "description": "Transient: damper closes at t=600 s then reopens at t=1200 s; persistence restarts from the reopen, alarming at 2100 s",
+      "inputs": {
+        "sf_status": true,
+        "oa_dmpr_cmd": [
+          { "t": 0, "value": 30.0 },
+          { "t": 600, "value": 0.0 },
+          { "t": 1200, "value": 30.0 }
+        ],
+        "occ_schedule": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2040, "equals": false },
+        { "output": "yFault", "from_s": 2160, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "occupancy_resumes_resets_persistence",
+      "description": "Transient: the occupied period starts at t=600 s while the damper is open; the timer resets and never alarms",
+      "inputs": {
+        "sf_status": true,
+        "oa_dmpr_cmd": 30.0,
+        "occ_schedule": [
+          { "t": 0, "value": false },
+          { "t": 600, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    }
+  ]
+}

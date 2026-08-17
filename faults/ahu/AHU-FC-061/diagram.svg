@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 790 92" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary input -->
+  <rect x="12" y="30" width="160" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="92" y="49" text-anchor="middle" fill="#1e3a8a">override_active</text>
+
+  <!-- duration measurement -->
+  <rect x="220" y="18" width="230" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="335" y="40" text-anchor="middle" fill="#24292f" font-weight="bold">staleOvr</text>
+  <text x="335" y="58" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 86400 s (24 h)</text>
+
+  <!-- persistence -->
+  <rect x="500" y="18" width="170" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="585" y="40" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="585" y="58" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 3600 s</text>
+
+  <!-- boundary output -->
+  <rect x="700" y="30" width="68" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="734" y="49" text-anchor="middle" fill="#7f1d1d">yFault</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 172 45 H 218"/>
+    <path d="M 450 45 H 498"/>
+    <path d="M 670 45 H 698"/>
+  </g>
+</svg>

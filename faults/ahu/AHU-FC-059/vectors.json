@@ -1,0 +1,104 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 3600 },
+  "scenarios": [
+    {
+      "name": "normal_heating_in_winter",
+      "description": "Reference vector: heating valve at 40% with OAT 2 °C — below the heating lockout, so heating is legitimate",
+      "inputs": { "htg_vlv_cmd": 40.0, "clg_vlv_cmd": 0.0, "oat": 2.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "heating_when_warm",
+      "description": "Reference vector: heating valve at 30% with OAT 25 °C — heating lockout is not active; alarms after alarm_delay (1800 s)",
+      "inputs": { "htg_vlv_cmd": 30.0, "clg_vlv_cmd": 0.0, "oat": 25.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "cooling_when_cold",
+      "description": "Reference vector: cooling valve at 40% with OAT 2 °C — cooling lockout is not active; alarms after alarm_delay",
+      "inputs": { "htg_vlv_cmd": 0.0, "clg_vlv_cmd": 40.0, "oat": 2.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "normal_cooling_in_summer",
+      "description": "Cooling valve at 60% with OAT 28 °C — above the cooling lockout, so cooling is legitimate",
+      "inputs": { "htg_vlv_cmd": 0.0, "clg_vlv_cmd": 60.0, "oat": 28.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "valve_exactly_at_threshold",
+      "description": "Edge case: heating valve sits exactly at valve_open_threshold (5%) in 25 °C weather — the strict `>` means the coil does not count as open",
+      "inputs": { "htg_vlv_cmd": 5.0, "clg_vlv_cmd": 5.0, "oat": 25.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "oat_at_heating_lockout_then_above",
+      "description": "Edge case: OAT sits exactly at heating_lockout_temp (18 °C) with the heating valve open — no alarm; at t=1200 OAT rises to 18.1 °C and the alarm follows 1800 s later",
+      "inputs": {
+        "htg_vlv_cmd": 30.0,
+        "clg_vlv_cmd": 0.0,
+        "oat": [
+          { "t": 0, "value": 18.0 },
+          { "t": 1200, "value": 18.1 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2940, "equals": false },
+        { "output": "yFault", "from_s": 3060, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "oat_at_cooling_lockout",
+      "description": "Edge case: OAT sits exactly at cooling_lockout_temp (10 °C) with the cooling valve open — the strict `<` means no alarm",
+      "inputs": { "htg_vlv_cmd": 0.0, "clg_vlv_cmd": 45.0, "oat": 10.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "warm_spell_clears_before_delay",
+      "description": "Transient: heating runs in 25 °C air, but OAT drops back to 5 °C at t=1200 — the condition clears before alarm_delay completes, so no alarm",
+      "inputs": {
+        "htg_vlv_cmd": 30.0,
+        "clg_vlv_cmd": 0.0,
+        "oat": [
+          { "t": 0, "value": 25.0 },
+          { "t": 1200, "value": 5.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "valve_cycle_resets_persistence",
+      "description": "Transient: cooling valve closes at t=900 and reopens at t=1200 in 2 °C air — persistence restarts from the reopen, so the alarm lands at 3000 s, not 1800 s",
+      "inputs": {
+        "htg_vlv_cmd": 0.0,
+        "clg_vlv_cmd": [
+          { "t": 0, "value": 40.0 },
+          { "t": 900, "value": 0.0 },
+          { "t": 1200, "value": 40.0 }
+        ],
+        "oat": 2.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2940, "equals": false },
+        { "output": "yFault", "from_s": 3060, "to_s": 3600, "equals": true }
+      ]
+    }
+  ]
+}
