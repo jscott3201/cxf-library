@@ -1,0 +1,11 @@
+[package]
+name = "cxf-verify"
+version = "0.1.0"
+edition = "2024"
+publish = false
+description = "Loads each fault rule's CXF into the open-control engine and replays its vectors.json scenarios"
+
+[dependencies]
+oce-api = { path = "../../../open-control/crates/oce-api" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

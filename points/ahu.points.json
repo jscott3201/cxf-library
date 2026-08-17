@@ -1,0 +1,147 @@
+{
+  "schema": "cxf-library/points/v1",
+  "equipment": "ahu",
+  "notes": "brick/s223 fields pending ontology-verified grounding; provisional until checked against the formal ASHRAE 223 standard text.",
+  "points": [
+    {
+      "name": "sat",
+      "description": "Supply (discharge) air temperature",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": null,
+      "provisional": true
+    },
+    {
+      "name": "sat_sp",
+      "description": "Supply air temperature setpoint",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": null,
+      "provisional": true
+    },
+    {
+      "name": "mat",
+      "description": "Mixed air temperature (after OA and RA mix)",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": null,
+      "provisional": true
+    },
+    {
+      "name": "oat",
+      "description": "Outdoor air temperature",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": null,
+      "provisional": true
+    },
+    {
+      "name": "rat",
+      "description": "Return air temperature",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": null,
+      "provisional": true
+    },
+    {
+      "name": "htg_vlv_cmd",
+      "description": "Heating coil valve command (0 = closed, 100 = full open)",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": null,
+      "s223": null,
+      "provisional": true
+    },
+    {
+      "name": "clg_vlv_cmd",
+      "description": "Cooling coil valve command (0 = closed, 100 = full open)",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": null,
+      "s223": null,
+      "provisional": true
+    },
+    {
+      "name": "oa_dmpr_cmd",
+      "description": "Outdoor air damper command (0 = closed, 100 = full open)",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": null,
+      "s223": null,
+      "provisional": true
+    },
+    {
+      "name": "sf_status",
+      "description": "Supply fan run status",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": null,
+      "s223": null,
+      "provisional": true
+    },
+    {
+      "name": "sf_speed",
+      "description": "Supply fan speed (VFD feedback)",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": null,
+      "s223": null,
+      "provisional": true
+    },
+    {
+      "name": "dsp",
+      "description": "Duct static pressure (measured in supply duct)",
+      "kind": "real",
+      "unit": "Pa",
+      "qudt_unit": "PA",
+      "brick": null,
+      "s223": null,
+      "provisional": true
+    },
+    {
+      "name": "dsp_sp",
+      "description": "Duct static pressure setpoint",
+      "kind": "real",
+      "unit": "Pa",
+      "qudt_unit": "PA",
+      "brick": null,
+      "s223": null,
+      "provisional": true
+    },
+    {
+      "name": "occ_schedule",
+      "description": "Occupancy schedule state (true = scheduled occupied)",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": null,
+      "s223": null,
+      "provisional": true
+    },
+    {
+      "name": "override_active",
+      "description": "Manual override active flag",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": null,
+      "s223": null,
+      "provisional": true
+    }
+  ]
+}
