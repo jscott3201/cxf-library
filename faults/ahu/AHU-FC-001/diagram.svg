@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <g>
+    <rect x="12" y="34" width="138" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="81" y="53" text-anchor="middle" fill="#1e3a8a">dsp_sp</text>
+    <rect x="12" y="104" width="138" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="81" y="123" text-anchor="middle" fill="#1e3a8a">dsp</text>
+    <rect x="12" y="214" width="138" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="81" y="233" text-anchor="middle" fill="#1e3a8a">sf_speed</text>
+  </g>
+
+  <!-- gap and threshold blocks -->
+  <g>
+    <rect x="190" y="50" width="230" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="305" y="72" text-anchor="middle" fill="#24292f" font-weight="bold">press_gap</text>
+    <text x="305" y="90" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract · dsp_sp − dsp</text>
+
+    <rect x="470" y="50" width="230" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="585" y="72" text-anchor="middle" fill="#24292f" font-weight="bold">gapBig</text>
+    <text x="585" y="90" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 25 Pa</text>
+
+    <rect x="470" y="200" width="230" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="585" y="222" text-anchor="middle" fill="#24292f" font-weight="bold">spdFull</text>
+    <text x="585" y="240" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 99 %</text>
+  </g>
+
+  <!-- and block -->
+  <rect x="750" y="125" width="120" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="810" y="147" text-anchor="middle" fill="#24292f" font-weight="bold">both</text>
+  <text x="810" y="165" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <!-- persistence -->
+  <rect x="910" y="125" width="168" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="994" y="147" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="994" y="165" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 1800 s</text>
+
+  <!-- boundary output -->
+  <rect x="1110" y="139" width="68" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1144" y="158" text-anchor="middle" fill="#7f1d1d">yFault</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 150 49 H 170 V 65 H 186"/>
+    <path d="M 150 119 H 170 V 93 H 186"/>
+    <path d="M 150 229 H 466"/>
+
+    <path d="M 420 79 H 466"/>
+
+    <path d="M 700 79 H 725 V 140 H 746"/>
+    <path d="M 700 229 H 725 V 168 H 746"/>
+
+    <path d="M 870 154 H 906"/>
+    <path d="M 1078 154 H 1106"/>
+  </g>
+
+  <!-- port and signal hints -->
+  <text x="176" y="62" fill="#7d8590" font-size="10">u1</text>
+  <text x="176" y="106" fill="#7d8590" font-size="10">u2</text>
+  <text x="158" y="28" fill="#7d8590" font-size="10">Real</text>
+  <text x="712" y="72" fill="#7d8590" font-size="10">Bool</text>
+</svg>
