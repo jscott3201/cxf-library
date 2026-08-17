@@ -1,0 +1,300 @@
+#!/usr/bin/env python3
+"""Generate the mdBook source tree from the repository's canonical files.
+
+Single source of truth stays in faults/, playbooks/, clusters/, points/ and
+SCHEMA.md — this script derives book/src/ from them at build time and is run
+by CI before `mdbook build`. Nothing under book/src/ is ever edited by hand.
+
+Usage: python3 tools/book/generate.py   (from the repo root or anywhere)
+"""
+
+import json
+import re
+import shutil
+import sys
+from pathlib import Path
+
+import yaml
+
+REPO = Path(__file__).resolve().parents[2]
+SRC = REPO / "book" / "src"
+
+FRONTMATTER_RE = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
+
+
+def read_card(card_path: Path):
+    text = card_path.read_text(encoding="utf-8")
+    m = FRONTMATTER_RE.match(text)
+    if not m:
+        sys.exit(f"{card_path}: no YAML frontmatter")
+    fm = yaml.safe_load(m.group(1))
+    body = text[m.end():]
+    return fm, body
+
+
+def fault_link(fid: str, from_depth: int, known: set) -> str:
+    """Markdown link to a fault page if it exists in this build, else plain text."""
+    if fid in known:
+        prefix = "../" * from_depth
+        family = fid.split("-")[0].lower()
+        return f"[{fid}]({prefix}faults/{family}/{fid}.md)"
+    return fid
+
+
+def yaml_list(v):
+    return v if isinstance(v, list) else ([] if v is None else [v])
+
+
+def render_fault_page(fid: str, fdir: Path, fm: dict, body: str, known: set) -> str:
+    out = [f"# {fid} — {fm.get('name', '')}\n"]
+
+    status = fm.get("status", "")
+    verified = fm.get("verified") or {}
+    if status == "verified" and verified:
+        status = (
+            f"**verified** — engine `{verified.get('engine_rev')}`, "
+            f"`{verified.get('content_id')}`, {verified.get('date')}"
+        )
+    rows = [
+        ("Status", status),
+        ("Severity", str(fm.get("severity", ""))),
+        ("Method", fm.get("method", "")),
+        ("Phase", str(fm.get("phase", ""))),
+        ("Category", fm.get("category", "")),
+        ("Confidence", fm.get("confidence", "")),
+        ("Estimation", fm.get("estimation_method", "")),
+        ("G36", fm.get("g36") or "—"),
+        ("Clusters", ", ".join(yaml_list(fm.get("clusters"))) or "—"),
+        ("Suppresses", ", ".join(fault_link(x, 2, known) for x in yaml_list(fm.get("suppresses"))) or "—"),
+        ("Suppressed by", ", ".join(fault_link(x, 2, known) for x in yaml_list(fm.get("suppressed_by"))) or "—"),
+        ("Related", ", ".join(fault_link(x, 2, known) for x in yaml_list(fm.get("related"))) or "—"),
+        ("Playbooks", ", ".join(f"[{p}](../../playbooks/{p}.md)" for p in yaml_list(fm.get("playbooks"))) or "—"),
+        ("Source", "; ".join(yaml_list(fm.get("source")))),
+        ("Operating states", fm.get("operating_states", "")),
+    ]
+    out.append("| | |\n|---|---|")
+    for k, v in rows:
+        out.append(f"| **{k}** | {v} |")
+    out.append("")
+
+    if fm.get("preconditions"):
+        out.append(f"> **Preconditions (host-enforced):** {fm['preconditions']}\n")
+
+    pts = yaml_list(fm.get("points"))
+    if pts:
+        family = fid.split("-")[0].lower()
+        linked = ", ".join(f"[`{p}`](../../points/{family}.md#{p})" for p in pts)
+        out.append(f"**Points:** {linked}\n")
+
+    outs = yaml_list(fm.get("outputs"))
+    if outs:
+        out.append("**Outputs:**\n")
+        for o in outs:
+            out.append(f"- `{o.get('name')}` — {o.get('description', '')}")
+        out.append("")
+
+    params = fm.get("params") or {}
+    if params:
+        out.append("**Parameters:**\n")
+        out.append("| Name | Default | Unit | CXF path | Description |\n|---|---|---|---|---|")
+        for name, spec in params.items():
+            cxf = spec.get("cxf")
+            cxf = ", ".join(f"`{c}`" for c in (cxf if isinstance(cxf, list) else [cxf]))
+            out.append(
+                f"| `{name}` | {spec.get('default')} | {spec.get('unit', '')} "
+                f"| {cxf} | {spec.get('description', '')} |"
+            )
+        out.append("")
+
+    # Body: fix diagram and playbook links for the book layout.
+    body = body.replace("](diagram.svg)", f"]({fid}.svg)")
+    body = body.replace("](../../../playbooks/", "](../../playbooks/")
+    out.append(body.rstrip() + "\n")
+
+    vectors_path = fdir / "vectors.json"
+    if vectors_path.is_file():
+        vec = json.loads(vectors_path.read_text(encoding="utf-8"))
+        scenarios = vec.get("scenarios", [])
+        clock = vec.get("clock", {})
+        out.append(
+            f"\n## Test Vectors\n\n{len(scenarios)} scenarios, "
+            f"clock step {clock.get('step_s')} s over {clock.get('horizon_s')} s.\n"
+        )
+        out.append("| Scenario | Description |\n|---|---|")
+        for s in scenarios:
+            out.append(f"| `{s.get('name')}` | {s.get('description', '')} |")
+        out.append("\n<details><summary>vectors.json</summary>\n")
+        out.append("```json")
+        out.append(json.dumps(vec, indent=2))
+        out.append("```\n</details>")
+
+    return "\n".join(out) + "\n"
+
+
+def build_family(family_dir: Path, known: set):
+    family = family_dir.name
+    dest = SRC / "faults" / family
+    dest.mkdir(parents=True, exist_ok=True)
+
+    entries = []
+    for fdir in sorted(family_dir.iterdir()):
+        if not (fdir / "card.md").is_file():
+            continue
+        fid = fdir.name
+        fm, body = read_card(fdir / "card.md")
+        (dest / f"{fid}.md").write_text(
+            render_fault_page(fid, fdir, fm, body, known), encoding="utf-8"
+        )
+        svg = fdir / "diagram.svg"
+        if svg.is_file():
+            shutil.copy(svg, dest / f"{fid}.svg")
+        entries.append((fid, fm.get("name", "")))
+
+    # Family index: the README with fault IDs linked to their pages.
+    readme = family_dir / "README.md"
+    if readme.is_file():
+        text = readme.read_text(encoding="utf-8")
+        for fid, _ in entries:
+            text = text.replace(f"| {fid} |", f"| [{fid}]({fid}.md) |")
+        text = text.replace("](../../points/", "](../../points/").replace(
+            f"](../../points/{family}.points.json)", f"](../../points/{family}.md)"
+        )
+        (dest / "index.md").write_text(text, encoding="utf-8")
+    return entries
+
+
+def build_points(known: set):
+    dest = SRC / "points"
+    dest.mkdir(parents=True, exist_ok=True)
+    pages = []
+    for pfile in sorted((REPO / "points").glob("*.points.json")):
+        family = pfile.name.split(".")[0]
+        d = json.loads(pfile.read_text(encoding="utf-8"))
+        pts = d.get("points", [])
+        out = [f"# Point Dictionary: {family.upper()}\n"]
+        if d.get("notes"):
+            out.append(f"{d['notes']}\n")
+        out.append("| Point | Kind | Unit | Brick | Derived | Provisional |\n|---|---|---|---|---|---|")
+        for p in pts:
+            out.append(
+                f"| [`{p['name']}`](#{p['name']}) | {p.get('kind')} | {p.get('unit')} "
+                f"| {p.get('brick') or '—'} | {'✓' if p.get('derived') else ''} "
+                f"| {'✓' if p.get('provisional') else ''} |"
+            )
+        out.append("")
+        for p in pts:
+            out.append(f'\n## {p["name"]} {{#{p["name"]}}}\n')
+            out.append(p.get("description", "") + "\n")
+            s223 = p.get("s223")
+            if s223 and s223.get("pattern"):
+                out.append(f"- **223P:** {s223['pattern']}")
+            if p.get("qudt_unit"):
+                out.append(f"- **QUDT unit:** `{p['qudt_unit']}`")
+            if p.get("notes"):
+                out.append(f"\n{p['notes']}")
+        (dest / f"{family}.md").write_text("\n".join(out) + "\n", encoding="utf-8")
+        pages.append(family)
+    return pages
+
+
+def build_clusters(known: set):
+    d = json.loads((REPO / "clusters" / "clusters.json").read_text(encoding="utf-8"))
+    clusters = d.get("clusters", d if isinstance(d, list) else [])
+    out = ["# Fault Clusters\n"]
+    out.append(
+        "Clusters group faults that share a root cause. The **trigger** is the "
+        "fault that usually fires first; members refine the diagnosis.\n"
+    )
+    for c in clusters:
+        out.append(f"\n## {c.get('id')} — {c.get('name')}\n")
+        out.append("| | |\n|---|---|")
+        out.append(f"| **Trigger** | {fault_link(c.get('trigger', ''), 0, known)} |")
+        members = ", ".join(fault_link(m, 0, known) for m in c.get("members", []))
+        out.append(f"| **Members** | {members} |")
+        if c.get("playbook"):
+            pb = c["playbook"]
+            if (REPO / "playbooks" / f"{pb}.md").is_file():
+                out.append(f"| **Playbook** | [{pb}](playbooks/{pb}.md) |")
+            else:
+                out.append(f"| **Playbook** | {pb} *(planned)* |")
+        if c.get("prevalence"):
+            out.append(f"| **Prevalence** | {c['prevalence']} |")
+        if c.get("energy_impact"):
+            out.append(f"| **Energy impact** | {c['energy_impact']} |")
+        if c.get("description"):
+            out.append(f"\n{c['description']}")
+    (SRC / "clusters.md").write_text("\n".join(out) + "\n", encoding="utf-8")
+
+
+def build_playbooks():
+    dest = SRC / "playbooks"
+    dest.mkdir(parents=True, exist_ok=True)
+    names = []
+    for pfile in sorted((REPO / "playbooks").glob("*.md")):
+        shutil.copy(pfile, dest / pfile.name)
+        title = pfile.read_text(encoding="utf-8").splitlines()[0].lstrip("# ")
+        names.append((pfile.stem, title))
+    index = ["# Remediation Playbooks\n"]
+    for stem, title in names:
+        index.append(f"- [{title}]({stem}.md)")
+    (dest / "index.md").write_text("\n".join(index) + "\n", encoding="utf-8")
+    return names
+
+
+def main():
+    if SRC.exists():
+        shutil.rmtree(SRC)
+    SRC.mkdir(parents=True)
+
+    # Every fault directory that exists in this build gets a page; links to
+    # faults outside this set stay plain text.
+    known = {
+        fdir.name
+        for fam in sorted((REPO / "faults").iterdir())
+        if fam.is_dir()
+        for fdir in fam.iterdir()
+        if (fdir / "card.md").is_file()
+    }
+
+    # Introduction and schema, links rewritten for the book layout.
+    intro = (REPO / "README.md").read_text(encoding="utf-8")
+    intro = intro.replace("**`SCHEMA.md`**", "**[`SCHEMA.md`](schema.md)**")
+    intro += (
+        "\n---\n\n*This book is generated from the repository by "
+        "`tools/book/generate.py`; the files above are the source of truth.*\n"
+    )
+    (SRC / "index.md").write_text(intro, encoding="utf-8")
+    shutil.copy(REPO / "SCHEMA.md", SRC / "schema.md")
+
+    families = {}
+    for fam in sorted((REPO / "faults").iterdir()):
+        if fam.is_dir():
+            entries = build_family(fam, known)
+            if entries:
+                families[fam.name] = entries
+
+    build_clusters(known)
+    playbooks = build_playbooks()
+    point_pages = build_points(known)
+
+    summary = ["# Summary\n", "[Introduction](index.md)", "[Schema](schema.md)\n", "# Fault Rules\n"]
+    for fam, entries in families.items():
+        summary.append(f"- [{fam.upper()}](faults/{fam}/index.md)")
+        for fid, name in entries:
+            summary.append(f"  - [{fid} — {name}](faults/{fam}/{fid}.md)")
+    summary.append("\n# Reference\n")
+    summary.append("- [Fault Clusters](clusters.md)")
+    summary.append("- [Playbooks](playbooks/index.md)")
+    for stem, title in playbooks:
+        summary.append(f"  - [{title}](playbooks/{stem}.md)")
+    for fam in point_pages:
+        summary.append(f"- [Point Dictionary: {fam.upper()}](points/{fam}.md)")
+    (SRC / "SUMMARY.md").write_text("\n".join(summary) + "\n", encoding="utf-8")
+
+    n_pages = sum(len(e) for e in families.values())
+    print(f"generated book/src: {n_pages} fault pages, {len(playbooks)} playbooks, "
+          f"{len(point_pages)} point dictionaries")
+
+
+if __name__ == "__main__":
+    main()
