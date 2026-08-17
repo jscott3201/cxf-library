@@ -1,0 +1,35 @@
+name: verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: cxf-library
+
+      - name: Read engine pin
+        id: pin
+        run: echo "rev=$(cat cxf-library/ENGINE_PIN)" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout open-control engine at pin
+        uses: actions/checkout@v4
+        with:
+          repository: jscott3201/open-control-engine
+          ref: ${{ steps.pin.outputs.rev }}
+          path: open-control
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: cxf-library/tools/verify
+
+      - name: Lint and verify fault library
+        working-directory: cxf-library
+        run: cargo run --manifest-path tools/verify/Cargo.toml -- --all
