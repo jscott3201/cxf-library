@@ -10,6 +10,8 @@ use std::process::ExitCode;
 use oce_api::{Engine, PointDirection, Value};
 use serde::Deserialize;
 
+mod lint;
+
 #[derive(Deserialize)]
 struct Vectors {
     schema: String,
@@ -222,10 +224,14 @@ fn verify_fault_dir(dir: &Path) -> Result<bool, String> {
 
     // Diagnostic identity: load once and report the engine's exported content id.
     let mut engine = Engine::in_memory();
+    let mut content_id = None;
     match engine.load_cxf(&rule_bytes) {
         Ok(_) => match engine.export_cxf() {
             Ok(report) => match report.content_id_complete() {
-                Ok(id) => println!("  content_id: {id}"),
+                Ok(id) => {
+                    println!("  content_id: {id}");
+                    content_id = Some(id);
+                }
                 Err(e) => println!("  content_id unavailable (export warnings): {e}"),
             },
             Err(e) => println!("  export_cxf failed: {e}"),
@@ -234,6 +240,38 @@ fn verify_fault_dir(dir: &Path) -> Result<bool, String> {
     }
 
     let mut all_pass = true;
+
+    // Schema lint (SCHEMA.md conformance), including recorded-vs-actual content id.
+    let repo_root = dir
+        .canonicalize()
+        .ok()
+        .and_then(|d| d.parent().and_then(|p| p.parent()).and_then(|p| p.parent()).map(Path::to_path_buf))
+        .ok_or("cannot locate repo root from fault dir")?;
+    match lint::lint_fault_dir(dir, &repo_root) {
+        Ok(report) => {
+            let mut errors = report.errors;
+            if matches!(report.status.as_str(), "verified" | "adopted")
+                && let (Some(recorded), Some(actual)) = (&report.recorded_content_id, &content_id)
+                && recorded != actual
+            {
+                errors.push(format!(
+                    "verified.content_id `{recorded}` != engine export `{actual}` — re-verify and update the card"
+                ));
+            }
+            if errors.is_empty() {
+                println!("  LINT  ok");
+            } else {
+                all_pass = false;
+                for e in errors {
+                    println!("  LINT  {e}");
+                }
+            }
+        }
+        Err(e) => {
+            all_pass = false;
+            println!("  LINT  {e}");
+        }
+    }
     for scenario in &vectors.scenarios {
         match run_scenario(&rule_bytes, &vectors.clock, scenario) {
             Ok(()) => println!("  PASS  {}", scenario.name),
@@ -246,10 +284,39 @@ fn verify_fault_dir(dir: &Path) -> Result<bool, String> {
     Ok(all_pass)
 }
 
+/// Every `faults/<equip>/<FAULT-ID>/` directory containing a rule document, sorted.
+fn discover_fault_dirs(faults_root: &Path) -> Result<Vec<PathBuf>, String> {
+    let mut dirs = Vec::new();
+    for equip in std::fs::read_dir(faults_root).map_err(|e| format!("{}: {e}", faults_root.display()))? {
+        let equip = equip.map_err(|e| e.to_string())?.path();
+        if !equip.is_dir() {
+            continue;
+        }
+        for fault in std::fs::read_dir(&equip).map_err(|e| e.to_string())? {
+            let fault = fault.map_err(|e| e.to_string())?.path();
+            if fault.is_dir() && fault.join("rule.cxf.jsonld").is_file() {
+                dirs.push(fault);
+            }
+        }
+    }
+    dirs.sort();
+    Ok(dirs)
+}
+
 fn main() -> ExitCode {
-    let args: Vec<PathBuf> = std::env::args_os().skip(1).map(PathBuf::from).collect();
+    let mut args: Vec<PathBuf> = std::env::args_os().skip(1).map(PathBuf::from).collect();
+    if args.iter().any(|a| a.as_os_str() == "--all") {
+        args = match discover_fault_dirs(Path::new("faults")) {
+            Ok(dirs) => dirs,
+            Err(e) => {
+                eprintln!("--all: {e}");
+                return ExitCode::from(2);
+            }
+        };
+        println!("discovered {} fault dirs", args.len());
+    }
     if args.is_empty() {
-        eprintln!("usage: cxf-verify <fault-dir>… (each containing rule.cxf.jsonld + vectors.json)");
+        eprintln!("usage: cxf-verify --all | <fault-dir>… (each containing rule.cxf.jsonld + vectors.json)");
         return ExitCode::from(2);
     }
     let mut ok = true;
