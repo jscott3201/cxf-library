@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | SYS-FC-054, SYS-FC-055, AHU-FC-002, AHU-FC-003, AHU-FC-062, CLU-09 |
+| **Applies to** | SYS-FC-054, SYS-FC-055, AHU-FC-002, AHU-FC-003, AHU-FC-008, AHU-FC-010, AHU-FC-062, CLU-09 |
 | **Fix complexity** | On-site service required |
 | **Typical time** | 1–2 h per sensor |
 | **Typical cost** | $50–$200 per sensor (recalibrate or replace) |

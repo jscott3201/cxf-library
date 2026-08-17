@@ -15,16 +15,16 @@ Point dictionary: [`points/ahu.points.json`](../../points/ahu.points.json).
 | AHU-FC-003 | Mixed air temperature too high | 3 | rule | **verified** |
 | AHU-FC-004 | Excessive operating state changes per hour | 3 | rule | **verified** |
 | AHU-FC-005 | SAT too low vs MAT in heating | 3 | rule | **verified** |
-| AHU-FC-006 | OA fraction deviation | 3 | rule | planned |
+| AHU-FC-006 | OA fraction deviation | 3 | rule | **verified** |
 | AHU-FC-007 | SAT too low at full heating | 3 | rule | **verified** |
-| AHU-FC-008 | SAT ≠ MAT in economizer mode | 3 | rule | planned |
+| AHU-FC-008 | SAT ≠ MAT in economizer mode | 3 | rule | **verified** |
 | AHU-FC-009 | OAT too high for free cooling | 3 | rule | **verified** |
-| AHU-FC-010 | OAT ≠ MAT in mech + econ cooling | 3 | rule | planned |
+| AHU-FC-010 | OAT ≠ MAT in mech + econ cooling | 3 | rule | **verified** |
 | AHU-FC-011 | OAT too low for mechanical cooling | 3 | rule | **verified** |
 | AHU-FC-012 | SAT too high vs MAT in cooling | 3 | rule | **verified** |
 | AHU-FC-013 | SAT too high at full cooling | 3 | rule | **verified** |
-| AHU-FC-014 | Inactive cooling coil temperature drop | 2 | rule | planned |
-| AHU-FC-015 | Inactive heating coil temperature rise | 2 | rule | planned |
+| AHU-FC-014 | Inactive cooling coil temperature drop | 2 | rule | **verified** |
+| AHU-FC-015 | Inactive heating coil temperature rise | 2 | rule | **verified** |
 | AHU-FC-050 | Simultaneous heating and cooling | 2 | rule | **verified** |
 | AHU-FC-051 | Economizer not operational when favorable | 3 | rule | **verified** |
 | AHU-FC-052 | Unoccupied override — running during off-hours | 3 | rule | **verified** |

@@ -1,0 +1,97 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 7200 },
+  "scenarios": [
+    {
+      "name": "mat_tracks_oat",
+      "description": "Healthy OS#3: the OA damper is at 100%, the return damper is shut, and 15.5 °C outdoor air reaches the mixed-air sensor at 15.8 °C. The 0.3 °C residual is plenum warming and sensor spread, far inside the 3.1623 °C band.",
+      "inputs": { "mat": 15.8, "oat": 15.5 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "return_air_leaking_past_shut_damper",
+      "description": "15.0 °C outdoor air, 20.0 °C mixed air: 5 °C of warm return air is finding its way into a plenum that is supposed to be on 100% outdoor air. The return damper reads closed, so only the temperature pair can see it. Alarms after the 30 min delay.",
+      "inputs": { "mat": 20.0, "oat": 15.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "oat_sensor_reads_high",
+      "description": "Mixed air 4 °C below outdoor air. Return air cannot cool a mixture below the outdoor stream, so this direction is a sensor story: an OAT sensor in afternoon sun, or a MAT sensor drifted low. Negative disagreement pins the Abs — without it the rule would be blind to half its diagnoses.",
+      "inputs": { "mat": 15.0, "oat": 19.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "edge_positive_dev_equals_threshold",
+      "description": "Strict boundary, clear side: mat − oat = 3.1623 °C exactly, the full root-sum-square of eMAT and eOAT. GreaterThreshold is u > t, so a unit sitting precisely on its combined sensor budget reads healthy.",
+      "inputs": { "mat": 18.5623, "oat": 15.4 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "edge_positive_dev_just_over_threshold",
+      "description": "Strict boundary, fault side: the same outdoor air with MAT 0.04 °C warmer puts the deviation at 3.2 °C, which clears u > t and alarms after the delay. Pins the edge from the other direction.",
+      "inputs": { "mat": 18.6, "oat": 15.4 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "edge_negative_dev_equals_threshold",
+      "description": "Same boundary on the cold side: mat − oat = −3.1623 °C exactly, |dev| = t, clear. The band is symmetric, so both signs have to be pinned.",
+      "inputs": { "mat": 14.8377, "oat": 18.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "edge_negative_dev_just_over_threshold",
+      "description": "Cold side, fault: mat − oat = −3.2 °C. |dev| clears the threshold and the alarm asserts at the same magnitude the positive case does.",
+      "inputs": { "mat": 14.8, "oat": 18.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "transient_disagreement_never_alarms",
+      "description": "MAT rises to 20 °C for 1200 s — shorter than the 1800 s alarm delay — then settles back. A damper still stroking toward 100% leaves return air in the plenum for a few minutes; the timer resets on the first compliant tick and nothing is reported.",
+      "inputs": {
+        "mat": [
+          { "t": 0, "value": 15.3 },
+          { "t": 600, "value": 20.0 },
+          { "t": 1800, "value": 15.3 }
+        ],
+        "oat": 15.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "fault_clears_when_damper_seats",
+      "description": "A leaking return damper holds MAT at 20 °C against 15 °C outdoor air; the alarm asserts at 1800 s. At 3600 s the damper seats and MAT falls to 15.3 °C, and the alarm drops on that tick — assertion waits out the delay, recovery does not.",
+      "inputs": {
+        "mat": [
+          { "t": 0, "value": 20.0 },
+          { "t": 3600, "value": 15.3 }
+        ],
+        "oat": 15.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 3300, "equals": true },
+        { "output": "yFault", "from_s": 3900, "to_s": 7200, "equals": false }
+      ]
+    }
+  ]
+}

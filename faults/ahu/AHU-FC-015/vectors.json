@@ -1,0 +1,100 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 5400 },
+  "scenarios": [
+    {
+      "name": "healthy_unit_shows_fan_heat_only",
+      "description": "The pin this rule exists to keep clear: a draw-through unit with the heating coil shut still warms its air by dTSF = 1 °C crossing the supply fan, so sat − mat = +1.0 °C in every healthy OS#2-#4 hour. The 4.1623 °C threshold carries the fan-heat term precisely so this reads healthy forever; without it every healthy AHU in the fleet would alarm",
+      "inputs": { "mat": 18.0, "sat": 19.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "rise_exactly_at_threshold",
+      "description": "Threshold edge: sat − mat = 4.1623 °C exactly, the composed sqrt(eHCET² + eHCLT²) + dTSF allowance. `riseBig` is a strict `>`, so a rise sitting precisely on the allowance reads healthy — G36's `≥` would report it (see Deviations)",
+      "inputs": { "mat": 15.8377, "sat": 20.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "rise_just_over_threshold",
+      "description": "Threshold edge, other side: sat − mat = 4.2623 °C clears the strict comparison on the first tick and the alarm asserts one alarm_delay (1800 s) later",
+      "inputs": { "mat": 15.7377, "sat": 20.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "heating_valve_leaking_during_free_cooling",
+      "description": "OS#2 on a mild morning: the economizer mixes to 16 °C and the air reaches the supply sensor at 23 °C with the heating valve commanded 0%. Take the fan's 1 °C back out and the coil is adding about 6 °C to air the economizer was brought in to cool — hot water flowing through a valve that reports itself shut, which is exactly the leak AHU-FC-050 is structurally blind to",
+      "inputs": { "mat": 16.0, "sat": 23.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "mat_sensor_reading_low",
+      "description": "Same 6 °C signature in a season when the hot-water plant is locked out and the valve has been verified shut: no coil can be adding heat, and the mixed-air sensor is what is wrong. The rule reports the contradiction; G36 lists both sensor errors ahead of the valve in its diagnosis order for this reason",
+      "inputs": { "mat": 14.0, "sat": 20.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "transient_clears_before_alarm_delay",
+      "description": "Transient: a 7 °C rise persists for 1200 s while hot water standing in a just-closed coil gives up its residual heat, then SAT settles back to mat + fan heat. Anything shorter than alarm_delay never reaches the operator",
+      "inputs": {
+        "mat": 16.0,
+        "sat": [
+          { "t": 0, "value": 23.0 },
+          { "t": 1200, "value": 17.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "fault_clears_on_recovery",
+      "description": "A sustained 7 °C rise alarms at 1800 s; the leaking valve is isolated at t = 3000 and SAT falls back to mat + fan heat. `TrueDelay` has no off-delay, so the alarm drops on that tick",
+      "inputs": {
+        "mat": 16.0,
+        "sat": [
+          { "t": 0, "value": 23.0 },
+          { "t": 3000, "value": 17.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 2700, "equals": true },
+        { "output": "yFault", "from_s": 3300, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "oscillating_rise_never_alarms",
+      "description": "An electric heating stage short-cycling on a 10-minute period swings the rise between 7 °C and 1 °C. Its mean is well outside the allowance and G36's 5-minute rolling average would report the fault, but persistence restarts on every compliant tick, so this rule stays silent — the limit of substituting TrueDelay for averaging (see Deviations)",
+      "inputs": {
+        "mat": 16.0,
+        "sat": [
+          { "t": 0, "value": 23.0 },
+          { "t": 600, "value": 17.0 },
+          { "t": 1200, "value": 23.0 },
+          { "t": 1800, "value": 17.0 },
+          { "t": 2400, "value": 23.0 },
+          { "t": 3000, "value": 17.0 },
+          { "t": 3600, "value": 23.0 },
+          { "t": 4200, "value": 17.0 },
+          { "t": 4800, "value": 23.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    }
+  ]
+}
