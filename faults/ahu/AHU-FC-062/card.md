@@ -17,7 +17,7 @@ source:
   - "Gunay 2023"
 g36: null
 clusters: [CLU-09]
-suppresses: [AHU-FC-002, AHU-FC-003, AHU-FC-055, AHU-FC-064]
+suppresses: [AHU-FC-002, AHU-FC-003, AHU-FC-005, AHU-FC-012, AHU-FC-055, AHU-FC-064]
 suppressed_by: []
 related: [AHU-FC-002, AHU-FC-003]
 playbooks: [sensor-drift]
@@ -167,7 +167,8 @@ basis: N/A.
 ## Notes
 
 The suppression contract matters more than the fault itself. While `yFault`
-is true the host must silence AHU-FC-002 and AHU-FC-003 along with the
+is true the host must silence AHU-FC-002 and AHU-FC-003, the SAT-vs-MAT
+comparison rules AHU-FC-005 and AHU-FC-012, and the
 outdoor-air-fraction pair AHU-FC-055 and AHU-FC-064 — the fraction is a ratio
 of temperature differences, so a MAT outside its envelope moves it directly —
 and per CLU-09 report every MAT-derived verdict as NO_EVAL rather than

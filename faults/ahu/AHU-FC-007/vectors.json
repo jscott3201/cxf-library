@@ -1,0 +1,120 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 5400 },
+  "scenarios": [
+    {
+      "name": "part_load_heating_holding_setpoint",
+      "description": "Healthy OS#1 operation: the coil is at 60% and SAT is 0.5 °C under a 21.5 °C setpoint. Neither half of the conjunction is true — the loop has capacity left and the error is inside eSAT",
+      "inputs": { "sat": 21.0, "sat_sp": 21.5, "htg_vlv_cmd": 60.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "full_heating_still_on_setpoint",
+      "description": "The valve is wide open on a design-day morning but SAT is only 0.5 °C short — the unit is sized close to its design point, not broken. Saturation alone is not a fault",
+      "inputs": { "sat": 20.5, "sat_sp": 21.0, "htg_vlv_cmd": 100.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "part_load_missing_setpoint",
+      "description": "SAT is 6 °C short of setpoint with the valve at 60% — that is a control-loop finding (tuning, or a reset the loop is chasing), not a capacity finding, and this rule stays silent by design",
+      "inputs": { "sat": 15.0, "sat_sp": 21.0, "htg_vlv_cmd": 60.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "full_heating_missing_setpoint",
+      "description": "The reportable case: valve at 100% and SAT 6 °C below setpoint. The coil is saturated and still losing, so the shortfall is capacity, supply, or sensing. Alarms one alarm_delay (1800 s) after the condition appears",
+      "inputs": { "sat": 15.0, "sat_sp": 21.0, "htg_vlv_cmd": 100.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "error_exactly_at_threshold",
+      "description": "Threshold edge: sat_sp − sat = 1.0 °C exactly with the valve at 100%. `spMiss` is a strict `>`, so an error sitting precisely on eSAT reads healthy",
+      "inputs": { "sat": 20.0, "sat_sp": 21.0, "htg_vlv_cmd": 100.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "error_just_over_threshold",
+      "description": "Threshold edge, other side: sat_sp − sat = 1.1 °C clears the strict comparison and alarms after alarm_delay",
+      "inputs": { "sat": 19.9, "sat_sp": 21.0, "htg_vlv_cmd": 100.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "valve_exactly_at_full_threshold",
+      "description": "Threshold edge: the valve reports exactly 99.0% with a 6 °C error present. `htgFull` is a strict `>`, so G36's `HC >= 99%` reads as not-full here — the case a host with integer-quantized valve feedback must retune hc_full_threshold to 98.9 to catch",
+      "inputs": { "sat": 15.0, "sat_sp": 21.0, "htg_vlv_cmd": 99.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "valve_just_over_full_threshold",
+      "description": "Threshold edge, other side: 99.5% clears the strict comparison, so the same 6 °C error alarms after alarm_delay",
+      "inputs": { "sat": 15.0, "sat_sp": 21.0, "htg_vlv_cmd": 99.5 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "morning_warmup_clears_before_delay",
+      "description": "Transient: the coil pins at 100% and SAT sits 6 °C short during warm-up, then reaches 20.5 °C at t = 1200 s. Twenty minutes is short of alarm_delay, so a cold start never alarms",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 15.0 },
+          { "t": 1200, "value": 20.5 }
+        ],
+        "sat_sp": 21.0,
+        "htg_vlv_cmd": 100.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "valve_modulates_off_before_delay",
+      "description": "Transient on the other input: the 6 °C error holds but the valve backs off to 70% at t = 1200 s, which means the loop was never out of capacity. Both halves must be true at once, so persistence restarts and no alarm follows",
+      "inputs": {
+        "sat": 15.0,
+        "sat_sp": 21.0,
+        "htg_vlv_cmd": [
+          { "t": 0, "value": 100.0 },
+          { "t": 1200, "value": 70.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "fault_clears_on_recovery",
+      "description": "A sustained shortfall alarms at 1800 s; hot water returns at t = 3000 s and SAT reaches 20.5 °C, dropping the alarm on that tick — TrueDelay has no off-delay",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 15.0 },
+          { "t": 3000, "value": 20.5 }
+        ],
+        "sat_sp": 21.0,
+        "htg_vlv_cmd": 100.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 2700, "equals": true },
+        { "output": "yFault", "from_s": 3300, "to_s": 5400, "equals": false }
+      ]
+    }
+  ]
+}
