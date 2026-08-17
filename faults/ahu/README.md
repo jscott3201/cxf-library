@@ -31,14 +31,14 @@ Point dictionary: [`points/ahu.points.json`](../../points/ahu.points.json).
 | AHU-FC-053 | SAT setpoint too low (over-cooling) | 3 | rule | **verified** |
 | AHU-FC-054 | Stuck actuator | 2 | rule | **verified** |
 | AHU-FC-055 | Excess outdoor air while occupied | 3 | rule | **verified** |
-| AHU-FC-056 | SAT hunting | 4 | rule | planned |
+| AHU-FC-056 | SAT hunting | 3 | statistical | **verified** |
 | AHU-FC-057 | SAT reset missing | 3 | statistical | **verified** |
 | AHU-FC-058 | DSP reset missing | 3 | statistical | **verified** |
 | AHU-FC-059 | Heating/cooling lockout not active | 3 | rule | **verified** |
 | AHU-FC-060 | OA damper not closed when unoccupied | 3 | rule | **verified** |
 | AHU-FC-061 | Manual override active | 4 | rule | **verified** |
 | AHU-FC-062 | Mixing box damper fault | 3 | rule | **verified** |
-| AHU-FC-063 | Operating mode mismatch | 2 | rule | planned |
+| AHU-FC-063 | Operating mode mismatch | 3 | rule | **verified** |
 | AHU-FC-064 | Excess OA during heating | 3 | rule | **verified** |
 | AHU-FC-065 | Fan at excess static pressure | 3 | rule | **verified** |
 

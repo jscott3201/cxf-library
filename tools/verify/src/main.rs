@@ -7,7 +7,7 @@
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
-use oce_api::{Engine, PointDirection, Value};
+use oce_api::{Engine, PointDirection, PointValueType, Value};
 use serde::Deserialize;
 
 mod lint;
@@ -52,39 +52,47 @@ struct InputEvent {
     value: Value,
 }
 
-fn json_to_value(v: &serde_json::Value) -> Result<Value, String> {
-    match v {
-        serde_json::Value::Bool(b) => Ok(Value::Boolean(*b)),
-        serde_json::Value::Number(n) => n
+/// Convert a JSON literal to an engine `Value`, coerced to the destination point's declared
+/// type: a JSON number stages as `Integer` on an `Int` point and as `Real` on a `Real` point,
+/// so vectors spell integer inputs as plain numbers with no format extension.
+fn json_to_value(v: &serde_json::Value, want: PointValueType) -> Result<Value, String> {
+    match (v, want) {
+        (serde_json::Value::Bool(b), PointValueType::Bool) => Ok(Value::Boolean(*b)),
+        (serde_json::Value::Number(n), PointValueType::Real) => n
             .as_f64()
             .map(Value::Real)
             .ok_or_else(|| format!("non-finite number {n}")),
-        other => Err(format!("unsupported input value {other}")),
+        (serde_json::Value::Number(n), PointValueType::Int) => n
+            .as_i64()
+            .map(Value::Integer)
+            .ok_or_else(|| format!("number {n} is not an exact i64 for an Int point")),
+        (other, want) => Err(format!("value {other} cannot stage on a {want:?} point")),
     }
 }
 
-/// Resolve a canonical point name to the engine's full point path. Boundary connectors are
-/// `<root IRI>.<name>` per SCHEMA.md, so match on a `.<name>` or `#<name>` suffix.
+/// Resolve a canonical point name to the engine's full point path and declared value type.
+/// Boundary connectors are `<root IRI>.<name>` per SCHEMA.md, so match on a `.<name>` or
+/// `#<name>` suffix.
 fn resolve_point(
-    points: &[(String, PointDirection)],
+    points: &[(String, PointDirection, PointValueType)],
     name: &str,
     want: PointDirection,
-) -> Result<String, String> {
+) -> Result<(String, PointValueType), String> {
     let dot = format!(".{name}");
     let hash = format!("#{name}");
-    let hits: Vec<&String> = points
+    let hits: Vec<(&String, PointValueType)> = points
         .iter()
-        .filter(|(p, d)| *d == want && (p.ends_with(&dot) || p.ends_with(&hash)))
-        .map(|(p, _)| p)
+        .filter(|(p, d, _)| *d == want && (p.ends_with(&dot) || p.ends_with(&hash)))
+        .map(|(p, _, vt)| (p, *vt))
         .collect();
     match hits.as_slice() {
-        [one] => Ok((*one).clone()),
+        [(one, vt)] => Ok(((*one).clone(), *vt)),
         [] => Err(format!(
             "no {want:?} point matching `{name}`; available: {}",
             points
                 .iter()
-                .filter(|(_, d)| *d == want)
-                .map(|(p, _)| p.as_str())
+                .filter(|(_, d, _)| *d == want)
+                .map(|(p, _, _)| p.as_str())
                 .collect::<Vec<_>>()
                 .join(", ")
         )),
@@ -125,22 +133,24 @@ fn run_scenario(
         eprintln!("      load warning: {w:?}");
     }
 
-    let mut points: Vec<(String, PointDirection)> = engine
+    let mut points: Vec<(String, PointDirection, PointValueType)> = engine
         .point_list(None)
         .map_err(|e| format!("point_list failed: {e}"))?
         .into_iter()
-        .map(|p| (p.path, p.direction))
+        .map(|p| (p.path, p.direction, p.value_type))
         .collect();
     // Root-declared boundary outputs are read aliases for their driving connectors — they appear
     // in `topology()`, not `point_list()`. `get_output` accepts the declared spelling directly.
+    // `DeclaredOutput` carries no value type; the placeholder is never consulted because
+    // `json_to_value` coercion only applies to staged inputs.
     for declared in engine.topology().boundary_outputs {
-        points.push((declared.path, PointDirection::Out));
+        points.push((declared.path, PointDirection::Out, PointValueType::Real));
     }
 
     // Flatten the input map into a time-sorted event list.
     let mut events: Vec<InputEvent> = Vec::new();
     for (name, spec) in &scenario.inputs {
-        let path = resolve_point(&points, name, PointDirection::In)?;
+        let (path, value_type) = resolve_point(&points, name, PointDirection::In)?;
         match spec {
             serde_json::Value::Array(steps) => {
                 for step in steps {
@@ -154,14 +164,16 @@ fn run_scenario(
                     events.push(InputEvent {
                         t,
                         path: path.clone(),
-                        value: json_to_value(value).map_err(|e| format!("input `{name}`: {e}"))?,
+                        value: json_to_value(value, value_type)
+                            .map_err(|e| format!("input `{name}`: {e}"))?,
                     });
                 }
             }
             constant => events.push(InputEvent {
                 t: 0.0,
                 path: path.clone(),
-                value: json_to_value(constant).map_err(|e| format!("input `{name}`: {e}"))?,
+                value: json_to_value(constant, value_type)
+                    .map_err(|e| format!("input `{name}`: {e}"))?,
             }),
         }
     }
@@ -170,7 +182,7 @@ fn run_scenario(
     // Pre-resolve assertion outputs.
     let mut expects: Vec<(String, &Expect)> = Vec::new();
     for e in &scenario.expect {
-        expects.push((resolve_point(&points, &e.output, PointDirection::Out)?, e));
+        expects.push((resolve_point(&points, &e.output, PointDirection::Out)?.0, e));
     }
 
     let n_ticks = (clock.horizon_s / clock.step_s).floor() as u64;

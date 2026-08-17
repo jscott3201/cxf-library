@@ -1,0 +1,281 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 150, "horizon_s": 21600 },
+  "scenarios": [
+    {
+      "name": "stable_operation",
+      "description": "Reference vector 1 (stable: short-window scatter 0.3, long-window 0.4). SAT holds 13 °C with a ±0.3 °C 15-min ripple for the whole 6 h horizon — normal PID trim, not hunting. madShort and madLong both settle at 0.3, so the absolute test (> 1.2) never fires and the ratio test never sees a raised short window. No fault at any tick.",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 13.3 },
+          { "t": 450, "value": 12.7 },
+          { "t": 900, "value": 13.3 },
+          { "t": 1350, "value": 12.7 },
+          { "t": 1800, "value": 13.3 },
+          { "t": 2250, "value": 12.7 },
+          { "t": 2700, "value": 13.3 },
+          { "t": 3150, "value": 12.7 },
+          { "t": 3600, "value": 13.3 },
+          { "t": 4050, "value": 12.7 },
+          { "t": 4500, "value": 13.3 },
+          { "t": 4950, "value": 12.7 },
+          { "t": 5400, "value": 13.3 },
+          { "t": 5850, "value": 12.7 },
+          { "t": 6300, "value": 13.3 },
+          { "t": 6750, "value": 12.7 },
+          { "t": 7200, "value": 13.3 },
+          { "t": 7650, "value": 12.7 },
+          { "t": 8100, "value": 13.3 },
+          { "t": 8550, "value": 12.7 },
+          { "t": 9000, "value": 13.3 },
+          { "t": 9450, "value": 12.7 },
+          { "t": 9900, "value": 13.3 },
+          { "t": 10350, "value": 12.7 },
+          { "t": 10800, "value": 13.3 },
+          { "t": 11250, "value": 12.7 },
+          { "t": 11700, "value": 13.3 },
+          { "t": 12150, "value": 12.7 },
+          { "t": 12600, "value": 13.3 },
+          { "t": 13050, "value": 12.7 },
+          { "t": 13500, "value": 13.3 },
+          { "t": 13950, "value": 12.7 },
+          { "t": 14400, "value": 13.3 },
+          { "t": 14850, "value": 12.7 },
+          { "t": 15300, "value": 13.3 },
+          { "t": 15750, "value": 12.7 },
+          { "t": 16200, "value": 13.3 },
+          { "t": 16650, "value": 12.7 },
+          { "t": 17100, "value": 13.3 },
+          { "t": 17550, "value": 12.7 },
+          { "t": 18000, "value": 13.3 },
+          { "t": 18450, "value": 12.7 },
+          { "t": 18900, "value": 13.3 },
+          { "t": 19350, "value": 12.7 },
+          { "t": 19800, "value": 13.3 },
+          { "t": 20250, "value": 12.7 },
+          { "t": 20700, "value": 13.3 },
+          { "t": 21150, "value": 12.7 },
+          { "t": 21600, "value": 13.3 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 21600, "equals": false }
+      ]
+    },
+    {
+      "name": "hunting_onset",
+      "description": "Reference vector 2 (oscillating: short-window scatter 2.5 against a long-window 0.4). SAT is flat at 13 °C for 2.5 h — long enough for madLong to converge on ~0 across a full 2 h baseline — then a ±3 °C 15-min square wave starts at t=9000 s. madShort clears 1.2 at t=9450 s and both conditions hold; persist asserts 1800 s later at t=11250 s. The alarm then self-clears at t=12600 s: by then half the 2 h baseline window is itself oscillating, madLong has risen past madShort/2, and the ratio test releases. Asserted windows keep two 150 s steps of margin from both edges.",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 13.0 },
+          { "t": 9000, "value": 16.0 },
+          { "t": 9450, "value": 10.0 },
+          { "t": 9900, "value": 16.0 },
+          { "t": 10350, "value": 10.0 },
+          { "t": 10800, "value": 16.0 },
+          { "t": 11250, "value": 10.0 },
+          { "t": 11700, "value": 16.0 },
+          { "t": 12150, "value": 10.0 },
+          { "t": 12600, "value": 16.0 },
+          { "t": 13050, "value": 10.0 },
+          { "t": 13500, "value": 16.0 },
+          { "t": 13950, "value": 10.0 },
+          { "t": 14400, "value": 16.0 },
+          { "t": 14850, "value": 10.0 },
+          { "t": 15300, "value": 16.0 },
+          { "t": 15750, "value": 10.0 },
+          { "t": 16200, "value": 16.0 },
+          { "t": 16650, "value": 10.0 },
+          { "t": 17100, "value": 16.0 },
+          { "t": 17550, "value": 10.0 },
+          { "t": 18000, "value": 16.0 },
+          { "t": 18450, "value": 10.0 },
+          { "t": 18900, "value": 16.0 },
+          { "t": 19350, "value": 10.0 },
+          { "t": 19800, "value": 16.0 },
+          { "t": 20250, "value": 10.0 },
+          { "t": 20700, "value": 16.0 },
+          { "t": 21150, "value": 10.0 },
+          { "t": 21600, "value": 16.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 10950, "equals": false },
+        { "output": "yFault", "from_s": 11550, "to_s": 12150, "equals": true },
+        { "output": "yFault", "from_s": 12900, "to_s": 21600, "equals": false }
+      ]
+    },
+    {
+      "name": "noisy_but_consistent",
+      "description": "Reference vector 3 (noisy but consistent: short 1.0 vs long 0.9 — scatter present in both windows). A ±3 °C ripple runs from t=0, so madShort and madLong converge on the same 3.0 and never separate by the factor k=2. The absolute test passes from t=450 s onward; the ratio test blocks the fault for the whole horizon. Established scatter is this detector's baseline, not its alarm.",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 16.0 },
+          { "t": 450, "value": 10.0 },
+          { "t": 900, "value": 16.0 },
+          { "t": 1350, "value": 10.0 },
+          { "t": 1800, "value": 16.0 },
+          { "t": 2250, "value": 10.0 },
+          { "t": 2700, "value": 16.0 },
+          { "t": 3150, "value": 10.0 },
+          { "t": 3600, "value": 16.0 },
+          { "t": 4050, "value": 10.0 },
+          { "t": 4500, "value": 16.0 },
+          { "t": 4950, "value": 10.0 },
+          { "t": 5400, "value": 16.0 },
+          { "t": 5850, "value": 10.0 },
+          { "t": 6300, "value": 16.0 },
+          { "t": 6750, "value": 10.0 },
+          { "t": 7200, "value": 16.0 },
+          { "t": 7650, "value": 10.0 },
+          { "t": 8100, "value": 16.0 },
+          { "t": 8550, "value": 10.0 },
+          { "t": 9000, "value": 16.0 },
+          { "t": 9450, "value": 10.0 },
+          { "t": 9900, "value": 16.0 },
+          { "t": 10350, "value": 10.0 },
+          { "t": 10800, "value": 16.0 },
+          { "t": 11250, "value": 10.0 },
+          { "t": 11700, "value": 16.0 },
+          { "t": 12150, "value": 10.0 },
+          { "t": 12600, "value": 16.0 },
+          { "t": 13050, "value": 10.0 },
+          { "t": 13500, "value": 16.0 },
+          { "t": 13950, "value": 10.0 },
+          { "t": 14400, "value": 16.0 },
+          { "t": 14850, "value": 10.0 },
+          { "t": 15300, "value": 16.0 },
+          { "t": 15750, "value": 10.0 },
+          { "t": 16200, "value": 16.0 },
+          { "t": 16650, "value": 10.0 },
+          { "t": 17100, "value": 16.0 },
+          { "t": 17550, "value": 10.0 },
+          { "t": 18000, "value": 16.0 },
+          { "t": 18450, "value": 10.0 },
+          { "t": 18900, "value": 16.0 },
+          { "t": 19350, "value": 10.0 },
+          { "t": 19800, "value": 16.0 },
+          { "t": 20250, "value": 10.0 },
+          { "t": 20700, "value": 16.0 },
+          { "t": 21150, "value": 10.0 },
+          { "t": 21600, "value": 16.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 21600, "equals": false }
+      ]
+    },
+    {
+      "name": "small_oscillation",
+      "description": "Threshold edge from below: same flat-then-oscillate trajectory as hunting_onset but at ±1.0 °C. The ratio test holds from t=9000 s (the baseline is near zero) yet madShort peaks at 1.083 and settles at 1.0, both under the 1.2 threshold, so the absolute test never fires. Pins that both conditions are required — a clean ratio alone cannot raise this fault.",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 13.0 },
+          { "t": 9000, "value": 14.0 },
+          { "t": 9450, "value": 12.0 },
+          { "t": 9900, "value": 14.0 },
+          { "t": 10350, "value": 12.0 },
+          { "t": 10800, "value": 14.0 },
+          { "t": 11250, "value": 12.0 },
+          { "t": 11700, "value": 14.0 },
+          { "t": 12150, "value": 12.0 },
+          { "t": 12600, "value": 14.0 },
+          { "t": 13050, "value": 12.0 },
+          { "t": 13500, "value": 14.0 },
+          { "t": 13950, "value": 12.0 },
+          { "t": 14400, "value": 14.0 },
+          { "t": 14850, "value": 12.0 },
+          { "t": 15300, "value": 14.0 },
+          { "t": 15750, "value": 12.0 },
+          { "t": 16200, "value": 14.0 },
+          { "t": 16650, "value": 12.0 },
+          { "t": 17100, "value": 14.0 },
+          { "t": 17550, "value": 12.0 },
+          { "t": 18000, "value": 14.0 },
+          { "t": 18450, "value": 12.0 },
+          { "t": 18900, "value": 14.0 },
+          { "t": 19350, "value": 12.0 },
+          { "t": 19800, "value": 14.0 },
+          { "t": 20250, "value": 12.0 },
+          { "t": 20700, "value": 14.0 },
+          { "t": 21150, "value": 12.0 },
+          { "t": 21600, "value": 14.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 21600, "equals": false }
+      ]
+    },
+    {
+      "name": "marginal_oscillation",
+      "description": "Threshold edge from above: the same trajectory at ±1.35 °C, just over the 1.2 threshold. madShort crosses at t=9750 s (300 s later than the ±3 case, because the short window has to fill), persist asserts at t=11550 s, and the ratio test releases at t=12600 s as in hunting_onset. The pair small_oscillation / marginal_oscillation brackets oscillation_threshold from both sides.",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 13.0 },
+          { "t": 9000, "value": 14.35 },
+          { "t": 9450, "value": 11.65 },
+          { "t": 9900, "value": 14.35 },
+          { "t": 10350, "value": 11.65 },
+          { "t": 10800, "value": 14.35 },
+          { "t": 11250, "value": 11.65 },
+          { "t": 11700, "value": 14.35 },
+          { "t": 12150, "value": 11.65 },
+          { "t": 12600, "value": 14.35 },
+          { "t": 13050, "value": 11.65 },
+          { "t": 13500, "value": 14.35 },
+          { "t": 13950, "value": 11.65 },
+          { "t": 14400, "value": 14.35 },
+          { "t": 14850, "value": 11.65 },
+          { "t": 15300, "value": 14.35 },
+          { "t": 15750, "value": 11.65 },
+          { "t": 16200, "value": 14.35 },
+          { "t": 16650, "value": 11.65 },
+          { "t": 17100, "value": 14.35 },
+          { "t": 17550, "value": 11.65 },
+          { "t": 18000, "value": 14.35 },
+          { "t": 18450, "value": 11.65 },
+          { "t": 18900, "value": 14.35 },
+          { "t": 19350, "value": 11.65 },
+          { "t": 19800, "value": 14.35 },
+          { "t": 20250, "value": 11.65 },
+          { "t": 20700, "value": 14.35 },
+          { "t": 21150, "value": 11.65 },
+          { "t": 21600, "value": 14.35 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 11250, "equals": false },
+        { "output": "yFault", "from_s": 11850, "to_s": 12150, "equals": true },
+        { "output": "yFault", "from_s": 12900, "to_s": 21600, "equals": false }
+      ]
+    },
+    {
+      "name": "onset_stops_before_delay",
+      "description": "Transient: a single 15-min hunting burst (±3 °C, t=9000–9900 s) on a flat baseline — one disturbance rejection, not sustained instability. Both conditions hold from t=9450 s but madShort decays back under 1.2 at t=10650 s, 1050 s of accumulated persistence into the 1800 s timer. The timer resets and no alarm is raised.",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 13.0 },
+          { "t": 9000, "value": 16.0 },
+          { "t": 9450, "value": 10.0 },
+          { "t": 9900, "value": 13.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 21600, "equals": false }
+      ]
+    },
+    {
+      "name": "mode_change_step",
+      "description": "Transient: a one-time 5 °C SAT step at t=9000 s (economizer changeover or a setpoint reset), then steady operation at the new value. The step spikes madShort to 2.08 and both conditions hold from t=9150 s, but the short window flushes the step out and madShort falls back under 1.2 at t=10050 s — 750 s of persistence, well short of the 1800 s alarm delay. Pins that alarm_delay rides out a genuine step disturbance.",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 13.0 },
+          { "t": 9000, "value": 8.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 21600, "equals": false }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 5400 },
+  "scenarios": [
+    {
+      "name": "heating_mode_consistent",
+      "description": "Reference vector (oat 0 °C staged as expected_mode = 1, HEATING): heating valve at 40%, cooling valve shut, OA damper at its 10% minimum. Every actuator agrees with the mode, so nothing fires.",
+      "inputs": { "expected_mode": 1, "htg_vlv_cmd": 40.0, "clg_vlv_cmd": 0.0, "oa_dmpr_cmd": 10.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "heating_mode_cooling_valve_open",
+      "description": "Reference vector: HEATING mode with the cooling valve at 20% — the chiller is fighting the mode. Violation is present from t=0, so delayOnInit makes the alarm land 1800 s in.",
+      "inputs": { "expected_mode": 1, "htg_vlv_cmd": 40.0, "clg_vlv_cmd": 20.0, "oa_dmpr_cmd": 10.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "econ_mode_consistent",
+      "description": "Reference vector (oat 15 °C staged as expected_mode = 2, ECONOMIZER): both coils shut, OA damper at 80%. Free cooling done right — the damper test is not applied in ECONOMIZER, where an open damper is the point.",
+      "inputs": { "expected_mode": 2, "htg_vlv_cmd": 0.0, "clg_vlv_cmd": 0.0, "oa_dmpr_cmd": 80.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "econ_mode_heating_valve_open",
+      "description": "Reference vector: ECONOMIZER mode with the heating valve at 25% — the boiler is reheating air the damper just brought in for free cooling. Alarms after alarm_delay.",
+      "inputs": { "expected_mode": 2, "htg_vlv_cmd": 25.0, "clg_vlv_cmd": 0.0, "oa_dmpr_cmd": 80.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "mech_cooling_heating_valve_open",
+      "description": "MECHANICAL_COOLING_MIN_OA with the cooling valve at 60% (legitimate) but the heating valve at 30% — classic simultaneous heating and cooling seen from the mode side. Damper at its 10% minimum is correct for this mode.",
+      "inputs": { "expected_mode": 3, "htg_vlv_cmd": 30.0, "clg_vlv_cmd": 60.0, "oa_dmpr_cmd": 10.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "heating_mode_damper_economizing",
+      "description": "HEATING mode with the OA damper at 40% — the unit is pulling in cold outdoor air while the heating coil pays for it. Both coils are otherwise consistent with the mode; the damper alone raises the fault.",
+      "inputs": { "expected_mode": 1, "htg_vlv_cmd": 45.0, "clg_vlv_cmd": 0.0, "oa_dmpr_cmd": 40.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "thresholds_exactly_at_edge",
+      "description": "Boundary: in HEATING mode the cooling valve sits exactly at valve_open_threshold (5.0%) and the damper exactly at econ_damper_threshold (30.0%). Both tests are strict `>`, so neither counts as a violation and the rule stays clear.",
+      "inputs": { "expected_mode": 1, "htg_vlv_cmd": 40.0, "clg_vlv_cmd": 5.0, "oa_dmpr_cmd": 30.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "thresholds_just_above_edge",
+      "description": "Boundary from the other side: the same HEATING case with the cooling valve at 5.1% and the damper at 30.1%. Both tests now pass, so the alarm lands one alarm_delay after t=0.",
+      "inputs": { "expected_mode": 1, "htg_vlv_cmd": 40.0, "clg_vlv_cmd": 5.1, "oa_dmpr_cmd": 30.1 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "unmapped_mode_stays_silent",
+      "description": "expected_mode = 0 matches none of the three code constants, so every mode gate is false and both coils wide open with the damper at 100% raise nothing. Structural silence, not a health claim — the host owes a NO_EVAL here.",
+      "inputs": { "expected_mode": 0, "htg_vlv_cmd": 80.0, "clg_vlv_cmd": 80.0, "oa_dmpr_cmd": 100.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "mode_switch_heals_before_delay",
+      "description": "Cooling valve holds 60% while the derived mode is HEATING — a violation — until the mode flips to MECHANICAL_COOLING_MIN_OA at t=1200 s, where 60% cooling is exactly right. The violation ends 600 s short of alarm_delay, so the timer resets and no alarm is ever raised.",
+      "inputs": {
+        "expected_mode": [
+          { "t": 0, "value": 1 },
+          { "t": 1200, "value": 3 }
+        ],
+        "htg_vlv_cmd": 0.0,
+        "clg_vlv_cmd": 60.0,
+        "oa_dmpr_cmd": 10.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "violation_alarms_then_clears",
+      "description": "HEATING mode with the cooling valve at 20% asserts the alarm at 1800 s; the valve is driven shut at t=3000 s and yFault drops on that same tick, since TrueDelay only delays the rising edge.",
+      "inputs": {
+        "expected_mode": 1,
+        "htg_vlv_cmd": 40.0,
+        "clg_vlv_cmd": [
+          { "t": 0, "value": 20.0 },
+          { "t": 3000, "value": 0.0 }
+        ],
+        "oa_dmpr_cmd": 10.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 2700, "equals": true },
+        { "output": "yFault", "from_s": 3300, "to_s": 5400, "equals": false }
+      ]
+    }
+  ]
+}
