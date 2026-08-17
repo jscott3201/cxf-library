@@ -1,0 +1,225 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 1800
+  },
+  "scenarios": [
+    {
+      "name": "cold_with_frost_protection_off",
+      "description": "The motivating case: -15 C outdoor air, the ERV running, and the frost sequence reporting inactive. All three conjuncts hold from t=0, so delayOnInit makes the alarm land one alarm_delay (300 s) in.",
+      "inputs": {
+        "oat": -15.0,
+        "erv_frost_prot": false,
+        "erv_enabled": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "cold_with_frost_protection_engaged",
+      "description": "Same -15 C outdoor air with the frost sequence engaged. This is the unit working as designed and the rule stays silent no matter how cold it gets.",
+      "inputs": {
+        "oat": -15.0,
+        "erv_frost_prot": true,
+        "erv_enabled": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mild_outdoor_air_no_frost_protection",
+      "description": "-2 C with frost protection off. Frost protection is not supposed to be running here \u2014 the threshold is what separates a missing sequence from a sequence that has no reason to act.",
+      "inputs": {
+        "oat": -2.0,
+        "erv_frost_prot": false,
+        "erv_enabled": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "erv_disabled_in_deep_cold",
+      "description": "-20 C, frost protection off, but the ERV is not enabled: no air is moving through the core, so there is nothing to frost. The enable conjunct holds yFault down \u2014 and false here means 'not applicable', not 'protected'.",
+      "inputs": {
+        "oat": -20.0,
+        "erv_frost_prot": false,
+        "erv_enabled": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "oat_exactly_at_frost_threshold",
+      "description": "Boundary: outdoor air sitting exactly on frost_threshold (-10.0 C) with frost protection off. CDL Reals has no LessEqual, so the comparison is strict `<` and exactly -10.0 clears.",
+      "inputs": {
+        "oat": -10.0,
+        "erv_frost_prot": false,
+        "erv_enabled": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "oat_just_below_frost_threshold",
+      "description": "Boundary from the other side: -10.1 C, one tenth of a degree colder than the threshold. The cold term now passes and the alarm lands after alarm_delay.",
+      "inputs": {
+        "oat": -10.1,
+        "erv_frost_prot": false,
+        "erv_enabled": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "brief_cold_excursion",
+      "description": "A three-minute dip to -12 C with frost protection off, ending 120 s short of the 300 s alarm_delay. The timer resets when the air warms and no alarm is ever raised.",
+      "inputs": {
+        "oat": [
+          {
+            "t": 0,
+            "value": -12.0
+          },
+          {
+            "t": 180,
+            "value": -5.0
+          }
+        ],
+        "erv_frost_prot": false,
+        "erv_enabled": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "frost_protection_engages_after_alarm",
+      "description": "Recovery: the alarm asserts at 300 s, then the frost sequence starts at t=900 s. yFault drops on that same tick \u2014 TrueDelay only delays the rising edge \u2014 even though the outdoor air is still at -15 C.",
+      "inputs": {
+        "oat": -15.0,
+        "erv_frost_prot": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 900,
+            "value": true
+          }
+        ],
+        "erv_enabled": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "erv_shuts_down_after_alarm",
+      "description": "The other release path: the alarm asserts at 300 s and the ERV is disabled at t=900 s. yFault drops with the enable, which is the reference's own semantics \u2014 the fault describes an enabled ERV running unprotected.",
+      "inputs": {
+        "oat": -15.0,
+        "erv_frost_prot": false,
+        "erv_enabled": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 900,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

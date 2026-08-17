@@ -1,0 +1,332 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 2400
+  },
+  "scenarios": [
+    {
+      "name": "drive_tracking_command",
+      "description": "Healthy drive: commanded to 60%, running at 58%. A 2-point offset is inside the 5% tolerance and the drive is well above the evaluation floor, so the rule is live and silent.",
+      "inputs": {
+        "vfd_speed_cmd": 60.0,
+        "vfd_speed": 58.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "feedback_below_command",
+      "description": "Commanded to 60%, running at 40%: the drive is 20 points short of what it was asked for. Both delays run from t=0 under delayOnInit, so the alarm lands 600 s in (deviation_duration + alarm_delay).",
+      "inputs": {
+        "vfd_speed_cmd": 60.0,
+        "vfd_speed": 40.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "feedback_above_command",
+      "description": "The mirror case: commanded to 40%, running at 60%. Abs makes the test symmetric, so a drive overrunning its command alarms exactly as a drive falling short does.",
+      "inputs": {
+        "vfd_speed_cmd": 40.0,
+        "vfd_speed": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "deviation_exactly_at_threshold",
+      "description": "Boundary: 60% commanded against 55% feedback is a deviation of exactly speed_error_threshold (5.0). CDL Reals has no GreaterEqual, so the comparison is strict and exactly 5 clears.",
+      "inputs": {
+        "vfd_speed_cmd": 60.0,
+        "vfd_speed": 55.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "deviation_just_above_threshold",
+      "description": "Boundary from the other side: 54.9% feedback against the same command is a 5.1-point deviation, and the alarm lands after the two delays.",
+      "inputs": {
+        "vfd_speed_cmd": 60.0,
+        "vfd_speed": 54.9
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "command_below_run_floor",
+      "description": "Commanded to 10% \u2014 below the drive's own minimum speed \u2014 with the drive stopped. The 10-point deviation clears the threshold, but a drive is not obliged to track a command below its minimum, so yCmdOk is false and the verdict is NO_EVAL rather than a fault.",
+      "inputs": {
+        "vfd_speed_cmd": 10.0,
+        "vfd_speed": 0.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "command_exactly_at_run_floor",
+      "description": "Evaluability boundary: the command sits exactly on min_cmd_for_eval (20.0%). Strict `>` again, so exactly 20 is not evaluable.",
+      "inputs": {
+        "vfd_speed_cmd": 20.0,
+        "vfd_speed": 0.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "command_just_above_run_floor",
+      "description": "Evaluability boundary from the other side: 20.1% commanded with the drive stopped. The rule becomes evaluable and the standing 20.1-point deviation alarms after the two delays.",
+      "inputs": {
+        "vfd_speed_cmd": 20.1,
+        "vfd_speed": 0.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "deviation_shorter_than_both_delays",
+      "description": "An 8-minute deviation: long enough to mature `track` (5 min) but only 3 of the further 5 minutes `persist` needs. No alarm. With a single 300 s delay in place of the chain this scenario would fire at 300 s, which is what makes it the regression test for the two-delay structure.",
+      "inputs": {
+        "vfd_speed_cmd": 60.0,
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 40.0
+          },
+          {
+            "t": 480,
+            "value": 60.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "drive_recovers_after_alarm",
+      "description": "Recovery: the alarm asserts at 600 s and the drive comes back to within 1 point of its command at t=1200 s. Both delays drop on that tick \u2014 TrueDelay only delays the rising edge.",
+      "inputs": {
+        "vfd_speed_cmd": 60.0,
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 40.0
+          },
+          {
+            "t": 1200,
+            "value": 59.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1260,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "command_drops_below_floor_after_alarm",
+      "description": "The evaluability release: a deviating drive alarms at 600 s, then the loop backs the command down to 10% at t=1200 s. yCmdOk goes false and yFault follows \u2014 the host must read that pair as NO_EVAL, not as a drive that fixed itself.",
+      "inputs": {
+        "vfd_speed_cmd": [
+          {
+            "t": 0,
+            "value": 60.0
+          },
+          {
+            "t": 1200,
+            "value": 10.0
+          }
+        ],
+        "vfd_speed": 40.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1260,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 1200,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

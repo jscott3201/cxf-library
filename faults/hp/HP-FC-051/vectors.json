@@ -1,0 +1,742 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 300,
+    "horizon_s": 12000
+  },
+  "scenarios": [
+    {
+      "name": "no_defrost_activity",
+      "description": "A cold day with the defrost sequence idle: no cycles, no duration, no mild-weather trigger. The rolling count sits at zero and all three branches stay down.",
+      "inputs": {
+        "oat": -5.0,
+        "defrost_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 12000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "normal_defrost_cadence",
+      "description": "Healthy winter operation: one 5-minute defrost every 30 minutes, so 2 cycles per hour against a limit of 4. The count reads 12/hr on the first pulse \u2014 the moving average divides by elapsed time until its window fills \u2014 but that artifact collapses within two ticks and never survives the 30-minute persistence.",
+      "inputs": {
+        "oat": -5.0,
+        "defrost_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          },
+          {
+            "t": 2100,
+            "value": true
+          },
+          {
+            "t": 2400,
+            "value": false
+          },
+          {
+            "t": 3900,
+            "value": true
+          },
+          {
+            "t": 4200,
+            "value": false
+          },
+          {
+            "t": 5700,
+            "value": true
+          },
+          {
+            "t": 6000,
+            "value": false
+          },
+          {
+            "t": 7500,
+            "value": true
+          },
+          {
+            "t": 7800,
+            "value": false
+          },
+          {
+            "t": 9300,
+            "value": true
+          },
+          {
+            "t": 9600,
+            "value": false
+          },
+          {
+            "t": 11100,
+            "value": true
+          },
+          {
+            "t": 11400,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 12000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "four_cycles_per_hour_is_exactly_the_threshold",
+      "description": "Threshold edge: the unit settles into a defrost every 15 minutes \u2014 exactly max_defrost_frequency \u2014 starting after the counting window has filled, so the reading is a completed-hour count rather than an extrapolated rate. `count` holds at precisely 4.0 and the strict `>` keeps it clear.",
+      "inputs": {
+        "oat": -5.0,
+        "defrost_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 3900,
+            "value": true
+          },
+          {
+            "t": 4200,
+            "value": false
+          },
+          {
+            "t": 4800,
+            "value": true
+          },
+          {
+            "t": 5100,
+            "value": false
+          },
+          {
+            "t": 5700,
+            "value": true
+          },
+          {
+            "t": 6000,
+            "value": false
+          },
+          {
+            "t": 6600,
+            "value": true
+          },
+          {
+            "t": 6900,
+            "value": false
+          },
+          {
+            "t": 7500,
+            "value": true
+          },
+          {
+            "t": 7800,
+            "value": false
+          },
+          {
+            "t": 8400,
+            "value": true
+          },
+          {
+            "t": 8700,
+            "value": false
+          },
+          {
+            "t": 9300,
+            "value": true
+          },
+          {
+            "t": 9600,
+            "value": false
+          },
+          {
+            "t": 10200,
+            "value": true
+          },
+          {
+            "t": 10500,
+            "value": false
+          },
+          {
+            "t": 11100,
+            "value": true
+          },
+          {
+            "t": 11400,
+            "value": false
+          },
+          {
+            "t": 12000,
+            "value": true
+          },
+          {
+            "t": 12300,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 12000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "five_cycles_per_hour_is_the_first_faulted_cadence",
+      "description": "Threshold edge from the other side, and the finest step a 300 s tick can resolve: a repeating 600/600/600/900/900 s spacing puts exactly 5 rising edges in every trailing hour. The count clears 4 at t = 6600 s and the alarm follows one alarm_delay later.",
+      "inputs": {
+        "oat": -5.0,
+        "defrost_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 3900,
+            "value": true
+          },
+          {
+            "t": 4200,
+            "value": false
+          },
+          {
+            "t": 4500,
+            "value": true
+          },
+          {
+            "t": 4800,
+            "value": false
+          },
+          {
+            "t": 5100,
+            "value": true
+          },
+          {
+            "t": 5400,
+            "value": false
+          },
+          {
+            "t": 5700,
+            "value": true
+          },
+          {
+            "t": 6000,
+            "value": false
+          },
+          {
+            "t": 6600,
+            "value": true
+          },
+          {
+            "t": 6900,
+            "value": false
+          },
+          {
+            "t": 7500,
+            "value": true
+          },
+          {
+            "t": 7800,
+            "value": false
+          },
+          {
+            "t": 8100,
+            "value": true
+          },
+          {
+            "t": 8400,
+            "value": false
+          },
+          {
+            "t": 8700,
+            "value": true
+          },
+          {
+            "t": 9000,
+            "value": false
+          },
+          {
+            "t": 9300,
+            "value": true
+          },
+          {
+            "t": 9600,
+            "value": false
+          },
+          {
+            "t": 10200,
+            "value": true
+          },
+          {
+            "t": 10500,
+            "value": false
+          },
+          {
+            "t": 11100,
+            "value": true
+          },
+          {
+            "t": 11400,
+            "value": false
+          },
+          {
+            "t": 11700,
+            "value": true
+          },
+          {
+            "t": 12000,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 8100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 8700,
+          "to_s": 12000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "excessive_defrost_frequency",
+      "description": "A coil icing up faster than it can be cleared: defrost every 10 minutes, 6 cycles per hour, beginning after the counting window has filled. The count crosses 4 at t = 6300 s \u2014 the fifth cycle of the run \u2014 and the alarm lands 1800 s after that.",
+      "inputs": {
+        "oat": -5.0,
+        "defrost_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 3900,
+            "value": true
+          },
+          {
+            "t": 4200,
+            "value": false
+          },
+          {
+            "t": 4500,
+            "value": true
+          },
+          {
+            "t": 4800,
+            "value": false
+          },
+          {
+            "t": 5100,
+            "value": true
+          },
+          {
+            "t": 5400,
+            "value": false
+          },
+          {
+            "t": 5700,
+            "value": true
+          },
+          {
+            "t": 6000,
+            "value": false
+          },
+          {
+            "t": 6300,
+            "value": true
+          },
+          {
+            "t": 6600,
+            "value": false
+          },
+          {
+            "t": 6900,
+            "value": true
+          },
+          {
+            "t": 7200,
+            "value": false
+          },
+          {
+            "t": 7500,
+            "value": true
+          },
+          {
+            "t": 7800,
+            "value": false
+          },
+          {
+            "t": 8100,
+            "value": true
+          },
+          {
+            "t": 8400,
+            "value": false
+          },
+          {
+            "t": 8700,
+            "value": true
+          },
+          {
+            "t": 9000,
+            "value": false
+          },
+          {
+            "t": 9300,
+            "value": true
+          },
+          {
+            "t": 9600,
+            "value": false
+          },
+          {
+            "t": 9900,
+            "value": true
+          },
+          {
+            "t": 10200,
+            "value": false
+          },
+          {
+            "t": 10500,
+            "value": true
+          },
+          {
+            "t": 10800,
+            "value": false
+          },
+          {
+            "t": 11100,
+            "value": true
+          },
+          {
+            "t": 11400,
+            "value": false
+          },
+          {
+            "t": 11700,
+            "value": true
+          },
+          {
+            "t": 12000,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 8400,
+          "to_s": 12000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "defrost_overlong",
+      "description": "One defrost cycle that never terminates. `tooLong` matures at 900 s and the alarm 1800 s after that, at t = 2700 s. The frequency branch contributes nothing: the single rising edge lands on tick 0, where the moving average's integrand encloses no area.",
+      "inputs": {
+        "oat": -5.0,
+        "defrost_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3000,
+          "to_s": 12000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "defrost_released_on_the_maturity_tick",
+      "description": "Duration edge: the first cycle is observed true at t = 0, 300 and 600 s and false at 900 s \u2014 the tick the duration timer would have matured on \u2014 so it does not trip the branch. Defrost restarts at 1200 s and runs on, which matures `tooLong` at 2100 s and the alarm at 3900 s: 1200 s later than the uninterrupted case.",
+      "inputs": {
+        "oat": -5.0,
+        "defrost_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 900,
+            "value": false
+          },
+          {
+            "t": 1200,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 4200,
+          "to_s": 12000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "defrost_released_on_the_alarm_tick",
+      "description": "Persistence edge: a single defrost runs from t = 0 and ends at t = 2700 s, the exact tick the alarm would assert on. The input is already false when persist is evaluated, so nothing is ever reported \u2014 a 45-minute defrost that this rule declines to call.",
+      "inputs": {
+        "oat": -5.0,
+        "defrost_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 2700,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 12000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "defrost_released_one_tick_later",
+      "description": "Persistence edge from the other side: the same defrost held 300 s longer asserts at t = 2700 s and drops again at 3000 s when the cycle ends. One tick of difference in the input is one tick of alarm.",
+      "inputs": {
+        "oat": -5.0,
+        "defrost_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 3000,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 2700,
+          "to_s": 2700,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 3000,
+          "to_s": 12000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "oat_exactly_at_the_mild_threshold",
+      "description": "Mild-weather edge: a continuous defrost at exactly defrost_unnecessary_temp (7.0 \u00b0C). The comparison is a strict `>`, so the third branch stays down and the alarm arrives on the duration branch's schedule at t = 2700 s.",
+      "inputs": {
+        "oat": 7.0,
+        "defrost_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3000,
+          "to_s": 12000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "mild_oat_advances_the_alarm",
+      "description": "Mild-weather edge from the other side: one tenth of a degree warmer and the third branch is live from t = 0, so the alarm matures at 1800 s instead of 2700 s. Defrosting at 7.1 \u00b0C means the defrost sensor or board is calling for a cycle the coil cannot need.",
+      "inputs": {
+        "oat": 7.1,
+        "defrost_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 2100,
+          "to_s": 12000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "mild_oat_short_cycles_never_persist",
+      "description": "The third branch's practical limit: 5-minute defrosts at 10 \u00b0C, twice an hour. Every cycle is needless and the branch says so, but it is true for one tick at a time and the 30-minute persistence never fills. On its own, branch 3 only reports a defrost that outlasts alarm_delay \u2014 see the card's Deviations.",
+      "inputs": {
+        "oat": 10.0,
+        "defrost_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          },
+          {
+            "t": 2100,
+            "value": true
+          },
+          {
+            "t": 2400,
+            "value": false
+          },
+          {
+            "t": 3900,
+            "value": true
+          },
+          {
+            "t": 4200,
+            "value": false
+          },
+          {
+            "t": 5700,
+            "value": true
+          },
+          {
+            "t": 6000,
+            "value": false
+          },
+          {
+            "t": 7500,
+            "value": true
+          },
+          {
+            "t": 7800,
+            "value": false
+          },
+          {
+            "t": 9300,
+            "value": true
+          },
+          {
+            "t": 9600,
+            "value": false
+          },
+          {
+            "t": 11100,
+            "value": true
+          },
+          {
+            "t": 11400,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 12000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "alarm_clears_when_defrost_ends",
+      "description": "Recovery: a stuck defrost alarms at 2700 s and the cycle finally terminates at 5400 s (the defrost sensor was replaced, or the board was reset). Both timers fall immediately and the alarm clears on that tick.",
+      "inputs": {
+        "oat": -5.0,
+        "defrost_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 5400,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3000,
+          "to_s": 5100,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 5400,
+          "to_s": 12000,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

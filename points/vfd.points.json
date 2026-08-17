@@ -1,0 +1,87 @@
+{
+  "schema": "cxf-library/points/v1",
+  "equipment": "vfd",
+  "namespaces": {
+    "brick": {
+      "iri": "https://brickschema.org/schema/Brick#",
+      "verified_version": "1.4.4"
+    },
+    "s223": {
+      "iri": "http://data.ashrae.org/standard223#",
+      "verified_version": "v1.0.0-2026"
+    },
+    "s223_g36": {
+      "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#",
+      "verified_version": "v1.0.0-2026"
+    },
+    "quantitykind": {
+      "iri": "http://qudt.org/vocab/quantitykind/",
+      "verified_version": "QUDT 3.1.4"
+    },
+    "unit": {
+      "iri": "http://qudt.org/vocab/unit/",
+      "verified_version": "QUDT 3.1.4"
+    }
+  },
+  "notes": "Variable frequency drive point dictionary. The VFD family's rules are application-agnostic (fan, pump); the process-variable pair is deliberately untyped beyond 'the controlled variable in its own units' and marked provisional. Owning equipment: brick:Variable_Frequency_Drive (verified in Brick 1.4.4).",
+  "points": [
+    {
+      "name": "vfd_speed_cmd",
+      "description": "VFD speed command (0-100%)",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": "Speed_Setpoint",
+      "s223": {
+        "pattern": "QuantifiableActuatableProperty on the VFD via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "brick:Speed_Setpoint grep-verified in Brick 1.4.4 (the commanded speed the drive is asked to track)."
+    },
+    {
+      "name": "vfd_speed",
+      "description": "VFD speed feedback (0-100%)",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": "Motor_Speed_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty on the driven motor via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "brick:Motor_Speed_Sensor grep-verified in Brick 1.4.4; brick:Speed_Status is the drive-reported alternative — bind whichever the site trends, but note VFD-FC-050 diagnosis 5 (tachometer failure) argues for the drive-reported value where both exist."
+    },
+    {
+      "name": "vfd_process_value",
+      "description": "Controlled process variable (pressure, flow, or temperature — the loop's PV, in its own units)",
+      "kind": "real",
+      "unit": "1",
+      "qudt_unit": null,
+      "brick": null,
+      "s223": null,
+      "provisional": true,
+      "notes": "Deliberately generic: the VFD family's rules compare PV against setpoint in whatever unit the loop uses, and VFD-FC-051's pv_error_threshold is set in those same units. Semantic tags belong on the application-specific point (duct static pressure, water differential pressure, ...) that the host binds here."
+    },
+    {
+      "name": "vfd_process_sp",
+      "description": "Setpoint for the controlled process variable (same units as vfd_process_value)",
+      "kind": "real",
+      "unit": "1",
+      "qudt_unit": null,
+      "brick": null,
+      "s223": null,
+      "provisional": true,
+      "notes": "See vfd_process_value; the pair must be bound from the same loop in the same units."
+    }
+  ]
+}

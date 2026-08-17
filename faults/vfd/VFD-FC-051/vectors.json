@@ -1,0 +1,311 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 3600
+  },
+  "scenarios": [
+    {
+      "name": "at_minimum_with_load_satisfied",
+      "description": "The drive is parked at its 20% minimum and the process variable is within 5 units of setpoint. This is normal light-load operation \u2014 the loop has nothing left to ask for and does not need it.",
+      "inputs": {
+        "vfd_speed": 20.0,
+        "vfd_process_value": 100.0,
+        "vfd_process_sp": 105.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "at_minimum_with_load_unsatisfied",
+      "description": "The motivating case: the drive sits at 20% while the process variable stays 15 units below setpoint. The loop cannot slow down any further to help itself and cannot speed up to close the gap. Both terms hold from t=0, so delayOnInit puts the alarm at 900 s.",
+      "inputs": {
+        "vfd_speed": 20.0,
+        "vfd_process_value": 90.0,
+        "vfd_process_sp": 105.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "modulating_above_minimum",
+      "description": "The same 15-unit setpoint miss with the drive at 60%. The loop still has headroom, so the miss is a tuning or capacity question rather than this fault \u2014 the minimum-speed term is what makes it actionable.",
+      "inputs": {
+        "vfd_speed": 60.0,
+        "vfd_process_value": 90.0,
+        "vfd_process_sp": 105.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "speed_exactly_at_floor",
+      "description": "Boundary on the composite floor: feedback at exactly min_speed + speed_tolerance (20.0 + 3.0 = 23.0) with the load unsatisfied. The reference writes `<=`; CDL Reals has no LessEqual, so the graph uses strict `<` and exactly 23.0 clears.",
+      "inputs": {
+        "vfd_speed": 23.0,
+        "vfd_process_value": 80.0,
+        "vfd_process_sp": 105.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "speed_just_below_floor",
+      "description": "One epsilon inside the floor: 22.9% with the same unsatisfied load. The speed term passes and the alarm lands after sustained_duration.",
+      "inputs": {
+        "vfd_speed": 22.9,
+        "vfd_process_value": 80.0,
+        "vfd_process_sp": 105.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "speed_just_above_floor",
+      "description": "One epsilon outside the floor: 23.1% with the same unsatisfied load, pinning the third side of the composite boundary. A drive that has started to modulate up is no longer stuck at minimum.",
+      "inputs": {
+        "vfd_speed": 23.1,
+        "vfd_process_value": 80.0,
+        "vfd_process_sp": 105.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "pv_error_exactly_at_threshold",
+      "description": "Boundary on the load term: the process variable sits exactly pv_error_threshold (10.0 units) below setpoint at minimum speed. Strict `>`, so exactly 10 is not a fault.",
+      "inputs": {
+        "vfd_speed": 20.0,
+        "vfd_process_value": 95.0,
+        "vfd_process_sp": 105.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "pv_error_just_above_threshold",
+      "description": "Boundary from the other side: 10.1 units below setpoint at minimum speed, and the alarm lands after sustained_duration.",
+      "inputs": {
+        "vfd_speed": 20.0,
+        "vfd_process_value": 94.9,
+        "vfd_process_sp": 105.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "pv_above_setpoint_at_minimum",
+      "description": "The over-delivery direction: at minimum speed the process variable runs 15 units above setpoint. The reference's absolute value makes this a fault too, and it is diagnosis 1 read backwards \u2014 the minimum is set too high for the load, so the loop cannot stop overshooting.",
+      "inputs": {
+        "vfd_speed": 20.0,
+        "vfd_process_value": 120.0,
+        "vfd_process_sp": 105.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "transient_load_excursion",
+      "description": "A 10-minute excursion 15 units below setpoint at minimum speed, ending 5 minutes short of sustained_duration \u2014 the load step a loop at minimum takes a while to answer. The timer resets and no alarm is raised.",
+      "inputs": {
+        "vfd_speed": 20.0,
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 90.0
+          },
+          {
+            "t": 600,
+            "value": 100.0
+          }
+        ],
+        "vfd_process_sp": 105.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "drive_modulates_up_after_alarm",
+      "description": "Recovery through the speed term: the alarm asserts at 900 s, then the drive leaves minimum for 45% at t=1800 s (the loop was released, or the obstruction cleared). yFault drops on that tick even though the process variable is still short of setpoint.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 20.0
+          },
+          {
+            "t": 1800,
+            "value": 45.0
+          }
+        ],
+        "vfd_process_value": 90.0,
+        "vfd_process_sp": 105.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1740,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "load_satisfied_after_alarm",
+      "description": "Recovery through the load term: the alarm asserts at 900 s, then the process variable climbs to within 1 unit of setpoint at t=1800 s while the drive stays at minimum. The condition is a conjunction, so either term releasing clears it.",
+      "inputs": {
+        "vfd_speed": 20.0,
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 90.0
+          },
+          {
+            "t": 1800,
+            "value": 104.0
+          }
+        ],
+        "vfd_process_sp": 105.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1740,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "stopped_drive_reads_as_at_minimum",
+      "description": "The known hole, pinned so it cannot change silently: a stopped drive (feedback 0%) satisfies `speed < min_speed + speed_tolerance` trivially, so a stopped pump under an unsatisfied loop alarms. The reference's equation has the same property. Suppressing it is the host's job \u2014 see the card's preconditions \u2014 and this vector is what a future in-graph run gate would have to change.",
+      "inputs": {
+        "vfd_speed": 0.0,
+        "vfd_process_value": 90.0,
+        "vfd_process_sp": 105.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}

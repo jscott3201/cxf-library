@@ -1,0 +1,160 @@
+{
+  "schema": "cxf-library/points/v1",
+  "equipment": "hp",
+  "namespaces": {
+    "brick": {
+      "iri": "https://brickschema.org/schema/Brick#",
+      "verified_version": "1.4.4"
+    },
+    "s223": {
+      "iri": "http://data.ashrae.org/standard223#",
+      "verified_version": "v1.0.0-2026"
+    },
+    "s223_g36": {
+      "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#",
+      "verified_version": "v1.0.0-2026"
+    },
+    "quantitykind": {
+      "iri": "http://qudt.org/vocab/quantitykind/",
+      "verified_version": "QUDT 3.1.4"
+    },
+    "unit": {
+      "iri": "http://qudt.org/vocab/unit/",
+      "verified_version": "QUDT 3.1.4"
+    }
+  },
+  "notes": "Heat pump point dictionary. Air-side and compressor points carry from the AHU/RTU dictionaries; HP-specific points grep-verified against Brick 1.4.4 where a class exists (Thermal_Power_Sensor, Active_Power_Sensor, Mode_Command) and provisional where none does (defrost_status). Owning equipment: the packaged heat pump unit.",
+  "points": [
+    {
+      "name": "thermal_power",
+      "description": "Delivered thermal output (heating or cooling), kW",
+      "kind": "real",
+      "unit": "kW",
+      "qudt_unit": "KiloW",
+      "brick": "Thermal_Power_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty on the unit via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "brick:Thermal_Power_Sensor grep-verified in Brick 1.4.4. Usually a host-computed virtual point (airflow x cp x deltaT or refrigerant-side); HP-FC-050 consumes it as the COP numerator, and the fit quality of the host's baseline depends on it — treat its provenance as part of the baseline R^2 precondition."
+    },
+    {
+      "name": "elec_power",
+      "description": "Compressor electrical input power, kW",
+      "kind": "real",
+      "unit": "kW",
+      "qudt_unit": "KiloW",
+      "brick": "Active_Power_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty on the compressor circuit via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "Brick 1.4.4 has no Electrical_Power_Sensor class; Active_Power_Sensor (verified) is the correct real-power reading. Bind the compressor circuit, not the whole unit, or fan energy pollutes the COP."
+    },
+    {
+      "name": "oat",
+      "description": "Outdoor air temperature",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": "Outside_Air_Temperature_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty at the outdoor-air intake",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Air",
+        "aspects": [
+          "Role-OutdoorAirIntake"
+        ]
+      },
+      "provisional": false,
+      "notes": "Brick spelling is Outside_ (Outdoor_Air_Temperature_Sensor does not exist). Role-OutdoorAirIntake is 223P's only outdoor role; used by reference instance oa-temp. [HP dictionary] Brick class and 223P pattern carried over (equipment-independent); used by the COP baseline (regression axis) and defrost sanity test."
+    },
+    {
+      "name": "sat",
+      "description": "Supply (discharge) air temperature",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": "Supply_Air_Temperature_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty attached to the AHU supply-air OutletConnectionPoint",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Air",
+        "aspects": [
+          "Role-Supply"
+        ]
+      },
+      "provisional": false,
+      "notes": "Brick Discharge_Air_Temperature_Sensor is brick:aliasOf this class. 223P pattern verbatim from reference instance MultipleZoneAhu-sa-temp; medium comes from hasMedium on the owning ConnectionPoint. [HP dictionary] Brick class and 223P pattern carried over (equipment-independent); for HP-FC-052 the discharge temperature is the reversing-valve witness."
+    },
+    {
+      "name": "comp_status",
+      "description": "Compressor run status (true = at least one compressor running)",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "On_Off_Status",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty on the Compressor via hasProperty",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": true,
+      "notes": "Brick 1.4.4 has no Compressor_Run_Status class; the honest mapping is the generic On_Off_Status attached via isPointOf to brick:Compressor (class verified). On multi-compressor units, rules that ask whether ANY compressor is running (RTU-FC-052) may bind the OR of the individual statuses; RTU-FC-050 counts rising edges, and an OR UNDERCOUNTS cycling — a lag-compressor start while the lead is already running never moves the OR, so a two-stage unit can short-cycle its lag circuit and read healthy. Bind RTU-FC-050 per compressor. 223P pattern mirrors sf_status's Binary-OnOff enumeration; no packaged-unit reference instance checked. [HP dictionary] Brick class and 223P pattern carried over (equipment-independent); same per-compressor binding caveat as RTU-FC-050."
+    },
+    {
+      "name": "defrost_status",
+      "description": "Defrost cycle active (true while the unit is in defrost)",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": null,
+      "s223": {
+        "pattern": "EnumeratedObservableProperty (Binary-OnOff) on the defrost sequence via hasProperty",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "Brick 1.4.4 has no Defrost_Status class (grep-verified absent); bind the BAS/unit defrost-active flag and tag the generic Status pattern. Sampling caveat for HP-FC-051: a defrost cycle shorter than the host tick is invisible to the edge counter — tick well below the ~5-10 min cycle length."
+    },
+    {
+      "name": "mode_command",
+      "description": "Commanded operating mode (host-mapped integer; library encoding 1 = HEATING, 2 = COOLING)",
+      "kind": "int",
+      "unit": "1",
+      "qudt_unit": "UNITLESS",
+      "brick": "Mode_Command",
+      "s223": {
+        "pattern": "EnumeratedActuatableProperty on the unit via hasProperty",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "brick:Mode_Command grep-verified in Brick 1.4.4. The 1/2 encoding is this library's convention (expected_mode precedent); HP-FC-052 exposes both codes as rule params so hosts with their own enum rebind without editing the graph."
+    }
+  ]
+}

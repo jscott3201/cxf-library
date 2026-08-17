@@ -1,0 +1,229 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 3600 },
+  "scenarios": [
+    {
+      "name": "reference_good_effectiveness",
+      "description": "Reference vector: entering −5 °C, leaving 15 °C, exhaust 22 °C — 74.1% sensible effectiveness against a 75% baseline. The shortfall is under one point, nowhere near the 15-point threshold.",
+      "inputs": {
+        "erv_oa_entering_temp": -5.0,
+        "erv_oa_leaving_temp": 15.0,
+        "erv_exhaust_temp": 22.0,
+        "erv_enabled": true
+      },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "reference_degraded_effectiveness",
+      "description": "Reference vector: the same air with the leaving temperature at 0 °C — 18.5% effectiveness, a 56-point shortfall. The wheel is barely recovering anything and the alarm lands one alarm_delay in.",
+      "inputs": {
+        "erv_oa_entering_temp": -5.0,
+        "erv_oa_leaving_temp": 0.0,
+        "erv_exhaust_temp": 22.0,
+        "erv_enabled": true
+      },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "reference_insufficient_delta",
+      "description": "Reference vector (NO_EVAL): entering 20 °C, leaving 21 °C, exhaust 22 °C. Only 2 °C is available to recover, so the ratio reads 50% off a denominator dominated by sensor error. yTempDeltaOk is false and the host must report NO_EVAL rather than reading yFault as healthy.",
+      "inputs": {
+        "erv_oa_entering_temp": 20.0,
+        "erv_oa_leaving_temp": 21.0,
+        "erv_exhaust_temp": 22.0,
+        "erv_enabled": true
+      },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "delta_exactly_at_eval_threshold",
+      "description": "Boundary: exhaust − entering is exactly min_delta_for_eval (25.0 − 20.0 = 5.0 °C) with a 35-point shortfall behind it. The comparison is strict, so the rule reports itself unevaluable rather than alarming.",
+      "inputs": {
+        "erv_oa_entering_temp": 20.0,
+        "erv_oa_leaving_temp": 22.0,
+        "erv_exhaust_temp": 25.0,
+        "erv_enabled": true
+      },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "delta_just_above_eval_threshold",
+      "description": "Boundary from the other side: exhaust 25.1 °C makes the available difference 5.1 °C, the rule becomes evaluable, and the same 36-point shortfall now alarms.",
+      "inputs": {
+        "erv_oa_entering_temp": 20.0,
+        "erv_oa_leaving_temp": 22.0,
+        "erv_exhaust_temp": 25.1,
+        "erv_enabled": true
+      },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "shortfall_just_under_threshold",
+      "description": "Threshold boundary, readable side: entering 0 °C, leaving 12.1 °C, exhaust 20 °C — 60.5% effectiveness, a 14.5-point shortfall, below the 15-point threshold.",
+      "inputs": {
+        "erv_oa_entering_temp": 0.0,
+        "erv_oa_leaving_temp": 12.1,
+        "erv_exhaust_temp": 20.0,
+        "erv_enabled": true
+      },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "shortfall_just_over_threshold",
+      "description": "The other readable side: leaving 11.9 °C gives 59.5% effectiveness, a 15.5-point shortfall, and the alarm lands after alarm_delay.",
+      "inputs": {
+        "erv_oa_entering_temp": 0.0,
+        "erv_oa_leaving_temp": 11.9,
+        "erv_exhaust_temp": 20.0,
+        "erv_enabled": true
+      },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "shortfall_at_nominal_boundary_alarms",
+      "description": "The nominal boundary: leaving 12.0 °C gives effectiveness 0.6 exactly, so in decimal arithmetic the shortfall is exactly 0.15 and the strict `>` would read healthy. In IEEE-754 doubles 0.75 − 0.6 evaluates to 0.15000000000000002, one ulp above the threshold, so the rule alarms. See Deviations — the exact boundary is unrepresentable and this is which side the machine lands on.",
+      "inputs": {
+        "erv_oa_entering_temp": 0.0,
+        "erv_oa_leaving_temp": 12.0,
+        "erv_exhaust_temp": 20.0,
+        "erv_enabled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "shortfall_one_ulp_under_threshold",
+      "description": "The machine boundary from the other side: leaving 12.000000000000002 °C is one ulp above 12, effectiveness comes out 0.6000000000000001, and the shortfall is 0.1499999999999999 — just under the threshold, so the rule is silent. This scenario and the one above are the two adjacent doubles that straddle the comparison.",
+      "inputs": {
+        "erv_oa_entering_temp": 0.0,
+        "erv_oa_leaving_temp": 12.000000000000002,
+        "erv_exhaust_temp": 20.0,
+        "erv_enabled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "zero_delta_divide_guard",
+      "description": "Divide guard: exhaust equals entering (both 20 °C) so the denominator is exactly zero, and with leaving below entering the quotient is −∞ and the shortfall +∞ — an ungated rule would alarm on garbage arithmetic. yTempDeltaOk is false and holds yFault down.",
+      "inputs": {
+        "erv_oa_entering_temp": 20.0,
+        "erv_oa_leaving_temp": 19.0,
+        "erv_exhaust_temp": 20.0,
+        "erv_enabled": true
+      },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "summer_reverse_delta_degraded",
+      "description": "Sign case: in summer the exhaust is the cold stream (entering 32 °C, exhaust 24 °C, leaving 30 °C). Both differences flip sign and the quotient still reads an effectiveness — 25%, a 50-point shortfall — so the rule alarms without a seasonal branch.",
+      "inputs": {
+        "erv_oa_entering_temp": 32.0,
+        "erv_oa_leaving_temp": 30.0,
+        "erv_exhaust_temp": 24.0,
+        "erv_enabled": true
+      },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "erv_disabled_is_silent",
+      "description": "The recovery device is off with the reference degraded temperatures on its sensors. A stationary wheel recovers nothing by design, so the shortfall means nothing and erv_enabled holds the alarm down. yTempDeltaOk stays true throughout — it reports the temperature difference only, never the enable state.",
+      "inputs": {
+        "erv_oa_entering_temp": -5.0,
+        "erv_oa_leaving_temp": 0.0,
+        "erv_exhaust_temp": 22.0,
+        "erv_enabled": false
+      },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 3600, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "enable_starts_the_persistence_clock",
+      "description": "The unit is enabled at t=600 s with the degraded temperatures already present. The persistence timer starts at the enable, not at t=0, so the alarm lands one alarm_delay after the enable rather than at 1800 s.",
+      "inputs": {
+        "erv_oa_entering_temp": -5.0,
+        "erv_oa_leaving_temp": 0.0,
+        "erv_exhaust_temp": 22.0,
+        "erv_enabled": [
+          { "t": 0, "value": false },
+          { "t": 600, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2340, "equals": false },
+        { "output": "yFault", "from_s": 2460, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "transient_degradation_clears_before_delay",
+      "description": "Transient: the leaving temperature collapses from 15 °C to 0 °C at t=600 s and recovers at t=1800 s — 1200 s of degradation, short of the 1800 s alarm_delay. A wheel briefly slowed by a frost-control cycle looks exactly like this, and it raises nothing.",
+      "inputs": {
+        "erv_oa_entering_temp": -5.0,
+        "erv_oa_leaving_temp": [
+          { "t": 0, "value": 15.0 },
+          { "t": 600, "value": 0.0 },
+          { "t": 1800, "value": 15.0 }
+        ],
+        "erv_exhaust_temp": 22.0,
+        "erv_enabled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "alarm_clears_after_cleaning",
+      "description": "Recovery: the degraded alarm asserts, the core is cleaned at t=2400 s and effectiveness returns to 74.1%. TrueDelay passes falling edges immediately, so yFault clears on that tick.",
+      "inputs": {
+        "erv_oa_entering_temp": -5.0,
+        "erv_oa_leaving_temp": [
+          { "t": 0, "value": 0.0 },
+          { "t": 2400, "value": 15.0 }
+        ],
+        "erv_exhaust_temp": 22.0,
+        "erv_enabled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 2340, "equals": true },
+        { "output": "yFault", "from_s": 2460, "to_s": 3600, "equals": false }
+      ]
+    }
+  ]
+}
