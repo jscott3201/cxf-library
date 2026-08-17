@@ -33,7 +33,7 @@ Point dictionary: [`points/ahu.points.json`](../../points/ahu.points.json).
 | AHU-FC-055 | Excess outdoor air while occupied | 2 | rule | planned |
 | AHU-FC-056 | SAT hunting | 4 | rule | planned |
 | AHU-FC-057 | SAT reset missing | 3 | statistical | **verified** |
-| AHU-FC-058 | DSP reset missing | 3 | rule | planned |
+| AHU-FC-058 | DSP reset missing | 3 | statistical | **verified** |
 | AHU-FC-059 | Heating/cooling lockout not active | 2 | rule | planned |
 | AHU-FC-060 | OA damper not closed when unoccupied | 2 | rule | planned |
 | AHU-FC-061 | Manual override active | 4 | rule | planned |

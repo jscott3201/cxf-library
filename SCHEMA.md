@@ -190,6 +190,9 @@ Target dialect: the open-control engine's composite subset
 
 - `name` is the library-wide canonical identifier (snake_case; suffixes: none =
   measured, `_sp` setpoint, `_cmd` command, `_status` status, `_fbk` feedback).
+- `derived: true` marks host-computed aggregates (e.g. a max across zones)
+  rather than physical points; the entry's `notes` say where the underlying
+  points' semantic tags live.
 - A top-level `namespaces` map records the exact ontology IRIs and the versions
   the terms were verified against.
 - `brick`: verified Brick class local name (namespace
