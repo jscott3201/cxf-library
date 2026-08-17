@@ -14,7 +14,7 @@
   </g>
 
   <!-- ventilation allowance -->
-  <rect x="240" y="140" width="230" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <rect x="230" y="140" width="250" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
   <text x="355" y="162" text-anchor="middle" fill="#24292f" font-weight="bold">ventReq</text>
   <text x="355" y="180" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 70 L/s</text>
 
@@ -48,7 +48,7 @@
   <!-- wires -->
   <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
     <path d="M 202 59 H 796"/>
-    <path d="M 470 169 H 506"/>
+    <path d="M 480 169 H 506"/>
     <path d="M 760 169 H 780 V 89 H 796"/>
     <path d="M 202 269 H 506"/>
 

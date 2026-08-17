@@ -5,3 +5,6 @@ __pycache__/
 # generated mdBook content (tools/book/generate.py + mdbook build)
 book/src/
 book/book/
+
+# local-only research scratch (never committed)
+_research/local/

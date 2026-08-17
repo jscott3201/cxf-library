@@ -1,4 +1,4 @@
-# cxf-library
+# open-control-library
 
 **An engine-verified library of HVAC fault detection rules, written as CDL
 block graphs and shipped as CXF JSON-LD the

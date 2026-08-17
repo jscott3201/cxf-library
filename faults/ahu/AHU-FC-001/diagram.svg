@@ -21,11 +21,11 @@
     <text x="305" y="72" text-anchor="middle" fill="#24292f" font-weight="bold">press_gap</text>
     <text x="305" y="90" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract · dsp_sp − dsp</text>
 
-    <rect x="470" y="50" width="230" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <rect x="465" y="50" width="240" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
     <text x="585" y="72" text-anchor="middle" fill="#24292f" font-weight="bold">gapBig</text>
     <text x="585" y="90" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 25 Pa</text>
 
-    <rect x="470" y="200" width="230" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <rect x="465" y="200" width="240" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
     <text x="585" y="222" text-anchor="middle" fill="#24292f" font-weight="bold">spdFull</text>
     <text x="585" y="240" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 99 %</text>
   </g>
@@ -48,12 +48,12 @@
   <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
     <path d="M 150 49 H 170 V 65 H 186"/>
     <path d="M 150 119 H 170 V 93 H 186"/>
-    <path d="M 150 229 H 466"/>
+    <path d="M 150 229 H 461"/>
 
-    <path d="M 420 79 H 466"/>
+    <path d="M 420 79 H 461"/>
 
-    <path d="M 700 79 H 725 V 140 H 746"/>
-    <path d="M 700 229 H 725 V 168 H 746"/>
+    <path d="M 705 79 H 725 V 140 H 746"/>
+    <path d="M 705 229 H 725 V 168 H 746"/>
 
     <path d="M 870 154 H 906"/>
     <path d="M 1078 154 H 1106"/>
