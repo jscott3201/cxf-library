@@ -1,0 +1,434 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 300,
+    "horizon_s": 432000
+  },
+  "scenarios": [
+    {
+      "name": "reset_working",
+      "description": "DP_SP swings 100 kPa with load; flatness dwell resets every 6 h, no fault",
+      "inputs": {
+        "dp_sp": [
+          {
+            "t": 0,
+            "value": 200.0
+          },
+          {
+            "t": 21600,
+            "value": 300.0
+          },
+          {
+            "t": 43200,
+            "value": 200.0
+          },
+          {
+            "t": 64800,
+            "value": 300.0
+          },
+          {
+            "t": 86400,
+            "value": 200.0
+          },
+          {
+            "t": 108000,
+            "value": 300.0
+          },
+          {
+            "t": 129600,
+            "value": 200.0
+          },
+          {
+            "t": 151200,
+            "value": 300.0
+          },
+          {
+            "t": 172800,
+            "value": 200.0
+          },
+          {
+            "t": 194400,
+            "value": 300.0
+          },
+          {
+            "t": 216000,
+            "value": 200.0
+          },
+          {
+            "t": 237600,
+            "value": 300.0
+          },
+          {
+            "t": 259200,
+            "value": 200.0
+          },
+          {
+            "t": 280800,
+            "value": 300.0
+          },
+          {
+            "t": 302400,
+            "value": 200.0
+          },
+          {
+            "t": 324000,
+            "value": 300.0
+          },
+          {
+            "t": 345600,
+            "value": 200.0
+          },
+          {
+            "t": 367200,
+            "value": 300.0
+          },
+          {
+            "t": 388800,
+            "value": 200.0
+          },
+          {
+            "t": 410400,
+            "value": 300.0
+          },
+          {
+            "t": 432000,
+            "value": 200.0
+          }
+        ],
+        "chw_valve_max": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "fixed_sp_low_valve",
+      "description": "DP_SP pinned while the most-open coil valve sits at 55%; fault at exactly evaluation_window (3 d) + alarm_delay (24 h) = 345600 s, pinned from both sides",
+      "inputs": {
+        "dp_sp": 250.0,
+        "chw_valve_max": 55.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 345300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 345600,
+          "to_s": 432000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "valve_at_threshold",
+      "description": "Most-open valve exactly at high_valve_threshold (90%) is not low demand (strict <), so a flat setpoint is not a fault",
+      "inputs": {
+        "dp_sp": 250.0,
+        "chw_valve_max": 90.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "valve_just_below_threshold",
+      "description": "Most-open valve at 89.9% is below the threshold; the same flat setpoint alarms at 345600 s",
+      "inputs": {
+        "dp_sp": 250.0,
+        "chw_valve_max": 89.9
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 345300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 345600,
+          "to_s": 432000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "sp_at_flat_tolerance",
+      "description": "Setpoint deviates from its baseline by exactly sp_flat_tolerance (7.5 kPa): strict < makes that not flat, so no fault",
+      "inputs": {
+        "dp_sp": [
+          {
+            "t": 0,
+            "value": 250.0
+          },
+          {
+            "t": 21600,
+            "value": 257.5
+          },
+          {
+            "t": 43200,
+            "value": 250.0
+          },
+          {
+            "t": 64800,
+            "value": 257.5
+          },
+          {
+            "t": 86400,
+            "value": 250.0
+          },
+          {
+            "t": 108000,
+            "value": 257.5
+          },
+          {
+            "t": 129600,
+            "value": 250.0
+          },
+          {
+            "t": 151200,
+            "value": 257.5
+          },
+          {
+            "t": 172800,
+            "value": 250.0
+          },
+          {
+            "t": 194400,
+            "value": 257.5
+          },
+          {
+            "t": 216000,
+            "value": 250.0
+          },
+          {
+            "t": 237600,
+            "value": 257.5
+          },
+          {
+            "t": 259200,
+            "value": 250.0
+          },
+          {
+            "t": 280800,
+            "value": 257.5
+          },
+          {
+            "t": 302400,
+            "value": 250.0
+          },
+          {
+            "t": 324000,
+            "value": 257.5
+          },
+          {
+            "t": 345600,
+            "value": 250.0
+          },
+          {
+            "t": 367200,
+            "value": 257.5
+          },
+          {
+            "t": 388800,
+            "value": 250.0
+          },
+          {
+            "t": 410400,
+            "value": 257.5
+          },
+          {
+            "t": 432000,
+            "value": 250.0
+          }
+        ],
+        "chw_valve_max": 55.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "sp_within_flat_tolerance",
+      "description": "Setpoint jitter of 7 kPa stays inside sp_flat_tolerance, so it still counts as flat; fault at 345600 s",
+      "inputs": {
+        "dp_sp": [
+          {
+            "t": 0,
+            "value": 250.0
+          },
+          {
+            "t": 21600,
+            "value": 257.0
+          },
+          {
+            "t": 43200,
+            "value": 250.0
+          },
+          {
+            "t": 64800,
+            "value": 257.0
+          },
+          {
+            "t": 86400,
+            "value": 250.0
+          },
+          {
+            "t": 108000,
+            "value": 257.0
+          },
+          {
+            "t": 129600,
+            "value": 250.0
+          },
+          {
+            "t": 151200,
+            "value": 257.0
+          },
+          {
+            "t": 172800,
+            "value": 250.0
+          },
+          {
+            "t": 194400,
+            "value": 257.0
+          },
+          {
+            "t": 216000,
+            "value": 250.0
+          },
+          {
+            "t": 237600,
+            "value": 257.0
+          },
+          {
+            "t": 259200,
+            "value": 250.0
+          },
+          {
+            "t": 280800,
+            "value": 257.0
+          },
+          {
+            "t": 302400,
+            "value": 250.0
+          },
+          {
+            "t": 324000,
+            "value": 257.0
+          },
+          {
+            "t": 345600,
+            "value": 250.0
+          },
+          {
+            "t": 367200,
+            "value": 257.0
+          },
+          {
+            "t": 388800,
+            "value": 250.0
+          },
+          {
+            "t": 410400,
+            "value": 257.0
+          },
+          {
+            "t": 432000,
+            "value": 250.0
+          }
+        ],
+        "chw_valve_max": 55.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 345300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 345600,
+          "to_s": 432000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "valve_drops_mid_run",
+      "description": "Coil demand falls away 12 h into the run: the valve dwell starts at 43200 s, so the alarm lands at exactly 43200 + 259200 + 86400 = 388800 s",
+      "inputs": {
+        "dp_sp": 250.0,
+        "chw_valve_max": [
+          {
+            "t": 0,
+            "value": 95.0
+          },
+          {
+            "t": 43200,
+            "value": 55.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 388500,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 388800,
+          "to_s": 432000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "valve_opens_resets",
+      "description": "Low valve demand for 2.3 days, then a coil starves before the window completes; dwell resets, never alarms",
+      "inputs": {
+        "dp_sp": 250.0,
+        "chw_valve_max": [
+          {
+            "t": 0,
+            "value": 55.0
+          },
+          {
+            "t": 200000,
+            "value": 95.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

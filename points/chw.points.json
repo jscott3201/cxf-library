@@ -1,0 +1,191 @@
+{
+  "schema": "cxf-library/points/v1",
+  "equipment": "chw",
+  "namespaces": {
+    "brick": {
+      "iri": "https://brickschema.org/schema/Brick#",
+      "verified_version": "1.4.4"
+    },
+    "s223": {
+      "iri": "http://data.ashrae.org/standard223#",
+      "verified_version": "v1.0.0-2026"
+    },
+    "s223_g36": {
+      "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#",
+      "verified_version": "v1.0.0-2026"
+    },
+    "quantitykind": {
+      "iri": "http://qudt.org/vocab/quantitykind/",
+      "verified_version": "QUDT 3.1.4"
+    },
+    "unit": {
+      "iri": "http://qudt.org/vocab/unit/",
+      "verified_version": "QUDT 3.1.4"
+    }
+  },
+  "notes": "Chilled water plant point dictionary (reference ch.13, CHW-FC-050..053). Owning equipment: brick:Chiller / brick:Chilled_Water_Loop (both verified in Brick 1.4.4). Plant-level rules: on multi-chiller plants, bind kW/tons/load per chiller instance and the loop temperatures/setpoints per loop. The reference expresses chiller output in tons; the dictionary keeps that unit so the kW/ton quantity matches the trade convention (1 ton = 3.517 kW thermal — conversion belongs at binding, not in the graph).",
+  "points": [
+    {
+      "name": "chiller_kw",
+      "description": "Chiller electrical input power",
+      "kind": "real",
+      "unit": "kW",
+      "qudt_unit": "KiloW",
+      "brick": "Active_Power_Sensor",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the Chiller via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "ActivePower",
+        "unit": "KiloW",
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "brick:Active_Power_Sensor grep-verified (same mapping as hp elec_power), isPointOf brick:Chiller (verified). Consumed by CHW-FC-050's kW/ton numerator."
+    },
+    {
+      "name": "chiller_tons",
+      "description": "Chiller cooling output (thermal)",
+      "kind": "real",
+      "unit": "tons",
+      "qudt_unit": "TON_FG",
+      "brick": "Thermal_Power_Sensor",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the Chiller via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "ThermalPower",
+        "unit": null,
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "brick:Thermal_Power_Sensor grep-verified, but marked provisional for the unit: the reference (and the kW/ton convention) uses refrigeration tons while most BAS trend kW thermal or derive tons from flow x deltaT. Binding must land on tons (1 ton = 3.517 kW) or CHW-FC-050's kW/ton and its baseline coefficients are silently wrong together. Often a host-derived point (flow x deltaT x cp)."
+    },
+    {
+      "name": "cwst",
+      "description": "Condenser water supply (chiller-leaving) temperature",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": "Leaving_Condenser_Water_Temperature_Sensor",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the condenser water leaving connection point",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Water",
+        "aspects": ["leaving"]
+      },
+      "provisional": false,
+      "notes": "brick:Leaving_Condenser_Water_Temperature_Sensor grep-verified. Reference Haystack markers: condenser, water, leaving, temp, sensor. Baseline regressor input for CHW-FC-050 (condenser lift proxy)."
+    },
+    {
+      "name": "chwst",
+      "description": "Chilled water supply (chiller-leaving) temperature",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": "Leaving_Chilled_Water_Temperature_Sensor",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the CHW leaving connection point",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Water",
+        "aspects": ["leaving"]
+      },
+      "provisional": false,
+      "notes": "brick:Leaving_Chilled_Water_Temperature_Sensor grep-verified. Consumed by CHW-FC-050 (baseline regressor) and CHW-FC-053 (delta-T)."
+    },
+    {
+      "name": "chwrt",
+      "description": "Chilled water return (chiller-entering) temperature",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": "Entering_Chilled_Water_Temperature_Sensor",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the CHW entering connection point",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Water",
+        "aspects": ["entering"]
+      },
+      "provisional": false,
+      "notes": "brick:Entering_Chilled_Water_Temperature_Sensor grep-verified — 'return' at the plant is 'entering' at the chiller; Brick 1.4.4 also carries Chilled_Water_Return_Temperature_Sensor, but the entering-form matches the chiller-owned binding these rules assume. Consumed by CHW-FC-053."
+    },
+    {
+      "name": "chiller_load",
+      "description": "Chiller load (percent of capacity, from the chiller controller)",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the Chiller via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "Brick 1.4.4 has no chiller-percent-load class (defrost_status precedent for a null mapping). Typical sources: the chiller's own RLA%/load output, or host-derived tons/design_tons. Evaluability floor for CHW-FC-050 (30%) and CHW-FC-053 (40%); range regressor for CHW-FC-051."
+    },
+    {
+      "name": "chwst_sp",
+      "description": "Chilled water supply temperature setpoint",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": "Leaving_Chilled_Water_Temperature_Setpoint",
+      "s223": {
+        "pattern": "QuantifiableActuatableProperty on the CHW loop via hasProperty",
+        "property_class": "QuantifiableActuatableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Water",
+        "aspects": ["leaving", "setpoint"]
+      },
+      "provisional": false,
+      "notes": "brick:Leaving_Chilled_Water_Temperature_Setpoint grep-verified. CHW-FC-051 watches this point's RANGE over the evaluation window — the reset detector reads the setpoint, never the measured temperature (AHU-FC-057 sat_sp precedent)."
+    },
+    {
+      "name": "dp_sp",
+      "description": "CHW loop differential pressure setpoint",
+      "kind": "real",
+      "unit": "kPa",
+      "qudt_unit": "KiloPA",
+      "brick": "Chilled_Water_Differential_Pressure_Setpoint",
+      "s223": {
+        "pattern": "QuantifiableActuatableProperty on the CHW loop via hasProperty",
+        "property_class": "QuantifiableActuatableProperty",
+        "quantitykind": "PressureDifference",
+        "unit": "KiloPA",
+        "medium": "Water",
+        "aspects": ["differential", "setpoint"]
+      },
+      "provisional": false,
+      "notes": "brick:Chilled_Water_Differential_Pressure_Setpoint grep-verified. CHW-FC-052 watches this point's range (AHU-FC-058 dsp_sp precedent)."
+    },
+    {
+      "name": "chw_valve_max",
+      "description": "Maximum CHW coil valve position across served coils (host-derived)",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": null,
+      "s223": {
+        "pattern": "host-derived aggregate; no single physical point",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
+        "medium": null,
+        "aspects": ["aggregate-max"]
+      },
+      "provisional": true,
+      "notes": "HOST-DERIVED (zone_reheat_fraction / satisfied_zone_fraction precedent): the reference's chw_valve_positions is a vector across AHU/FCU cooling coils; the rule needs only its max, so the host binds max() over the coil valve commands it serves. CHW-FC-052's 'no coil starving' conjunct. Engine vector blocks could compute this in-graph once the points contract grows vector bindings — see _research/local/engine-block-inventory-fdd-candidates.md."
+    }
+  ]
+}

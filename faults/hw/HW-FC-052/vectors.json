@@ -1,0 +1,349 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 300,
+    "horizon_s": 9000
+  },
+  "scenarios": [
+    {
+      "name": "cold_day_plant_running",
+      "description": "January: 5 degC outdoors, boiler firing, pump circulating. This is the hot water plant doing its job and the rule has nothing to say about it.",
+      "inputs": {
+        "oat": 5.0,
+        "boiler_status": true,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "warm_day_plant_off",
+      "description": "The other healthy case: 25 degC outdoors with the plant properly locked out. Both status points are false, so the disjunction is false and the outdoor temperature never matters.",
+      "inputs": {
+        "oat": 25.0,
+        "boiler_status": false,
+        "hw_pump_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "boiler_firing_above_lockout",
+      "description": "The fault as the reference writes it: 20 degC outdoors and the boiler firing, held for the full lockout_check_duration. The alarm asserts at t = 3600 s.",
+      "inputs": {
+        "oat": 20.0,
+        "boiler_status": true,
+        "hw_pump_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 9000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "pump_circulating_above_lockout",
+      "description": "The second branch of the disjunction, and the one sites forget: the boiler is off but the HW pump is still circulating at 20 degC. Pump energy, distribution losses through warm pipe, and no heating load to justify either. Same alarm at 3600 s.",
+      "inputs": {
+        "oat": 20.0,
+        "boiler_status": false,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 9000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "oat_exactly_at_the_lockout_temperature",
+      "description": "Threshold edge from below: the outdoor air sits exactly on heating_plant_lockout_temp with the whole plant running. `Reals.GreaterThreshold` is strict, so 16.0 degC is not above 16.0 degC and nothing is reported.",
+      "inputs": {
+        "oat": 16.0,
+        "boiler_status": true,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "oat_one_tenth_above_the_lockout_temperature",
+      "description": "Threshold edge from above: a tenth of a degree warmer, same plant, and the alarm arrives at 3600 s. A measure-zero disagreement on a real-valued signal, pinned from both sides.",
+      "inputs": {
+        "oat": 16.1,
+        "boiler_status": true,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 9000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "lead_pump_hands_over_to_the_boiler",
+      "description": "The disjunction is continuous, not per-point: the pump runs alone until t = 1800 s, then the boiler picks up and the pump stops. Neither point is true for a whole hour but the plant is, so the timer never restarts and the alarm still lands at 3600 s. A rule written per point would miss this.",
+      "inputs": {
+        "oat": 20.0,
+        "boiler_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 1800,
+            "value": true
+          }
+        ],
+        "hw_pump_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 1800,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 9000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "oat_rises_through_the_lockout",
+      "description": "A spring morning: the plant runs from midnight and the outdoor temperature crosses 16 degC at t = 1800 s. The clock starts at the crossing, not at the start of the run, and the alarm lands at 5400 s.",
+      "inputs": {
+        "boiler_status": true,
+        "hw_pump_status": false,
+        "oat": [
+          {
+            "t": 0,
+            "value": 12.0
+          },
+          {
+            "t": 1800,
+            "value": 20.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 5700,
+          "to_s": 9000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "oat_dips_below_lockout_and_restarts_the_clock",
+      "description": "Persistence is continuous, so a 600 s dip back under the lockout at t = 1800 s discards the elapsed time rather than pausing it: the alarm lands at 6000 s, one full duration after the second crossing.",
+      "inputs": {
+        "boiler_status": true,
+        "hw_pump_status": true,
+        "oat": [
+          {
+            "t": 0,
+            "value": 20.0
+          },
+          {
+            "t": 1800,
+            "value": 15.0
+          },
+          {
+            "t": 2400,
+            "value": 20.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5700,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 6300,
+          "to_s": 9000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "plant_stops_on_the_maturity_tick",
+      "description": "Delay edge from below: the plant runs above lockout from t = 0 and both status points drop at exactly 3600 s, the tick the timer matures on. The input is false when the timer comes due, so a full hour of unnecessary operation is never reported.",
+      "inputs": {
+        "oat": 20.0,
+        "boiler_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 3600,
+            "value": false
+          }
+        ],
+        "hw_pump_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "plant_stops_one_tick_later",
+      "description": "Delay edge from above: the same run held 300 s longer asserts at exactly 3600 s and clears at 3900 s.",
+      "inputs": {
+        "oat": 20.0,
+        "boiler_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 3900,
+            "value": false
+          }
+        ],
+        "hw_pump_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3600,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 9000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "alarm_clears_when_the_plant_shuts_down",
+      "description": "Recovery: the lockout is programmed and the plant stops at t = 5400 s. The alarm falls on that tick — this rule has no fall delay — which is the operator's confirmation that the fix took.",
+      "inputs": {
+        "oat": 20.0,
+        "boiler_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 5400,
+            "value": false
+          }
+        ],
+        "hw_pump_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 5400,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 5100,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 5400,
+          "to_s": 9000,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

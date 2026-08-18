@@ -1,0 +1,1140 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 300,
+    "horizon_s": 777600
+  },
+  "scenarios": [
+    {
+      "name": "reset_working",
+      "description": "CHWST_SP swings 2.5 degC with load; flatness dwell resets every half day, no fault",
+      "inputs": {
+        "chwst_sp": [
+          {
+            "t": 0,
+            "value": 6.5
+          },
+          {
+            "t": 43200,
+            "value": 9.0
+          },
+          {
+            "t": 86400,
+            "value": 6.5
+          },
+          {
+            "t": 129600,
+            "value": 9.0
+          },
+          {
+            "t": 172800,
+            "value": 6.5
+          },
+          {
+            "t": 216000,
+            "value": 9.0
+          },
+          {
+            "t": 259200,
+            "value": 6.5
+          },
+          {
+            "t": 302400,
+            "value": 9.0
+          },
+          {
+            "t": 345600,
+            "value": 6.5
+          },
+          {
+            "t": 388800,
+            "value": 9.0
+          },
+          {
+            "t": 432000,
+            "value": 6.5
+          },
+          {
+            "t": 475200,
+            "value": 9.0
+          },
+          {
+            "t": 518400,
+            "value": 6.5
+          },
+          {
+            "t": 561600,
+            "value": 9.0
+          },
+          {
+            "t": 604800,
+            "value": 6.5
+          },
+          {
+            "t": 648000,
+            "value": 9.0
+          },
+          {
+            "t": 691200,
+            "value": 6.5
+          },
+          {
+            "t": 734400,
+            "value": 9.0
+          },
+          {
+            "t": 777600,
+            "value": 6.5
+          }
+        ],
+        "chiller_load": [
+          {
+            "t": 0,
+            "value": 30.0
+          },
+          {
+            "t": 43200,
+            "value": 80.0
+          },
+          {
+            "t": 86400,
+            "value": 30.0
+          },
+          {
+            "t": 129600,
+            "value": 80.0
+          },
+          {
+            "t": 172800,
+            "value": 30.0
+          },
+          {
+            "t": 216000,
+            "value": 80.0
+          },
+          {
+            "t": 259200,
+            "value": 30.0
+          },
+          {
+            "t": 302400,
+            "value": 80.0
+          },
+          {
+            "t": 345600,
+            "value": 30.0
+          },
+          {
+            "t": 388800,
+            "value": 80.0
+          },
+          {
+            "t": 432000,
+            "value": 30.0
+          },
+          {
+            "t": 475200,
+            "value": 80.0
+          },
+          {
+            "t": 518400,
+            "value": 30.0
+          },
+          {
+            "t": 561600,
+            "value": 80.0
+          },
+          {
+            "t": 604800,
+            "value": 30.0
+          },
+          {
+            "t": 648000,
+            "value": 80.0
+          },
+          {
+            "t": 691200,
+            "value": 30.0
+          },
+          {
+            "t": 734400,
+            "value": 80.0
+          },
+          {
+            "t": 777600,
+            "value": 30.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": false
+        },
+        {
+          "output": "yLoadVaried",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "fixed_setpoint",
+      "description": "CHWST_SP pinned at 6.5 degC while load swings 30-80%; fault asserts at exactly evaluation_window (7 d) + alarm_delay (24 h) = 691200 s, pinned from both sides",
+      "inputs": {
+        "chwst_sp": 6.5,
+        "chiller_load": [
+          {
+            "t": 0,
+            "value": 30.0
+          },
+          {
+            "t": 43200,
+            "value": 80.0
+          },
+          {
+            "t": 86400,
+            "value": 30.0
+          },
+          {
+            "t": 129600,
+            "value": 80.0
+          },
+          {
+            "t": 172800,
+            "value": 30.0
+          },
+          {
+            "t": 216000,
+            "value": 80.0
+          },
+          {
+            "t": 259200,
+            "value": 30.0
+          },
+          {
+            "t": 302400,
+            "value": 80.0
+          },
+          {
+            "t": 345600,
+            "value": 30.0
+          },
+          {
+            "t": 388800,
+            "value": 80.0
+          },
+          {
+            "t": 432000,
+            "value": 30.0
+          },
+          {
+            "t": 475200,
+            "value": 80.0
+          },
+          {
+            "t": 518400,
+            "value": 30.0
+          },
+          {
+            "t": 561600,
+            "value": 80.0
+          },
+          {
+            "t": 604800,
+            "value": 30.0
+          },
+          {
+            "t": 648000,
+            "value": 80.0
+          },
+          {
+            "t": 691200,
+            "value": 30.0
+          },
+          {
+            "t": 734400,
+            "value": 80.0
+          },
+          {
+            "t": 777600,
+            "value": 30.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 690900,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 691200,
+          "to_s": 777600,
+          "equals": true
+        },
+        {
+          "output": "yLoadVaried",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "flat_load_no_eval",
+      "description": "NO_EVAL: setpoint flat but load never moves; yLoadVaried drops at exactly evaluation_window and yFault never fires",
+      "inputs": {
+        "chwst_sp": 6.5,
+        "chiller_load": 55.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": false
+        },
+        {
+          "output": "yLoadVaried",
+          "from_s": 0,
+          "to_s": 604500,
+          "equals": true
+        },
+        {
+          "output": "yLoadVaried",
+          "from_s": 604800,
+          "to_s": 777600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "sp_at_flat_tolerance",
+      "description": "Setpoint deviates from its baseline by exactly sp_flat_tolerance (0.75 degC): strict < makes that not flat, so no fault",
+      "inputs": {
+        "chwst_sp": [
+          {
+            "t": 0,
+            "value": 6.5
+          },
+          {
+            "t": 43200,
+            "value": 7.25
+          },
+          {
+            "t": 86400,
+            "value": 6.5
+          },
+          {
+            "t": 129600,
+            "value": 7.25
+          },
+          {
+            "t": 172800,
+            "value": 6.5
+          },
+          {
+            "t": 216000,
+            "value": 7.25
+          },
+          {
+            "t": 259200,
+            "value": 6.5
+          },
+          {
+            "t": 302400,
+            "value": 7.25
+          },
+          {
+            "t": 345600,
+            "value": 6.5
+          },
+          {
+            "t": 388800,
+            "value": 7.25
+          },
+          {
+            "t": 432000,
+            "value": 6.5
+          },
+          {
+            "t": 475200,
+            "value": 7.25
+          },
+          {
+            "t": 518400,
+            "value": 6.5
+          },
+          {
+            "t": 561600,
+            "value": 7.25
+          },
+          {
+            "t": 604800,
+            "value": 6.5
+          },
+          {
+            "t": 648000,
+            "value": 7.25
+          },
+          {
+            "t": 691200,
+            "value": 6.5
+          },
+          {
+            "t": 734400,
+            "value": 7.25
+          },
+          {
+            "t": 777600,
+            "value": 6.5
+          }
+        ],
+        "chiller_load": [
+          {
+            "t": 0,
+            "value": 30.0
+          },
+          {
+            "t": 43200,
+            "value": 80.0
+          },
+          {
+            "t": 86400,
+            "value": 30.0
+          },
+          {
+            "t": 129600,
+            "value": 80.0
+          },
+          {
+            "t": 172800,
+            "value": 30.0
+          },
+          {
+            "t": 216000,
+            "value": 80.0
+          },
+          {
+            "t": 259200,
+            "value": 30.0
+          },
+          {
+            "t": 302400,
+            "value": 80.0
+          },
+          {
+            "t": 345600,
+            "value": 30.0
+          },
+          {
+            "t": 388800,
+            "value": 80.0
+          },
+          {
+            "t": 432000,
+            "value": 30.0
+          },
+          {
+            "t": 475200,
+            "value": 80.0
+          },
+          {
+            "t": 518400,
+            "value": 30.0
+          },
+          {
+            "t": 561600,
+            "value": 80.0
+          },
+          {
+            "t": 604800,
+            "value": 30.0
+          },
+          {
+            "t": 648000,
+            "value": 80.0
+          },
+          {
+            "t": 691200,
+            "value": 30.0
+          },
+          {
+            "t": 734400,
+            "value": 80.0
+          },
+          {
+            "t": 777600,
+            "value": 30.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": false
+        },
+        {
+          "output": "yLoadVaried",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "sp_within_flat_tolerance",
+      "description": "Setpoint jitter of 0.625 degC stays inside sp_flat_tolerance, so it still counts as flat; fault at 691200 s",
+      "inputs": {
+        "chwst_sp": [
+          {
+            "t": 0,
+            "value": 6.5
+          },
+          {
+            "t": 43200,
+            "value": 7.125
+          },
+          {
+            "t": 86400,
+            "value": 6.5
+          },
+          {
+            "t": 129600,
+            "value": 7.125
+          },
+          {
+            "t": 172800,
+            "value": 6.5
+          },
+          {
+            "t": 216000,
+            "value": 7.125
+          },
+          {
+            "t": 259200,
+            "value": 6.5
+          },
+          {
+            "t": 302400,
+            "value": 7.125
+          },
+          {
+            "t": 345600,
+            "value": 6.5
+          },
+          {
+            "t": 388800,
+            "value": 7.125
+          },
+          {
+            "t": 432000,
+            "value": 6.5
+          },
+          {
+            "t": 475200,
+            "value": 7.125
+          },
+          {
+            "t": 518400,
+            "value": 6.5
+          },
+          {
+            "t": 561600,
+            "value": 7.125
+          },
+          {
+            "t": 604800,
+            "value": 6.5
+          },
+          {
+            "t": 648000,
+            "value": 7.125
+          },
+          {
+            "t": 691200,
+            "value": 6.5
+          },
+          {
+            "t": 734400,
+            "value": 7.125
+          },
+          {
+            "t": 777600,
+            "value": 6.5
+          }
+        ],
+        "chiller_load": [
+          {
+            "t": 0,
+            "value": 30.0
+          },
+          {
+            "t": 43200,
+            "value": 80.0
+          },
+          {
+            "t": 86400,
+            "value": 30.0
+          },
+          {
+            "t": 129600,
+            "value": 80.0
+          },
+          {
+            "t": 172800,
+            "value": 30.0
+          },
+          {
+            "t": 216000,
+            "value": 80.0
+          },
+          {
+            "t": 259200,
+            "value": 30.0
+          },
+          {
+            "t": 302400,
+            "value": 80.0
+          },
+          {
+            "t": 345600,
+            "value": 30.0
+          },
+          {
+            "t": 388800,
+            "value": 80.0
+          },
+          {
+            "t": 432000,
+            "value": 30.0
+          },
+          {
+            "t": 475200,
+            "value": 80.0
+          },
+          {
+            "t": 518400,
+            "value": 30.0
+          },
+          {
+            "t": 561600,
+            "value": 80.0
+          },
+          {
+            "t": 604800,
+            "value": 30.0
+          },
+          {
+            "t": 648000,
+            "value": 80.0
+          },
+          {
+            "t": 691200,
+            "value": 30.0
+          },
+          {
+            "t": 734400,
+            "value": 80.0
+          },
+          {
+            "t": 777600,
+            "value": 30.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 690900,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 691200,
+          "to_s": 777600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "load_at_variation_tolerance",
+      "description": "Load deviates from its baseline by exactly load_variation_tolerance (10%): strict < makes that varied, so the rule stays evaluable and the flat setpoint alarms",
+      "inputs": {
+        "chwst_sp": 6.5,
+        "chiller_load": [
+          {
+            "t": 0,
+            "value": 50.0
+          },
+          {
+            "t": 43200,
+            "value": 60.0
+          },
+          {
+            "t": 86400,
+            "value": 50.0
+          },
+          {
+            "t": 129600,
+            "value": 60.0
+          },
+          {
+            "t": 172800,
+            "value": 50.0
+          },
+          {
+            "t": 216000,
+            "value": 60.0
+          },
+          {
+            "t": 259200,
+            "value": 50.0
+          },
+          {
+            "t": 302400,
+            "value": 60.0
+          },
+          {
+            "t": 345600,
+            "value": 50.0
+          },
+          {
+            "t": 388800,
+            "value": 60.0
+          },
+          {
+            "t": 432000,
+            "value": 50.0
+          },
+          {
+            "t": 475200,
+            "value": 60.0
+          },
+          {
+            "t": 518400,
+            "value": 50.0
+          },
+          {
+            "t": 561600,
+            "value": 60.0
+          },
+          {
+            "t": 604800,
+            "value": 50.0
+          },
+          {
+            "t": 648000,
+            "value": 60.0
+          },
+          {
+            "t": 691200,
+            "value": 50.0
+          },
+          {
+            "t": 734400,
+            "value": 60.0
+          },
+          {
+            "t": 777600,
+            "value": 50.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yLoadVaried",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 690900,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 691200,
+          "to_s": 777600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "load_within_variation_tolerance",
+      "description": "Load moves only 9.5% about its baseline, inside load_variation_tolerance: NO_EVAL at exactly evaluation_window, and the simultaneous setpoint-flat edge cannot race it into a fault",
+      "inputs": {
+        "chwst_sp": 6.5,
+        "chiller_load": [
+          {
+            "t": 0,
+            "value": 50.0
+          },
+          {
+            "t": 43200,
+            "value": 59.5
+          },
+          {
+            "t": 86400,
+            "value": 50.0
+          },
+          {
+            "t": 129600,
+            "value": 59.5
+          },
+          {
+            "t": 172800,
+            "value": 50.0
+          },
+          {
+            "t": 216000,
+            "value": 59.5
+          },
+          {
+            "t": 259200,
+            "value": 50.0
+          },
+          {
+            "t": 302400,
+            "value": 59.5
+          },
+          {
+            "t": 345600,
+            "value": 50.0
+          },
+          {
+            "t": 388800,
+            "value": 59.5
+          },
+          {
+            "t": 432000,
+            "value": 50.0
+          },
+          {
+            "t": 475200,
+            "value": 59.5
+          },
+          {
+            "t": 518400,
+            "value": 50.0
+          },
+          {
+            "t": 561600,
+            "value": 59.5
+          },
+          {
+            "t": 604800,
+            "value": 50.0
+          },
+          {
+            "t": 648000,
+            "value": 59.5
+          },
+          {
+            "t": 691200,
+            "value": 50.0
+          },
+          {
+            "t": 734400,
+            "value": 59.5
+          },
+          {
+            "t": 777600,
+            "value": 50.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yLoadVaried",
+          "from_s": 0,
+          "to_s": 604500,
+          "equals": true
+        },
+        {
+          "output": "yLoadVaried",
+          "from_s": 604800,
+          "to_s": 777600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "sp_goes_flat_mid_run",
+      "description": "Reset stops working 12 h into the run: dwell starts at 43200 s, so the alarm lands at exactly 43200 + 604800 + 86400 = 734400 s",
+      "inputs": {
+        "chwst_sp": [
+          {
+            "t": 0,
+            "value": 6.5
+          },
+          {
+            "t": 21600,
+            "value": 9.0
+          },
+          {
+            "t": 43200,
+            "value": 6.5
+          }
+        ],
+        "chiller_load": [
+          {
+            "t": 0,
+            "value": 30.0
+          },
+          {
+            "t": 43200,
+            "value": 80.0
+          },
+          {
+            "t": 86400,
+            "value": 30.0
+          },
+          {
+            "t": 129600,
+            "value": 80.0
+          },
+          {
+            "t": 172800,
+            "value": 30.0
+          },
+          {
+            "t": 216000,
+            "value": 80.0
+          },
+          {
+            "t": 259200,
+            "value": 30.0
+          },
+          {
+            "t": 302400,
+            "value": 80.0
+          },
+          {
+            "t": 345600,
+            "value": 30.0
+          },
+          {
+            "t": 388800,
+            "value": 80.0
+          },
+          {
+            "t": 432000,
+            "value": 30.0
+          },
+          {
+            "t": 475200,
+            "value": 80.0
+          },
+          {
+            "t": 518400,
+            "value": 30.0
+          },
+          {
+            "t": 561600,
+            "value": 80.0
+          },
+          {
+            "t": 604800,
+            "value": 30.0
+          },
+          {
+            "t": 648000,
+            "value": 80.0
+          },
+          {
+            "t": 691200,
+            "value": 30.0
+          },
+          {
+            "t": 734400,
+            "value": 80.0
+          },
+          {
+            "t": 777600,
+            "value": 30.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 734100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 734400,
+          "to_s": 777600,
+          "equals": true
+        },
+        {
+          "output": "yLoadVaried",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "reset_resumes",
+      "description": "Setpoint flat for 4 days, then reset activity resumes before the window completes; dwell resets and never alarms",
+      "inputs": {
+        "chwst_sp": [
+          {
+            "t": 0,
+            "value": 6.5
+          },
+          {
+            "t": 345600,
+            "value": 9.0
+          },
+          {
+            "t": 388800,
+            "value": 6.5
+          },
+          {
+            "t": 432000,
+            "value": 9.0
+          },
+          {
+            "t": 475200,
+            "value": 6.5
+          },
+          {
+            "t": 518400,
+            "value": 9.0
+          },
+          {
+            "t": 561600,
+            "value": 6.5
+          },
+          {
+            "t": 604800,
+            "value": 9.0
+          },
+          {
+            "t": 648000,
+            "value": 6.5
+          },
+          {
+            "t": 691200,
+            "value": 9.0
+          },
+          {
+            "t": 734400,
+            "value": 6.5
+          },
+          {
+            "t": 777600,
+            "value": 9.0
+          }
+        ],
+        "chiller_load": [
+          {
+            "t": 0,
+            "value": 30.0
+          },
+          {
+            "t": 43200,
+            "value": 80.0
+          },
+          {
+            "t": 86400,
+            "value": 30.0
+          },
+          {
+            "t": 129600,
+            "value": 80.0
+          },
+          {
+            "t": 172800,
+            "value": 30.0
+          },
+          {
+            "t": 216000,
+            "value": 80.0
+          },
+          {
+            "t": 259200,
+            "value": 30.0
+          },
+          {
+            "t": 302400,
+            "value": 80.0
+          },
+          {
+            "t": 345600,
+            "value": 30.0
+          },
+          {
+            "t": 388800,
+            "value": 80.0
+          },
+          {
+            "t": 432000,
+            "value": 30.0
+          },
+          {
+            "t": 475200,
+            "value": 80.0
+          },
+          {
+            "t": 518400,
+            "value": 30.0
+          },
+          {
+            "t": 561600,
+            "value": 80.0
+          },
+          {
+            "t": 604800,
+            "value": 30.0
+          },
+          {
+            "t": 648000,
+            "value": 80.0
+          },
+          {
+            "t": 691200,
+            "value": 30.0
+          },
+          {
+            "t": 734400,
+            "value": 80.0
+          },
+          {
+            "t": 777600,
+            "value": 30.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

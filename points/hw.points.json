@@ -1,0 +1,139 @@
+{
+  "schema": "cxf-library/points/v1",
+  "equipment": "hw",
+  "namespaces": {
+    "brick": {
+      "iri": "https://brickschema.org/schema/Brick#",
+      "verified_version": "1.4.4"
+    },
+    "s223": {
+      "iri": "http://data.ashrae.org/standard223#",
+      "verified_version": "v1.0.0-2026"
+    },
+    "s223_g36": {
+      "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#",
+      "verified_version": "v1.0.0-2026"
+    },
+    "quantitykind": {
+      "iri": "http://qudt.org/vocab/quantitykind/",
+      "verified_version": "QUDT 3.1.4"
+    },
+    "unit": {
+      "iri": "http://qudt.org/vocab/unit/",
+      "verified_version": "QUDT 3.1.4"
+    }
+  },
+  "notes": "Hot water / boiler plant point dictionary (reference ch.14, HW-FC-050..052). Owning equipment: brick:Boiler (verified in Brick 1.4.4; brick:Natural_Gas_Boiler for the gas-fired subclass). Multi-boiler plants bind per boiler; the OAT lockout rule (HW-FC-052) is plant-level and may bind the OR of boiler statuses plus the lead HW pump.",
+  "points": [
+    {
+      "name": "boiler_status",
+      "description": "Boiler firing status (true = firing)",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Run_Status",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty on the Boiler via hasProperty",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": false,
+      "notes": "brick:Run_Status grep-verified, isPointOf brick:Boiler (verified). Reference Haystack markers: boiler, run. 'Firing' vs 'enabled' matters for HW-FC-050's start counting: bind the FIRING/flame status where available — an enable status hides burner cycling and undercounts starts (comp_status OR-undercount precedent). Consumed by HW-FC-050 (edge counting) and HW-FC-052 (lockout)."
+    },
+    {
+      "name": "thermal_power",
+      "description": "Boiler useful thermal output",
+      "kind": "real",
+      "unit": "kW",
+      "qudt_unit": "KiloW",
+      "brick": "Thermal_Power_Sensor",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the Boiler via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "ThermalPower",
+        "unit": "KiloW",
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "brick:Thermal_Power_Sensor grep-verified (carried from hp thermal_power), but marked provisional: few boiler plants meter thermal output directly — usually host-derived from HW flow x deltaT x cp. HW-FC-051's efficiency numerator; same derivation caveat as chw chiller_tons."
+    },
+    {
+      "name": "fuel_power",
+      "description": "Boiler fuel input power (fuel flow x heating value)",
+      "kind": "real",
+      "unit": "kW",
+      "qudt_unit": "KiloW",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the Boiler via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Power",
+        "unit": "KiloW",
+        "medium": "NaturalGas",
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "No Brick 1.4.4 class for fuel INPUT POWER: brick:Natural_Gas_Usage_Sensor and Natural_Gas_Flow_Sensor (both verified present) meter volume/flow, not kW. Binding derives kW from fuel flow x HHV (or LHV — pick ONE convention and keep the baseline consistent, else HW-FC-051's efficiency shifts ~10% between conventions). HW-FC-051's efficiency denominator and its divide guard."
+    },
+    {
+      "name": "boiler_firing_rate",
+      "description": "Boiler firing rate (percent of maximum fire)",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the Boiler via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "No Brick 1.4.4 percent-firing-rate class (chiller_load precedent for a null mapping). Modulating burners expose this on the burner controller. HW-FC-051's single baseline regressor."
+    },
+    {
+      "name": "hw_pump_status",
+      "description": "HW pump run status (true = running)",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Pump_On_Off_Status",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty on the Pump via hasProperty",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": false,
+      "notes": "brick:Pump_On_Off_Status grep-verified (carried from pmp pump_status). Second branch of HW-FC-052's lockout OR — pumps circulating above lockout waste energy even with the boiler off."
+    },
+    {
+      "name": "oat",
+      "description": "Outdoor air temperature",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": "Outside_Air_Temperature_Sensor",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the outdoor air connection point",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Air",
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "Carried from the ahu/erv dictionaries (brick:Outside_Air_Temperature_Sensor, grep-verified there). HW-FC-052's lockout comparator; its diagnosis list includes an OAT sensor reading low — pair with sensor-health rules when phase 3 opens."
+    }
+  ]
+}
