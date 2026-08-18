@@ -1,0 +1,197 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 300,
+    "horizon_s": 36000
+  },
+  "scenarios": [
+    {
+      "name": "healthy_inside_deadband_silent",
+      "description": "Zone parked mid-band all day. Temperror is identically zero (the deadband branch), so both accumulators sit at their floor and nothing ever arrives at the alarm limit.",
+      "inputs": {
+        "zone_temp": 22.0,
+        "zone_temp_sp_htg": 20.0,
+        "zone_temp_sp_clg": 24.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 36000, "equals": false },
+        { "output": "yHigh", "from_s": 0, "to_s": 36000, "equals": false },
+        { "output": "yLow", "from_s": 0, "to_s": 36000, "equals": false },
+        { "output": "yArmedOk", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yArmedOk", "from_s": 3600, "to_s": 36000, "equals": true }
+      ]
+    },
+    {
+      "name": "excursion_below_slack_stays_silent",
+      "description": "0.2 degC above the cooling setpoint forever: z = 0.4 is under the slack k = 0.5, so every increment is negative and the Max clamp holds S at zero. The point of k.",
+      "inputs": {
+        "zone_temp": 24.2,
+        "zone_temp_sp_htg": 20.0,
+        "zone_temp_sp_clg": 24.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 36000, "equals": false },
+        { "output": "yHigh", "from_s": 0, "to_s": 36000, "equals": false },
+        { "output": "yLow", "from_s": 0, "to_s": 36000, "equals": false }
+      ]
+    },
+    {
+      "name": "excursion_exactly_at_slack_never_accumulates",
+      "description": "0.25 degC above the cooling setpoint is exactly k * sigma, so z - k is exactly zero and S never leaves the floor however long it runs. The slack edge, pinned exactly (0.25 and 0.5 are binary-exact).",
+      "inputs": {
+        "zone_temp": 24.25,
+        "zone_temp_sp_htg": 20.0,
+        "zone_temp_sp_clg": 24.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 36000, "equals": false },
+        { "output": "yHigh", "from_s": 0, "to_s": 36000, "equals": false },
+        { "output": "yLow", "from_s": 0, "to_s": 36000, "equals": false }
+      ]
+    },
+    {
+      "name": "small_warm_bias_accumulates_to_alarm",
+      "description": "0.3 degC above the cooling setpoint — a bias no fixed threshold in this library would report — accumulates at 0.1 per sample and reaches the alarm limit after about 50 samples. This is what CUSUM buys.",
+      "inputs": {
+        "zone_temp": 24.3,
+        "zone_temp_sp_htg": 20.0,
+        "zone_temp_sp_clg": 24.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 17400, "equals": false },
+        { "output": "yFault", "from_s": 19800, "to_s": 36000, "equals": true },
+        { "output": "yHigh", "from_s": 19800, "to_s": 36000, "equals": true },
+        { "output": "yLow", "from_s": 0, "to_s": 36000, "equals": false }
+      ]
+    },
+    {
+      "name": "warm_bias_trips_high_side_at_alarm_limit",
+      "description": "0.5 degC above the cooling setpoint gives z = 1 and an increment of exactly 0.5, so S lands on 5.0 at t=6300 (not above the limit, strict >) and 5.5 at t=6600. Both sides of h at the accumulator level.",
+      "inputs": {
+        "zone_temp": 24.5,
+        "zone_temp_sp_htg": 20.0,
+        "zone_temp_sp_clg": 24.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 6300, "equals": false },
+        { "output": "yFault", "from_s": 6600, "to_s": 36000, "equals": true },
+        { "output": "yHigh", "from_s": 0, "to_s": 6300, "equals": false },
+        { "output": "yHigh", "from_s": 6600, "to_s": 36000, "equals": true },
+        { "output": "yLow", "from_s": 0, "to_s": 36000, "equals": false }
+      ]
+    },
+    {
+      "name": "cold_bias_trips_low_side_at_alarm_limit",
+      "description": "0.5 degC below the heating setpoint: the heating branch of the piecewise gives a negative Temperror, the T accumulator carries it, and the same 5.0 / 5.5 edge appears on the low side while the high side stays at zero.",
+      "inputs": {
+        "zone_temp": 19.5,
+        "zone_temp_sp_htg": 20.0,
+        "zone_temp_sp_clg": 24.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 6300, "equals": false },
+        { "output": "yFault", "from_s": 6600, "to_s": 36000, "equals": true },
+        { "output": "yLow", "from_s": 0, "to_s": 6300, "equals": false },
+        { "output": "yLow", "from_s": 6600, "to_s": 36000, "equals": true },
+        { "output": "yHigh", "from_s": 0, "to_s": 36000, "equals": false }
+      ]
+    },
+    {
+      "name": "first_hour_of_occupancy_excluded",
+      "description": "A 2 degC excursion present from the first tick would cross the alarm limit two samples in without the exclusion; the accumulators stay clamped to zero until t=3600 and only then start, so the alarm lands at 3900.",
+      "inputs": {
+        "zone_temp": 26.0,
+        "zone_temp_sp_htg": 20.0,
+        "zone_temp_sp_clg": 24.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 36000, "equals": true },
+        { "output": "yArmedOk", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yArmedOk", "from_s": 3600, "to_s": 36000, "equals": true }
+      ]
+    },
+    {
+      "name": "unoccupied_never_accumulates",
+      "description": "6 degC above the cooling setpoint for ten hours with the schedule off. The Switch feeds zero into both accumulators and into their unit delays, so the rule is silent and yArmedOk says why.",
+      "inputs": {
+        "zone_temp": 30.0,
+        "zone_temp_sp_htg": 20.0,
+        "zone_temp_sp_clg": 24.0,
+        "occ_scheduled": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 36000, "equals": false },
+        { "output": "yHigh", "from_s": 0, "to_s": 36000, "equals": false },
+        { "output": "yLow", "from_s": 0, "to_s": 36000, "equals": false },
+        { "output": "yArmedOk", "from_s": 0, "to_s": 36000, "equals": false }
+      ]
+    },
+    {
+      "name": "occupancy_reset_clears_mid_accumulation",
+      "description": "The same 0.5 degC bias, interrupted: S has reached 3.0 when the schedule drops at t=5400, the reset zeroes it, and the second occupied period has to serve its own exclusion hour and climb from zero again — so the alarm arrives at 13800 instead of 6600.",
+      "inputs": {
+        "zone_temp": 24.5,
+        "zone_temp_sp_htg": 20.0,
+        "zone_temp_sp_clg": 24.0,
+        "occ_scheduled": [
+          { "t": 0, "value": true },
+          { "t": 5400, "value": false },
+          { "t": 7200, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 13500, "equals": false },
+        { "output": "yFault", "from_s": 13800, "to_s": 36000, "equals": true },
+        { "output": "yArmedOk", "from_s": 3600, "to_s": 5100, "equals": true },
+        { "output": "yArmedOk", "from_s": 5400, "to_s": 10500, "equals": false },
+        { "output": "yArmedOk", "from_s": 10800, "to_s": 36000, "equals": true }
+      ]
+    },
+    {
+      "name": "alarm_drains_after_zone_returns_to_deadband",
+      "description": "Warm bias until t=7200, then the zone recovers. S drains by k per sample once the error is back inside the deadband and the alarm clears at 7500 — CUSUM forgets at the slack rate, not instantly.",
+      "inputs": {
+        "zone_temp": [
+          { "t": 0, "value": 24.5 },
+          { "t": 7200, "value": 22.0 }
+        ],
+        "zone_temp_sp_htg": 20.0,
+        "zone_temp_sp_clg": 24.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 6300, "equals": false },
+        { "output": "yFault", "from_s": 6600, "to_s": 7200, "equals": true },
+        { "output": "yFault", "from_s": 7500, "to_s": 36000, "equals": false },
+        { "output": "yLow", "from_s": 0, "to_s": 36000, "equals": false }
+      ]
+    },
+    {
+      "name": "setpoint_edges_are_zero_error",
+      "description": "Zone parked exactly on the heating setpoint, then exactly on the cooling setpoint, then mid-band. All three branches of the piecewise evaluate to zero at and inside the edges, so ten occupied hours produce nothing.",
+      "inputs": {
+        "zone_temp": [
+          { "t": 0, "value": 20.0 },
+          { "t": 12000, "value": 24.0 },
+          { "t": 24000, "value": 22.0 }
+        ],
+        "zone_temp_sp_htg": 20.0,
+        "zone_temp_sp_clg": 24.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 36000, "equals": false },
+        { "output": "yHigh", "from_s": 0, "to_s": 36000, "equals": false },
+        { "output": "yLow", "from_s": 0, "to_s": 36000, "equals": false }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,173 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 10800 },
+  "scenarios": [
+    {
+      "name": "healthy_variation_below_slack",
+      "description": "dTerror wanders over 0.05, 0.83 and 1.60 degC — plus and minus one sigma about the commissioned 0.44 degC, then out to just inside 3 sigma. |z| never clears slack_k, so neither accumulator ever leaves zero. This is what the slack parameter is for.",
+      "inputs": {
+        "vav_dat": [
+          { "t": 0, "value": 13.83 },
+          { "t": 600, "value": 13.05 },
+          { "t": 1200, "value": 14.6 },
+          { "t": 1800, "value": 13.05 },
+          { "t": 2400, "value": 13.83 },
+          { "t": 3000, "value": 14.6 },
+          { "t": 3600, "value": 13.05 },
+          { "t": 4200, "value": 13.83 },
+          { "t": 4800, "value": 14.6 },
+          { "t": 5400, "value": 13.05 },
+          { "t": 6000, "value": 13.83 },
+          { "t": 6600, "value": 14.6 },
+          { "t": 7200, "value": 13.05 },
+          { "t": 7800, "value": 13.83 },
+          { "t": 8400, "value": 14.6 },
+          { "t": 9000, "value": 13.05 },
+          { "t": 9600, "value": 13.83 },
+          { "t": 10200, "value": 14.6 }
+        ],
+        "sat": 13.0,
+        "rht_vlv_cmd": 0.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 10800, "equals": false },
+        { "output": "yHigh", "from_s": 0, "to_s": 10800, "equals": false },
+        { "output": "yLow", "from_s": 0, "to_s": 10800, "equals": false },
+        { "output": "yReheatOk", "from_s": 0, "to_s": 10800, "equals": true },
+        { "output": "yOccupiedOk", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yOccupiedOk", "from_s": 3660, "to_s": 10800, "equals": true }
+      ]
+    },
+    {
+      "name": "leak_accumulates_to_alarm",
+      "description": "A 5.0 degC rise across a coil commanded shut — inside the 3.7 to 11.9 degF band the source measured on its stuck valve (Table 3). z = 11.7, so each sample banks 8.69 and the twelfth accumulating sample carries S past h = 100 at t = 4260 s.",
+      "inputs": {
+        "vav_dat": 18.0,
+        "sat": 13.0,
+        "rht_vlv_cmd": 0.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 4140, "equals": false },
+        { "output": "yFault", "from_s": 4320, "to_s": 10800, "equals": true },
+        { "output": "yHigh", "from_s": 0, "to_s": 4140, "equals": false },
+        { "output": "yHigh", "from_s": 4320, "to_s": 10800, "equals": true },
+        { "output": "yLow", "from_s": 0, "to_s": 10800, "equals": false }
+      ]
+    },
+    {
+      "name": "negative_bias_accumulates_on_low_side",
+      "description": "The mirror direction: the discharge reads 5.0 degC BELOW the broadcast supply temperature, which no leak can produce. T accumulates, yLow rises and yHigh stays down — the direction flags are what separate a leaking coil from a broken dT channel.",
+      "inputs": {
+        "vav_dat": 8.0,
+        "sat": 13.0,
+        "rht_vlv_cmd": 0.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 4020, "equals": false },
+        { "output": "yFault", "from_s": 4200, "to_s": 10800, "equals": true },
+        { "output": "yLow", "from_s": 0, "to_s": 4020, "equals": false },
+        { "output": "yLow", "from_s": 4200, "to_s": 10800, "equals": true },
+        { "output": "yHigh", "from_s": 0, "to_s": 10800, "equals": false }
+      ]
+    },
+    {
+      "name": "unoccupied_resets_mid_accumulation",
+      "description": "S reaches 86.9 and the schedule drops at t = 4140 s. The accumulator goes to zero rather than freezing, so the return to occupancy at 4380 s costs a fresh warmup hour and a fresh climb: the alarm lands at 8640 s instead of 4260 s.",
+      "inputs": {
+        "vav_dat": 18.0,
+        "sat": 13.0,
+        "rht_vlv_cmd": 0.0,
+        "occ_scheduled": [
+          { "t": 0, "value": true },
+          { "t": 4140, "value": false },
+          { "t": 4380, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 8520, "equals": false },
+        { "output": "yFault", "from_s": 8700, "to_s": 10800, "equals": true },
+        { "output": "yOccupiedOk", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yOccupiedOk", "from_s": 3660, "to_s": 4080, "equals": true },
+        { "output": "yOccupiedOk", "from_s": 4140, "to_s": 7920, "equals": false },
+        { "output": "yOccupiedOk", "from_s": 8040, "to_s": 10800, "equals": true }
+      ]
+    },
+    {
+      "name": "warmup_hour_runs_from_the_occupied_transition",
+      "description": "Occupancy starts at t = 1800 s, so the excluded hour ends at 5400 s and not at 3600 s: the source's first-hour rule is measured from the transition, not from controller start. The alarm follows twelve samples later.",
+      "inputs": {
+        "vav_dat": 18.0,
+        "sat": 13.0,
+        "rht_vlv_cmd": 0.0,
+        "occ_scheduled": [
+          { "t": 0, "value": false },
+          { "t": 1800, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yOccupiedOk", "from_s": 0, "to_s": 5340, "equals": false },
+        { "output": "yOccupiedOk", "from_s": 5460, "to_s": 10800, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 5940, "equals": false },
+        { "output": "yFault", "from_s": 6120, "to_s": 10800, "equals": true }
+      ]
+    },
+    {
+      "name": "reheat_command_resets_accumulator",
+      "description": "S reaches 78.2, the coil is commanded open from 4140 s to 4440 s, and the accumulator is back at zero when the valve shuts again — the source's own reading of its Figure 13 (the dT CUSUM is reset to zero when the valve is not full close). The climb restarts from nothing and the alarm lands at 5160 s, not the 4620 s a held accumulator would give.",
+      "inputs": {
+        "vav_dat": 18.0,
+        "sat": 13.0,
+        "rht_vlv_cmd": [
+          { "t": 0, "value": 0.0 },
+          { "t": 4140, "value": 50.0 },
+          { "t": 4500, "value": 0.0 }
+        ],
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5040, "equals": false },
+        { "output": "yFault", "from_s": 5220, "to_s": 10800, "equals": true },
+        { "output": "yReheatOk", "from_s": 0, "to_s": 4080, "equals": true },
+        { "output": "yReheatOk", "from_s": 4140, "to_s": 4440, "equals": false },
+        { "output": "yReheatOk", "from_s": 4500, "to_s": 10800, "equals": true }
+      ]
+    },
+    {
+      "name": "alarm_clears_as_accumulator_drains_through_h",
+      "description": "After the alarm at 4260 s the rise falls back to 1.415 degC, inside the slack band, and S drains at 0.5 per sample from 104.3. Both sides of h at the accumulator level: still true at 4680 s (S = 100.8), false from 4860 s (S = 99.3). The comparison is strict and there is no persistence timer to unwind.",
+      "inputs": {
+        "vav_dat": [
+          { "t": 0, "value": 18.0 },
+          { "t": 4320, "value": 14.415 }
+        ],
+        "sat": 13.0,
+        "rht_vlv_cmd": 0.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 4140, "equals": false },
+        { "output": "yFault", "from_s": 4320, "to_s": 4680, "equals": true },
+        { "output": "yFault", "from_s": 4860, "to_s": 10800, "equals": false }
+      ]
+    },
+    {
+      "name": "reheat_open_throughout_channel_silent",
+      "description": "A 5.0 degC rise across a coil commanded 50% open is the coil doing its job. No reheat-off sample exists all run, both accumulators stay at zero, and yReheatOk stays false so the host reports NO_EVAL rather than a healthy box.",
+      "inputs": {
+        "vav_dat": 18.0,
+        "sat": 13.0,
+        "rht_vlv_cmd": 50.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 10800, "equals": false },
+        { "output": "yHigh", "from_s": 0, "to_s": 10800, "equals": false },
+        { "output": "yLow", "from_s": 0, "to_s": 10800, "equals": false },
+        { "output": "yReheatOk", "from_s": 0, "to_s": 10800, "equals": false }
+      ]
+    }
+  ]
+}
