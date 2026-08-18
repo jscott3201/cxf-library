@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1110 250" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <g>
+    <rect x="12" y="44" width="200" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="112" y="63" text-anchor="middle" fill="#1e3a8a">zone_dmpr_fraction_open</text>
+    <rect x="12" y="154" width="200" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="112" y="173" text-anchor="middle" fill="#1e3a8a">zone_reheat_fraction</text>
+  </g>
+
+  <!-- threshold blocks -->
+  <g>
+    <rect x="250" y="30" width="250" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="375" y="52" text-anchor="middle" fill="#24292f" font-weight="bold">dmprHigh</text>
+    <text x="375" y="70" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 0.60</text>
+
+    <rect x="250" y="140" width="250" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="375" y="162" text-anchor="middle" fill="#24292f" font-weight="bold">rhtLow</text>
+    <text x="375" y="180" text-anchor="middle" fill="#57606a" font-size="11">Reals.LessThreshold · t = 0.25</text>
+  </g>
+
+  <!-- conjunction -->
+  <rect x="570" y="85" width="120" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="630" y="107" text-anchor="middle" fill="#24292f" font-weight="bold">both</text>
+  <text x="630" y="125" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <!-- persistence -->
+  <rect x="760" y="85" width="180" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="850" y="107" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="850" y="125" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 1800 s</text>
+
+  <!-- boundary output -->
+  <rect x="1000" y="99" width="80" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1040" y="118" text-anchor="middle" fill="#7f1d1d">yFault</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 212 59 H 246"/>
+    <path d="M 212 169 H 246"/>
+
+    <path d="M 500 59 H 535 V 99 H 566"/>
+    <path d="M 500 169 H 535 V 129 H 566"/>
+
+    <path d="M 690 114 H 756"/>
+    <path d="M 940 114 H 996"/>
+  </g>
+
+  <!-- port and signal hints -->
+  <g fill="#7d8590" font-size="9">
+    <text x="576" y="103">u1</text>
+    <text x="576" y="133">u2</text>
+  </g>
+  <text x="220" y="38" fill="#7d8590" font-size="10">Real</text>
+  <text x="510" y="52" fill="#7d8590" font-size="10">Bool</text>
+
+  <g fill="#7d8590" font-size="11">
+    <text x="12" y="224">Both fractions are host-computed over the zone population; the per-zone counting thresholds (90% damper, 10% reheat) are host configuration.</text>
+    <text x="12" y="242">Wide-open dampers alone are not the finding: the low-reheat conjunct is what separates warm supply air from an ordinary high-load hour.</text>
+  </g>
+</svg>

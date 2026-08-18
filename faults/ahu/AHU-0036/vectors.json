@@ -1,0 +1,116 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 3600 },
+  "scenarios": [
+    {
+      "name": "good_operation_dampers_50_to_75",
+      "description": "Reference vector (PNNL-27338 Figure 2.15, good operation): most dampers between 50% and 75%, so the top half averages 72% and the bottom half 55% — the bottom half clears its threshold but the top half does not, and no fault is reported",
+      "inputs": { "zone_dmpr_high_avg": 72.0, "zone_dmpr_low_avg": 55.0, "sf_status": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "whole_population_wide_open",
+      "description": "Reference vector (PNNL-27338 Figure 2.14, bad operation): nearly every damper near 100%, top half 98% and bottom half 92% — the trunk is starved and the alarm lands at alarm_delay (900 s)",
+      "inputs": { "zone_dmpr_high_avg": 98.0, "zone_dmpr_low_avg": 92.0, "sf_status": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 960, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "busy_zones_only_bottom_half_closed",
+      "description": "The discrimination this rule exists for: the top half averages 95% (a few zones at load, or one damper stuck open) while the bottom half sits at 15% — pressure is reaching the zones that are not asking, so the population test stays silent where a max-based test would fire",
+      "inputs": { "zone_dmpr_high_avg": 95.0, "zone_dmpr_low_avg": 15.0, "sf_status": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "high_avg_exactly_at_threshold",
+      "description": "Edge case: the top half sits exactly on zone_high_damper_threshold (90%) with the bottom half well above its threshold — the strict `>` keeps the boundary out of the alarm",
+      "inputs": { "zone_dmpr_high_avg": 90.0, "zone_dmpr_low_avg": 60.0, "sf_status": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "low_avg_exactly_at_threshold",
+      "description": "Edge case: the bottom half sits exactly on zone_low_damper_threshold (25%) with the top half at 97% — same strict `>`, so the quiet half must exceed the threshold rather than sit on it",
+      "inputs": { "zone_dmpr_high_avg": 97.0, "zone_dmpr_low_avg": 25.0, "sf_status": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "both_halves_just_above_thresholds",
+      "description": "Edge case, other side: 90.1% and 25.1% clear both thresholds by a tenth of a percent — the alarm still lands at 900 s",
+      "inputs": { "zone_dmpr_high_avg": 90.1, "zone_dmpr_low_avg": 25.1, "sf_status": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 960, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "fan_off_dampers_parked_open",
+      "description": "Gate: the fan is off and the boxes have driven their dampers open against a dead duct — the damper pattern reads exactly like a starved trunk, and sf_status suppresses the rule outright",
+      "inputs": { "zone_dmpr_high_avg": 98.0, "zone_dmpr_low_avg": 92.0, "sf_status": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "fan_cycle_restarts_persistence",
+      "description": "Gate transient: the fan stops at t=300 and restarts at t=600 with the damper pattern unchanged — the timer restarts from the fan restart, so the alarm lands at 1500 s rather than 900 s",
+      "inputs": {
+        "zone_dmpr_high_avg": 98.0,
+        "zone_dmpr_low_avg": 92.0,
+        "sf_status": [
+          { "t": 0, "value": true },
+          { "t": 300, "value": false },
+          { "t": 600, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1440, "equals": false },
+        { "output": "yFault", "from_s": 1560, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "retuning_raises_pressure_before_delay",
+      "description": "Transient: the setpoint is raised at t=600 and the boxes throttle back to 70% / 45% — the condition clears inside alarm_delay, which is what a successful re-tuning cycle looks like from the rule's side",
+      "inputs": {
+        "zone_dmpr_high_avg": [
+          { "t": 0, "value": 98.0 },
+          { "t": 600, "value": 70.0 }
+        ],
+        "zone_dmpr_low_avg": [
+          { "t": 0, "value": 92.0 },
+          { "t": 600, "value": 45.0 }
+        ],
+        "sf_status": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "bottom_half_dip_restarts_persistence",
+      "description": "Transient: the bottom half drops to 20% at t=420 and returns to 92% at t=780 — the conjunction breaks and the persistence window restarts, so the alarm lands at 1680 s",
+      "inputs": {
+        "zone_dmpr_high_avg": 98.0,
+        "zone_dmpr_low_avg": [
+          { "t": 0, "value": 92.0 },
+          { "t": 420, "value": 20.0 },
+          { "t": 780, "value": 92.0 }
+        ],
+        "sf_status": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1620, "equals": false },
+        { "output": "yFault", "from_s": 1740, "to_s": 3600, "equals": true }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 5400 },
+  "scenarios": [
+    {
+      "name": "dampers_open_few_reheating",
+      "description": "Reference vector: 75% of zones above the high-open damper threshold with 10% reheating — cooling starvation with nobody reheating; alarms after alarm_delay (1800 s), served in full from load because delayOnInit is true",
+      "inputs": { "zone_dmpr_fraction_open": 0.75, "zone_reheat_fraction": 0.10 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "dampers_moderate_few_reheating",
+      "description": "Reference vector: 45% of zones wide open with 10% reheating — light reheat alone is not a finding; the damper population never clears its threshold",
+      "inputs": { "zone_dmpr_fraction_open": 0.45, "zone_reheat_fraction": 0.10 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "dampers_open_widespread_reheat",
+      "description": "Reference vector: 75% of zones wide open but 40% reheating — a mixed-load hour, not warm supply air; PNNL-27338 forbids lowering the setpoint here",
+      "inputs": { "zone_dmpr_fraction_open": 0.75, "zone_reheat_fraction": 0.40 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_fraction_exactly_at_threshold",
+      "description": "Edge case: the open-damper fraction sits exactly on damper_fraction_threshold (0.60) with 10% reheating — the strict `>` keeps it out of the alarm",
+      "inputs": { "zone_dmpr_fraction_open": 0.60, "zone_reheat_fraction": 0.10 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "reheat_fraction_exactly_at_threshold",
+      "description": "Edge case: exactly a quarter of zones reheating (0.25) against 75% wide-open dampers — the strict `<` means the fraction must fall below the threshold",
+      "inputs": { "zone_dmpr_fraction_open": 0.75, "zone_reheat_fraction": 0.25 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "morning_pulldown_clears_before_delay",
+      "description": "Transient: the pull-down signature — every damper open, nothing reheating — relaxes to 0.40 open at t=1200, inside alarm_delay, so no alarm",
+      "inputs": {
+        "zone_dmpr_fraction_open": [
+          { "t": 0, "value": 0.75 },
+          { "t": 1200, "value": 0.40 }
+        ],
+        "zone_reheat_fraction": 0.10
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "reheat_returns_before_delay",
+      "description": "Transient: dampers stay at 0.75 but the reheating fraction climbs back to 0.35 at t=1200 — the corroborating conjunct drops out before the alarm can assert",
+      "inputs": {
+        "zone_dmpr_fraction_open": 0.75,
+        "zone_reheat_fraction": [
+          { "t": 0, "value": 0.10 },
+          { "t": 1200, "value": 0.35 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_dip_restarts_persistence",
+      "description": "Transient: the open-damper fraction dips to 0.50 at t=900 and returns to 0.75 at t=1200 — persistence restarts from the return, so the alarm lands at 3000 s, not 1800 s",
+      "inputs": {
+        "zone_dmpr_fraction_open": [
+          { "t": 0, "value": 0.75 },
+          { "t": 900, "value": 0.50 },
+          { "t": 1200, "value": 0.75 }
+        ],
+        "zone_reheat_fraction": 0.10
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2940, "equals": false },
+        { "output": "yFault", "from_s": 3060, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "reheat_gate_opens_late",
+      "description": "Gate edge: dampers held at 0.75 throughout while the reheating fraction falls from 0.40 to 0.10 at t=900 — persistence starts at the reheat crossing, so the alarm lands at 2700 s",
+      "inputs": {
+        "zone_dmpr_fraction_open": 0.75,
+        "zone_reheat_fraction": [
+          { "t": 0, "value": 0.40 },
+          { "t": 900, "value": 0.10 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2640, "equals": false },
+        { "output": "yFault", "from_s": 2760, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "both_gates_arrive_together",
+      "description": "Gate edge: both conjuncts start false (0.45 open, 0.40 reheating) and both cross at t=600 to 0.80 open and 0.05 reheating — the alarm lands at 2400 s",
+      "inputs": {
+        "zone_dmpr_fraction_open": [
+          { "t": 0, "value": 0.45 },
+          { "t": 600, "value": 0.80 }
+        ],
+        "zone_reheat_fraction": [
+          { "t": 0, "value": 0.40 },
+          { "t": 600, "value": 0.05 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2340, "equals": false },
+        { "output": "yFault", "from_s": 2460, "to_s": 5400, "equals": true }
+      ]
+    }
+  ]
+}

@@ -274,6 +274,30 @@
       "legacy_id": "AHU-FC-068"
     },
     {
+      "id": "AHU-0035",
+      "family": "ahu",
+      "name": "Supply air temperature too high for the zone population",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "AHU-0036",
+      "family": "ahu",
+      "name": "Duct static pressure too low for the zone population",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "AHU-0037",
+      "family": "ahu",
+      "name": "Economizing when it should not (damper position)",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
       "id": "CHW-0001",
       "family": "chw",
       "name": "Chiller efficiency (kW/ton) degradation",
