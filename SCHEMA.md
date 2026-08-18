@@ -20,7 +20,6 @@ cxf-library/
 ├── clusters/clusters.json       # fault clusters (syndromes with shared root cause)
 ├── routines/                    # G36 routine enhancements (non-fault control programs)
 ├── tools/verify/                # Rust harness: loads each rule into the engine, runs vectors
-└── _research/                   # source digests and orientation notes (non-normative)
 ```
 
 Equipment family keys: `ahu`, `vav`, `rtu`, `hp`, `fcu`, `chw`, `hw`, `erv`,
@@ -231,7 +230,7 @@ Target dialect: the open-control engine's composite subset
 - `s223`: object `{pattern, property_class, quantitykind, unit, medium,
   aspects, enumerationkind?}` using verified ASHRAE 223P terms
   (`enumerationkind` for enumerated properties). See
-  `_research/223p-point-modeling.md` for the modeling pattern.
+  the internal 223P point-modeling note (local-only, not distributed) for the modeling pattern.
 - Every term must be verified against the published ontology files — never
   from memory. `provisional: true` additionally marks entries with genuine
   ambiguity (class-choice judgment calls, unit conflicts, or patterns

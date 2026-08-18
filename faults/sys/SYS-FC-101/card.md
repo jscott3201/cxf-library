@@ -11,7 +11,7 @@ category: COMFORT_ENERGY
 confidence: MEDIUM
 estimation_method: QUALITATIVE_ONLY
 source:
-  - "Library-authored per the accepted sensor-health design: _research/fc100-sensor-health-design.md (§2 stance, §4.1-4.2 block choice, §4.4 vector strategy)"
+  - "Library-authored per the accepted internal sensor-health design note (local-only, not distributed; §2 stance, §4.1-4.2 block choice, §4.4 vector strategy)"
   - "Yang, Cho, Tae, Zaheeruddin 2008, Energy Conversion and Management 49(8) 2291-2306, doi:10.1016/j.enconman.2008.01.029 — sequential rule-based temperature sensor fault detection in AHUs"
   - "Liao, Cai, Cheng, Dubey, Rajesh 2021, Sensors 21(13) 4358, doi:10.3390/s21134358 — a cheap deterministic sensor-rule layer under a heavier diagnostic layer"
   - "Dey & Dong 2016, Energy and Buildings 130 177-187, doi:10.1016/j.enbuild.2016.08.017 — the sensor-bias ambiguity this family removes before the equipment rules are read"

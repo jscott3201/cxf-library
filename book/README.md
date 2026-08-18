@@ -49,7 +49,7 @@ Work through this before flipping the repo public or enabling deployment:
 - [ ] **Provenance statement**: the HVAC FDD Reference v1.0 is cited
       throughout as grounding — confirm its own redistribution terms and add
       an attribution section to the book introduction.
-- [ ] **Repo hygiene**: `_research/` digests and any internal notes — decide
+- [x] **Repo hygiene**: `_research/` is local-only (untracked, gitignored 2026-08-18) — decided
       whether they ship, move, or are excluded from the book (the generator
       currently ignores them).
 - [ ] **README framing**: the introduction currently says "Private library";
