@@ -21,7 +21,7 @@ suppressed_by: [AHU-FC-062]
 related: [AHU-FC-006, AHU-FC-051, AHU-FC-064]
 playbooks: [economizer-failure]
 operating_states: "occupied, non-economizer operation (host-gated); reference OS 1, OS 4"
-preconditions: "Supply fan running. The host must not evaluate during economizer operation — bringing in more than the design minimum is the point of economizing, and this rule cannot tell that apart from a stuck damper. MAT must pass its integrity gate (AHU-FC-062, see suppressed_by): the fraction is a ratio of temperature differences, so a biased mixed-air reading moves it directly. The temperature-difference gate is signalled in-rule by yTempDeltaOk; when it is false the verdict is NO_EVAL, not healthy."
+preconditions: "Supply fan running. The host must not evaluate during economizer operation — bringing in more than the design minimum is the point of economizing, and this rule cannot tell that apart from a stuck damper. MAT must pass its integrity gate (AHU-FC-062, see suppressed_by): the fraction is a ratio of temperature differences, so a biased mixed-air reading moves it directly. The temperature-difference gate is signalled in-rule by yTempDeltaOk; when it is false the verdict is NO_EVAL, not healthy. Additionally suspend evaluation (NO_EVAL) while demand-controlled ventilation or a ventilation-demand override holds outdoor-air flow above the minimum-OA state — at VAV turndown a constant ventilation flow becomes a large OA fraction and this rule fires on healthy operation (fleet-validated FP mechanism; see the validation block)."
 points:
   - mat
   - rat

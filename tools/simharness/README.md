@@ -84,6 +84,27 @@ fault by construction; excluded from FPR claims, useful as a
 known-positive. Reset-family rules are likewise excluded (constant-setpoint
 baselines read "reset absent" by construction).
 
+## Plant mode (DOE prototypes)
+
+`--mode plant` maps CHW/HW plant loops instead of air loops: loop
+supply/return node temperatures and setpoints from `PlantLoop`, chiller/
+boiler part-load ratios for load and status, pump electricity for
+`hw_pump_status`, and `hw_pump_vfd_speed` as a pump mass-flow fraction
+(affinity-law proxy). DOE prototype IDFs enter via the E+ transition chain
+(`PreProcess/IDFVersionUpdater`, e.g. 22.1 → 25.1 in six steps) +
+`ConvertInputFormat`. Rules replay per family with rule-specific gates
+(`PLANT_GATE`: CHW-FC-053 needs chiller load > 40%; boiler rules need the
+boiler active; unnecessary-operation rules replay ungated — gating on the
+equipment they accuse would mask them). `PLANT_EXCLUDE` names the
+baseline-fitted, reset-class, and by-construction rules with reasons.
+
+First plant results (OfficeLarge STD2019 Atlanta, Jul + Jan weeks):
+CHW-FC-053, HW-FC-052/053/054 all clean in their gated windows (recorded
+as `validation:` blocks); HW-FC-056 verified firing correctly on the
+prototype's constant-HWST-at-low-load operation (excluded by-construction);
+Atlanta January never crosses CHW-FC-053's 40% chiller-load floor — season
+selection matters per family.
+
 ## First results (single building, superseded by the fleet sweep above) (B2B OfficeMedium-4004, Albuquerque, July week, 3 loops)
 
 **16 of 18 auto-eligible AHU rules replayed clean across all three loops

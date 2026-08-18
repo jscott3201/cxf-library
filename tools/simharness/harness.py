@@ -229,14 +229,15 @@ def card_points(card: Path) -> list[str]:
     return re.findall(r"-\s+(\S+)", m.group(1)) if m else []
 
 
-def eligible_rules(families=("ahu",)) -> dict:
+def eligible_rules(families=("ahu",), mapped=None) -> dict:
+    mapped = mapped or MAPPED_POINTS
     rules = {}
     for fam in families:
         for d in sorted((REPO / "faults" / fam).iterdir()):
             card = d / "card.md"
             if card.is_file():
                 pts = card_points(card)
-                if pts and set(pts) <= MAPPED_POINTS:
+                if pts and set(pts) <= mapped:
                     rules[d.name] = {"dir": d, "points": pts}
     return rules
 
@@ -305,6 +306,135 @@ def emit_and_replay(building: str, loops_pts: dict, rules: dict, out: Path):
         capture_output=True, text=True, cwd=REPO)
     return r.stdout + r.stderr
 
+
+
+# ================================================================ plants
+
+PLANT_EXCLUDE = {
+    "CHW-FC-050": "host-fitted kW/ton baseline placeholders — needs a per-plant fit first",
+    "CHW-FC-051": "reset-class: prototype uses a constant scheduled CHW setpoint, fires by construction",
+    "HW-FC-050": "host-fitted baseline placeholders — needs a per-plant fit first",
+    "HW-FC-051": "host-fitted baseline placeholders — needs a per-plant fit first",
+    "HW-FC-057": "reset-class: constant scheduled HW setpoint, fires by construction",
+    "HW-FC-056": "by-construction: constant HWST at low evening load IS the retuning condition it detects (no HWST reset in the prototype); verified firing correctly, Jan week",
+}
+PLANT_MAPPED = {"chwst", "chwrt", "chwst_sp", "chiller_load", "boiler_status",
+                "hw_pump_status", "hws_temp", "hwr_temp", "hws_temp_sp",
+                "hw_pump_vfd_speed", "oat"}
+# rule -> gate key; rules absent here replay ungated (lead margin only):
+# unnecessary-operation rules must NOT be gated on the equipment they accuse.
+PLANT_GATE = {"CHW-FC-053": "chw_load40", "HW-FC-053": "hw_on", "HW-FC-056": "hw_on"}
+PUMP_ON_W = 100.0
+
+
+def plant_nodes(b: dict) -> dict:
+    """CHW + HW loop node/equipment map (DOE prototype shapes)."""
+    out = {}
+    for name, pl in b.get("PlantLoop", {}).items():
+        fluid = pl.get("fluid_type", "Water")
+        entry = {"out_node": pl["plant_side_outlet_node_name"],
+                 "in_node": pl["plant_side_inlet_node_name"],
+                 "sp_node": pl.get("loop_temperature_setpoint_node_name")}
+        if any(name.startswith(p) for p in ("CoolSys", "CHW")) and "Demand" not in name:
+            entry["chillers"] = [c for c in b.get("Chiller:Electric:ReformulatedEIR", {})
+                                 ] + [c for c in b.get("Chiller:Electric:EIR", {})]
+            out["chw"] = entry
+        elif any(name.startswith(p) for p in ("HeatSys", "HW")) and "SWH" not in name:
+            entry["boilers"] = [x for x in b.get("Boiler:HotWater", {}) if name.split("_")[0].lower() in x.lower() or "Central" not in x]
+            entry["pumps"] = [p for p in list(b.get("Pump:VariableSpeed", {})) if name.split("_")[0].lower() in p.lower()]
+            out["hw"] = entry
+    return out
+
+
+def patch_plant(b: dict, pn: dict, begin, end) -> dict:
+    b = json.loads(json.dumps(b))
+    for rp in b.get("RunPeriod", {}).values():
+        rp["begin_month"], rp["begin_day_of_month"] = begin
+        rp["end_month"], rp["end_day_of_month"] = end
+    b.setdefault("Output:Variable", {})
+    def req(key, var):
+        n = f"simharness {len(b['Output:Variable'])}"
+        b["Output:Variable"][n] = {"key_value": key, "variable_name": var,
+                                   "reporting_frequency": "Timestep"}
+    req("Environment", "Site Outdoor Air Drybulb Temperature")
+    if "chw" in pn:
+        c = pn["chw"]
+        req(c["out_node"], "System Node Temperature")
+        req(c["in_node"], "System Node Temperature")
+        req(c["sp_node"], "System Node Setpoint Temperature")
+        for ch in c["chillers"]:
+            req(ch, "Chiller Part Load Ratio")
+    if "hw" in pn:
+        h = pn["hw"]
+        req(h["out_node"], "System Node Temperature")
+        req(h["in_node"], "System Node Temperature")
+        req(h["sp_node"], "System Node Setpoint Temperature")
+        for bo in h["boilers"]:
+            req(bo, "Boiler Part Load Ratio")
+        for p in h["pumps"]:
+            req(p, "Pump Electricity Rate")
+            req(p, "Pump Mass Flow Rate")
+    return b
+
+
+def extract_plant(csv_path: Path, pn: dict, b: dict) -> dict:
+    with open(csv_path) as f:
+        rows = list(csv.reader(f))
+    header, data = rows[0], rows[1:]
+    oat = series(data, col(header, "Environment", "Site Outdoor Air Drybulb Temperature"))
+    fams = {}
+    if "chw" in pn:
+        c = pn["chw"]
+        plrs = [series(data, col(header, ch, "Chiller Part Load Ratio")) for ch in c["chillers"]]
+        fams["chw"] = {
+            "oat": oat,
+            "chwst": series(data, col(header, c["out_node"], "System Node Temperature")),
+            "chwrt": series(data, col(header, c["in_node"], "System Node Temperature")),
+            "chwst_sp": series(data, col(header, c["sp_node"], "System Node Setpoint Temperature")),
+            # plant chiller_load proxy: max PLR across chillers x100 — the
+            # loaded chiller's PLR, the quantity the delta-T floor gates on
+            "chiller_load": [round(max(v) * 100.0, ROUND) for v in zip(*plrs)],
+        }
+    if "hw" in pn:
+        h = pn["hw"]
+        plrs = [series(data, col(header, bo, "Boiler Part Load Ratio")) for bo in h["boilers"]]
+        pump_w = [series(data, col(header, p, "Pump Electricity Rate")) for p in h["pumps"]]
+        flows = [series(data, col(header, p, "Pump Mass Flow Rate")) for p in h["pumps"]]
+        fmax = max(v for row in flows for v in row) or 1.0
+        fams["hw"] = {
+            "oat": oat,
+            "hws_temp": series(data, col(header, h["out_node"], "System Node Temperature")),
+            "hwr_temp": series(data, col(header, h["in_node"], "System Node Temperature")),
+            "hws_temp_sp": series(data, col(header, h["sp_node"], "System Node Setpoint Temperature")),
+            "boiler_status": [max(v) > 0.02 for v in zip(*plrs)],
+            "hw_pump_status": [max(v) > PUMP_ON_W for v in zip(*pump_w)],
+            # VFD speed proxy: pump mass-flow fraction of observed max x100
+            # (affinity-law approximation; documented proxy)
+            "hw_pump_vfd_speed": [round(max(v) / fmax * 100.0, ROUND) for v in zip(*flows)],
+        }
+    return fams
+
+
+def plant_gate_windows(key: str | None, pts: dict, n: int) -> list:
+    if key is None:
+        return [(GATE_LEAD_S, (n - 1) * STEP_S)]
+    if key == "chw_load40":
+        ok = [v > 40.0 for v in pts["chiller_load"]]
+    elif key == "hw_on":
+        ok = pts["boiler_status"]
+    else:
+        raise KeyError(key)
+    wins, start = [], None
+    for i, v in enumerate(list(ok) + [False]):
+        if v and start is None:
+            start = i
+        elif not v and start is not None:
+            a, b_ = start * STEP_S + OS_LEAD_S, (i - 1) * STEP_S
+            if b_ - a >= 1800:
+                wins.append((a, b_))
+            start = None
+    return wins
+
 # ---------------------------------------------------------------- main
 
 def main():
@@ -315,16 +445,77 @@ def main():
     runp.add_argument("--out", default=None)
     runp.add_argument("--begin", default="7-6", help="run period start M-D")
     runp.add_argument("--end", default="7-12", help="run period end M-D")
+    runp.add_argument("--mode", default="airloop", choices=["airloop", "plant"])
     args = ap.parse_args()
 
     bdir = Path(args.building)
     out = Path(args.out) if args.out else bdir / "simharness_out"
     out.mkdir(parents=True, exist_ok=True)
-    b = json.load(open(bdir / "building.epjson"))
+    src = bdir / "building.epjson"
+    if not src.is_file():
+        src = next(bdir.glob("*.epJSON"))
+    b = json.load(open(src))
     epw = next(bdir.glob("*.epw"))
-    loops = loop_nodes(b)
     begin = tuple(int(x) for x in args.begin.split("-"))
     end = tuple(int(x) for x in args.end.split("-"))
+
+    if args.mode == "plant":
+        pn = plant_nodes(b)
+        patched = patch_plant(b, pn, begin, end)
+        pj = out / "patched.epjson"
+        pj.write_text(json.dumps(patched))
+        print(f"plant loops: {list(pn)}; running EnergyPlus…")
+        csv_path = run_energyplus(pj, epw, out / "ep")
+        fams = extract_plant(csv_path, pn, b)
+        rules = {}
+        for fam in fams:
+            for rid, r in eligible_rules(families=(fam, "sys"), mapped=PLANT_MAPPED).items():
+                if rid not in rules:
+                    if rid in PLANT_EXCLUDE:
+                        print(f"  excluded {rid}: {PLANT_EXCLUDE[rid]}")
+                    else:
+                        rules[rid] = r
+        print(f"eligible plant rules: {sorted(rules)}")
+        replay = out / "replay"
+        if replay.exists():
+            shutil.rmtree(replay)
+        dirs = []
+        for rid, r in rules.items():
+            fam = rid.split("-")[0].lower()
+            pts = fams.get(fam) or fams.get("chw") or fams.get("hw")
+            if not all(p in pts for p in r["points"]):
+                continue
+            n = len(pts["oat"])
+            wins = plant_gate_windows(PLANT_GATE.get(rid), pts, n)
+            if not wins:
+                print(f"  {rid}: no gated windows this period"); continue
+            d = replay / rid
+            d.mkdir(parents=True)
+            shutil.copy(r["dir"] / "rule.cxf.jsonld", d / "rule.cxf.jsonld")
+            scen = {
+                "name": f"{bdir.name}_{fam}".replace("-", "_").replace(".", "_").lower(),
+                "description": f"Healthy-baseline EnergyPlus week ({bdir.name}); "
+                               "plant-mode replay, gated; any FAIL is a false positive.",
+                "inputs": {p: to_steps(pts[p]) for p in r["points"]},
+                "expect": [{"output": "yFault", "from_s": a, "to_s": b_,
+                            "equals": False} for a, b_ in wins],
+            }
+            (d / "vectors.json").write_text(json.dumps({
+                "schema": "cxf-library/vectors/v1",
+                "clock": {"step_s": STEP_S, "horizon_s": (n - 1) * STEP_S},
+                "scenarios": [scen]}, indent=1))
+            dirs.append(d)
+        rr = subprocess.run(["cargo", "run", "--quiet", "--manifest-path",
+                             str(REPO / "tools/verify/Cargo.toml"), "--", *map(str, dirs)],
+                            capture_output=True, text=True, cwd=REPO)
+        log = rr.stdout + rr.stderr
+        (out / "verify.log").write_text(log)
+        for line in log.splitlines():
+            if re.search(r"replay/|PASS|FAIL", line):
+                print(line if "replay/" not in line else "  " + line.split("replay/")[-1])
+        return
+
+    loops = loop_nodes(b)
     patched = patch(b, loops, begin, end)
     pj = out / "patched.epjson"
     pj.write_text(json.dumps(patched))

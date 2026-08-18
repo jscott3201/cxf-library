@@ -47,6 +47,13 @@ energy_impact:
 emissions:
   scope: "1+2"
   method: DIRECT_EMISSIONS
+validation:
+  - kind: simulation_fpr
+    harness: simharness/v1
+    date: 2026-08-18
+    fleet: "DOE prototype OfficeLarge STD2019 Atlanta (IDF 22.1 auto-transitioned to E+ 25.1), one July + one January week, plant mode"
+    scenarios: 2
+    failures: 0
 verified:
   engine_rev: e2ff2f8
   content_id: "cxf:fnv1a128:d6dd066552fff48e4a1b0ebab1cff9e6"
