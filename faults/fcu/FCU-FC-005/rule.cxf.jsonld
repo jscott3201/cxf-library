@@ -1,0 +1,304 @@
+{
+  "@context": {
+    "S231": "http://data.ashrae.org/S231P#",
+    "base": "urn:cxf-library:fcu-fc-005#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005",
+      "@type": "S231:Block",
+      "S231:label": "fcu_fc_005",
+      "S231:containsBlock": [
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.vlvShut"
+        },
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.rise"
+        },
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.riseBig"
+        },
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.gate"
+        },
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.persist"
+        }
+      ],
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.htg_vlv_cmd"
+        },
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.sat"
+        },
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.rat"
+        }
+      ],
+      "S231:hasOutput": [
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.yFault"
+        },
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.yCmdOk"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.vlvShut",
+      "@type": "urn:cxf-library:fcu-fc-005#Buildings.Controls.OBC.CDL.Reals.LessThreshold",
+      "S231:label": "vlvShut",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.vlvShut.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.vlvShut.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.vlvShut.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.vlvShut.t",
+      "S231:value": {
+        "@value": "1.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.vlvShut.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.vlvShut.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.gate.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.yCmdOk"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.rise",
+      "@type": "urn:cxf-library:fcu-fc-005#Buildings.Controls.OBC.CDL.Reals.Subtract",
+      "S231:label": "rise",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.rise.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.rise.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.rise.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.rise.u1",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.rise.u2",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.rise.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.riseBig.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.riseBig",
+      "@type": "urn:cxf-library:fcu-fc-005#Buildings.Controls.OBC.CDL.Reals.GreaterThreshold",
+      "S231:label": "riseBig",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.riseBig.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.riseBig.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.riseBig.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.riseBig.t",
+      "S231:value": {
+        "@value": "3.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.riseBig.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.riseBig.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.gate.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.gate",
+      "@type": "urn:cxf-library:fcu-fc-005#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "gate",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.gate.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.gate.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.gate.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.gate.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.gate.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.gate.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.persist.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.persist",
+      "@type": "urn:cxf-library:fcu-fc-005#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "persist",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.persist.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.persist.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.persist.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.persist.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.persist.delayTime",
+      "S231:value": {
+        "@value": "1800.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.persist.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.persist.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.persist.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.yFault"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.htg_vlv_cmd",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.vlvShut.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.sat",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.rise.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.rat",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.rise.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.yFault",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fcu-fc-005#fcu_fc_005.yCmdOk",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    }
+  ]
+}

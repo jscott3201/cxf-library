@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1230 400" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <rect x="12" y="60" width="115" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="69.5" y="79" text-anchor="middle" fill="#1e3a8a">htg_vlv_cmd</text>
+  <rect x="12" y="250" width="52" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="38" y="269" text-anchor="middle" fill="#1e3a8a">sat</text>
+  <rect x="12" y="320" width="52" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="38" y="339" text-anchor="middle" fill="#1e3a8a">rat</text>
+
+  <!-- commanded-closed test -->
+  <rect x="230" y="46" width="221" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="340.5" y="68" text-anchor="middle" fill="#24292f" font-weight="bold">vlvShut</text>
+  <text x="340.5" y="86" text-anchor="middle" fill="#57606a" font-size="11">Reals.LessThreshold · t = 1 %</text>
+
+  <!-- leaving minus entering -->
+  <rect x="230" y="256" width="121" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="290.5" y="278" text-anchor="middle" fill="#24292f" font-weight="bold">rise</text>
+  <text x="290.5" y="296" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="430" y="256" width="247" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="553.5" y="278" text-anchor="middle" fill="#24292f" font-weight="bold">riseBig</text>
+  <text x="553.5" y="296" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 3 °C</text>
+
+  <!-- gate + persistence -->
+  <rect x="760" y="150" width="101" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="810.5" y="172" text-anchor="middle" fill="#24292f" font-weight="bold">gate</text>
+  <text x="810.5" y="190" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="910" y="150" width="148" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="984" y="172" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="984" y="190" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 1800 s</text>
+
+  <!-- boundary outputs -->
+  <rect x="1110" y="164" width="75" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1147.5" y="183" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="560" y="60" width="75" height="30" rx="15" fill="#fef3c7" stroke="#d97706"/>
+  <text x="597.5" y="79" text-anchor="middle" fill="#78350f">yCmdOk</text>
+
+  <!-- fan-out trunk -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none">
+    <path d="M 451 75 H 500"/>
+  </g>
+  <circle cx="500" cy="75" r="3" fill="#7d8590"/>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 127 75 H 226"/>
+    <path d="M 500 75 H 556"/>
+    <path d="M 500 75 V 165 H 756"/>
+    <path d="M 64 265 H 190 V 271 H 226"/>
+    <path d="M 64 335 H 200 V 299 H 226"/>
+    <path d="M 351 285 H 426"/>
+    <path d="M 677 285 H 700 V 193 H 756"/>
+    <path d="M 861 179 H 906"/>
+    <path d="M 1058 179 H 1106"/>
+  </g>
+
+  <!-- annotations -->
+  <text x="135" y="62" fill="#7d8590" font-size="10">Real</text>
+  <text x="72" y="252" fill="#7d8590" font-size="10">Real</text>
+  <text x="508" y="66" fill="#7d8590" font-size="10">Bool</text>
+  <text x="766" y="160" fill="#7d8590" font-size="9">u1</text>
+  <text x="766" y="204" fill="#7d8590" font-size="9">u2</text>
+  <text x="236" y="266" fill="#7d8590" font-size="9">u1</text>
+  <text x="236" y="310" fill="#7d8590" font-size="9">u2</text>
+  <text x="342" y="246" fill="#7d8590" font-size="11">sat − rat</text>
+  <text x="560" y="112" fill="#7d8590" font-size="11">false ⇒ NO_EVAL</text>
+</svg>

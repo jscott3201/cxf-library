@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1276 340" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <rect x="14" y="209" width="79" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="53.5" y="228" text-anchor="middle" fill="#1e3a8a">sat_sp</text>
+  <rect x="14" y="261" width="55" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="41.7" y="280" text-anchor="middle" fill="#1e3a8a">sat</text>
+  <rect x="14" y="81" width="118" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="73.0" y="100" text-anchor="middle" fill="#1e3a8a">htg_vlv_cmd</text>
+  <rect x="200" y="221" width="125" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="262.4" y="243" text-anchor="middle" fill="#24292f" font-weight="bold">spGap</text>
+  <text x="262.4" y="261" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="373" y="221" width="317" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="531.4" y="243" text-anchor="middle" fill="#24292f" font-weight="bold">spMiss</text>
+  <text x="531.4" y="261" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold &#183; t = 1 &#176;C</text>
+  <rect x="200" y="67" width="284" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="341.8" y="89" text-anchor="middle" fill="#24292f" font-weight="bold">htgFull</text>
+  <text x="341.8" y="107" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold &#183; t = 99 %</text>
+  <rect x="798" y="221" width="105" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="850.4" y="243" text-anchor="middle" fill="#24292f" font-weight="bold">both</text>
+  <text x="850.4" y="261" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="951" y="221" width="184" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1043.2" y="243" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1043.2" y="261" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay &#183; 1800 s</text>
+  <rect x="1183" y="235" width="79" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1222.5" y="254" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1123" y="81" width="110" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1178.1" y="100" text-anchor="middle" fill="#7f1d1d">yHtgFullOk</text>
+
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 93 224 H 176 V 238 H 196"/>
+    <path d="M 69 276 H 176 V 262 H 196"/>
+    <path d="M 325 250 H 369"/>
+    <path d="M 132 96 H 196"/>
+    <path d="M 690 250 H 714 V 238 H 794"/>
+    <path d="M 484 96 H 1119"/>
+    <path d="M 750 96 V 262 H 794"/>
+    <path d="M 903 250 H 947"/>
+    <path d="M 1135 250 H 1179"/>
+  </g>
+  <circle cx="750" cy="96" r="3" fill="#7d8590"/>
+  <text x="180" y="206" fill="#7d8590" font-size="9">u1</text>
+  <text x="180" y="282" fill="#7d8590" font-size="9">u2</text>
+  <text x="774" y="234" fill="#7d8590" font-size="9">u1</text>
+  <text x="774" y="274" fill="#7d8590" font-size="9">u2</text>
+  <text x="200" y="304" fill="#7d8590" font-size="11">sat_sp &#8722; sat, so the threshold parameter stays positive</text>
+  <text x="200" y="62" fill="#7d8590" font-size="11">evaluability signal: the heating coil is out of capacity</text>
+  <text x="951" y="210" fill="#7d8590" font-size="11">30 min of sustained shortfall</text>
+</svg>

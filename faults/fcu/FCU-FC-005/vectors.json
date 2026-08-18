@@ -1,0 +1,450 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 5400
+  },
+  "scenarios": [
+    {
+      "name": "healthy_unit_shows_fan_heat_only",
+      "description": "The pin this rule exists to keep clear. Valve commanded shut, and the air still leaves the unit 1.0 \u00b0C warmer than it entered because the fan sits in the airstream between the two sensors. Every healthy FCU in the fleet reads like this in OS#2; inactive_coil_threshold carries the fan-heat term precisely so it stays quiet.",
+      "inputs": {
+        "htg_vlv_cmd": 0.0,
+        "rat": 22.0,
+        "sat": 23.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "rise_just_below_threshold",
+      "description": "Threshold edge from inside: sat \u2212 rat = 2.9 \u00b0C, one tenth under the allowance. Fan heat plus a pair of zone-grade sensors leaning the wrong way lands here, which is exactly what the allowance is sized to absorb.",
+      "inputs": {
+        "htg_vlv_cmd": 0.0,
+        "rat": 22.0,
+        "sat": 24.9
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "rise_exactly_at_threshold",
+      "description": "Threshold edge, on the line: sat \u2212 rat = 3.0 \u00b0C exactly. `riseBig` is a strict `>` because CDL Reals has no GreaterEqual, so a rise sitting precisely on inactive_coil_threshold reads healthy. The reference writes `>` here too, so this side agrees with it (see Deviations).",
+      "inputs": {
+        "htg_vlv_cmd": 0.0,
+        "rat": 22.0,
+        "sat": 25.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "rise_just_over_threshold",
+      "description": "Threshold edge from outside: 3.1 \u00b0C clears the strict comparison on the first tick, and with delayOnInit the alarm lands exactly one alarm_delay later, at t = 1800 s. Both sides of the delay edge are pinned at adjacent ticks.",
+      "inputs": {
+        "htg_vlv_cmd": 0.0,
+        "rat": 22.0,
+        "sat": 25.1
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 5400,
+          "equals": true
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "cmd_just_below_closed_threshold",
+      "description": "Command edge from inside: 0.9% is below cmd_closed_threshold, so the valve counts as commanded shut and a 6 \u00b0C rise is a leak. This is the case a host sees when its BAS writes a small non-zero null value rather than a clean 0%.",
+      "inputs": {
+        "htg_vlv_cmd": 0.9,
+        "rat": 22.0,
+        "sat": 28.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 5400,
+          "equals": true
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "cmd_exactly_at_closed_threshold",
+      "description": "Command edge, on the line: htg_vlv_cmd = 1.0% exactly. `vlvShut` is a strict `<`, so the valve does not count as shut and the same 6 \u00b0C rise raises nothing. yCmdOk goes false, which is the rule telling the host this is NO_EVAL rather than a clean bill of health.",
+      "inputs": {
+        "htg_vlv_cmd": 1.0,
+        "rat": 22.0,
+        "sat": 28.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "cmd_just_above_closed_threshold",
+      "description": "Command edge from outside, pinning the third side: 1.1% with the same 6 \u00b0C rise. A valve cracked open at 1.1% is modulating, not shut, and the coil is allowed to be doing something.",
+      "inputs": {
+        "htg_vlv_cmd": 1.1,
+        "rat": 22.0,
+        "sat": 28.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "valve_open_and_heating_normally",
+      "description": "The unit doing its job: valve at 60% and a 13 \u00b0C rise across the coil. This is the largest rise in the vector set and it is not a fault \u2014 the command is what separates parasitic heat from heat somebody asked for.",
+      "inputs": {
+        "htg_vlv_cmd": 60.0,
+        "rat": 22.0,
+        "sat": 35.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "gravity_circulation_overnight",
+      "description": "Diagnosis 3, and the playbook's multi-story warning: with the pump running and the valve shut, hot water thermosiphons up through a vertically piped coil and the discharge sits 5 \u00b0C above the return all night. Nothing about the valve is broken \u2014 a check valve is the fix \u2014 and this rule cannot tell that apart from a worn seat, which is why both are on the diagnosis list.",
+      "inputs": {
+        "htg_vlv_cmd": 0.0,
+        "rat": 21.0,
+        "sat": 26.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 5400,
+          "equals": true
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "leak_starts_mid_run",
+      "description": "The rising edge is mid-run rather than at load: the unit runs on fan heat alone until t = 600 s, then the seat lets go and the rise jumps to 6 \u00b0C. TrueDelay measures from that edge, so the alarm lands at 600 + 1800 = 2400 s exactly.",
+      "inputs": {
+        "htg_vlv_cmd": 0.0,
+        "rat": 22.0,
+        "sat": [
+          {
+            "t": 0,
+            "value": 23.0
+          },
+          {
+            "t": 600,
+            "value": 28.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2340,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 2400,
+          "to_s": 5400,
+          "equals": true
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "transient_clears_before_alarm_delay",
+      "description": "Residual heat, not a leak: hot water standing in a just-closed coil gives up a 6 \u00b0C rise for 1200 s and then the unit settles back to fan heat. Anything shorter than alarm_delay never reaches the operator, which is most of what the 30 minutes buys.",
+      "inputs": {
+        "htg_vlv_cmd": 0.0,
+        "rat": 22.0,
+        "sat": [
+          {
+            "t": 0,
+            "value": 28.0
+          },
+          {
+            "t": 1200,
+            "value": 23.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "fault_clears_on_recovery",
+      "description": "A sustained 6 \u00b0C rise alarms at 1800 s; the coil is isolated at t = 3000 s and the rise falls back to fan heat. TrueDelay has no off-delay, so yFault drops on that same tick.",
+      "inputs": {
+        "htg_vlv_cmd": 0.0,
+        "rat": 22.0,
+        "sat": [
+          {
+            "t": 0,
+            "value": 28.0
+          },
+          {
+            "t": 3000,
+            "value": 23.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 2940,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 3000,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "zone_calls_for_heat_before_alarm",
+      "description": "Recovery through the command term instead of the temperature term: the rise never changes, but at t = 1200 s the zone calls and the valve is driven to 55%. The conjunction releases, the timer is discarded, and yCmdOk marks the rest of the run NO_EVAL. A leak that only ever shows itself between calls for heat is invisible to this rule \u2014 see Deviations.",
+      "inputs": {
+        "rat": 22.0,
+        "sat": 28.0,
+        "htg_vlv_cmd": [
+          {
+            "t": 0,
+            "value": 0.0
+          },
+          {
+            "t": 1200,
+            "value": 55.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 1200,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "oscillating_rise_never_alarms",
+      "description": "The known miss, pinned so it cannot change silently: the rise swings between 6 \u00b0C and 1 \u00b0C on a 20-minute period, so its mean is well outside the allowance while no single episode reaches alarm_delay. A rolling average would report this; persistence restarts on every compliant tick and stays silent (see Deviations).",
+      "inputs": {
+        "htg_vlv_cmd": 0.0,
+        "rat": 22.0,
+        "sat": [
+          {
+            "t": 0,
+            "value": 28.0
+          },
+          {
+            "t": 600,
+            "value": 23.0
+          },
+          {
+            "t": 1200,
+            "value": 28.0
+          },
+          {
+            "t": 1800,
+            "value": 23.0
+          },
+          {
+            "t": 2400,
+            "value": 28.0
+          },
+          {
+            "t": 3000,
+            "value": 23.0
+          },
+          {
+            "t": 3600,
+            "value": 28.0
+          },
+          {
+            "t": 4200,
+            "value": 23.0
+          },
+          {
+            "t": 4800,
+            "value": 28.0
+          },
+          {
+            "t": 5400,
+            "value": 23.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}

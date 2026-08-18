@@ -1,0 +1,478 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 5400
+  },
+  "scenarios": [
+    {
+      "name": "cooling_loop_modulating_on_setpoint",
+      "description": "Ordinary zone cooling: the discharge sits on its 13 \u00b0C setpoint with the chilled-water valve at 55%. The loop has reserve in both directions, which is what a healthy fan coil looks like, and yClgFullOk is false because a loop that has not saturated is one this rule has no verdict about",
+      "inputs": {
+        "sat": 13.0,
+        "sat_sp": 13.0,
+        "clg_vlv_cmd": 55.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yClgFullOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "valve_wide_open_holding_setpoint",
+      "description": "The valve is at 100% and the discharge is 0.5 \u00b0C high \u2014 a coil sized close to its design point on a design day. Half a degree is inside \u03b5_sat, so this is a unit at capacity rather than a unit that has lost capacity, and here the silence is a health claim: yClgFullOk is true",
+      "inputs": {
+        "sat": 13.5,
+        "sat_sp": 13.0,
+        "clg_vlv_cmd": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yClgFullOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "sat_error_just_below_threshold",
+      "description": "One tenth inside the allowance: sat \u2212 sat_sp = 0.9 \u00b0C at a saturated valve. Silent, and the closest healthy case to the boundary",
+      "inputs": {
+        "sat": 13.9,
+        "sat_sp": 13.0,
+        "clg_vlv_cmd": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yClgFullOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "sat_error_exactly_at_threshold",
+      "description": "Threshold edge: sat \u2212 sat_sp = 1.0 \u00b0C exactly, the whole \u03b5_sat allowance, with the valve at 100%. `spMiss` is a strict `>`, so an error sitting precisely on the sensor allowance reads healthy",
+      "inputs": {
+        "sat": 14.0,
+        "sat_sp": 13.0,
+        "clg_vlv_cmd": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yClgFullOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "sat_error_just_over_threshold",
+      "description": "Threshold edge, other side: 1.1 \u00b0C above setpoint at a 100% valve clears the strict comparison on the first tick, and with delayOnInit the alarm asserts at exactly one alarm_delay (1800 s)",
+      "inputs": {
+        "sat": 14.1,
+        "sat_sp": 13.0,
+        "clg_vlv_cmd": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 5400,
+          "equals": true
+        },
+        {
+          "output": "yClgFullOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "valve_just_below_full_threshold",
+      "description": "Command edge: a 5 \u00b0C setpoint miss with the valve at 98.9%. Below cc_full_threshold the loop still has something to ask for, so yClgFullOk is false and this rule has no verdict \u2014 the miss is real and belongs to a loop-response rule, not to this one",
+      "inputs": {
+        "sat": 18.0,
+        "sat_sp": 13.0,
+        "clg_vlv_cmd": 98.9
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yClgFullOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "valve_exactly_at_full_threshold",
+      "description": "Command edge: the same 5 \u00b0C miss with the valve parked on exactly 99.0%. `clgFull` is a strict `>`, so a command sitting on cc_full_threshold does not count as saturated and the rule stays silent where the reference's `\u2265 99%` would report",
+      "inputs": {
+        "sat": 18.0,
+        "sat_sp": 13.0,
+        "clg_vlv_cmd": 99.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yClgFullOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "valve_just_over_full_threshold",
+      "description": "Command edge, third side: the same 5 \u00b0C miss at 99.5% clears the strict comparison, yClgFullOk goes true, and the alarm lands after alarm_delay",
+      "inputs": {
+        "sat": 18.0,
+        "sat_sp": 13.0,
+        "clg_vlv_cmd": 99.5
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 5400,
+          "equals": true
+        },
+        {
+          "output": "yClgFullOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "coil_saturated_and_missing_setpoint",
+      "description": "The motivating case: the valve is wide open and the discharge is stuck 5 \u00b0C above setpoint. The loop has asked for everything it has and the air has not moved \u2014 chilled water too warm, a fouled coil, a valve that reports open and is not, or a stalled fan leaving stagnant room air on the sensor",
+      "inputs": {
+        "sat": 18.0,
+        "sat_sp": 13.0,
+        "clg_vlv_cmd": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 5400,
+          "equals": true
+        },
+        {
+          "output": "yClgFullOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "miss_opens_mid_run",
+      "description": "A rising edge mid-run rather than at load: the unit holds setpoint at a saturated valve until the chilled-water riser warms at t = 600 s, after which the discharge sits 5 \u00b0C high. The alarm lands at exactly 600 + 1800 = 2400 s",
+      "inputs": {
+        "sat": [
+          {
+            "t": 0,
+            "value": 13.0
+          },
+          {
+            "t": 600,
+            "value": 18.0
+          }
+        ],
+        "sat_sp": 13.0,
+        "clg_vlv_cmd": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2340,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 2400,
+          "to_s": 5400,
+          "equals": true
+        },
+        {
+          "output": "yClgFullOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "morning_pulldown_clears_before_delay",
+      "description": "Transient: the valve pins at 100% and the discharge runs 5 \u00b0C high while the coil pulls a hotel room down after an unoccupied night, reaching setpoint at t = 1200 s. A pulldown is shorter than alarm_delay, so nothing alarms",
+      "inputs": {
+        "sat": [
+          {
+            "t": 0,
+            "value": 18.0
+          },
+          {
+            "t": 1200,
+            "value": 13.2
+          }
+        ],
+        "sat_sp": 13.0,
+        "clg_vlv_cmd": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yClgFullOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "fault_clears_when_chilled_water_returns",
+      "description": "A saturated valve missing setpoint alarms at 1800 s; the riser comes back at t = 3000 s and the discharge reaches setpoint. `TrueDelay` has no off-delay, so the alarm drops on that tick",
+      "inputs": {
+        "sat": [
+          {
+            "t": 0,
+            "value": 18.0
+          },
+          {
+            "t": 3000,
+            "value": 13.0
+          }
+        ],
+        "sat_sp": 13.0,
+        "clg_vlv_cmd": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 2940,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 3000,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yClgFullOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "valve_backs_off_before_delay",
+      "description": "Recovery through the command term: the discharge stays 5 \u00b0C high but the valve modulates back to 80% at t = 1200 s. yClgFullOk goes false, persistence restarts, and no alarm follows \u2014 a loop with reserve left is a loop still working, and the saturation half is what makes the setpoint miss evidence of a defect",
+      "inputs": {
+        "sat": 18.0,
+        "sat_sp": 13.0,
+        "clg_vlv_cmd": [
+          {
+            "t": 0,
+            "value": 100.0
+          },
+          {
+            "t": 1200,
+            "value": 80.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yClgFullOk",
+          "from_s": 0,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yClgFullOk",
+          "from_s": 1200,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "setpoint_reset_upward_clears_the_miss",
+      "description": "The setpoint moves, not the air: the discharge holds 18 \u00b0C at a saturated valve while the sequence resets sat_sp from 13 \u00b0C to 17.5 \u00b0C at t = 1200 s. The remaining 0.5 \u00b0C gap is inside \u03b5_sat, so the rule falls silent \u2014 the comparison is against the active setpoint, which is why the preconditions insist on the one the sequence is actually holding",
+      "inputs": {
+        "sat": 18.0,
+        "sat_sp": [
+          {
+            "t": 0,
+            "value": 13.0
+          },
+          {
+            "t": 1200,
+            "value": 17.5
+          }
+        ],
+        "clg_vlv_cmd": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yClgFullOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "hunting_loop_never_alarms",
+      "description": "A hunting cooling loop swings the discharge between 18 \u00b0C and 12.8 \u00b0C on a 20-minute period with the valve pinned open. Its mean sits well above setpoint and a 5-minute rolling average would report the fault, but persistence restarts on every compliant tick, so this rule stays silent \u2014 the limit of substituting TrueDelay for averaging (see Deviations)",
+      "inputs": {
+        "sat": [
+          {
+            "t": 0,
+            "value": 18.0
+          },
+          {
+            "t": 600,
+            "value": 12.8
+          },
+          {
+            "t": 1200,
+            "value": 18.0
+          },
+          {
+            "t": 1800,
+            "value": 12.8
+          },
+          {
+            "t": 2400,
+            "value": 18.0
+          },
+          {
+            "t": 3000,
+            "value": 12.8
+          },
+          {
+            "t": 3600,
+            "value": 18.0
+          },
+          {
+            "t": 4200,
+            "value": 12.8
+          },
+          {
+            "t": 4800,
+            "value": 18.0
+          }
+        ],
+        "sat_sp": 13.0,
+        "clg_vlv_cmd": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yClgFullOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}

@@ -178,10 +178,12 @@ basis: N/A.
   quietly — a mis-set `count_scale` produces a plausible-looking number.
 - **Minimum tick interval, from the same block.** Each `MovingAverage` instance
   keeps a fixed 64-checkpoint ring and silently drops the oldest in-window
-  sample past that (one warning per instance), so the window must not hold more
-  than 64 ticks: `dt ≥ count_window/64` = 3600/64 = **56.25 s**. Combined with
-  the scale rule, a legal deployment has `dt ≥ 56.25 s` and
-  `count_scale = 3600/dt ≤ 64`. At the default 300 s tick the window holds 12
+  sample past that (one warning per instance). A window spanning n ticks
+  retains n + 1 checkpoints (one sits at or before the trailing edge), so the
+  window may span at most 63 ticks: `dt ≥ count_window/63` = 3600/63 =
+  **57.15 s** (an earlier revision of this card said 56.25 s, dividing by 64).
+  Combined with the scale rule, a legal deployment has `dt ≥ 57.15 s` and
+  `count_scale = 3600/dt ≤ 63`. At the default 300 s tick the window holds 12
   samples, well inside the ring.
 - **Startup artifact (a): a spurious first-tick pulse, which costs nothing
   here.** `Integers.Change` compares against `pre_u_start` on the first tick, so

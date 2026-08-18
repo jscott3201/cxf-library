@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2453 320" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <rect x="14" y="215" width="149" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="88.7" y="234" text-anchor="middle" fill="#1e3a8a">operating_state</text>
+  <rect x="209" y="201" width="131" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="274.7" y="223" text-anchor="middle" fill="#24292f" font-weight="bold">chg</text>
+  <text x="274.7" y="241" text-anchor="middle" fill="#57606a" font-size="11">Integers.Change</text>
+  <rect x="386" y="201" width="217" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="494.7" y="223" text-anchor="middle" fill="#24292f" font-weight="bold">pulseInt</text>
+  <text x="494.7" y="241" text-anchor="middle" fill="#57606a" font-size="11">Conversions.BooleanToInteger</text>
+  <rect x="649" y="201" width="198" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="747.8" y="223" text-anchor="middle" fill="#24292f" font-weight="bold">pulseReal</text>
+  <text x="747.8" y="241" text-anchor="middle" fill="#57606a" font-size="11">Conversions.IntegerToReal</text>
+  <rect x="893" y="201" width="304" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1044.8" y="223" text-anchor="middle" fill="#24292f" font-weight="bold">rate</text>
+  <text x="1044.8" y="241" text-anchor="middle" fill="#57606a" font-size="11">Reals.MovingAverage &#183; delta = 3600 s</text>
+  <rect x="1243" y="201" width="290" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1388.1" y="223" text-anchor="middle" fill="#24292f" font-weight="bold">count</text>
+  <text x="1388.1" y="241" text-anchor="middle" fill="#57606a" font-size="11">Reals.MultiplyByParameter &#183; k = 20</text>
+  <rect x="1579" y="201" width="284" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1720.8" y="223" text-anchor="middle" fill="#24292f" font-weight="bold">cntHigh</text>
+  <text x="1720.8" y="241" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold &#183; t = 7 /h</text>
+  <rect x="1979" y="201" width="105" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="2031.4" y="223" text-anchor="middle" fill="#24292f" font-weight="bold">gate</text>
+  <text x="2031.4" y="241" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="2130" y="201" width="184" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="2222.2" y="223" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="2222.2" y="241" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay &#183; 3600 s</text>
+  <rect x="2360" y="215" width="79" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="2399.5" y="234" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="893" y="63" width="297" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1041.4" y="85" text-anchor="middle" fill="#24292f" font-weight="bold">alwaysOn</text>
+  <text x="1041.4" y="103" text-anchor="middle" fill="#57606a" font-size="11">Logical.Sources.Constant &#183; k = true</text>
+  <rect x="1236" y="63" width="184" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1328.2" y="85" text-anchor="middle" fill="#24292f" font-weight="bold">windowFull</text>
+  <text x="1328.2" y="103" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay &#183; 3600 s</text>
+  <rect x="2330" y="77" width="118" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="2389.0" y="96" text-anchor="middle" fill="#7f1d1d">yWindowFull</text>
+
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 163 230 H 205"/>
+    <path d="M 340 230 H 382"/>
+    <path d="M 603 230 H 645"/>
+    <path d="M 847 230 H 889"/>
+    <path d="M 1197 230 H 1239"/>
+    <path d="M 1533 230 H 1575"/>
+    <path d="M 1863 230 H 1883 V 218 H 1975"/>
+    <path d="M 2084 230 H 2126"/>
+    <path d="M 2314 230 H 2356"/>
+    <path d="M 1190 92 H 1232"/>
+    <path d="M 1420 92 H 2326"/>
+    <path d="M 1931 92 V 242 H 1975"/>
+  </g>
+  <circle cx="1931" cy="92" r="3" fill="#7d8590"/>
+  <text x="1955" y="214" fill="#7d8590" font-size="9">u1</text>
+  <text x="1955" y="254" fill="#7d8590" font-size="9">u2</text>
+  <text x="893" y="282" fill="#7d8590" font-size="11">one-tick pulse per state change, integrated over the trailing hour</text>
+  <text x="893" y="58" fill="#7d8590" font-size="11">evaluability signal: the trailing window has filled (t &#8805; count_window)</text>
+  <text x="2130" y="190" fill="#7d8590" font-size="11">60 min of sustained excess</text>
+</svg>
