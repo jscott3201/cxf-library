@@ -98,6 +98,25 @@ non-OAT rules stay correctly silent. Empirical demonstration of the CLU-09
 biased-OAT cascade; recorded as `simulation_tpr` validation blocks
 (failures = missed detections).
 
+## TPR: physics-level FaultModel campaigns (`--faultmodel kind=delta`)
+
+Patches EnergyPlus `FaultModel:*` objects into the epJSON before
+simulation, so the CONTROLLER acts on the faulted sensor while FDD replays
+true node values — the complement of the `--bias` campaign (where FDD's
+own input lies). First campaign, OAT sensor offset +/-4 degC on all OA
+controllers (OfficeMedium-4004, July): +4 (economizer locks out early) is
+caught by AHU-FC-051 (3/3 loops); -4 (economizes past true changeover) by
+AHU-FC-068 (3/3, one loop in ~5 min); each direction's mirror rule and the
+entire envelope family stay correctly silent, since every replayed sensor
+is physically consistent. Where FDD and the controller share a sensor,
+real deployments see BOTH signatures — the input-bias envelope detections
+and the behavioral detections — which is what the cluster grouping is for.
+
+The OS gating map is now parsed from each card's `operating_states`
+frontmatter (`parse_operating_states`; ranges, comma lists, "all");
+unparseable prose is a hard error requiring an explicit `OS_OVERRIDE`
+entry — never a silent all-states default.
+
 ## Plant mode (DOE prototypes)
 
 `--mode plant` maps CHW/HW plant loops instead of air loops: loop

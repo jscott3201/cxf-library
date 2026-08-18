@@ -76,6 +76,13 @@ validation:
   - kind: simulation_tpr
     harness: simharness/v1
     date: 2026-08-18
+    fleet: "TPR physics-level: FaultModel:TemperatureSensorOffset:OutdoorAir +/-4 degC patched into the epJSON (controller acts on the biased sensor; FDD replays true node values), B2B OfficeMedium-4004 July week, 3 loops; failures = missed detections"
+    scenarios: 3
+    failures: 0
+    notes: "-4 degC controller offset (economizes past true changeover): detected 3/3 loops, one within ~5 min; correctly silent at +4. Complement of the input-bias campaign"
+  - kind: simulation_tpr
+    harness: simharness/v1
+    date: 2026-08-18
     fleet: "TPR: +/-3 degC OAT bias injected into replay inputs (faulted-sensor-as-seen-by-FDD), B2B OfficeMedium-4004 July week, 3 VAV loops; failures = missed detections; baseline-confounded rules excluded from attribution"
     scenarios: 3
     failures: 0
