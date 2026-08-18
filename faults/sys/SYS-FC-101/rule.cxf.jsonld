@@ -1,0 +1,345 @@
+{
+  "@context": {
+    "S231": "http://data.ashrae.org/S231P#",
+    "base": "urn:cxf-library:sys-fc-101#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101",
+      "@type": "S231:Block",
+      "S231:label": "sys_fc_101",
+      "S231:containsBlock": [
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.prev"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.step"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.stepAbs"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.tooFast"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.always"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.historyOk"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.gate"
+        }
+      ],
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.sensor_value"
+        }
+      ],
+      "S231:hasOutput": [
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.yFault"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.yHistoryOk"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.prev",
+      "@type": "urn:cxf-library:sys-fc-101#Buildings.Controls.OBC.CDL.Discrete.UnitDelay",
+      "S231:label": "prev",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.prev.samplePeriod"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.prev.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.prev.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.prev.samplePeriod",
+      "S231:value": {
+        "@value": "60.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.prev.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.prev.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.step.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.step",
+      "@type": "urn:cxf-library:sys-fc-101#Buildings.Controls.OBC.CDL.Reals.Subtract",
+      "S231:label": "step",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.step.u1"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.step.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.step.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.step.u1",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.step.u2",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.step.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.stepAbs.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.stepAbs",
+      "@type": "urn:cxf-library:sys-fc-101#Buildings.Controls.OBC.CDL.Reals.Abs",
+      "S231:label": "stepAbs",
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.stepAbs.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.stepAbs.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.stepAbs.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.stepAbs.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.tooFast.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.tooFast",
+      "@type": "urn:cxf-library:sys-fc-101#Buildings.Controls.OBC.CDL.Reals.GreaterThreshold",
+      "S231:label": "tooFast",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.tooFast.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.tooFast.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.tooFast.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.tooFast.t",
+      "S231:value": {
+        "@value": "10.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.tooFast.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.tooFast.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.gate.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.always",
+      "@type": "urn:cxf-library:sys-fc-101#Buildings.Controls.OBC.CDL.Logical.Sources.Constant",
+      "S231:label": "always",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.always.k"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.always.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.always.k",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.always.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.historyOk.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.historyOk",
+      "@type": "urn:cxf-library:sys-fc-101#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "historyOk",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.historyOk.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.historyOk.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.historyOk.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.historyOk.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.historyOk.delayTime",
+      "S231:value": {
+        "@value": "120.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.historyOk.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.historyOk.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.historyOk.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.gate.u2"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.yHistoryOk"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.gate",
+      "@type": "urn:cxf-library:sys-fc-101#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "gate",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.gate.u1"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.gate.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.gate.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.gate.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.gate.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.gate.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.yFault"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.sensor_value",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.prev.u"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.step.u1"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.yFault",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-101#sys_fc_101.yHistoryOk",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    }
+  ]
+}

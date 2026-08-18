@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1700 400" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs (ROLE points) -->
+  <rect x="12" y="80" width="130" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="77" y="99" text-anchor="middle" fill="#1e3a8a">sensor_value</text>
+  <rect x="12" y="300" width="130" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="77" y="319" text-anchor="middle" fill="#1e3a8a">equip_active</text>
+
+  <!-- stillness chain -->
+  <rect x="180" y="40" width="160" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="260" y="60" text-anchor="middle" fill="#24292f" font-weight="bold">sensRef</text>
+  <text x="260" y="78" text-anchor="middle" fill="#57606a" font-size="11">Sampler · 2 h</text>
+
+  <rect x="400" y="80" width="130" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="465" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">dev</text>
+  <text x="465" y="118" text-anchor="middle" fill="#57606a" font-size="11">Subtract</text>
+
+  <rect x="570" y="80" width="100" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="620" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">devAbs</text>
+  <text x="620" y="118" text-anchor="middle" fill="#57606a" font-size="11">Abs</text>
+
+  <rect x="710" y="80" width="200" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="810" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">stillBand</text>
+  <text x="810" y="118" text-anchor="middle" fill="#57606a" font-size="11">LessThreshold · 0.25</text>
+
+  <rect x="950" y="80" width="180" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1040" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">stillAndActive</text>
+  <text x="1040" y="118" text-anchor="middle" fill="#57606a" font-size="11">And</text>
+
+  <rect x="1170" y="80" width="180" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1260" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">stillHeld</text>
+  <text x="1260" y="118" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 2 h</text>
+
+  <rect x="1390" y="80" width="180" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1480" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1480" y="118" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 15 min</text>
+
+  <!-- evaluability branch -->
+  <rect x="950" y="290" width="180" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1040" y="310" text-anchor="middle" fill="#24292f" font-weight="bold">windowOk</text>
+  <text x="1040" y="328" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 2 h</text>
+
+  <!-- boundary outputs -->
+  <rect x="1610" y="90" width="80" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1650" y="109" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1180" y="300" width="130" height="30" rx="15" fill="#fef3c7" stroke="#d97706"/>
+  <text x="1245" y="319" text-anchor="middle" fill="#78350f">yWindowOk</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 142 95 H 160 V 65 H 178"/>
+    <path d="M 142 95 H 380 V 93 H 398"/>
+    <path d="M 340 65 H 380 V 117 H 398"/>
+    <path d="M 530 105 H 568"/>
+    <path d="M 670 105 H 708"/>
+    <path d="M 910 105 H 925 V 93 H 948"/>
+
+    <path d="M 142 315 H 935 V 117 H 948"/>
+    <path d="M 142 315 H 948"/>
+
+    <path d="M 1130 105 H 1168"/>
+    <path d="M 1350 105 H 1388"/>
+    <path d="M 1570 105 H 1608"/>
+    <path d="M 1130 315 H 1178"/>
+  </g>
+
+  <!-- annotation -->
+  <text x="1180" y="362" fill="#7d8590" font-size="11">false ⇒ NO_EVAL</text>
+</svg>

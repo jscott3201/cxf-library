@@ -1,0 +1,69 @@
+{
+  "schema": "cxf-library/points/v1",
+  "equipment": "sys",
+  "namespaces": {
+    "brick": {
+      "iri": "https://brickschema.org/schema/Brick#",
+      "verified_version": "1.4.4"
+    },
+    "s223": {
+      "iri": "http://data.ashrae.org/standard223#",
+      "verified_version": "v1.0.0-2026"
+    },
+    "quantitykind": {
+      "iri": "http://qudt.org/vocab/quantitykind/",
+      "verified_version": "QUDT 3.1.4"
+    },
+    "unit": {
+      "iri": "http://qudt.org/vocab/unit/",
+      "verified_version": "QUDT 3.1.4"
+    }
+  },
+  "notes": "System-level / cross-equipment point dictionary. The sensor-health rules (SYS-FC-054/100/101) bind ROLE POINTS, not canonical equipment points — the documented exception to the canonical-name convention (SCHEMA.md points contract; decided 2026-08-17, _research/fc100-sensor-health-design.md §3). The reference's own SYS-FC-054 card does the same ('varies by application'). The host's instance configuration records which real point each role is bound to; that same record drives the adjudicates NO_EVAL fan-out. Role entries carry brick/s223 null — the semantics belong to whatever the role is bound to. Reference ch.16's other rules (SYS-FC-050..053/055..057) will add their own points when that batch opens.",
+  "points": [
+    {
+      "name": "sensor_value",
+      "description": "ROLE: the single sensor under adjudication (flatline/spike rules)",
+      "kind": "real",
+      "unit": "varies",
+      "qudt_unit": null,
+      "brick": null,
+      "s223": null,
+      "provisional": true,
+      "notes": "Role point: bound per instance to any real-valued sensor (temperature, pressure, flow...). Thresholds on the rules that consume it are in the BOUND point's units and MUST be retuned per binding — a 0.1 degC flatline band is nonsense for a Pa sensor. Binding record doubles as the adjudicates target."
+    },
+    {
+      "name": "sensor_value_a",
+      "description": "ROLE: primary sensor of a redundancy pair (SYS-FC-054)",
+      "kind": "real",
+      "unit": "varies",
+      "qudt_unit": null,
+      "brick": null,
+      "s223": null,
+      "provisional": true,
+      "notes": "Role point; the reference's own required-points table for SYS-FC-054 lists sensor_a/sensor_b with 'varies by application'. Pair members must share quantity kind and units at binding."
+    },
+    {
+      "name": "sensor_value_b",
+      "description": "ROLE: reference sensor of a redundancy pair (SYS-FC-054)",
+      "kind": "real",
+      "unit": "varies",
+      "qudt_unit": null,
+      "brick": null,
+      "s223": null,
+      "provisional": true,
+      "notes": "Role point; see sensor_value_a. The pair rule's verdict is `ambiguous` — it cannot name which member drifted."
+    },
+    {
+      "name": "equip_active",
+      "description": "ROLE: owning equipment is running/active (gates flatline evaluation)",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": null,
+      "s223": null,
+      "provisional": true,
+      "notes": "Role point: bound to the owning equipment's run/enable status (sf_status, pump_status, boiler_status...). A flat signal on idle equipment is normal; flatline only accuses the sensor while the process should be moving."
+    }
+  ]
+}

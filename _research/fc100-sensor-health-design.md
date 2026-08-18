@@ -321,6 +321,14 @@ transcribed. Carried into §6.
 
 ## 4. Engine mechanics
 
+> **Correction (2026-08-18, from SYS-FC-101's verification):** the UnitDelay
+> `y_start` seed can survive up to **two** sample periods, not one. The init
+> branch stages the input only at a sample instant, so a rule loaded between
+> instants stages nothing, the next instant promotes seed→seed, and the first
+> real sample appears up to `2 × samplePeriod` after load. The one-period
+> claim below holds only for grid-aligned loads; SYS-FC-101's startup inhibit
+> and vectors are built to the two-period bound.
+
 All three blocks named in the task exist at the pin. Verified in
 `crates/oce-blocks/src/registry/`:
 

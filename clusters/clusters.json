@@ -108,12 +108,14 @@
     {
       "id": "CLU-09",
       "name": "Sensor Integrity Failure",
-      "trigger": "AHU-FC-062",
+      "trigger": "SYS-FC-054",
       "members": [
+        "AHU-FC-062",
         "AHU-FC-002",
         "AHU-FC-003",
-        "SYS-FC-054",
-        "SYS-FC-055"
+        "SYS-FC-055",
+        "SYS-FC-100",
+        "SYS-FC-101"
       ],
       "playbook": "sensor-drift",
       "prevalence": "~15%",

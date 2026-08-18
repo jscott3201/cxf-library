@@ -191,6 +191,14 @@ Target dialect: the open-control engine's composite subset
 
 - `name` is the library-wide canonical identifier (snake_case; suffixes: none =
   measured, `_sp` setpoint, `_cmd` command, `_status` status, `_fbk` feedback).
+- **Role points** (documented exception, `points/sys.points.json` only): the
+  cross-equipment sensor-health rules bind role names (`sensor_value`,
+  `sensor_value_a/b`, `equip_active`) rather than canonical points, because
+  the same graph deploys against many real points. Role entries carry
+  `brick: null, s223: null`; the host's instance configuration records each
+  binding, and that record is also what resolves the rule's `adjudicates`
+  target and drives its NO_EVAL fan-out. The reference's own SYS-FC-054 card
+  uses the same role form ("varies by application").
 - `derived: true` marks host-computed points rather than physical ones — both
   aggregates (a max or fraction across zones) and physical transforms (e.g.
   saturation temperatures from pressure via a refrigerant P-T lookup). The
