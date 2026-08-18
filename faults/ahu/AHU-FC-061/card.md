@@ -61,12 +61,10 @@ skipped. What was a ten-minute diagnostic becomes the building's permanent
 control strategy, invisible to anyone reading the sequence, and it stays that
 way until someone audits the priority arrays. Around 10% of buildings carry at
 least one; they are a standard retro-commissioning finding (PNNL RetuningOpps
-A30, PNNL-27338).
-
-The energy cost is entirely a function of what was overridden — a heating
-valve held at 100% is expensive, a nuisance alarm limit is not — so this rule
-is rated info severity. Its value is that it turns an invisible condition into
-a work order.
+A30, PNNL-27338). The cost is entirely a function of what was overridden — a
+heating valve held at 100% is expensive, a nuisance alarm limit is not — hence
+info severity. The value of the rule is that it turns an invisible condition
+into a work order.
 
 ## Detection Logic
 
@@ -99,40 +97,32 @@ override. An override released and re-applied restarts the full 25 h.
 ## Energy Impact
 
 EXCESS_CONSUMPTION, LOW confidence, QUALITATIVE_ONLY. There is no per-fault
-energy model: the waste depends on which point is overridden and to what
-value, spanning from zero (an override that happens to match what the sequence
-would command) to the full cost of a disabled control loop. Quantify it after
-identifying the point, using the Energy Impact Reference §4.4 framework.
-Prevalence ~10% of buildings (PNNL RetuningOpps A30). No PNNL EEM maps to this
-fault, which is why detection is worth having: the cost is real but nobody
-budgets for it.
+energy model: the waste depends on which point is overridden and to what value,
+spanning from zero (an override matching what the sequence would command) to the
+full cost of a disabled control loop. Quantify it after identifying the point,
+using the Energy Impact Reference §4.4 framework. Prevalence ~10% of buildings
+(PNNL RetuningOpps A30); no PNNL EEM maps to this fault.
 
 ## Emissions Impact
 
 Scope 1 or 2, QUALITATIVE_EMISSIONS, LOW confidence, basis N/A. Which scope
-applies follows the overridden point: an override on a hot-water valve, boiler
-enable, or gas-fired heating stage drives on-site combustion (scope 1), while
-an override on a fan, chiller, pump, or electric-heat command drives purchased
-electricity (scope 2). An override on a setpoint or damper can drive both at
-once. The magnitude range therefore cannot be stated until the point is known.
+applies follows the overridden point: a hot-water valve, boiler enable, or
+gas-fired stage drives on-site combustion (scope 1); a fan, chiller, pump, or
+electric-heat command drives purchased electricity (scope 2); a setpoint or
+damper can drive both. No magnitude range until the point is known.
 
 ## Deviations
 
-- **The derived `override_duration` point is dropped.** The reference logic is
-  `override_active AND override_duration > max_override_duration`, where
-  `override_duration` is a host-computed elapsed time. We measure the duration
-  in-rule with a `TrueDelay` chain and consume only `override_active`. This
-  keeps the rule deployable against a raw BAS flag with no host-side state
-  machine, and it removes a derived point whose semantics (does it reset on
-  release? on a value change at the same priority?) would have to be specified
-  and trusted. The semantics we implement — continuous override, any release
-  resets — match the reference's intent for a stale override.
-- The trade-off of in-rule timing is that the duration does not survive a
-  controller restart. With `delayOnInit = true` (library stance, see
-  AHU-FC-050/052), an override already active for a week re-times from the
-  restart and alarms 25 h later. That is the conservative direction — the
-  library never asserts a fault it has not observed — but a host that keeps
-  its own override history can raise the fault sooner.
+- The reference's host-computed `override_duration` point is dropped: the
+  duration is measured in-rule with a `TrueDelay` chain, so the rule deploys
+  against a raw BAS flag with no host-side state machine and no derived point
+  whose reset semantics would have to be specified and trusted. What is
+  implemented — continuous override, any release resets — matches the
+  reference's intent for a stale override.
+- The trade-off is that the duration does not survive a controller restart:
+  with `delayOnInit = true` an override already active for a week re-times from
+  the restart and alarms 25 h later. That is the conservative direction; a host
+  keeping its own override history can raise the fault sooner.
 - Two delays instead of one: the reference's `AlarmDelay` is separate from
   `max_override_duration`, so we keep both parameters independently tunable
   even though a single 90000 s delay would behave identically at the default
@@ -144,13 +134,12 @@ once. The magnitude range therefore cannot be stated until the point is known.
 ## Notes
 
 Step 2 of the after-hours-operation playbook — release stuck overrides in the
-BACnet priority array — is the remote fix for this fault verbatim, which is
-why it shares that playbook despite not being a scheduling fault. The two
-faults also co-occur: AHU-FC-052 explicitly treats an active override as
-justification for after-hours fan operation, so a forgotten override silences
-FC-052 while this rule keeps flagging the reason it is silent.
+BACnet priority array — is this fault's remote fix verbatim, which is why it
+shares that playbook. The two also co-occur: AHU-FC-052 treats an active
+override as justification for after-hours fan operation, so a forgotten
+override silences FC-052 while this rule flags the reason it is silent.
 
-Diagnosis 3 is worth taking seriously before releasing anything. If the
-override was masking a failed sensor or a stuck actuator, releasing it will
-put the equipment back under a control loop that cannot work — trend the
-affected point for a shift after release rather than assuming the fix held.
+Take diagnosis 3 seriously before releasing anything. If the override was
+masking a failed sensor or a stuck actuator, releasing it puts the equipment
+back under a control loop that cannot work — trend the affected point for a
+shift after release.

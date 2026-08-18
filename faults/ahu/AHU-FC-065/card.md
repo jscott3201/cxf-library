@@ -64,15 +64,14 @@ verified:
 ## Description
 
 The fan holds duct static pressure at the top of its band while every zone
-damper sits well below fully open. Those two facts together say the setpoint is
+damper sits well below fully open. Together those facts say the setpoint is
 higher than the system needs: the dampers are throttling away pressure the fan
 spent energy producing, and the excess leaves as noise, leakage, and heat. Fan
-power scales with the cube of pressure, so the arithmetic is brutal in both
-directions — a setpoint 20% above what the worst zone needs costs roughly half
-again the fan energy, and trimming it back returns that energy immediately, at
-no capital cost. DSP reset is absent in 74% of buildings (PNNL 151-building
-study); this rule is the CLU-02 member that catches the resulting operating
-symptom.
+power scales with the cube of pressure, so a setpoint 20% above what the worst
+zone needs costs roughly half again the fan energy — and trimming it back
+returns that energy immediately at no capital cost. DSP reset is absent in 74%
+of buildings (PNNL 151-building study); this is the CLU-02 member that catches
+the resulting operating symptom.
 
 ## Detection Logic
 
@@ -90,15 +89,14 @@ Block graph (`rule.cxf.jsonld`):
 `scaled` turns the live setpoint into the top-of-band pressure — a ratio rather
 than a fixed offset, so the test travels with a setpoint the reset is allowed
 to move. `spHigh` compares the measurement against that band and `dmprLow`
-against the host-aggregated damper maximum; `demand` requires both, which is
-the whole diagnostic content of the rule. Note what the pair excludes: high
-pressure with an open damper is a system doing its job, and low dampers at low
-pressure are a reset already working. `gated` adds the fan-running condition —
-`dsp` and `dsp_sp` mean nothing with the fan off, and a stale reading held over
-from the last occupied period would otherwise alarm overnight. `persist`
-requires 30 minutes of continuous violation, which rides out morning start-up,
-the pressure spike after a damper slams, and the settling period after any
-setpoint change.
+against the host-aggregated damper maximum; `demand` requires both, which is the
+whole diagnostic content of the rule. Note what the pair excludes: high pressure
+with an open damper is a system doing its job, and low dampers at low pressure
+are a reset already working. `gated` adds the fan-running condition, since `dsp`
+and `dsp_sp` mean nothing with the fan off and a stale reading would otherwise
+alarm overnight. `persist` requires 30 minutes of continuous violation, riding
+out morning start-up and the settling period after a setpoint change;
+`delayOnInit = true` holds that window across a controller restart.
 
 ## Possible Diagnoses
 
@@ -120,9 +118,7 @@ power follows the cube law: `excess_fan_kw = ahu_fan_design_kw × [1 −
 (needed_dsp/actual_dsp)³]`, where `needed_dsp` is the pressure at which the
 most-open zone reaches its damper target. Savings run 5–30% of fan energy
 depending on how far above the true requirement the setpoint sits — the wide
-range is the cube law, not uncertainty in the measurement. Climate-neutral:
-fan energy tracks operating hours and pressure, not weather. Prevalence: 74% of
-buildings lack DSP reset.
+range is the cube law, not measurement uncertainty. Climate-neutral.
 
 ## Emissions Impact
 
@@ -133,24 +129,18 @@ Avoided-emissions basis: marginal operating emissions rate (MOER).
 
 ## Deviations
 
-- **`dsp >= dsp_sp × high_sp_fraction` → strict `>`.** CDL has no
-  `Reals.GreaterEqual`, so the band test is `Reals.Greater`. On a measured
-  pressure signal the exact-equality case has measure zero, and the strict form
-  errs toward silence; the vectors pin `dsp` exactly at the scaled setpoint as
-  NO_FAULT. (At the bit level the distinction is moot for the default
-  parameters: `400 × 0.95` rounds to 380.000000000000057 in IEEE-754, so a
-  reading of exactly 380 Pa sits below the band either way.)
-- **`zone_dmpr_pos_all` (zone array) → host-derived `zone_dmpr_pos_max`
-  (scalar).** The reference takes `max()` over every zone damper position;
-  library v1 avoids array boundary points, so the host aggregates and feeds one
-  scalar — the same point AHU-FC-058 consumes, flagged `derived` in the point
-  dictionary. The zone-side semantic tags land with the VAV dictionary.
-- **The fan-running condition is in the block graph, not the preconditions.**
-  The library's stance puts operating-state gating on the host, but the
-  reference states `sf_status = ON` as part of the detection logic and
-  `sf_status` is a canonical point, so it is wired as a boundary input (as in
-  AHU-FC-052). The multi-zone and damper-data preconditions stay in frontmatter
-  where the host can enforce them.
+- The reference's `dsp >= dsp_sp × high_sp_fraction` becomes a strict `>`:
+  CDL has no `Reals.GreaterEqual`, the exact-equality case has measure zero on
+  a measured pressure signal, and the strict form errs toward silence.
+- The reference takes `max()` over a per-zone damper array; library v1 avoids
+  array boundary points, so the host aggregates and feeds the scalar
+  `zone_dmpr_pos_max` — the same point AHU-FC-058 consumes, flagged `derived`
+  in the point dictionary.
+- The fan-running condition is in the block graph rather than the
+  preconditions: the library gates operating state host-side, but the reference
+  states `sf_status = ON` as part of its detection logic and `sf_status` is a
+  canonical point, so it is wired as a boundary input (as in AHU-FC-052). The
+  multi-zone and damper-data preconditions stay in frontmatter.
 - `high_sp_fraction` is dimensionless (0–1), consistent with the reference's
   0.95; `low_demand_damper_threshold` stays in percent because
   `zone_dmpr_pos_max` is a percent point.
@@ -160,19 +150,14 @@ Avoided-emissions basis: marginal operating emissions rate (MOER).
 
 ## Notes
 
-This rule and AHU-FC-058 are the DSP half of CLU-02, approached from opposite
-sides. FC-058 is statistical and patient: it watches the setpoint sit flat for
-three days and concludes the reset is absent. This rule is instantaneous and
-symptomatic: it does not care whether a reset exists, only that right now the
-fan is pushing pressure nobody is asking for. A misconfigured but active reset
-— trim too small, floor too high — leaves FC-058 quiet and fires this rule,
-which is exactly the case diagnosis 2 covers. Both point at the same
-`missing-reset` playbook and the same $0 remote fix, programmed per G36
-§5.16.1 (step 2.3).
+This rule and AHU-FC-058 are the DSP half of CLU-02 from opposite sides. FC-058
+watches the setpoint sit flat for three days and concludes the reset is absent;
+this rule does not care whether a reset exists, only that the fan is pushing
+pressure nobody is asking for. A misconfigured but active reset leaves FC-058
+quiet and fires this rule — diagnosis 2. Both share the `missing-reset` playbook
+and the same $0 fix per G36 §5.16.1.
 
-Before touching the setpoint, check for a rogue zone: the playbook's step 1.2
-plot of DSP setpoint against the highest zone damper position separates "the
-setpoint is too high" from "one box is holding it there." Healthy operation
-puts most zone dampers in the 50–75% band; all of them near 0% with pressure at
-maximum is the signature this rule detects, and all of them near 100% is the
-opposite fault (AHU-FC-001, insufficient static pressure).
+Before touching the setpoint, check for a rogue zone (playbook step 1.2).
+Healthy operation puts most zone dampers in the 50–75% band; all near 0% with
+pressure at maximum is this rule's signature, and all near 100% is the opposite
+fault (AHU-FC-001, insufficient static pressure).

@@ -72,17 +72,13 @@ The unit is pulling in more outdoor air than its design minimum ventilation
 requires, and it is not economizing — every extra cubic metre has to be heated
 or cooled to supply temperature for no ventilation benefit. Unlike a failed
 economizer, this fault is invisible from the zone: the space stays comfortable,
-the coils simply work harder to keep it that way, and the overspend runs
-continuously through every occupied hour.
-
+the coils simply work harder to keep it that way, through every occupied hour.
 The outdoor air fraction is inferred from the mixing-box energy balance rather
-than measured, which is what makes the diagnostic cheap — three temperature
-sensors most AHUs already have, no airflow station. It is also what makes it
-conditional: the inference only holds when outdoor and return air differ enough
-for the mixture to locate the fraction, which is why this rule carries an
-explicit evaluability output. AHU-FC-064 is the same measurement narrowed to
-heating operation, where the excess is most expensive. Present in roughly 15%
-of buildings.
+than measured, which makes the diagnostic cheap — three temperatures, no airflow
+station — and conditional, since the inference only holds when outdoor and
+return air differ enough to locate the fraction; hence the explicit evaluability
+output. AHU-FC-064 is the same measurement narrowed to heating operation, where
+the excess is most expensive. Present in roughly 15% of buildings.
 
 ## Detection Logic
 
@@ -99,29 +95,21 @@ Block graph (`rule.cxf.jsonld`):
 
 `matRat` and `oatRat` form the two differences, `oaf` divides them, and
 `margin` subtracts the design fraction so that `marginHigh` tests the excess
-against a single positive threshold. Both tunables the reference exposes stay
-independent single-value parameters this way: the design fraction is
-`designConst.k` and the tolerance is `marginHigh.t`, each one number, neither
-requiring a sign flip when a host retunes it through `set_param`.
-
-`oatRat` fans out a second time into `absDelta` and `deltaOk`, the evaluability
-branch. Its output is both the boundary output `yTempDeltaOk` and the second
-input of `gate`, so the gate holds `yFault` down over exactly the interval the
-host is told to disregard it. That belt-and-braces arrangement matters because
-the division is unguarded: CDL `Divide` follows IEEE-754, so `oat = rat`
-yields ±∞ or NaN rather than an error, and a near-zero denominator amplifies
-ordinary sensor noise into a fraction of any magnitude. NaN compares false
-everywhere, so a NaN can never raise `marginHigh` — but ±∞ and a noise-inflated
-finite fraction both can, and `gate` is what stops them. Garbage arithmetic
-cannot assert a fault; it can only make the rule report itself unevaluable.
-
-Both comparisons are strict. An outdoor air fraction sitting exactly at
-`desired_oaf + oaf_threshold` is not a fault, and a temperature difference of
-exactly `oaf_temp_threshold` is not evaluable. The fraction is signed
-consistently on both sides of the year — in summer both differences are
-positive, in winter both negative, and the quotient reads the same — so no
-seasonal branch is needed. `persist` requires 30 continuous minutes, which
-rides out damper strokes and the mixing transient after a mode change.
+against a single positive threshold. `oatRat` fans out a second time into
+`absDelta` and `deltaOk`, whose output is both the boundary output
+`yTempDeltaOk` and the second input of `gate` — so `yFault` is held down over
+exactly the interval the host is told to disregard it. That matters because the
+division is unguarded: CDL `Divide` follows IEEE-754, so `oat = rat` yields ±∞
+or NaN rather than an error, and a near-zero denominator amplifies ordinary
+sensor noise into a fraction of any magnitude. NaN compares false everywhere,
+but ±∞ and a noise-inflated finite fraction can both raise `marginHigh`, and
+`gate` is what stops them. Both comparisons are strict: a fraction sitting
+exactly at `desired_oaf + oaf_threshold` is not a fault, and a temperature
+difference of exactly `oaf_temp_threshold` is not evaluable. The fraction is
+signed consistently across the year — summer both differences positive, winter
+both negative — so no seasonal branch is needed. `persist` requires 30
+continuous minutes, riding out damper strokes and the mixing transient after a
+mode change; `delayOnInit = true` holds that window across a restart.
 
 ## Possible Diagnoses
 
@@ -140,11 +128,10 @@ computable from live data: `excess_oa_kw = (actual_oaf − desired_oaf) ×
 airflow × cp × |oat − rat|`, with the excess fraction already on the wire as
 `oaf − designConst.k`. Correcting minimum ventilation saves 2–10% of AHU
 thermal energy (PNNL-27338), the upper half of that range in heating-dominant
-climates where the outdoor–return difference — and therefore the cost of every
-extra cubic metre — is largest. PNNL EEM-17 (demand control ventilation) is
-the related retrofit, and this rule is its screening test: a unit already over
-its design fraction with the dampers at minimum will not benefit from CO₂
-control until the mechanical problem is fixed. Prevalence ~15%.
+climates. PNNL EEM-17 (demand control ventilation) is the related retrofit and
+this rule is its screening test: a unit already over its design fraction with
+the dampers at minimum will not benefit from CO₂ control until the mechanical
+problem is fixed.
 
 ## Emissions Impact
 
@@ -156,37 +143,23 @@ marginal operating emissions rate (MOER).
 
 ## Deviations
 
-- **The reference's `AND NOT econ_favorable` term is not in the block graph.**
-  Economizer operation is an operating state, not a measurement, and the
-  reference itself scopes this fault to non-economizer states. This library
-  keeps operating-state gating host-side per its design stance (precedent:
-  AHU-FC-051 keeps its OS-4 restriction in `preconditions`), so the term lives
-  in `operating_states` and `preconditions` instead. The consequence is
-  concrete: the reference's third test vector — economizer mode with an 80%
-  outdoor air fraction, expected NO_FAULT — has no counterpart in
-  `vectors.json`, because in this library that verdict is produced by the host
-  gate rather than by the rule. A host that evaluates this rule during
-  economizing will get a fault, and it will be the host's bug.
-- **Design fraction as a constant, excess as a threshold.** The reference
-  writes the test as `oaf > (desired_oaf + oaf_threshold)`. Implemented that
-  way, the two tunables would have to be summed into one threshold value, and
-  a host could no longer retune either alone. Feeding `desired_oaf` in as
-  `Reals.Sources.Constant.k` and comparing the remaining margin against
-  `oaf_threshold` keeps both as independent single-value `set_param` paths
-  with no sign flips. Algebraically identical.
-- **Evaluability is an output, not just a precondition.** The reference states
-  the fraction is meaningful only when outdoor and return air differ enough
-  (PNNL-27338 uses 5 °F for the same computation; the reference's
-  `oaf_temp_threshold` default of 6 °C is adopted here). Because that test is
-  computable from this rule's own inputs, SCHEMA.md requires exposing it as a
-  boolean output: `yTempDeltaOk`. It is additionally wired into `gate`, so
-  `yFault` reads false throughout a non-evaluable period — but false `yFault`
-  under false `yTempDeltaOk` means "unknown", not "healthy", and the host must
-  treat it that way.
-- **Both comparisons are strict** (`>`). The reference does not specify
-  boundary behavior; strict inequalities keep a fraction sitting exactly on
-  the alarm point and a temperature difference sitting exactly on the
-  evaluability limit out of the alarm, and the vectors pin both choices.
+- The reference's `AND NOT econ_favorable` term is not in the block graph.
+  Economizer operation is an operating state, not a measurement, and this
+  library keeps operating-state gating host-side (precedent: AHU-FC-051's OS-4
+  restriction), so the term lives in `operating_states` and `preconditions`
+  instead. A host that evaluates this rule during economizing will get a fault,
+  and it will be the host's bug.
+- The reference writes the test as `oaf > (desired_oaf + oaf_threshold)`, which
+  would force the two tunables into one summed threshold. Feeding `desired_oaf`
+  as `Reals.Sources.Constant.k` and comparing the remaining margin against
+  `oaf_threshold` is algebraically identical and keeps both retunable alone.
+- Evaluability is an output, not just a precondition: the `|oat − rat|` test is
+  computable from this rule's own inputs, so SCHEMA.md requires exposing it as
+  `yTempDeltaOk` (PNNL-27338 uses 5 °F for the same computation; the
+  reference's 6 °C default is adopted). A false `yFault` under a false
+  `yTempDeltaOk` means "unknown", not "healthy".
+- Both comparisons are strict (`>`); the reference does not specify boundary
+  behavior, so the library's strict convention applies.
 - `persist.delayOnInit = true` (Modelica/CDL default is `false`), the
   library's standing choice: an excess already present at load waits out the
   full 30 minutes instead of alarming on the first tick after a controller
@@ -194,14 +167,14 @@ marginal operating emissions rate (MOER).
 
 ## Notes
 
-Check the minimum position setpoint before sending anyone to the roof. The
-most common cause is not a broken damper but a minimum position dialled up
-during a ventilation complaint or a commissioning shortcut, and it is a
-$0 desk fix; the [economizer-failure](../../../playbooks/economizer-failure.md)
-playbook's damper and linkage steps come after that.
+Check the minimum position setpoint before sending anyone to the roof — the
+most common cause is a minimum dialled up during a ventilation complaint or a
+commissioning shortcut, and it is a $0 desk fix. The
+[economizer-failure](../../../playbooks/economizer-failure.md) playbook's damper
+and linkage steps come after that.
 
-The rule is deliberately blind to why the outdoor air fraction is high. A
-damper stuck at 40% and a building held under negative pressure by an
-oversized exhaust fan produce the same number, and the second is invisible
-from the AHU's own points — if commanding the damper closed does not move the
-fraction, measure building pressure before replacing the actuator.
+The rule is deliberately blind to why the fraction is high. A damper stuck at
+40% and a building held under negative pressure by an oversized exhaust fan
+produce the same number, and the second is invisible from the AHU's own points:
+if commanding the damper closed does not move the fraction, measure building
+pressure before replacing the actuator.

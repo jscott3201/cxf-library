@@ -127,30 +127,21 @@ Scope 2, PROXY_EMISSIONS, HIGH confidence; typical 800–5,000 kg CO₂e/yr
 
 ## Deviations
 
-- **Windowed range → deviation from a weekly sampled baseline.** The
-  reference computes `max − min` of SAT_SP and OAT over the window; CDL's
-  elementary library has no windowed min/max. We compare each signal against
-  a `Discrete.Sampler` hold refreshed once per window, with tolerances set to
-  half the reference ranges (`sp_flat_tolerance = min_expected_sp_range/2`,
-  `oat_variation_tolerance = min_oat_range_for_eval/2`). Any variation
-  exceeding the tolerance relative to the window's baseline resets the
-  flatness dwell — equivalent detection for signals that move and return,
-  slightly conservative for monotonic drift within one window.
-  *Engine-verified constraint:* the seemingly-natural `Reals.MovingAverage`
-  was rejected — the engine implements it with a 64-checkpoint ring, so a
-  7-day window sampled at BAS tick rates silently degrades; the sampler
-  design is exact and deterministic at any tick rate.
-- **NO_EVAL surfaced as `yOatVaried`.** The reference's insufficient-OAT
-  vector expects NO_EVAL. Boolean block logic cannot express a tri-state, so
-  evaluability is a second boundary output the host must consult before
-  interpreting `yFault` — false means NO_EVAL, never healthy. Semantics are
-  inverted-flat ("varied unless OAT has been continuously flat for a full
-  window"), which makes `yOatVaried` optimistically true during the first
-  window after startup; `yFault` cannot fire in that period anyway, since
-  `spFlatHeld` needs the same full window.
-- **`AlarmDelay` = 24 h implemented as `TrueDelay` on the fault
-  conjunction**; the evaluation window itself is enforced by the flatness
-  dwell timers.
+- Windowed range → deviation from a weekly sampled baseline. The reference
+  computes `max − min` over the window and CDL has no windowed min/max, so
+  each signal is compared against a `Discrete.Sampler` hold refreshed once per
+  window, with tolerances at half the reference ranges. Equivalent detection
+  for signals that move and return, slightly conservative for monotonic drift
+  within one window. `Reals.MovingAverage` was rejected: the engine implements
+  it with a 64-checkpoint ring, so a 7-day window silently degrades at BAS tick
+  rates, while the sampler is exact at any tick rate.
+- NO_EVAL is surfaced as the second output `yOatVaried`, since boolean block
+  logic cannot express a tri-state; false means NO_EVAL, never healthy. Its
+  inverted-flat semantics make it optimistically true during the first window
+  after startup, when `yFault` cannot fire anyway because `spFlatHeld` needs
+  the same full window.
+- `AlarmDelay` = 24 h is a `TrueDelay` on the fault conjunction; the evaluation
+  window itself is enforced by the flatness dwell timers.
 - `delayOnInit = true` on all `TrueDelay`s (startup conservatism per
   AHU-FC-050).
 

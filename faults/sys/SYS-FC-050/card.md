@@ -61,27 +61,15 @@ verified:
 ## Description
 
 Water is moving and nothing is asking for it. Every cooling coil on the loop is
-commanded shut, so the chilled water leaves the plant and comes back at the
-temperature it left, and the pump energy that pushed it around the building
-turns into heat in the water it was supposed to cool. The chiller, if it is
-still enabled, holds its evaporator and its controls alive for a load that is
-not there.
-
-What makes this a system rule rather than a plant rule is that neither side can
-see it alone. The plant knows its flow and knows nothing about demand: a pump
-running at 40% against a closed system looks like a pump running. The air
-handlers know their valves are shut and know nothing about the loop: a shut
-valve is the normal state of a coil that is satisfied. The fault only exists in
-the pair, which is why the reference files it under cross-equipment rules and
-why the two points come from opposite ends of the building.
-
-It also tends to be invisible in the utility bill. There is no comfort
-complaint, no alarm from the chiller, and no obvious signature in monthly
-consumption, because the waste is a base load rather than a peak — a 15 kW
-distribution pump running 24/7 through a shoulder season is around 65 MWh
-nobody notices. The reference puts the fault's category at CRITICAL_WASTE for
-that reason: the energy is not merely being spent inefficiently, it is buying
-nothing at all.
+commanded shut, so the chilled water comes back at the temperature it left and
+the pump energy that pushed it around the building turns into heat in the water
+it was supposed to cool; a chiller still enabled holds its evaporator and its
+controls alive for a load that is not there. Neither side can see the fault
+alone — the plant knows flow and nothing about demand, the AHUs know their
+valves are shut and nothing about the loop — which is why it is a
+cross-equipment rule. The waste is a base load with no comfort complaint and no
+plant alarm behind it: a 15 kW distribution pump left running through a shoulder
+season is around 65 MWh nobody notices.
 
 ## Detection Logic
 
@@ -96,80 +84,50 @@ Block graph (`rule.cxf.jsonld`):
 
 ![SYS-FC-050 block graph](diagram.svg)
 
-Four blocks. `flowHigh` decodes the meter, `valvesShut` decodes demand, `both`
-requires them at once, and `persist` holds the pair for the reference's
-15-minute `AlarmDelay`.
-
-The second conjunct is where the reference's equation and a block graph have to
-be reconciled. The reference writes `all(ahu.clg_vlv_cmd <=
-valve_closed_threshold for ahu in served_ahus)`, a quantifier over a set whose
-width is a property of the site, and CXF has no variable-width input. The host
-computes `ahu_clg_vlv_max` instead — the maximum cooling valve command across
-the served AHUs — and a maximum below the closed threshold is exactly every
-member below it. Nothing is approximated in that step; what moves is the
-obligation, from the rule to the host's aggregate, which is why the
-preconditions spend their length on which valves belong in it.
-`one_open_valve_holds_the_aggregate_up` is the vector that states the
-consequence: one coil trimming at 8% with every other valve shut is a plant
-serving a load, and an aggregate that missed that coil would report a fault.
+The demand conjunct is where the reference and a block graph have to be
+reconciled. The reference writes `all(clg_vlv_cmd <= valve_closed_threshold for
+ahu in served_ahus)`, a quantifier over a set whose width is a site property,
+and CXF has no variable-width input. The host supplies `ahu_clg_vlv_max`
+instead, and `max < t` is exactly `all < t` — an identity, not an
+approximation. What moves is the obligation to span every cooling load on the
+loop, which is what the preconditions spend their length on.
 
 Both comparisons are single-sided and strict. `flow_high` is strict in the
-reference too. `valves_shut` is not — the reference writes `<=` and CDL `Reals`
-has no `LessEqual` — so the shipped test is `LessThreshold` pinned at 2.0 and a
-served set whose maximum sits at exactly 2.0% reads as demand rather than as
-closed. The error is one part in fifty of a valve command, in the direction of
-silence, and
-`valve_max_exactly_at_the_closed_threshold` / `valve_max_just_below_the_closed_threshold`
-pin both sides of it.
+reference too; `valves_shut` is not — the reference writes `<=` and CDL `Reals`
+has no `LessEqual` — so a served-set maximum sitting at exactly 2.0% reads as
+demand rather than as closed, an error of one part in fifty of a valve command
+in the direction of silence.
 
-`persist` is a `TrueDelay` that asserts at exactly `T + delayTime`, so the
+`persist` is a `TrueDelay` asserting at exactly `T + delayTime`, so the
 realized test is "flow with no demand for strictly more than `alarm_delay`" at
-tick resolution. `demand_returns_on_the_maturity_tick` (a valve reopens at
-exactly 900 s, never reported) and `demand_returns_one_tick_after_maturity`
-(one tick of alarm, then clear) pin that edge from both sides. Continuous means
-continuous: `demand_returns_before_the_delay_matures` reopens a valve one tick
-short of maturity and shuts it again, and the alarm lands a full 900 s after
-the *second* shut rather than resuming where it stopped.
+tick resolution, and any interruption discards the elapsed time rather than
+pausing it. `delayOnInit = true` (CDL default `false`) makes a loop already
+circulating at engine start wait out the full 15 minutes.
 
 ## Possible Diagnoses
 
 The reference's four, in its order:
 
-1. CHW pump running unnecessarily — the common case and the cheapest fix. The
-   pump is enabled by a schedule, a hand switch, or a start command nobody
-   revoked, and the loop circulates because something told it to
-2. Leaking cooling coil valve(s): a valve commanded shut that does not seat
-   passes water continuously, and on a variable-flow loop that leakage is what
-   the pump is chasing. AHU-FC-014 sees the same defect from the air side, as a
-   temperature drop across a coil that is supposed to be inactive
-3. Bypass valve stuck open — a minimum-flow or pressure-bypass valve that
-   never closed, which keeps the loop circulating no matter what the coils do
-4. Control sequence not shutting down the CHW loop: the plant has no logic that
-   stops the pumps when demand goes away, so it runs whenever it is enabled.
-   This is the diagnosis that turns into a sequence change rather than a work
-   order, and the one most likely to be shared with SYS-FC-051 on the same site
-
-Diagnoses 1 and 4 are remote fixes; 2 and 3 send someone to a valve. The first
-question to settle is which of the two groups you are in, and the pump status
-answers it: a pump that is off while the meter reads flow is a valve problem by
-elimination.
+1. CHW pump running unnecessarily — enabled by a schedule, a hand switch, or a
+   start command nobody revoked
+2. Leaking cooling coil valve(s) — a valve commanded shut that does not seat
+   passes water continuously; AHU-FC-014 sees the same defect from the air side
+3. Bypass valve stuck open — a minimum-flow or pressure-bypass valve that never
+   closed, keeping the loop circulating whatever the coils do
+4. Control sequence not shutting down the CHW loop — no logic stops the pumps
+   when demand goes away, so the plant runs whenever it is enabled
 
 ## Energy Impact
 
-CRITICAL_WASTE, HIGH confidence, DIRECT_MEASUREMENT — the reference's own
-profile, transcribed. The affected subsystem is the distribution pump plus
-chiller standby, and the savings figure is 100% of both while the condition
-holds, because the load being served is zero by construction: that is what the
-second conjunct establishes.
-
-`waste_kw = chw_pump_kw + chiller_standby_kw` is the reference's runtime term,
-and both quantities are the host's. This rule reads a flow meter and a valve
-aggregate; it never sees a kW. DIRECT_MEASUREMENT is honest where the pump has
-a power meter or a drive that reports kW, and becomes an estimate the moment
-the host substitutes nameplate power for a measurement. Climate sensitivity is
-Both, per the reference — a CHW loop left circulating in winter wastes exactly
-as much as one left circulating in summer, and arguably more, because there is
-less chance anyone is looking at the plant.
+CRITICAL_WASTE, HIGH confidence, DIRECT_MEASUREMENT — the reference's profile.
+The affected subsystem is the distribution pump plus chiller standby, and the
+savings figure is 100% of both while the condition holds, because the load
+being served is zero by construction. `waste_kw = chw_pump_kw +
+chiller_standby_kw` is the reference's runtime term and both quantities are the
+host's; this rule reads a flow meter and a valve aggregate and never sees a kW,
+so DIRECT_MEASUREMENT holds only as far as the host's pump metering does.
+Climate sensitivity is Both — a loop left circulating in winter wastes as much
+as one left circulating in summer.
 
 ## Emissions Impact
 
@@ -177,71 +135,47 @@ Scope 2, DIRECT_EMISSIONS, HIGH confidence; the reference's typical range is
 1,500-10,000 kg CO₂e/yr for the pump plus chiller standby, on a marginal
 operating emissions rate (MOER) basis. All of it is electricity, and the
 marginal basis is the right one because the waste is dispatchable — it stops
-the moment someone stops the pump, so the emissions avoided are those of
-whatever generator was on the margin at that hour rather than an annual
-average.
+the moment someone stops the pump.
 
 ## Deviations
 
 - **The reference's `all(...)` quantifier becomes one host-derived aggregate.**
-  `ahu_clg_vlv_max` is the maximum cooling valve command across the served
-  AHUs, and `max < t` is exactly `all < t`, so the substitution is an identity
-  rather than an approximation. The reason it is needed is structural: the
-  reference's required-points table lists a per-AHU `clg_vlv_cmd`, the served
-  set is a site property, and a CXF block has a fixed number of inputs.
-  Precedent is CHW-FC-052's `chw_valve_max`, and the point dictionary carries
-  the same warning both cards do — the aggregate must span every coil on the
-  loop, and a maximum over a subset is worse than no rule.
+  `max < t` is exactly `all < t`, so the substitution is an identity; it is
+  needed because the reference's required points list a per-AHU `clg_vlv_cmd`
+  and a CXF block has a fixed number of inputs. Precedent is CHW-FC-052's
+  `chw_valve_max`, and the point dictionary carries the same warning: a maximum
+  over a subset of the served loads is worse than no rule.
 - **`<=` becomes a strict `<`.** CDL `Reals` has no `LessEqual`, so
-  `valve_closed_threshold` is applied as `LessThreshold` with `t = 2.0`: a
-  served-set maximum of exactly 2.0% reads as demand and blocks the fault,
-  where the reference would call it closed. The library's standing convention
-  is to pin the threshold at the boundary and take the strict form. The
-  direction is the conservative one for a waste rule.
+  `valve_closed_threshold` is applied as `LessThreshold` with `t = 2.0` and a
+  served-set maximum of exactly 2.0% reads as demand where the reference would
+  call it closed. The library's standing convention is to pin the threshold at
+  the boundary and take the strict form; the direction is the conservative one
+  for a waste rule.
 - **`no_demand_flow_threshold` ships as a placeholder, not a default.** The
-  reference gives `10% of design`, which is a fitting rule and not a number:
-  design flow is a per-loop quantity, and a CXF `S231:value` is one double in
-  one unit. The card publishes the parameter in absolute L/s and ships 5.0,
-  which is 10% of a 50 L/s design loop. **It is not a site value**, and a host
-  that leaves it unset is comparing a flow meter against an arbitrary number:
-  too low and the rule alarms on the leakage every real loop has, too high and
-  a pump running at minimum speed never trips it. Same precedent and same
-  words as VAV-FC-050's `ventilation_requirement` and HP-FC-050's fitted
-  baseline coefficients.
-- **The valve aggregate is built from commands, deliberately, and not from
-  feedback.** CHW-FC-052 prefers position feedback for its own aggregate,
-  because it is asking how open the loop's valves really are. This rule asks a
-  different question — what is the control system requesting — and the command
-  is the direct answer to it. The choice is also what keeps diagnoses 2 and 3
-  visible: a leaking or stuck-open valve reads 0% on the command while it
-  passes water, which is the fault; bind feedback instead and the same valve
-  reads 20%, the demand conjunct blocks, and the rule goes quiet on the case it
-  was written to catch.
-- **No schedule or occupancy gate.** The reference does not put one in this
-  fault's equation, and the omission is right: flow with no demand costs the
-  same at 2 pm as at 2 am. SYS-FC-052 and SYS-FC-053 are the chapter's
-  schedule-gated rules and this is not one of them, so nothing in the graph
-  consumes `occ_scheduled`.
+  reference gives `10% of design`, a fitting rule rather than a number, and a
+  CXF `S231:value` is one double in one unit. The shipped 5.0 L/s is 10% of a
+  50 L/s design loop and **is not a site value**: too low and the rule alarms on
+  the leakage every loop has, too high and a pump at minimum speed never trips
+  it. Same precedent as VAV-FC-050's `ventilation_requirement`.
+- **The valve aggregate is built from commands, not feedback**, unlike
+  CHW-FC-052's. The question here is what the control system is requesting, and
+  it is also what keeps diagnoses 2 and 3 visible: a leaking or stuck-open valve
+  reads 0% on the command while it passes water; bind feedback and the same
+  valve reads 20%, the demand conjunct blocks, and the rule goes quiet on the
+  case it was written to catch.
+- **No schedule or occupancy gate.** The reference puts none in this equation
+  and the omission is right — flow with no demand costs the same at 2 pm as at
+  2 am. SYS-FC-052 and SYS-FC-053 are the chapter's schedule-gated rules.
 - **`AlarmDelay = 15 min` becomes `persist.delayTime = 900 s` with
-  `delayOnInit = true`** (the CDL default is `false`), the library's standing
-  choice: a loop already circulating with no demand when the controller
-  restarts waits out the full 15 minutes rather than alarming on the first
-  tick.
+  `delayOnInit = true`** (CDL default `false`), the library's standing choice:
+  a loop already circulating with no demand at controller restart waits out the
+  full 15 minutes rather than alarming on the first tick.
 - **`TrueDelay` asserts at exactly `T + delayTime`,** verified against the
   engine at the pin rather than assumed, so the realized test is "strictly more
-  than `alarm_delay`" at tick resolution. Two vectors pin that edge and a third
-  pins that a dip discards the elapsed time rather than pausing it.
-- **Playbook binding.** The primary playbook is
-  `unnecessary-plant-operation` (CLU-07's declared slug; transcribed from the
-  reference's remediation playbooks, pp. 171–172, in the same batch as this
-  card). `stuck-actuator` stays bound as the secondary procedure for
-  diagnoses 2 and 3 (leaking coil valve, stuck bypass).
-- **The reference publishes no test vectors for this card,** so all thirteen
-  scenarios in `vectors.json` are authored: the two healthy cases that isolate
-  each conjunct, the plain fault, both sides of the flow threshold, both sides
-  of the valve threshold, the partial aggregate, the demand-stops transition,
-  the restart-the-clock case, both sides of the maturity edge, and the
-  recovery.
+  than `alarm_delay`" at tick resolution.
+- **Playbook binding.** Primary is `unnecessary-plant-operation`, CLU-07's
+  declared slug; `stuck-actuator` stays bound as the secondary procedure for
+  diagnoses 2 and 3.
 - Operating states and preconditions are declared in frontmatter for host
   enforcement rather than encoded in the block graph, per the library's design
   stance.
@@ -249,21 +183,11 @@ average.
 ## Notes
 
 Read the finding as a question about the pump before it is a question about a
-valve. Pull the CHW pump status and the chiller status alongside the trend: if
-the pump is commanded on, the fault is diagnosis 1 or 4 and the work is in the
-BAS; if the pump is off and the meter still reads flow, something is open that
-should not be, and diagnoses 2 and 3 are what remain. PMP-FC-051 is worth
-checking at the same time, because a pump running against a closed system is
-the definition of deadheading and the two rules will often fire together on the
-same hour.
+valve: if the pump is commanded on, the fault is diagnosis 1 or 4 and the work
+is in the BAS; if the pump is off and the meter still reads flow, diagnoses 2
+and 3 are what remain. PMP-FC-051 (deadheading) often fires on the same hour.
 
-The mirror is SYS-FC-051, and a site that has one usually has both — the
-sequence gap in diagnosis 4 tends to be written once and copied to the other
-plant. CLU-07 exists for exactly that pairing: this rule is the cluster's
-trigger, SYS-FC-051 is its member, and clearing the CHW sequence should clear
-the HW one within a day or two.
-
-A finding here is also a standing warning about CHW-FC-053. Flow with no load
-is the low delta-T syndrome's cleanest possible case — the return water comes
-back at supply temperature — so a plant that trips both is not showing two
-independent problems.
+SYS-FC-051 is the mirror, and a site with one usually has both — CLU-07 exists
+for that pairing, with this rule as the trigger. A plant tripping CHW-FC-053 at
+the same time is not showing two independent problems: flow with no load is the
+cleanest possible case of low delta-T syndrome.

@@ -114,12 +114,11 @@ the live valve command and the coil's design capacity: heating branch
 `waste_kw = htg_vlv_cmd/100 × ahu_htg_capacity_kw`, cooling branch
 `waste_kw = clg_vlv_cmd/100 × ahu_clg_capacity_kw`. Correcting the lockout
 saves 5–15% of the affected subsystem's energy while the fault is active
-(PNNL-25985 EEM-38, eliminate simultaneous heating and cooling). Confidence is
-MEDIUM rather than HIGH because the lockout temperatures are site-specific:
-a building with a genuine year-round reheat load or a heat-recovery scheme may
-legitimately hold a coil open outside the default band. Sensitive to both
-heating and cooling climates — the heating branch bites in shoulder seasons and
-summer, the cooling branch in winter. Prevalence ~15%.
+(PNNL-25985 EEM-38). Confidence is MEDIUM rather than HIGH because the lockout
+temperatures are site-specific: a building with a genuine year-round reheat load
+or a heat-recovery scheme may legitimately hold a coil open outside the default
+band. Sensitive to both climates — the heating branch bites in shoulder seasons
+and summer, the cooling branch in winter.
 
 ## Emissions Impact
 
@@ -130,18 +129,16 @@ chiller. Avoided-emissions basis: marginal operating emissions rate (MOER).
 
 ## Deviations
 
-- Severity 3 (warning), per the reference's chapter 9 card — the reference's
-  only severity statement for this fault (its §5.8.1 index carries no severity
-  column). This chapter's README previously mistranscribed the severity as 2;
-  corrected alongside this card. Severity 3 matches the fault's slow-burn
-  character — real waste, no comfort or equipment risk.
+- Severity 3 (warning), per the reference's chapter 9 card — its only severity
+  statement for this fault, since the §5.8.1 index carries no severity column.
+  This chapter's README previously mistranscribed it as 2, corrected alongside
+  this card.
 - The reference tags this fault for both AHU and RTU. This card is the
   AHU-family instance; an RTU-FC-059 would restate it against staged
   compressor and gas-valve commands rather than modulating valve positions.
-- All three comparisons are strict (`>`, `>`, `<`). The reference does not
-  specify boundary behavior; strict inequalities keep a closed valve reported
-  as 0% and an OAT parked on a lockout setpoint out of the alarm, and the
-  vectors pin that choice.
+- All three comparisons are strict (`>`, `>`, `<`); the reference does not
+  specify boundary behavior, so an OAT parked exactly on a lockout setpoint
+  stays out of the alarm.
 - `valve_open_threshold` is one card parameter bound to two CXF paths
   (`htgOpen.t`, `clgOpen.t`), matching the reference's single threshold. Hosts
   must set both together; a site needing per-coil thresholds should retune the
@@ -155,13 +152,11 @@ chiller. Avoided-emissions basis: marginal operating emissions rate (MOER).
 ## Notes
 
 Both branches feed one `persist` timer, so a violation that switches branches
-without a gap keeps the timer running. That requires an 8 °C OAT swing inside a
-single tick — not a real weather event, but it is the signature of a failing OAT
-sensor. If both branches fire on the same day, suspect the sensor before the
-sequence.
+without a gap keeps the timer running — which takes an 8 °C OAT swing inside a
+single tick. If both branches fire on the same day, suspect the sensor before
+the sequence.
 
-Fix order matters within CLU-01: clear the trigger (AHU-FC-050) first, since a
-valve held open by a fighting control loop will also read as a missing lockout.
-When the lockout is genuinely absent, the remote fix is to add one with
-hysteresis — typically disable heating above 16 °C and re-enable below 14 °C
-(playbook `simultaneous-hc`, step 2.4).
+Fix order within CLU-01: clear the trigger (AHU-FC-050) first, since a valve
+held open by a fighting control loop also reads as a missing lockout. When the
+lockout is genuinely absent, add one with hysteresis — typically disable heating
+above 16 °C and re-enable below 14 °C (playbook `simultaneous-hc`, step 2.4).
