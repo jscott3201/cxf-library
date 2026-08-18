@@ -60,6 +60,14 @@ energy_impact:
 emissions:
   scope: "2"
   method: PROXY_EMISSIONS
+validation:
+  - kind: simulation_fpr
+    harness: simharness/v1
+    date: 2026-08-18
+    fleet: "DOE prototype OfficeLarge STD2019 Atlanta (IDF 22.1 auto-transitioned to E+ 25.1), one July + one January week, plant mode"
+    scenarios: 1
+    failures: 0
+    notes: "gated windows only in the July week (chiller load > 40% floor); Atlanta January never crosses the floor"
 verified:
   engine_rev: e2ff2f8
   content_id: "cxf:fnv1a128:f12c5169f0aa1755a37402fe2dbfe04a"

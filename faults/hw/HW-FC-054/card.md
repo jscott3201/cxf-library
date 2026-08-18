@@ -55,6 +55,14 @@ energy_impact:
 emissions:
   scope: "2"
   method: PROXY_EMISSIONS
+validation:
+  - kind: simulation_fpr
+    harness: simharness/v1
+    date: 2026-08-18
+    fleet: "DOE prototype OfficeLarge STD2019 Atlanta (IDF 22.1 auto-transitioned to E+ 25.1), one July + one January week, plant mode"
+    scenarios: 2
+    failures: 0
+    notes: "hw_pump_vfd_speed is a flow-fraction proxy (affinity-law approximation)"
 verified:
   engine_rev: e2ff2f8
   content_id: "cxf:fnv1a128:6d35dff9c968ba4897bf8966d5555c16"
