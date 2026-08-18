@@ -28,6 +28,10 @@ jobs:
         working-directory: cxf-library
         run: python3 tools/lint/svg_fitment.py
 
+      - name: id band lint
+        working-directory: cxf-library
+        run: python3 tools/lint/id_bands.py
+
       - uses: dtolnay/rust-toolchain@stable
 
       - uses: Swatinem/rust-cache@v2

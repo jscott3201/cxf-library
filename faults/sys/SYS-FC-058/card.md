@@ -1,6 +1,6 @@
 ---
 schema: cxf-library/fault-card/v1
-id: SYS-FC-100
+id: SYS-FC-058
 name: Sensor flatline while equipment active
 equipment: sys
 status: verified
@@ -24,7 +24,7 @@ suppressed_by: []
 adjudicates:
   points: [sensor_value]
   verdict: invalid_while_active
-related: [SYS-FC-054, SYS-FC-101, AHU-FC-062, RTU-FC-052]
+related: [SYS-FC-054, SYS-FC-059, AHU-FC-062, RTU-FC-052]
 playbooks: [sensor-drift]
 operating_states: "all — the rule evaluates only while equip_active is true, and its own yWindowOk reports whether a complete window of running time has accumulated"
 preconditions: "Host delivery quality must be resolved before this rule runs, and this is the load-bearing precondition rather than boilerplate: a value the host is re-serving from cache because the subscription died presents to the graph as a perfectly frozen sensor, and the rule will report flatline and be right about the number it was given and wrong about the transmitter. Freshness, PointStatus and gap handling stay where the reference's ch.4 puts them — host-side, ahead of this rule (design doc §2.2). sensor_value must be bound to a live measurement: a setpoint, a configured constant, a schedule output or a host-derived aggregate that only refreshes hourly will all read as flatline and none of them is a sensor. equip_active must be bound to the run status of the equipment whose process actually drives the bound sensor — sf_status for an AHU supply-air temperature, comp_status for a suction line, pump_status for a loop reading. A VAV box has no run status of its own; bind the parent AHU's fan status or zone_airflow > 0 and record which. Both flatline_band and flatline_window are per-binding site configuration in the bound point's units and MUST be set for this instance before the rule is trusted; the shipped defaults are a worked example for a supply-air temperature, not a site value. Where yWindowOk is false the verdict is NO_EVAL, not a healthy sensor."
@@ -103,7 +103,7 @@ yFault     = (still AND equip_active) held continuously for flatline_window,
 
 Block graph (`rule.cxf.jsonld`):
 
-![SYS-FC-100 block graph](diagram.svg)
+![SYS-FC-058 block graph](diagram.svg)
 
 Eight blocks. `sensRef` is a `Discrete.Sampler` on the window period, so the
 comparison is always against where the reading sat at the start of the current
@@ -225,7 +225,7 @@ heating fault or an electric cooling one, and the rule does not know which.
   reporting twice the actual slope at a 300 s tick with `T = 300 s`.
 - **`Discrete.Sampler` emits the live input on its first tick,** so there is no
   startup artifact of the kind `Discrete.UnitDelay` produces with `y_start = 0`
-  (that is SYS-FC-101's problem). This is pinned by an arrival time rather than
+  (that is SYS-FC-059's problem). This is pinned by an arrival time rather than
   asserted: the alarm lands at `flatline_window + alarm_delay` from t = 0, which
   is only reachable if the first baseline was the live reading.
 - **The sampler grid is anchored to absolute model time, not to controller
@@ -244,7 +244,7 @@ heating fault or an electric cooling one, and the rule does not know which.
   `flatline_band` per `flatline_window` satisfies the test. That is a sensor
   finding either way, but the *name* is wrong and this rule cannot supply the
   right one — naming drift is SYS-FC-054's job, and a host running both should
-  read a simultaneous SYS-FC-100 and SYS-FC-054 as drift, not two faults.
+  read a simultaneous SYS-FC-058 and SYS-FC-054 as drift, not two faults.
 - **Strict `<` on the band.** CDL `Reals` has no `LessEqual` and the
   disagreement is measure-zero on a real-valued signal, so the comparison errs
   toward silence. Edge cases use dyadic values (14.0 against 14.25) so the

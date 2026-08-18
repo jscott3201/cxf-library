@@ -7,7 +7,7 @@ this chapter:
   schedule faults, fully specified in HVAC FDD Reference v1.0 ch.16
   (pdf pages 138–147). All eight are verified — this completed the
   reference's entire fully-specified fault set.
-- **Sensor-health rules** (SYS-FC-054 + SYS-FC-100/101): the library's
+- **Sensor-health rules** (SYS-FC-054 + SYS-FC-058/059): the library's
   cross-equipment sensor-integrity family per the accepted design
   (internal sensor-health design note, local-only). SYS-FC-054 is BOTH — the
   reference's own paired-sensor cross-validation card is exactly the
@@ -33,12 +33,12 @@ Point dictionary: [`points/sys.points.json`](../../points/sys.points.json).
 | SYS-FC-055 | Virtual sensor drift detection | 3 | statistical | **verified** |
 | SYS-FC-056 | Zone heating active during summer / warm weather | 3 | rule | **verified** |
 | SYS-FC-057 | Exhaust fan schedule misalignment with AHU | 3 | rule | **verified** |
-| SYS-FC-100 | Sensor flatline while equipment active | 3 | rule | **verified** |
-| SYS-FC-101 | Sensor spike / rate-of-change violation | 3 | rule | **verified** |
+| SYS-FC-058 | Sensor flatline while equipment active | 3 | rule | **verified** |
+| SYS-FC-059 | Sensor spike / rate-of-change violation | 3 | rule | **verified** |
 
 All severities/methods are re-verified against the chapter text (SYS-FC-052
 is severity 4/info per the chapter, correcting the provisional row).
-SYS-FC-100/101 are library-authored (design doc + public sources: Yang et
+SYS-FC-058/059 are library-authored (design doc + public sources: Yang et
 al. 2008, Liao et al. 2021, Dey & Dong 2016). Naming note: the sys
 dictionary's host-derived schedule boolean is `occ_scheduled`; the ahu
 dictionary spells the same concept `occ_schedule` — a known inconsistency,

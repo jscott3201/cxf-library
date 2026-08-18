@@ -14,7 +14,7 @@ source:
   - "HVAC FDD Reference v1.0 §16, SYS-FC-055 (pdf pp. 144-145) — the residual equation, both published thresholds, the four diagnoses, the whole impact profile, and the Koo & Yoon note"
   - "The reference's own provenance line for that card: Koo & Yoon 2022; Sun et al. 2024 (virtual sensor RMSE 0.30 °C, bias > 1 °C detected reliably)"
   - "Accepted design: internal sensor-health design note (local-only, not distributed) (§2 stance, §2.3 the adjudicates contract, §4.3 the MovingAverage ring floor, §4.4 vector strategy)"
-  - "Library precedent: SYS-FC-054 (the pair form of the same question), SYS-FC-100/101 (the role-point sensor family), AHU-FC-056 (Reals.MovingAverage at a 64-checkpoint ring), HP-FC-050 and VAV-FC-050 (host-fitted baselines consumed as ordinary points)"
+  - "Library precedent: SYS-FC-054 (the pair form of the same question), SYS-FC-058/059 (the role-point sensor family), AHU-FC-056 (Reals.MovingAverage at a 64-checkpoint ring), HP-FC-050 and VAV-FC-050 (host-fitted baselines consumed as ordinary points)"
 g36: null
 clusters: [CLU-09]
 suppresses: []
@@ -22,7 +22,7 @@ suppressed_by: []
 adjudicates:
   points: [physical_sensor]
   verdict: invalid_while_active
-related: [SYS-FC-054, SYS-FC-100, SYS-FC-101, AHU-FC-062, RTU-FC-052]
+related: [SYS-FC-054, SYS-FC-058, SYS-FC-059, AHU-FC-062, RTU-FC-052]
 playbooks: [sensor-drift]
 operating_states: "all, within the operating envelope the virtual sensor was trained on. The graph has no gate and evaluates whenever the host publishes a prediction, so the envelope is the host's to enforce: a Ridge model fitted over a summer learning period is extrapolating in January, and its extrapolation error arrives here as a residual indistinguishable from sensor drift. Where the host cannot vouch for the prediction it should stop publishing virtual_value rather than publish a guess."
 preconditions: "physical_sensor and virtual_value are a ROLE PAIR, not canonical names: the host's instance configuration records which real point physical_sensor is bound to, and that record is what resolves this card's adjudicates target. Both thresholds are in the BOUND point's units — the reference's 1.5 and 3.0 are its temperature defaults and MUST be retuned for any other quantity kind. Four host obligations decide whether this rule means anything. (1) The model must never take the accused sensor as one of its own features: a regression that can see physical_sensor predicts it perfectly, the residual collapses to zero, and the rule goes permanently silent while reporting health. (2) The learning period must be known-good. A model trained while the sensor was already 2 K high learns the bias as truth, and the drift becomes invisible from the moment it is fitted — this rule cannot detect a fault that predates its own baseline. (3) Model health is a separate question with a separate rule: the reference's META-FC-050 (statistical model confidence degradation) is what says the Ridge fit has stopped tracking, and a host running it should read a degraded model as NO_EVAL here rather than as sensor drift. (4) Delivery quality is resolved before this rule runs, not by it — a value held over from a dead subscription reads as a residual, and the rule is right about the number it was given and wrong about the sensor (design doc §2.2). Recommended: report NO_EVAL for the first `window` after load, where both statistics are computed over a partial window; the graph will still produce a verdict there, and `bias_present_at_load` pins what that verdict looks like."
@@ -153,7 +153,7 @@ The reference's four, in its order:
    identical output with the accused transmitter in perfect health
 
 Diagnosis 4 is the residual ambiguity to weigh against `invalid_while_active`.
-The cheap discriminator is the family: run SYS-FC-054, SYS-FC-100 and SYS-FC-101
+The cheap discriminator is the family: run SYS-FC-054, SYS-FC-058 and SYS-FC-059
 on the model's *input* sensors, and a clean bill on the features turns this
 rule's finding from a suspicion into an accusation. The expensive one is a
 reference instrument, which is where the playbook ends up anyway.
@@ -244,7 +244,7 @@ emits nothing. The quantity is entirely cascade, which is why
   never means NO_EVAL — this rule has no evaluability output, because its
   evaluability question (is the model still fit?) lives outside the graph.
 - **Role points, and the thresholds are in the bound point's units.** Same
-  documented exception as SYS-FC-054 and SYS-FC-100 (SCHEMA.md points contract):
+  documented exception as SYS-FC-054 and SYS-FC-058 (SCHEMA.md points contract):
   one graph deploys against many real points, so the host's instance
   configuration records each binding. Both published thresholds are the
   reference's temperature numbers; a humidity or pressure binding left at 1.5
@@ -260,7 +260,7 @@ emits nothing. The quantity is entirely cascade, which is why
   SYS-FC-055 as a member with SYS-FC-054 as trigger, and
   `playbooks/sensor-drift.md` already names this rule in its Applies-To row and
   in step 1.2. Both files predate this card and neither needs an edit.
-- **`category: COMFORT_ENERGY` transcribed, not argued.** SYS-FC-100 departs to
+- **`category: COMFORT_ENERGY` transcribed, not argued.** SYS-FC-058 departs to
   `PROTECTIVE` on the grounds that a sensor gate delivers avoided false alarms
   rather than energy, and the argument applies word for word here; it is not
   taken because the reference publishes a profile for *this* card and it says
@@ -295,7 +295,7 @@ calibration, never before, and treat a fault that cleared without a work order
 as a retraining event to be explained.
 
 The family's members answer different questions about the same transmitter:
-SYS-FC-100 catches the sensor that has stopped moving, SYS-FC-101 the one that
+SYS-FC-058 catches the sensor that has stopped moving, SYS-FC-059 the one that
 jumps further than the process can, SYS-FC-054 the one that disagrees with a
 partner in the same air stream, and this one the one that disagrees with
 everything else at once. The
