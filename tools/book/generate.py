@@ -32,6 +32,34 @@ def read_card(card_path: Path):
     return fm, body
 
 
+SVG_ROOT_RE = re.compile(r"<svg\b[^>]*>")
+SVG_VIEWBOX_RE = re.compile(
+    r'viewBox="\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)[\s,]+([\d.]+)\s*"'
+)
+
+
+def copy_svg(src: Path, dst: Path):
+    """Copy an SVG, injecting width/height from the viewBox when absent.
+
+    An <svg> with only a viewBox has no intrinsic size inside an <img>
+    element. The book wraps diagrams in shrink-to-fit self-links, and the
+    max-width:100% / shrink-to-fit circularity collapses intrinsic-size-less
+    images to 0x0 — they load but render invisible. Explicit pixel
+    attributes restore the intrinsic size; book/custom.css scales them back
+    down responsively.
+    """
+    text = src.read_text(encoding="utf-8")
+    m = SVG_ROOT_RE.search(text)
+    if m and not re.search(r'(?<![-\w])(width|height)\s*=', m.group(0)):
+        vb = SVG_VIEWBOX_RE.search(m.group(0))
+        if vb:
+            w, h = vb.group(1), vb.group(2)
+            text = (text[: m.end() - 1]
+                    + f' width="{w}" height="{h}">'
+                    + text[m.end():])
+    dst.write_text(text, encoding="utf-8")
+
+
 def fault_link(fid: str, from_depth: int, known: set) -> str:
     """Markdown link to a fault page if it exists in this build, else plain text."""
     if fid in known:
@@ -150,7 +178,7 @@ def build_family(family_dir: Path, known: set):
         )
         svg = fdir / "diagram.svg"
         if svg.is_file():
-            shutil.copy(svg, dest / f"{fid}.svg")
+            copy_svg(svg, dest / f"{fid}.svg")
         entries.append((fid, fm.get("name", "")))
 
     # Family index: the README with fault IDs linked to their pages.
@@ -262,6 +290,8 @@ def main():
     # Introduction and schema, links rewritten for the book layout.
     if (REPO / "assets").is_dir():
         shutil.copytree(REPO / "assets", SRC / "assets")
+        for asset_svg in (SRC / "assets").rglob("*.svg"):
+            copy_svg(asset_svg, asset_svg)
     intro = (REPO / "README.md").read_text(encoding="utf-8")
     intro = intro.replace("**`SCHEMA.md`**", "**[`SCHEMA.md`](schema.md)**")
     # Fault-dir asset links flatten in the book (<ID>/diagram.svg -> <ID>.svg)
