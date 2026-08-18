@@ -34,8 +34,9 @@ Here is a real one — AHU-FC-050, simultaneous heating and cooling:
 
 ## What's inside
 
-- **79 verified fault rules** across eleven equipment families: air handlers
-  (`faults/ahu/`, all 31 reference faults), system-level & cross-equipment
+- **82 verified fault rules** across eleven equipment families: air handlers
+  (`faults/ahu/`, 34 — all 31 reference faults plus 3 APAR-grounded
+  library extensions), system-level & cross-equipment
   rules (10 — the reference's full ch.16 set plus the library's sensor-health
   family), rooftop units (6), hot water plants (8 — the reference's 3 plus 5
   library-authored loop rules grounded in PNNL-27338), VAV terminal boxes

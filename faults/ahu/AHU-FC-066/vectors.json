@@ -1,0 +1,134 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 5400 },
+  "scenarios": [
+    {
+      "name": "cooling_air_well_below_the_space",
+      "description": "Minimum-OA mechanical cooling on a warm day: the space returns at 24 °C and the coil delivers 13 °C. Supply air is 11 K colder than the return, which is the sign every cooling-side mode expects, so there is nothing to report",
+      "inputs": { "sat": 13.0, "rat": 24.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "supply_inside_the_fan_and_sensor_allowance",
+      "description": "Supply air reads 0.5 K warmer than return air. The return-fan rise credit alone (1.1 K) more than covers that, so the comparison lands at 1.6 K against a 1.7 K allowance and the single conjunct is false — the rule's only blocking condition, exercised alone",
+      "inputs": { "sat": 24.5, "rat": 24.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "excess_just_inside_the_allowance",
+      "description": "Threshold edge, healthy side: a 0.59 K gap puts the comparison at 1.69 K, one hundredth of a kelvin inside epsilon_t. Reachable as an exact double from these operands, unlike a nominal 0.60 (see the next two scenarios)",
+      "inputs": { "sat": 24.59, "rat": 24.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "nominal_edge_operands_land_healthy",
+      "description": "A gap of nominally 0.60 K — the exact trip line for the shipped defaults — written as 24.7 − 24.1. The subtraction lands on 0.5999999999999979, the comparison on 1.699999999999998, and the strict `>` reads healthy. Paired with the next scenario, which is the same nominal gap on the other side of the line",
+      "inputs": { "sat": 24.7, "rat": 24.1 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "nominal_edge_operands_land_faulted",
+      "description": "The same nominal 0.60 K gap written as 24.6 − 24.0 lands on 0.6000000000000014 instead, the comparison on 1.7000000000000015, and the alarm asserts. The trip line falls between two doubles no realistic temperature pair can reach, so at exactly epsilon_t the verdict is decided by the ulp of the subtraction rather than by the rule — see Deviations",
+      "inputs": { "sat": 24.6, "rat": 24.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "excess_just_outside_the_allowance",
+      "description": "Threshold edge, faulted side: a 0.61 K gap puts the comparison at 1.71 K, and the alarm follows one alarm_delay later. Ten millikelvin either side of the line is decided the way the equation says",
+      "inputs": { "sat": 24.61, "rat": 24.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "alarm_delay_edge_asserts_at_1800s",
+      "description": "Both sides of the TrueDelay edge, pinned to the tick. A 2 K gap violates from load with delayOnInit true, so yFault is false through 1500 s and asserts at exactly 1800 s",
+      "inputs": { "sat": 26.0, "rat": 24.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 1800, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "chilled_water_lost_during_mechanical_cooling",
+      "description": "The unit is in a cooling mode and supply air leaves 1.5 K warmer than the return — the coil is passing no useful capacity, so the fan is delivering the building's own heat back to it. Comparison lands at 2.6 K against 1.7 K",
+      "inputs": { "sat": 25.5, "rat": 24.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "return_sensor_reading_low",
+      "description": "A plausible 22 °C supply against a 19 °C return in a building nowhere near 19 °C: the same 3 K violation, but here the return-air sensor is what is wrong. The rule reports the contradiction and cannot say which of the two sensors is lying",
+      "inputs": { "sat": 22.0, "rat": 19.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "transient_clears_before_alarm_delay",
+      "description": "The gap holds at 2 K for 1200 s while the chilled-water valve strokes open after a mode change, then supply air falls to 14 °C. Anything shorter than alarm_delay never reaches the operator",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 26.0 },
+          { "t": 1200, "value": 14.0 }
+        ],
+        "rat": 24.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "fault_clears_on_recovery",
+      "description": "A sustained 2 K gap alarms at 1800 s; chilled water returns at t = 3000 and supply air falls to 14 °C. TrueDelay has no off-delay, so the alarm drops on that tick",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 26.0 },
+          { "t": 3000, "value": 14.0 }
+        ],
+        "rat": 24.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 2700, "equals": true },
+        { "output": "yFault", "from_s": 3300, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "oscillating_excess_never_alarms",
+      "description": "A cooling loop hunting on a 10-minute period drives supply air between 26 °C and 20 °C. Its mean sits well outside the allowance and an hourly evaluation of averaged data would report the fault, but persistence restarts on every compliant tick, so this rule stays silent — the limit of substituting TrueDelay for a data window (see Deviations)",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 26.0 },
+          { "t": 600, "value": 20.0 },
+          { "t": 1200, "value": 26.0 },
+          { "t": 1800, "value": 20.0 },
+          { "t": 2400, "value": 26.0 },
+          { "t": 3000, "value": 20.0 },
+          { "t": 3600, "value": 26.0 },
+          { "t": 4200, "value": 20.0 },
+          { "t": 4800, "value": 26.0 }
+        ],
+        "rat": 24.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 3600 },
+  "scenarios": [
+    {
+      "name": "past_changeover_damper_at_min",
+      "description": "Healthy changeover: OAT 30 °C against RAT 22 °C with mechanical cooling at 40% — the unit has handed back to minimum outdoor air (damper 15%), which is the correct response",
+      "inputs": { "oat": 30.0, "rat": 22.0, "clg_vlv_cmd": 40.0, "oa_dmpr_cmd": 15.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "past_changeover_damper_still_open",
+      "description": "The fault: OAT 30 °C is 8 °C hotter than return air, mechanical cooling is running, and the OA damper is still at 95% — the unit never stopped economizing; alarms after alarm_delay (1800 s)",
+      "inputs": { "oat": 30.0, "rat": 22.0, "clg_vlv_cmd": 40.0, "oa_dmpr_cmd": 95.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "still_favorable_for_economizing",
+      "description": "Temperature conjunct blocking alone: OAT 10 °C is well below the 22 °C return air, so a wide-open damper with cooling running is free cooling doing its job",
+      "inputs": { "oat": 10.0, "rat": 22.0, "clg_vlv_cmd": 40.0, "oa_dmpr_cmd": 95.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "no_cooling_call",
+      "description": "Cooling conjunct blocking alone: hot outdoor air and a wide-open damper, but the cooling valve is shut — no mechanical cooling is paying for the outdoor air, so there is no waste to report",
+      "inputs": { "oat": 30.0, "rat": 22.0, "clg_vlv_cmd": 0.0, "oa_dmpr_cmd": 95.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_exactly_at_threshold",
+      "description": "Edge case: damper parked exactly at econ_damper_high_threshold (75%) past changeover with cooling running — the strict `>` keeps it out of the alarm",
+      "inputs": { "oat": 30.0, "rat": 22.0, "clg_vlv_cmd": 40.0, "oa_dmpr_cmd": 75.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_just_above_threshold",
+      "description": "Edge case, other side: damper at 75.1% clears the threshold by a tenth of a point and the alarm follows at 1800 s",
+      "inputs": { "oat": 30.0, "rat": 22.0, "clg_vlv_cmd": 40.0, "oa_dmpr_cmd": 75.1 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "cooling_exactly_at_threshold",
+      "description": "Edge case: cooling valve exactly at cooling_enabled_threshold (10%) with the damper wide open past changeover — the strict `>` means the coil does not count as cooling",
+      "inputs": { "oat": 30.0, "rat": 22.0, "clg_vlv_cmd": 10.0, "oa_dmpr_cmd": 95.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "cooling_just_above_threshold",
+      "description": "Edge case, other side: cooling valve at 10.1% counts as mechanical cooling and the alarm follows at 1800 s",
+      "inputs": { "oat": 30.0, "rat": 22.0, "clg_vlv_cmd": 10.1, "oa_dmpr_cmd": 95.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "deadband_edge_then_past_changeover",
+      "description": "Edge case: oat − rat sits exactly on temp_deadband (1.0 °C) — no alarm; at t=1200 the outdoor air rises to 23.5 °C, opening the gap to 1.5 °C, and the alarm follows 1800 s later",
+      "inputs": {
+        "rat": 22.0,
+        "oat": [
+          { "t": 0, "value": 23.0 },
+          { "t": 1200, "value": 23.5 }
+        ],
+        "clg_vlv_cmd": 40.0,
+        "oa_dmpr_cmd": 95.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2940, "equals": false },
+        { "output": "yFault", "from_s": 3060, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "damper_closes_before_delay",
+      "description": "Transient: the economizer is wide open against hot outdoor air with cooling running, but the damper drives to 20% at t=1200 — the condition clears before alarm_delay completes, so no alarm",
+      "inputs": {
+        "oat": 30.0,
+        "rat": 22.0,
+        "clg_vlv_cmd": 40.0,
+        "oa_dmpr_cmd": [
+          { "t": 0, "value": 95.0 },
+          { "t": 1200, "value": 20.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_cycle_resets_persistence",
+      "description": "Transient: the damper closes at t=900 and drives back open at t=1200 under an unbroken past-changeover-plus-cooling condition — persistence restarts from the reopen, so the alarm lands at 3000 s, not 1800 s",
+      "inputs": {
+        "oat": 30.0,
+        "rat": 22.0,
+        "clg_vlv_cmd": 40.0,
+        "oa_dmpr_cmd": [
+          { "t": 0, "value": 95.0 },
+          { "t": 900, "value": 20.0 },
+          { "t": 1200, "value": 95.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2940, "equals": false },
+        { "output": "yFault", "from_s": 3060, "to_s": 3600, "equals": true }
+      ]
+    }
+  ]
+}

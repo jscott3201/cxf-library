@@ -12,7 +12,8 @@
         "AHU-FC-012",
         "AHU-FC-059",
         "AHU-FC-063",
-        "FCU-FC-001"
+        "FCU-FC-001",
+        "AHU-FC-066"
       ],
       "playbook": "simultaneous-hc",
       "prevalence": "common",

@@ -13,6 +13,7 @@ estimation_method: QUALITATIVE_ONLY
 source:
   - "HVAC FDD Reference v1.0 §9, AHU-FC-062"
   - "Schein et al. 2006 (APAR Rule 1)"
+  - "Bushby et al. 2001 (NIST/CEC PIER Project 2.3, APAR rules 26/27 — earliest form of this envelope test)"
   - "Torabi 2022"
   - "Gunay 2023"
 g36: null

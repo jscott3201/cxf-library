@@ -18,7 +18,7 @@ g36: "§5.16.14 FC#13"
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [AHU-FC-012, AHU-FC-007, AHU-FC-057]
+related: [AHU-FC-012, AHU-FC-007, AHU-FC-057, AHU-FC-066, AHU-FC-067]
 playbooks: []
 operating_states: "OS#3-#4 (mechanical cooling) — host-gated"
 preconditions: "Supply fan running, and the unit in one of the two mechanical-cooling operating states G36 defines by actuator signature: OS#3 (HC = 0, CC > 0, OA damper = 100%) or OS#4 (HC = 0, CC > 0, OA damper at minimum). Suspend evaluation for ModeDelay (30 min) after any mode or operating-state change in a zone group the AHU serves, while actuators are still stroking and the coil has not caught up. `clg_vlv_cmd` must be the command the AHU controller is issuing, not a position feedback: this rule asks whether the loop has run out of capacity to ask for, and a feedback that disagrees with its command is a stuck-actuator finding (AHU-FC-054), not this one. `sat_sp` must be the active setpoint, including any reset — comparing against a design value the sequence is no longer holding produces a fault every mild afternoon. When any gate is unmet the verdict is NO_EVAL, not healthy."
