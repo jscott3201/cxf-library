@@ -175,17 +175,43 @@ def extract(csv_path: Path, loops: dict) -> dict:
 # ------------------------------------------------- operating states
 
 ALL_OS = {1, 2, 3, 4, 5}
-# G36-style OS sets transcribed from each card's operating_states frontmatter.
-OS_MAP = {
-    "AHU-FC-002": ALL_OS, "AHU-FC-003": ALL_OS,
-    "AHU-FC-005": {1}, "AHU-FC-006": {1, 4}, "AHU-FC-008": {2},
-    "AHU-FC-009": {2}, "AHU-FC-010": {3}, "AHU-FC-011": {3},
-    "AHU-FC-012": {2, 3, 4}, "AHU-FC-013": {3, 4}, "AHU-FC-015": {2, 3, 4},
-    "AHU-FC-056": ALL_OS, "AHU-FC-057": {2, 3, 4},
-    "AHU-FC-014": {1, 2}, "AHU-FC-051": {4}, "AHU-FC-053": {2, 3, 4},
-    "AHU-FC-054": ALL_OS, "AHU-FC-055": {1, 4}, "AHU-FC-062": ALL_OS,
-    "AHU-FC-066": {2, 3, 4}, "AHU-FC-067": {1, 2, 3, 4}, "AHU-FC-068": {3},
-}
+OS_OVERRIDE: dict = {}   # rule-id -> set, only for cards whose prose defeats the parser
+
+
+def parse_operating_states(s: str):
+    """G36-style OS set from a card's operating_states frontmatter.
+
+    Handles ranges (OS#2-#4), comma lists (OS 2, 3, 4), singletons, and
+    a leading "all". Returns None when nothing parses — callers must treat
+    that as an ERROR, never default to ALL_OS: the fleet sweep's two
+    spurious FP clusters came from exactly that silent default.
+    """
+    s = s.strip().strip('"')
+    out = set()
+    for m in re.finditer(r'OS\s?#?\s?(\d)((?:\s*,\s*\d)*)(?:\s*[-–]\s*(?:OS\s?)?#?(\d))?', s):
+        a, lst, b = m.groups()
+        if b:
+            out |= set(range(int(a), int(b) + 1))
+        else:
+            out.add(int(a))
+            out |= {int(x) for x in re.findall(r'\d', lst or '')}
+    if not out and re.match(r'(?i)^\s*"?all\b', s):
+        return set(ALL_OS)
+    return out or None
+
+
+def rule_os_set(rid: str, card: Path):
+    if rid in OS_OVERRIDE:
+        return OS_OVERRIDE[rid]
+    fm = card.read_text().split("---", 2)[1]
+    m = re.search(r'^operating_states:\s*(.+)$', fm, re.M)
+    got = parse_operating_states(m.group(1)) if m else None
+    if got is None:
+        sys.exit(f"{rid}: operating_states unparseable ({m.group(1)[:60] if m else 'missing'}) — "
+                 "add an OS_OVERRIDE entry rather than defaulting")
+    return got
+
+
 SMOOTH_TICKS = 6   # 30 min any-window smoothing over DX/burner cycling
 
 
@@ -279,7 +305,7 @@ def emit_and_replay(building: str, loops_pts: dict, rules: dict, out: Path):
             n = len(next(iter(pts.values())))
             horizon = (n - 1) * STEP_S
             wins = gated_windows(pts["sf_status"], derive_os(pts),
-                                 OS_MAP.get(rid, ALL_OS))
+                                 rule_os_set(rid, r["dir"] / "card.md"))
             if not wins:
                 continue
             d = replay / f"{rid}__{lp.replace(' ', '_')}"
@@ -448,6 +474,11 @@ def main():
     runp.add_argument("--mode", default="airloop", choices=["airloop", "plant"])
     runp.add_argument("--reuse", action="store_true",
                       help="reuse an existing eplusout.csv instead of re-running EnergyPlus")
+    runp.add_argument("--faultmodel", default=None, metavar="KIND=DELTA",
+                      help="physics-level fault: patch FaultModel objects into the "
+                           "epJSON before simulation (e.g. oa_temp_offset=4.0 — the "
+                           "CONTROLLER acts on the biased sensor; FDD replays truth). "
+                           "FAILs are DETECTIONS")
     runp.add_argument("--bias", default=None, metavar="POINT=DELTA",
                       help="TPR mode: add DELTA to POINT in the replayed inputs "
                            "(faulted-sensor-as-seen-by-FDD); FAILs are DETECTIONS")
@@ -524,6 +555,18 @@ def main():
 
     loops = loop_nodes(b)
     patched = patch(b, loops, begin, end)
+    if args.faultmodel:
+        kind, delta = args.faultmodel.split("=")
+        assert kind == "oa_temp_offset", kind
+        patched.setdefault("FaultModel:TemperatureSensorOffset:OutdoorAir", {})
+        for i, oa in enumerate(patched.get("Controller:OutdoorAir", {})):
+            patched["FaultModel:TemperatureSensorOffset:OutdoorAir"][f"simharness OAT fault {i}"] = {
+                "controller_object_type": "Controller:OutdoorAir",
+                "controller_object_name": oa,
+                "temperature_sensor_offset": float(delta),
+            }
+        print(f"FaultModel injected: OAT sensor offset {delta} degC on "
+              f"{len(patched.get('Controller:OutdoorAir', {}))} OA controllers — FAILs are DETECTIONS")
     pj = out / "patched.epjson"
     pj.write_text(json.dumps(patched))
     csv_path = out / "ep" / "eplusout.csv"
