@@ -369,6 +369,12 @@ def plant_nodes(b: dict) -> dict:
             entry["boilers"] = [x for x in b.get("Boiler:HotWater", {}) if name.split("_")[0].lower() in x.lower() or "Central" not in x]
             entry["pumps"] = [p for p in list(b.get("Pump:VariableSpeed", {})) if name.split("_")[0].lower() in p.lower()]
             out["hw"] = entry
+    for name, cl in b.get("CondenserLoop", {}).items():
+        out["tower"] = {"out_node": cl["condenser_side_outlet_node_name"],
+                        "in_node": cl["condenser_side_inlet_node_name"],
+                        "towers": list(b.get("CoolingTower:VariableSpeed", {}))
+                                  + list(b.get("CoolingTower:SingleSpeed", {}))
+                                  + list(b.get("CoolingTower:TwoSpeed", {}))}
     return out
 
 
@@ -390,6 +396,13 @@ def patch_plant(b: dict, pn: dict, begin, end) -> dict:
         req(c["sp_node"], "System Node Setpoint Temperature")
         for ch in c["chillers"]:
             req(ch, "Chiller Part Load Ratio")
+    if "tower" in pn:
+        tw = pn["tower"]
+        req("Environment", "Site Outdoor Air Wetbulb Temperature")
+        req(tw["out_node"], "System Node Temperature")
+        req(tw["in_node"], "System Node Temperature")
+        for c in tw["towers"]:
+            req(c, "Cooling Tower Fan Electricity Rate")
     if "hw" in pn:
         h = pn["hw"]
         req(h["out_node"], "System Node Temperature")
@@ -420,6 +433,16 @@ def extract_plant(csv_path: Path, pn: dict, b: dict) -> dict:
             # plant chiller_load proxy: max PLR across chillers x100 — the
             # loaded chiller's PLR, the quantity the delta-T floor gates on
             "chiller_load": [round(max(v) * 100.0, ROUND) for v in zip(*plrs)],
+        }
+    if "tower" in pn:
+        tw = pn["tower"]
+        fan_w = [series(data, col(header, c, "Cooling Tower Fan Electricity Rate")) for c in tw["towers"]]
+        fams["tower"] = {
+            "oat": oat,
+            "oa_wetbulb": series(data, col(header, "Environment", "Site Outdoor Air Wetbulb Temperature")),
+            "tower_leaving_temp": series(data, col(header, tw["out_node"], "System Node Temperature")),
+            "tower_entering_temp": series(data, col(header, tw["in_node"], "System Node Temperature")),
+            "tower_fan_on": [max(v) > 100.0 for v in zip(*fan_w)],
         }
     if "hw" in pn:
         h = pn["hw"]
@@ -505,6 +528,30 @@ def main():
             print(f"plant loops: {list(pn)}; running EnergyPlus…")
             csv_path = run_energyplus(pj, epw, out / "ep")
         fams = extract_plant(csv_path, pn, b)
+        if "tower" in fams:
+            tp = fams.pop("tower")
+            on = tp["tower_fan_on"]
+            appr = [round(l - w, 3) for l, w, o in
+                    zip(tp["tower_leaving_temp"], tp["oa_wetbulb"], on) if o]
+            rng = [round(e - l, 3) for e, l, o in
+                   zip(tp["tower_entering_temp"], tp["tower_leaving_temp"], on) if o]
+            if appr:
+                import statistics as st
+                def pct(v, q):
+                    v = sorted(v); return round(v[min(len(v) - 1, int(q * len(v)))], 2)
+                stats = {"ticks_tower_on": len(appr),
+                         "approach_degC": {"p50": pct(appr, .5), "p90": pct(appr, .9),
+                                            "p95": pct(appr, .95), "max": max(appr)},
+                         "range_degC": {"p50": pct(rng, .5), "p90": pct(rng, .9),
+                                         "max": max(rng)},
+                         "wetbulb_degC": {"min": min(tp["oa_wetbulb"]),
+                                           "max": max(tp["oa_wetbulb"])}}
+                (out / "tower_stats.json").write_text(json.dumps(stats, indent=1))
+                print(f"tower stats ({len(appr)} on-ticks): approach p50/p90/p95 = "
+                      f"{stats['approach_degC']['p50']}/{stats['approach_degC']['p90']}/"
+                      f"{stats['approach_degC']['p95']} degC; range p50 = {stats['range_degC']['p50']}")
+            else:
+                print("tower stats: tower never ran this period")
         rules = {}
         for fam in fams:
             for rid, r in eligible_rules(families=(fam, "sys"), mapped=PLANT_MAPPED).items():
