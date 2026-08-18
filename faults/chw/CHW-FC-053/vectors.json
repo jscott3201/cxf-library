@@ -1,0 +1,217 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 7200
+  },
+  "scenarios": [
+    {
+      "name": "normal_delta_t",
+      "description": "The reference's published vector 1: CHWST 6 °C, CHWRT 12 °C, load 60% — expected NO_FAULT. A 6 K delta-T is above design, let alone above the 2.8 K trip line, so the rule is evaluated and silent.",
+      "inputs": {
+        "chwst": 6.0,
+        "chwrt": 12.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "low_delta_t",
+      "description": "The reference's published vector 2: CHWST 6 °C, CHWRT 8 °C, load 60% — expected FAULT. Delta-T is 2 K against a 2.8 K trip line; the alarm lands at exactly alarm_delay because delayOnInit holds the condition from the first tick.",
+      "inputs": {
+        "chwst": 6.0,
+        "chwrt": 8.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "low_load",
+      "description": "The reference's published vector 3: CHWST 6 °C, CHWRT 7 °C, load 20% — expected NO_EVAL. The 1 K delta-T is well below the trip line and means nothing at 20% load, which is what yLoadOk = false tells the host.",
+      "inputs": {
+        "chwst": 6.0,
+        "chwrt": 7.0,
+        "chiller_load": 20.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "delta_t_exactly_at_the_threshold",
+      "description": "Boundary, bit-exact: 7.8 − 5.0 is the double nearest 2.8, and 5.6 × 0.5 is the same double (halving is exact), so delta-T sits exactly on the trip line. Reals.Less is strict, so exactly-at-the-line is not a fault.",
+      "inputs": {
+        "chwst": 5.0,
+        "chwrt": 7.8,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "delta_t_just_below_the_threshold",
+      "description": "Boundary from below: 7.79 − 5.0 = 2.79 K clears the strict comparison by 10 mK and alarms on the normal schedule.",
+      "inputs": {
+        "chwst": 5.0,
+        "chwrt": 7.79,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "delta_t_just_above_the_threshold",
+      "description": "Boundary from above: 7.81 − 5.0 = 2.81 K is above the trip line and never alarms, however marginal the plant's performance is.",
+      "inputs": {
+        "chwst": 5.0,
+        "chwrt": 7.81,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "load_exactly_at_the_evaluability_floor",
+      "description": "Boundary on the other conjunct: load is exactly min_load_for_eval (40%) with a collapsed 2 K delta-T. Reals.GreaterThreshold is strict, so exactly-at-the-floor is NO_EVAL and the rule stays silent.",
+      "inputs": {
+        "chwst": 6.0,
+        "chwrt": 8.0,
+        "chiller_load": 40.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "load_just_below_the_evaluability_floor",
+      "description": "39.9% load with the same collapsed delta-T: still NO_EVAL.",
+      "inputs": {
+        "chwst": 6.0,
+        "chwrt": 8.0,
+        "chiller_load": 39.9
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "load_just_above_the_evaluability_floor",
+      "description": "40.1% load with the same collapsed delta-T: evaluable, and the alarm lands at exactly alarm_delay. One tenth of a percent of chiller load is the whole difference between this scenario and the previous one.",
+      "inputs": {
+        "chwst": 6.0,
+        "chwrt": 8.0,
+        "chiller_load": 40.1
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "delta_t_collapses_mid_run",
+      "description": "A plant running at a healthy 6 K delta-T loses it at t = 1800 s — a three-way valve opening its bypass, or a coil starving. The alarm lands at exactly 5400 s: the mid-run rising edge carries the same T + delayTime arithmetic as the init case.",
+      "inputs": {
+        "chwst": 6.0,
+        "chwrt": [
+          { "t": 0, "value": 12.0 },
+          { "t": 1800, "value": 8.0 }
+        ],
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5340, "equals": false },
+        { "output": "yFault", "from_s": 5400, "to_s": 7200, "equals": true },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "delta_t_recovers_after_alarm",
+      "description": "Recovery: the alarm asserts at 3600 s and the return temperature comes back at t = 5400 s. TrueDelay passes the falling edge with no delay, so yFault drops on that tick.",
+      "inputs": {
+        "chwst": 6.0,
+        "chwrt": [
+          { "t": 0, "value": 8.0 },
+          { "t": 5400, "value": 12.0 }
+        ],
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 5340, "equals": true },
+        { "output": "yFault", "from_s": 5400, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "load_drops_after_alarm",
+      "description": "The evaluability release: an alarming plant unloads to 20% at t = 5400 s with the low delta-T unchanged. yFault and yLoadOk fall on the same tick, and only the pair tells the host that the chiller unloaded rather than that the delta-T recovered.",
+      "inputs": {
+        "chwst": 6.0,
+        "chwrt": 8.0,
+        "chiller_load": [
+          { "t": 0, "value": 60.0 },
+          { "t": 5400, "value": 20.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 5340, "equals": true },
+        { "output": "yFault", "from_s": 5400, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 5340, "equals": true },
+        { "output": "yLoadOk", "from_s": 5400, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "intermittent_low_delta_never_alarms",
+      "description": "Delta-T alternating between 2 K and 6 K every 1200 s — a hunting control valve, or a plant cycling between two coils. No single episode reaches alarm_delay, so nothing fires. Persistence is not averaging: a loop spending half its day at 2 K delta-T is a real finding this rule cannot make.",
+      "inputs": {
+        "chwst": 6.0,
+        "chwrt": [
+          { "t": 0, "value": 8.0 },
+          { "t": 1200, "value": 12.0 },
+          { "t": 2400, "value": 8.0 },
+          { "t": 3600, "value": 12.0 },
+          { "t": 4800, "value": 8.0 },
+          { "t": 6000, "value": 12.0 }
+        ],
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "supply_and_return_sensors_swapped",
+      "description": "Blind spot, pinned: the two temperature sensors are wired backwards (CHWST 12 °C, CHWRT 6 °C), so delta-T reads −6 K. Nothing in the graph knows a negative delta-T is impossible, and the rule reports the strongest possible low-delta-T fault on a plant that may be running perfectly.",
+      "inputs": {
+        "chwst": 12.0,
+        "chwrt": 6.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    }
+  ]
+}

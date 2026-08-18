@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1590 400" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <rect x="12" y="40" width="124" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="74" y="59" text-anchor="middle" fill="#1e3a8a">thermal_power</text>
+  <rect x="12" y="100" width="101" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="62.5" y="119" text-anchor="middle" fill="#1e3a8a">fuel_power</text>
+  <rect x="12" y="294" width="163" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="93.5" y="313" text-anchor="middle" fill="#1e3a8a">boiler_firing_rate</text>
+
+  <!-- measured efficiency -->
+  <rect x="210" y="40" width="90" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="255" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">eff</text>
+  <text x="255" y="80" text-anchor="middle" fill="#57606a" font-size="11">Reals.Divide</text>
+
+  <!-- evaluability guard -->
+  <rect x="210" y="160" width="242" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="331" y="182" text-anchor="middle" fill="#24292f" font-weight="bold">fuelOk</text>
+  <text x="331" y="200" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 5.0 kW</text>
+
+  <!-- host-fitted baseline line -->
+  <rect x="210" y="280" width="262" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="341" y="302" text-anchor="middle" fill="#24292f" font-weight="bold">fireSlope</text>
+  <text x="341" y="320" text-anchor="middle" fill="#57606a" font-size="11">Reals.MultiplyByParameter · k = 0.0006</text>
+
+  <rect x="512" y="280" width="203" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="613.5" y="302" text-anchor="middle" fill="#24292f" font-weight="bold">expected</text>
+  <text x="613.5" y="320" text-anchor="middle" fill="#57606a" font-size="11">Reals.AddParameter · p = 0.78</text>
+
+  <!-- shortfall test -->
+  <rect x="770" y="160" width="103" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="821.5" y="182" text-anchor="middle" fill="#24292f" font-weight="bold">shortfall</text>
+  <text x="821.5" y="200" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+
+  <rect x="913" y="160" width="229" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1027.5" y="182" text-anchor="middle" fill="#24292f" font-weight="bold">effLow</text>
+  <text x="1027.5" y="200" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 0.05</text>
+
+  <rect x="1182" y="160" width="83" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1223.5" y="182" text-anchor="middle" fill="#24292f" font-weight="bold">gate</text>
+  <text x="1223.5" y="200" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <rect x="1305" y="160" width="130" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1370" y="182" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1370" y="200" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 3600 s</text>
+
+  <!-- boundary outputs -->
+  <rect x="1475" y="174" width="69" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1509.5" y="193" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1475" y="345" width="77" height="30" rx="15" fill="#fef3c7" stroke="#d97706"/>
+  <text x="1513.5" y="364" text-anchor="middle" fill="#78350f">yFuelOk</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 136 55 H 206"/>
+    <path d="M 113 115 H 170 V 83 H 206"/>
+    <path d="M 113 115 H 170 V 189 H 206"/>
+    <path d="M 175 309 H 206"/>
+    <path d="M 472 309 H 508"/>
+    <path d="M 715 309 H 735 V 175 H 766"/>
+    <path d="M 300 69 H 745 V 203 H 766"/>
+    <path d="M 873 189 H 909"/>
+    <path d="M 1142 189 H 1160 V 175 H 1178"/>
+    <path d="M 452 189 H 490 V 360 H 1166 V 203 H 1178"/>
+    <path d="M 490 360 H 1471"/>
+    <path d="M 1265 189 H 1301"/>
+    <path d="M 1435 189 H 1471"/>
+  </g>
+  <circle cx="490" cy="360" r="3" fill="#7d8590"/>
+
+  <!-- signal type hints -->
+  <text x="142" y="48" fill="#7d8590" font-size="10">Real</text>
+  <text x="119" y="108" fill="#7d8590" font-size="10">Real</text>
+  <text x="181" y="302" fill="#7d8590" font-size="10">Real</text>
+  <text x="306" y="62" fill="#7d8590" font-size="10">Real</text>
+  <text x="721" y="302" fill="#7d8590" font-size="10">Real</text>
+  <text x="458" y="182" fill="#7d8590" font-size="10">Bool</text>
+  <text x="1148" y="182" fill="#7d8590" font-size="10">Bool</text>
+  <text x="776" y="171" fill="#7d8590" font-size="9">u1</text>
+  <text x="776" y="215" fill="#7d8590" font-size="9">u2</text>
+  <text x="1188" y="171" fill="#7d8590" font-size="9">u1</text>
+  <text x="1188" y="215" fill="#7d8590" font-size="9">u2</text>
+  <text x="1475" y="392" fill="#7d8590" font-size="11">false ⇒ NO_EVAL</text>
+</svg>

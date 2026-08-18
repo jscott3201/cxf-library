@@ -1,0 +1,427 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 300,
+    "horizon_s": 10800
+  },
+  "scenarios": [
+    {
+      "name": "on_the_baseline_line",
+      "description": "A boiler sitting exactly on its fitted line: 50% fire, 1000 kW of gas in, 810 kW of heat out, measured efficiency 0.810 against an expected 0.810. The shortfall is exactly zero and nothing is reported.",
+      "inputs": {
+        "boiler_firing_rate": 50.0,
+        "fuel_power": 1000.0,
+        "thermal_power": 810.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        },
+        {
+          "output": "yFuelOk",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "two_points_below_the_line_is_not_a_fault",
+      "description": "Ordinary drift: 0.790 measured against 0.810 expected, a two-point shortfall against a five-point threshold. Boilers wander this much between cleanings and the reference does not call it.",
+      "inputs": {
+        "boiler_firing_rate": 50.0,
+        "fuel_power": 1000.0,
+        "thermal_power": 790.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "degraded_at_mid_fire",
+      "description": "The fault the card is for: 0.740 measured against 0.810 expected, a seven-point shortfall held continuously. The alarm asserts at t = 3600 s.",
+      "inputs": {
+        "boiler_firing_rate": 50.0,
+        "fuel_power": 1000.0,
+        "thermal_power": 740.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 10800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "nominal_five_point_shortfall_faults",
+      "description": "Threshold edge, and the surprise: 0.760 measured against 0.810 expected is nominally exactly the five-point threshold, but 0.81 - 0.76 evaluates to 0.050000000000000044 in IEEE-754 and the strict `>` fires. The nominal boundary case is a FAULT, not a pass — see Deviations.",
+      "inputs": {
+        "boiler_firing_rate": 50.0,
+        "fuel_power": 1000.0,
+        "thermal_power": 760.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 10800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "one_ulp_of_efficiency_clears_the_threshold",
+      "description": "Threshold edge from the other side, one unit in the last place away: thermal power of 760.0000000000001 kW puts the measured efficiency on the next double above 0.76, the shortfall at 0.04999999999999993, and the verdict back to clear. The boundary is bracketed as tightly as binary arithmetic allows.",
+      "inputs": {
+        "boiler_firing_rate": 50.0,
+        "fuel_power": 1000.0,
+        "thermal_power": 760.0000000000001
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "same_efficiency_is_healthy_at_low_fire",
+      "description": "The regressor earning its place: 0.780 measured at 20% fire, where the line expects 0.792. A 1.2-point shortfall, clear.",
+      "inputs": {
+        "boiler_firing_rate": 20.0,
+        "fuel_power": 1000.0,
+        "thermal_power": 780.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "same_efficiency_is_a_fault_at_high_fire",
+      "description": "Identical meter readings to the scenario above, opposite verdict: at 100% fire the line expects 0.840, so the same 0.780 is a six-point shortfall and alarms at 3600 s. Nothing but boiler_firing_rate changed.",
+      "inputs": {
+        "boiler_firing_rate": 100.0,
+        "fuel_power": 1000.0,
+        "thermal_power": 780.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 10800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "fuel_power_exactly_at_the_floor",
+      "description": "Evaluability edge from below: fuel input sitting exactly on fuel_power_min. The strict `>` reads that as not evaluable, yFuelOk is false, and yFault stays down even though the efficiency shortfall behind the gate is 8.6 points. False here means NO_EVAL, not healthy.",
+      "inputs": {
+        "boiler_firing_rate": 10.0,
+        "fuel_power": 5.0,
+        "thermal_power": 3.5
+      },
+      "expect": [
+        {
+          "output": "yFuelOk",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "fuel_power_just_above_the_floor",
+      "description": "Evaluability edge from above: a tenth of a kilowatt more fuel and the same 8.6-point shortfall is evaluated and alarmed at 3600 s.",
+      "inputs": {
+        "boiler_firing_rate": 10.0,
+        "fuel_power": 5.1,
+        "thermal_power": 3.57
+      },
+      "expect": [
+        {
+          "output": "yFuelOk",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 10800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "boiler_off_divide_by_zero",
+      "description": "The boiler is off: no fuel, no heat, and the efficiency quotient is 0/0 = NaN. Every comparison against NaN is false, so the rule is silent — but the gate is what makes that silence legible, and yFuelOk says NO_EVAL rather than leaving the host to infer it.",
+      "inputs": {
+        "boiler_firing_rate": 0.0,
+        "fuel_power": 0.0,
+        "thermal_power": 0.0
+      },
+      "expect": [
+        {
+          "output": "yFuelOk",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "transient_dip_never_alarms",
+      "description": "A half-hour excursion — a cold-start cycle, a load step the burner has not caught up with — that reaches a seven-point shortfall and recovers at t = 2700 s. The hour of persistence swallows it.",
+      "inputs": {
+        "boiler_firing_rate": 50.0,
+        "fuel_power": 1000.0,
+        "thermal_power": [
+          {
+            "t": 0,
+            "value": 810.0
+          },
+          {
+            "t": 900,
+            "value": 740.0
+          },
+          {
+            "t": 2700,
+            "value": 810.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "alarm_clears_after_burner_service",
+      "description": "Recovery: the boiler runs seven points down until the burner is cleaned and the fuel/air ratio reset at t = 7200 s. The alarm holds from 3600 s and falls on the tick the efficiency returns — no fall delay in this rule.",
+      "inputs": {
+        "boiler_firing_rate": 50.0,
+        "fuel_power": 1000.0,
+        "thermal_power": [
+          {
+            "t": 0,
+            "value": 740.0
+          },
+          {
+            "t": 7200,
+            "value": 810.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 6900,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 7200,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "fuel_meter_dropout_forces_no_eval",
+      "description": "The scenario a host must not read as a repair. The same degraded boiler shuts down at t = 7200 s, both meters go to zero, and yFault falls exactly as it does in alarm_clears_after_burner_service. Only yFuelOk separates them: it stays true through a real recovery and goes false here.",
+      "inputs": {
+        "boiler_firing_rate": [
+          {
+            "t": 0,
+            "value": 50.0
+          },
+          {
+            "t": 7200,
+            "value": 0.0
+          }
+        ],
+        "fuel_power": [
+          {
+            "t": 0,
+            "value": 1000.0
+          },
+          {
+            "t": 7200,
+            "value": 0.0
+          }
+        ],
+        "thermal_power": [
+          {
+            "t": 0,
+            "value": 740.0
+          },
+          {
+            "t": 7200,
+            "value": 0.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 6900,
+          "equals": true
+        },
+        {
+          "output": "yFuelOk",
+          "from_s": 0,
+          "to_s": 6900,
+          "equals": true
+        },
+        {
+          "output": "yFuelOk",
+          "from_s": 7200,
+          "to_s": 10800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 7200,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "degradation_released_on_the_alarm_tick",
+      "description": "Delay edge from below: the shortfall is present from t = 0 and disappears at exactly 3600 s, the tick persist would mature on. The input is already clear when the timer comes due, so nothing is reported — a full hour of seven-point degradation this rule declines to call.",
+      "inputs": {
+        "boiler_firing_rate": 50.0,
+        "fuel_power": 1000.0,
+        "thermal_power": [
+          {
+            "t": 0,
+            "value": 740.0
+          },
+          {
+            "t": 3600,
+            "value": 810.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "degradation_released_one_tick_later",
+      "description": "Delay edge from above: the same shortfall held 300 s longer asserts at exactly 3600 s and clears at 3900 s. One tick of input is one tick of alarm.",
+      "inputs": {
+        "boiler_firing_rate": 50.0,
+        "fuel_power": 1000.0,
+        "thermal_power": [
+          {
+            "t": 0,
+            "value": 740.0
+          },
+          {
+            "t": 3900,
+            "value": 810.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3600,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

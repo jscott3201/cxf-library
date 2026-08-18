@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1520 430" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <rect x="12" y="80" width="130" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="77" y="99" text-anchor="middle" fill="#1e3a8a">dp_sp</text>
+  <rect x="12" y="300" width="150" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="87" y="319" text-anchor="middle" fill="#1e3a8a">chw_valve_max</text>
+
+  <!-- setpoint chain -->
+  <rect x="190" y="40" width="160" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="270" y="60" text-anchor="middle" fill="#24292f" font-weight="bold">spRef</text>
+  <text x="270" y="78" text-anchor="middle" fill="#57606a" font-size="11">Sampler · 3 d</text>
+
+  <rect x="410" y="80" width="130" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="475" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">spDev</text>
+  <text x="475" y="118" text-anchor="middle" fill="#57606a" font-size="11">Subtract</text>
+
+  <rect x="580" y="80" width="90" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="625" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">spAbs</text>
+  <text x="625" y="118" text-anchor="middle" fill="#57606a" font-size="11">Abs</text>
+
+  <rect x="710" y="80" width="180" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="800" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">spFlat</text>
+  <text x="800" y="118" text-anchor="middle" fill="#57606a" font-size="11">LessThreshold · 7.5 kPa</text>
+
+  <rect x="930" y="80" width="170" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1015" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">spFlatHeld</text>
+  <text x="1015" y="118" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 3 d</text>
+
+  <!-- valve-demand chain -->
+  <rect x="710" y="300" width="180" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="800" y="320" text-anchor="middle" fill="#24292f" font-weight="bold">vlvLow</text>
+  <text x="800" y="338" text-anchor="middle" fill="#57606a" font-size="11">LessThreshold · 90 %</text>
+
+  <rect x="930" y="300" width="170" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1015" y="320" text-anchor="middle" fill="#24292f" font-weight="bold">vlvLowHeld</text>
+  <text x="1015" y="338" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 3 d</text>
+
+  <!-- conjunction + persistence -->
+  <rect x="1150" y="180" width="130" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1215" y="200" text-anchor="middle" fill="#24292f" font-weight="bold">flatAndLow</text>
+  <text x="1215" y="218" text-anchor="middle" fill="#57606a" font-size="11">And</text>
+
+  <rect x="1320" y="180" width="160" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1400" y="200" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1400" y="218" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 24 h</text>
+
+  <!-- boundary output -->
+  <rect x="1400" y="280" width="90" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1445" y="299" text-anchor="middle" fill="#7f1d1d">yFault</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 142 95 H 165 V 65 H 188"/>
+    <path d="M 142 95 H 390 V 93 H 408"/>
+    <path d="M 350 65 H 390 V 117 H 408"/>
+    <path d="M 540 105 H 578"/>
+    <path d="M 670 105 H 708"/>
+    <path d="M 890 105 H 928"/>
+    <path d="M 1100 105 H 1120 V 198 H 1148"/>
+
+    <path d="M 162 315 H 690 V 325 H 708"/>
+    <path d="M 890 325 H 928"/>
+    <path d="M 1100 325 H 1120 V 212 H 1148"/>
+
+    <path d="M 1280 205 H 1318"/>
+    <path d="M 1480 205 H 1502 V 250 H 1445 V 278"/>
+  </g>
+</svg>

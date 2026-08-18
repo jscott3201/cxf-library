@@ -1,0 +1,963 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 300,
+    "horizon_s": 14400
+  },
+  "scenarios": [
+    {
+      "name": "boiler_off_all_day",
+      "description": "The boiler never fires. No rising edges, no count, no verdict — the baseline case that shows the counter reads zero rather than drifting.",
+      "inputs": {
+        "boiler_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "steady_firing_never_counts",
+      "description": "The boiler is firing continuously from the moment the rule loads and never stops. `Logical.Edge` registers one rising edge at t = 0 against its `pre_u_start` default, and that pulse encloses no area because the moving average's first tick has dt = 0, so the count stays at zero. A boiler that holds fire for four hours is the opposite of short-cycling and reads as such.",
+      "inputs": {
+        "boiler_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "three_starts_per_hour",
+      "description": "Healthy load-following: a 5-minute fire every 20 minutes, three starts an hour against a ceiling of four. The cadence begins at t = 3600 s so the reading is a completed-hour count rather than the warm-up extrapolation.",
+      "inputs": {
+        "boiler_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 3600,
+            "value": true
+          },
+          {
+            "t": 3900,
+            "value": false
+          },
+          {
+            "t": 4800,
+            "value": true
+          },
+          {
+            "t": 5100,
+            "value": false
+          },
+          {
+            "t": 6000,
+            "value": true
+          },
+          {
+            "t": 6300,
+            "value": false
+          },
+          {
+            "t": 7200,
+            "value": true
+          },
+          {
+            "t": 7500,
+            "value": false
+          },
+          {
+            "t": 8400,
+            "value": true
+          },
+          {
+            "t": 8700,
+            "value": false
+          },
+          {
+            "t": 9600,
+            "value": true
+          },
+          {
+            "t": 9900,
+            "value": false
+          },
+          {
+            "t": 10800,
+            "value": true
+          },
+          {
+            "t": 11100,
+            "value": false
+          },
+          {
+            "t": 12000,
+            "value": true
+          },
+          {
+            "t": 12300,
+            "value": false
+          },
+          {
+            "t": 13200,
+            "value": true
+          },
+          {
+            "t": 13500,
+            "value": false
+          },
+          {
+            "t": 14400,
+            "value": true
+          },
+          {
+            "t": 14700,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "four_starts_per_hour_is_exactly_the_threshold",
+      "description": "Threshold edge from below: a 5-minute fire every 15 minutes puts exactly four starts in every trailing hour. The count evaluates to precisely 4.0 in IEEE-754 (12.0 x 1200/3600), so the strict `>` keeps it clear — this is a real boundary pin, not a near miss.",
+      "inputs": {
+        "boiler_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 3600,
+            "value": true
+          },
+          {
+            "t": 3900,
+            "value": false
+          },
+          {
+            "t": 4500,
+            "value": true
+          },
+          {
+            "t": 4800,
+            "value": false
+          },
+          {
+            "t": 5400,
+            "value": true
+          },
+          {
+            "t": 5700,
+            "value": false
+          },
+          {
+            "t": 6300,
+            "value": true
+          },
+          {
+            "t": 6600,
+            "value": false
+          },
+          {
+            "t": 7200,
+            "value": true
+          },
+          {
+            "t": 7500,
+            "value": false
+          },
+          {
+            "t": 8100,
+            "value": true
+          },
+          {
+            "t": 8400,
+            "value": false
+          },
+          {
+            "t": 9000,
+            "value": true
+          },
+          {
+            "t": 9300,
+            "value": false
+          },
+          {
+            "t": 9900,
+            "value": true
+          },
+          {
+            "t": 10200,
+            "value": false
+          },
+          {
+            "t": 10800,
+            "value": true
+          },
+          {
+            "t": 11100,
+            "value": false
+          },
+          {
+            "t": 11700,
+            "value": true
+          },
+          {
+            "t": 12000,
+            "value": false
+          },
+          {
+            "t": 12600,
+            "value": true
+          },
+          {
+            "t": 12900,
+            "value": false
+          },
+          {
+            "t": 13500,
+            "value": true
+          },
+          {
+            "t": 13800,
+            "value": false
+          },
+          {
+            "t": 14400,
+            "value": true
+          },
+          {
+            "t": 14700,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "five_starts_per_hour_is_the_first_faulted_cadence",
+      "description": "Threshold edge from above, and the finest cadence a 300 s tick can resolve above four: a repeating 600/600/600/900/900 s spacing puts exactly five rising edges in every trailing hour. The count clears 4 at t = 6300 s (the fifth start) and the alarm follows one alarm_delay later at 7200 s.",
+      "inputs": {
+        "boiler_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 3600,
+            "value": true
+          },
+          {
+            "t": 3900,
+            "value": false
+          },
+          {
+            "t": 4200,
+            "value": true
+          },
+          {
+            "t": 4500,
+            "value": false
+          },
+          {
+            "t": 4800,
+            "value": true
+          },
+          {
+            "t": 5100,
+            "value": false
+          },
+          {
+            "t": 5400,
+            "value": true
+          },
+          {
+            "t": 5700,
+            "value": false
+          },
+          {
+            "t": 6300,
+            "value": true
+          },
+          {
+            "t": 6600,
+            "value": false
+          },
+          {
+            "t": 7200,
+            "value": true
+          },
+          {
+            "t": 7500,
+            "value": false
+          },
+          {
+            "t": 7800,
+            "value": true
+          },
+          {
+            "t": 8100,
+            "value": false
+          },
+          {
+            "t": 8400,
+            "value": true
+          },
+          {
+            "t": 8700,
+            "value": false
+          },
+          {
+            "t": 9000,
+            "value": true
+          },
+          {
+            "t": 9300,
+            "value": false
+          },
+          {
+            "t": 9900,
+            "value": true
+          },
+          {
+            "t": 10200,
+            "value": false
+          },
+          {
+            "t": 10800,
+            "value": true
+          },
+          {
+            "t": 11100,
+            "value": false
+          },
+          {
+            "t": 11400,
+            "value": true
+          },
+          {
+            "t": 11700,
+            "value": false
+          },
+          {
+            "t": 12000,
+            "value": true
+          },
+          {
+            "t": 12300,
+            "value": false
+          },
+          {
+            "t": 12600,
+            "value": true
+          },
+          {
+            "t": 12900,
+            "value": false
+          },
+          {
+            "t": 13500,
+            "value": true
+          },
+          {
+            "t": 13800,
+            "value": false
+          },
+          {
+            "t": 14400,
+            "value": true
+          },
+          {
+            "t": 14700,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 6900,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 7500,
+          "to_s": 14400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "six_starts_per_hour_is_the_fastest_resolvable_cadence",
+      "description": "A boiler cycling on a 10-minute period — five minutes of fire, five minutes off — which at the 300 s tick these vectors run is the Nyquist ceiling: one start per two ticks, 6/h. The count crosses 4 at t = 6000 s and the alarm lands at 6900 s.",
+      "inputs": {
+        "boiler_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 3600,
+            "value": true
+          },
+          {
+            "t": 3900,
+            "value": false
+          },
+          {
+            "t": 4200,
+            "value": true
+          },
+          {
+            "t": 4500,
+            "value": false
+          },
+          {
+            "t": 4800,
+            "value": true
+          },
+          {
+            "t": 5100,
+            "value": false
+          },
+          {
+            "t": 5400,
+            "value": true
+          },
+          {
+            "t": 5700,
+            "value": false
+          },
+          {
+            "t": 6000,
+            "value": true
+          },
+          {
+            "t": 6300,
+            "value": false
+          },
+          {
+            "t": 6600,
+            "value": true
+          },
+          {
+            "t": 6900,
+            "value": false
+          },
+          {
+            "t": 7200,
+            "value": true
+          },
+          {
+            "t": 7500,
+            "value": false
+          },
+          {
+            "t": 7800,
+            "value": true
+          },
+          {
+            "t": 8100,
+            "value": false
+          },
+          {
+            "t": 8400,
+            "value": true
+          },
+          {
+            "t": 8700,
+            "value": false
+          },
+          {
+            "t": 9000,
+            "value": true
+          },
+          {
+            "t": 9300,
+            "value": false
+          },
+          {
+            "t": 9600,
+            "value": true
+          },
+          {
+            "t": 9900,
+            "value": false
+          },
+          {
+            "t": 10200,
+            "value": true
+          },
+          {
+            "t": 10500,
+            "value": false
+          },
+          {
+            "t": 10800,
+            "value": true
+          },
+          {
+            "t": 11100,
+            "value": false
+          },
+          {
+            "t": 11400,
+            "value": true
+          },
+          {
+            "t": 11700,
+            "value": false
+          },
+          {
+            "t": 12000,
+            "value": true
+          },
+          {
+            "t": 12300,
+            "value": false
+          },
+          {
+            "t": 12600,
+            "value": true
+          },
+          {
+            "t": 12900,
+            "value": false
+          },
+          {
+            "t": 13200,
+            "value": true
+          },
+          {
+            "t": 13500,
+            "value": false
+          },
+          {
+            "t": 13800,
+            "value": true
+          },
+          {
+            "t": 14100,
+            "value": false
+          },
+          {
+            "t": 14400,
+            "value": true
+          },
+          {
+            "t": 14700,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 6600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 7200,
+          "to_s": 14400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "five_starts_in_forty_minutes_alarms_for_one_tick",
+      "description": "Delay edge from above: five starts packed into 2400 s hold the count above the ceiling from t = 6000 s until the first of them ages out of the trailing hour at 7200 s — 1200 s, one tick longer than alarm_delay. The alarm asserts at exactly 6900 s and falls again at 7200 s.",
+      "inputs": {
+        "boiler_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 3600,
+            "value": true
+          },
+          {
+            "t": 3900,
+            "value": false
+          },
+          {
+            "t": 4200,
+            "value": true
+          },
+          {
+            "t": 4500,
+            "value": false
+          },
+          {
+            "t": 4800,
+            "value": true
+          },
+          {
+            "t": 5100,
+            "value": false
+          },
+          {
+            "t": 5400,
+            "value": true
+          },
+          {
+            "t": 5700,
+            "value": false
+          },
+          {
+            "t": 6000,
+            "value": true
+          },
+          {
+            "t": 6300,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 6600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 6900,
+          "to_s": 6900,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 7200,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "five_starts_in_forty_five_minutes_release_on_the_maturity_tick",
+      "description": "Delay edge from below, and the same five starts: spreading them over 2700 s holds the count above the ceiling for exactly alarm_delay (t = 6300 s to 7200 s). `persist` matures at 7200 s, the tick the fifth start's window has already dropped the first, so the input is false when the timer comes due and nothing is ever reported. Three hundred seconds of burst spacing is the whole difference between this scenario and the one above.",
+      "inputs": {
+        "boiler_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 3600,
+            "value": true
+          },
+          {
+            "t": 3900,
+            "value": false
+          },
+          {
+            "t": 4200,
+            "value": true
+          },
+          {
+            "t": 4500,
+            "value": false
+          },
+          {
+            "t": 4800,
+            "value": true
+          },
+          {
+            "t": 5100,
+            "value": false
+          },
+          {
+            "t": 5700,
+            "value": true
+          },
+          {
+            "t": 6000,
+            "value": false
+          },
+          {
+            "t": 6300,
+            "value": true
+          },
+          {
+            "t": 6600,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "five_starts_in_fifty_five_minutes_never_alarms",
+      "description": "The rolling counter's blind spot, stated as a vector: five starts spread across 3300 s reach the same five-per-hour count, but only for the 300 s between the fifth start and the first one ageing out. Same starts in the same hour as the two scenarios above, no alarm — what the rule reports is cycling sustained above the ceiling, not every excursion through it.",
+      "inputs": {
+        "boiler_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 3600,
+            "value": true
+          },
+          {
+            "t": 3900,
+            "value": false
+          },
+          {
+            "t": 4500,
+            "value": true
+          },
+          {
+            "t": 4800,
+            "value": false
+          },
+          {
+            "t": 5400,
+            "value": true
+          },
+          {
+            "t": 5700,
+            "value": false
+          },
+          {
+            "t": 6300,
+            "value": true
+          },
+          {
+            "t": 6600,
+            "value": false
+          },
+          {
+            "t": 6900,
+            "value": true
+          },
+          {
+            "t": 7200,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "cycling_stops_alarm_clears",
+      "description": "Recovery: the boiler cycles at 6/h from t = 3600 s and the aquastat differential is widened after the twelfth start (t = 10200 s). The alarm holds from 6900 s until 11100 s and clears at 11400 s, the tick the trailing hour first holds four starts rather than five. The clear lags the last start by 1200 s here, and by up to a full count_window when the cycling stops after a shorter burst — the counter has to forget.",
+      "inputs": {
+        "boiler_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 3600,
+            "value": true
+          },
+          {
+            "t": 3900,
+            "value": false
+          },
+          {
+            "t": 4200,
+            "value": true
+          },
+          {
+            "t": 4500,
+            "value": false
+          },
+          {
+            "t": 4800,
+            "value": true
+          },
+          {
+            "t": 5100,
+            "value": false
+          },
+          {
+            "t": 5400,
+            "value": true
+          },
+          {
+            "t": 5700,
+            "value": false
+          },
+          {
+            "t": 6000,
+            "value": true
+          },
+          {
+            "t": 6300,
+            "value": false
+          },
+          {
+            "t": 6600,
+            "value": true
+          },
+          {
+            "t": 6900,
+            "value": false
+          },
+          {
+            "t": 7200,
+            "value": true
+          },
+          {
+            "t": 7500,
+            "value": false
+          },
+          {
+            "t": 7800,
+            "value": true
+          },
+          {
+            "t": 8100,
+            "value": false
+          },
+          {
+            "t": 8400,
+            "value": true
+          },
+          {
+            "t": 8700,
+            "value": false
+          },
+          {
+            "t": 9000,
+            "value": true
+          },
+          {
+            "t": 9300,
+            "value": false
+          },
+          {
+            "t": 9600,
+            "value": true
+          },
+          {
+            "t": 9900,
+            "value": false
+          },
+          {
+            "t": 10200,
+            "value": true
+          },
+          {
+            "t": 10500,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 6600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 7200,
+          "to_s": 10800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 11400,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "warmup_pace_asserts_on_two_starts",
+      "description": "The warm-up artifact, and why the host NO_EVAL precondition is not optional. Two starts inside the first fifteen minutes (t = 300 s and 900 s) are read against elapsed time rather than against the window, so the count reports the extrapolated pace — well above four — and `persist` matures at 1200 s on the strength of two starts. The verdict decays with the growing divisor and clears at 1800 s. A single start from cold does not do this, and neither does a healthy 2/h or 3/h cadence; two starts inside ten minutes does.",
+      "inputs": {
+        "boiler_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          },
+          {
+            "t": 900,
+            "value": true
+          },
+          {
+            "t": 1200,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 900,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1200,
+          "to_s": 1500,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}
