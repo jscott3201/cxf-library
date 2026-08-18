@@ -53,6 +53,13 @@ energy_impact:
 emissions:
   scope: "1|2"
   method: QUALITATIVE_EMISSIONS
+validation:
+  - kind: simulation_fpr
+    harness: simharness/v1
+    date: 2026-08-18
+    fleet: "B2B OfficeMedium x8 ASHRAE climate zones (1-8), one July + one January week, 3 VAV loops each, host-gated (fan + OS)"
+    scenarios: 33
+    failures: 0
 verified:
   engine_rev: e2ff2f8
   content_id: "cxf:fnv1a128:9a1a1d3f2efeeaa385ba4336b64530a2"

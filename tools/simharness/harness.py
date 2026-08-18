@@ -179,7 +179,9 @@ ALL_OS = {1, 2, 3, 4, 5}
 OS_MAP = {
     "AHU-FC-002": ALL_OS, "AHU-FC-003": ALL_OS,
     "AHU-FC-005": {1}, "AHU-FC-006": {1, 4}, "AHU-FC-008": {2},
-    "AHU-FC-009": {2}, "AHU-FC-010": {3}, "AHU-FC-012": {2, 3, 4},
+    "AHU-FC-009": {2}, "AHU-FC-010": {3}, "AHU-FC-011": {3},
+    "AHU-FC-012": {2, 3, 4}, "AHU-FC-013": {3, 4}, "AHU-FC-015": {2, 3, 4},
+    "AHU-FC-056": ALL_OS, "AHU-FC-057": {2, 3, 4},
     "AHU-FC-014": {1, 2}, "AHU-FC-051": {4}, "AHU-FC-053": {2, 3, 4},
     "AHU-FC-054": ALL_OS, "AHU-FC-055": {1, 4}, "AHU-FC-062": ALL_OS,
     "AHU-FC-066": {2, 3, 4}, "AHU-FC-067": {1, 2, 3, 4}, "AHU-FC-068": {3},
@@ -194,11 +196,20 @@ def derive_os(pts: dict) -> list:
     raw_htg = [w > 1000.0 for w in pts["_htg_w"]]
     econ = [v >= 0.5 for v in pts["_econ"]]
     def smooth(sig):
-        return [any(sig[max(0, i - SMOOTH_TICKS):i + 1]) for i in range(n)]
+        # majority-of-window, not any-of-window: a single compressor blip
+        # must not reclassify half an hour of economizing as OS#3
+        # (fleet-sweep artifact: AHU-FC-011 false cluster, 2026-08-18)
+        return [sum(sig[max(0, i - SMOOTH_TICKS):i + 1]) * 2
+                > len(sig[max(0, i - SMOOTH_TICKS):i + 1])
+                for i in range(n)]
     clg, htg = smooth(raw_clg), smooth(raw_htg)
     os_ = []
     for i in range(n):
-        if htg[i] and not clg[i]:
+        # heating takes precedence outright: under smoothing, htg and clg
+        # can overlap at warmup transitions, and evaluating OS#2-4-scoped
+        # rules during actual heating produced the AHU-FC-015 false
+        # cluster (fleet sweep, 2026-08-18)
+        if htg[i]:
             os_.append(1)
         elif econ[i] and clg[i]:
             os_.append(3)
@@ -302,6 +313,8 @@ def main():
     runp = sub.add_parser("run")
     runp.add_argument("--building", required=True)
     runp.add_argument("--out", default=None)
+    runp.add_argument("--begin", default="7-6", help="run period start M-D")
+    runp.add_argument("--end", default="7-12", help="run period end M-D")
     args = ap.parse_args()
 
     bdir = Path(args.building)
@@ -310,7 +323,9 @@ def main():
     b = json.load(open(bdir / "building.epjson"))
     epw = next(bdir.glob("*.epw"))
     loops = loop_nodes(b)
-    patched = patch(b, loops)
+    begin = tuple(int(x) for x in args.begin.split("-"))
+    end = tuple(int(x) for x in args.end.split("-"))
+    patched = patch(b, loops, begin, end)
     pj = out / "patched.epjson"
     pj.write_text(json.dumps(patched))
     print(f"loops: {list(loops)}; running EnergyPlus…")
