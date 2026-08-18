@@ -21,8 +21,12 @@ and the chiller-plant entries in the project’s internal research triage (licen
 | CHW-0003 | CHW loop DP reset not functioning | 3 | statistical | **verified** |
 | CHW-0004 | Chilled water low delta-T syndrome | 3 | rule | **verified** |
 | CHW-0005 | Chiller condenser approach high | 3 | rule | **verified** |
+| CHW-0006 | Chiller evaporator approach high | 3 | rule | **verified** |
 
-Severity and method per the reference's ch.13 cards.
+Severity and method per the reference's ch.13 cards. CHW-0005/CHW-0006 are
+the approach pair resolving the reference's dangling CHW-FC-008/009 playbook
+citations (mentioned there, never defined): condenser side and evaporator
+side of the same verify step, tube-side discriminators for CHW-0001.
 
 ## Relationships
 

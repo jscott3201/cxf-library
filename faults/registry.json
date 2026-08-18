@@ -314,6 +314,14 @@
       "legacy_id": "CHW-FC-054"
     },
     {
+      "id": "CHW-0006",
+      "family": "chw",
+      "name": "Chiller evaporator approach high",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
       "id": "ERV-0001",
       "family": "erv",
       "name": "Sensible effectiveness degradation",
@@ -546,6 +554,14 @@
       "legacy_id": "RTU-FC-055"
     },
     {
+      "id": "RTU-0007",
+      "family": "rtu",
+      "name": "Condenser airflow restriction (fouling)",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": "RTU-FC-100"
+    },
+    {
       "id": "SYS-0001",
       "family": "sys",
       "name": "CHW flow with no cooling demand",
@@ -720,6 +736,14 @@
       "method": "statistical",
       "status": "verified",
       "legacy_id": "VAV-FC-103"
+    },
+    {
+      "id": "VAV-0010",
+      "family": "vav",
+      "name": "Zone temperature sensor drift (neighbor-median)",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": null
     },
     {
       "id": "VFD-0001",

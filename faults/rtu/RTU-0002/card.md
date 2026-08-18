@@ -192,6 +192,6 @@ playbook orders the remediation (filter, coil cleaning, fan motor, ice) and
 tests resolution at the split returning to within 15% of baseline — tighter than
 the 25% this rule alarms at, so a coil cleaned back to 20% degraded clears the
 alarm without being fixed. RTU-0007 (condenser airflow restriction) is the
-condenser-side counterpart and is deferred: its baseline depends on both stage
-and outdoor temperature, which needs baseline-curve infrastructure this block
-set does not have.
+condenser-side counterpart: its stage-and-OAT baseline ships as the
+host-fitted point `cond_split_baseline`, and its own resolution-vs-alarm
+gap mirrors this one.

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | CHW-0001, CLU-06 (also the reference's CHW-FC-008/009, not yet authored) |
+| **Applies to** | CHW-0001, CHW-0005, CHW-0006, CLU-06 |
 | **Fix complexity** | On-site service (cleaning) · Capital (refrigerant/compressor) |
 | **Typical time** | 4–8 h on-site (tube cleaning) |
 | **Typical cost** | $1,000–$3,000 cleaning / $5,000+ compressor service |

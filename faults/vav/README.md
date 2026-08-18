@@ -19,15 +19,15 @@ Point dictionary: [`points/vav.points.json`](../../points/vav.points.json).
 | VAV-0004 | Airflow tracking error | 3 | rule | **verified** |
 | VAV-0005 | Damper hunting / oscillation | 3 | rule | **verified** |
 | VAV-0006 | Reheat waste during cooling season | 3 | rule | **verified** |
-| VAV-0010 | Zone temperature sensor drift | 3 | statistical | planned |
+| VAV-0010 | Zone temperature sensor drift (neighbor-median) | 3 | statistical | **verified** |
 | VAV-0007 | VAV airflow tracking CUSUM | 3 | statistical | **verified** |
 | VAV-0008 | Zone temperature CUSUM | 3 | statistical | **verified** |
 | VAV-0009 | Reheat coil leakage CUSUM | 3 | statistical | **verified** |
 
 Severity and method per the reference's ch.10 cards (its §5.8.2 index carries
-no severity column). VAV-0010 is phase 3; its neighbor-comparison method is
-expressible with a host-derived median point and can be authored once the
-phase-3 scope opens.
+no severity column). VAV-0010 is the neighbor-median drift rule the CUSUM
+batch reserved: it adjudicates `zone_temp` (verdict: invalid_while_active),
+deciding whether the VPACC cards' input can be believed.
 
 VAV-0007/VAV-0008/VAV-0009 are the VPACC trio (NIST/CEC PIER Project 2.3 §5.1):
 two-sided CUSUM charts over the three per-box error signals, the library's

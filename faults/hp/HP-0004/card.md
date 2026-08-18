@@ -176,9 +176,9 @@ refrigerant-tracking obligations should account for it separately.
 - **Two features, so severe condenser airflow restriction is not excluded.** It
   shares the zone-B superheat-up/subcooling-down pair and separates on condensing
   temperature moving up rather than down — a direction test that needs a baseline
-  for the current operating condition, the same infrastructure gap that keeps
-  RTU-0007 deferred. The card names it as diagnosis 3 rather than pretending
-  to rule it out.
+  for the current operating condition — the host-fitted-baseline convention
+  that later shipped RTU-0007. The card names it as diagnosis 3 rather than
+  pretending to rule it out.
 - **Grounding is cooling-mode only.** SP 1087 tested cooling exclusively, and in
   heating the coils swap roles, so the sensors sit on different heat exchangers
   even though the arithmetic is unchanged. `operating_states` says cooling; a

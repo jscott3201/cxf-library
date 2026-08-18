@@ -60,13 +60,13 @@ auto-eligible AHU rules fully clean.** Recorded on each swept card as a
 `validation:` frontmatter block (SCHEMA.md contract). Remaining failures
 are two explained findings, not noise:
 
-1. **AHU-FC-006/055 (31 events each, winter-dominant, all buildings)** —
+1. **AHU-0006/AHU-0021 (31 events each, winter-dominant, all buildings)** —
    DCV-driven excess outdoor air: `Controller:MechanicalVentilation` holds
    ventilation flow while VAV turndown shrinks total flow, so OA fraction
    legitimately exceeds any fixed minimum (~86% observed at −7.8 °C OAT —
    freeze-stat territory in a real building). Conclusion: OA-fraction
    rules need a DCV-aware host precondition.
-2. **AHU-FC-067 (8 events, winter only)** — the fleet publishes one
+2. **AHU-0033 (8 events, winter only)** — the fleet publishes one
    constant cooling-oriented SAT setpoint, so heating-season tracking
    error is real per the rule's letter while the setpoint no longer means
    the active mode's target. Per-mode setpoint binding is a deployment
@@ -92,7 +92,7 @@ DETECTIONS; attribution requires differencing against the healthy baseline
 (rules that fail on the healthy run — the DCV pair — are confounded and
 excluded). First campaign, +/-3 degC OAT bias (OfficeMedium-4004, July):
 the envelope family and the direction-appropriate economizer rule catch the
-bias in both directions — +3: AHU-FC-062 (3/3), 002 (3/3), 068 (3/3,
+bias in both directions — +3: AHU-0028 (3/3), 002 (3/3), 068 (3/3,
 ~2.3 h); -3: 051 (3/3, ~40 min), 003 (2/3), 062 (2/3) — while a dozen
 non-OAT rules stay correctly silent. Empirical demonstration of the CLU-09
 biased-OAT cascade; recorded as `simulation_tpr` validation blocks
@@ -122,8 +122,8 @@ simulation, so the CONTROLLER acts on the faulted sensor while FDD replays
 true node values — the complement of the `--bias` campaign (where FDD's
 own input lies). First campaign, OAT sensor offset +/-4 degC on all OA
 controllers (OfficeMedium-4004, July): +4 (economizer locks out early) is
-caught by AHU-FC-051 (3/3 loops); -4 (economizes past true changeover) by
-AHU-FC-068 (3/3, one loop in ~5 min); each direction's mirror rule and the
+caught by AHU-0017 (3/3 loops); -4 (economizes past true changeover) by
+AHU-0034 (3/3, one loop in ~5 min); each direction's mirror rule and the
 entire envelope family stay correctly silent, since every replayed sensor
 is physically consistent. Where FDD and the controller share a sensor,
 real deployments see BOTH signatures — the input-bias envelope detections
@@ -143,16 +143,16 @@ boiler part-load ratios for load and status, pump electricity for
 (affinity-law proxy). DOE prototype IDFs enter via the E+ transition chain
 (`PreProcess/IDFVersionUpdater`, e.g. 22.1 → 25.1 in six steps) +
 `ConvertInputFormat`. Rules replay per family with rule-specific gates
-(`PLANT_GATE`: CHW-FC-053 needs chiller load > 40%; boiler rules need the
+(`PLANT_GATE`: CHW-0004 needs chiller load > 40%; boiler rules need the
 boiler active; unnecessary-operation rules replay ungated — gating on the
 equipment they accuse would mask them). `PLANT_EXCLUDE` names the
 baseline-fitted, reset-class, and by-construction rules with reasons.
 
 First plant results (OfficeLarge STD2019 Atlanta, Jul + Jan weeks):
-CHW-FC-053, HW-FC-052/053/054 all clean in their gated windows (recorded
-as `validation:` blocks); HW-FC-056 verified firing correctly on the
+CHW-0004, HW-0003/HW-0004/HW-0005 all clean in their gated windows (recorded
+as `validation:` blocks); HW-0007 verified firing correctly on the
 prototype's constant-HWST-at-low-load operation (excluded by-construction);
-Atlanta January never crosses CHW-FC-053's 40% chiller-load floor — season
+Atlanta January never crosses CHW-0004's 40% chiller-load floor — season
 selection matters per family.
 
 ## First results (single building, superseded by the fleet sweep above) (B2B OfficeMedium-4004, Albuquerque, July week, 3 loops)
@@ -164,7 +164,7 @@ for the full week** — the envelope pair (002/003), SAT families
 
 Two findings:
 
-1. **AHU-FC-006 and AHU-FC-055 fire together during hot afternoons** (e.g.
+1. **AHU-0006 and AHU-0021 fire together during hot afternoons** (e.g.
    day 2 ~11:20, implied OA fraction (mat−rat)/(oat−rat) ≈ 66% at
    OAT 30.6 °C, economizer locked out). Root cause is real, not an
    artifact: `Controller:MechanicalVentilation` holds ventilation *flow*
@@ -178,6 +178,6 @@ Two findings:
    carries an after-hours fault by construction. Useful as a
    known-positive for schedule rules; excluded from FPR claims.
 
-Reset-family rules (AHU-FC-057/058-style) read "reset absent" against
+Reset-family rules (AHU-0023/AHU-0024-style) read "reset absent" against
 constant-setpoint baselines by construction and are excluded from FPR
 claims, per the validation plan.
