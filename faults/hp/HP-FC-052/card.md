@@ -17,7 +17,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [HP-FC-050, HP-FC-051]
+related: [HP-FC-050, HP-FC-051, HP-FC-055]
 playbooks: [heat-pump-faults]
 operating_states: "heating and cooling, compressor running (host-gated)"
 preconditions: "The compressor must be running. A heat pump idling on its indoor fan drifts its discharge toward room temperature, which reads as too warm for cooling and too cold for heating at the same time, so an unrunning unit must not be evaluated. The host must map its own mode enum onto heating_mode_code and cooling_mode_code and must report NO_EVAL — not healthy — for every other mode it can command (off, auto, emergency heat, dehumidify): the graph is structurally silent on codes it does not carry. Defrost is the sharp case: during a defrost cycle the unit deliberately runs the reversing valve in cooling while mode_command still reads HEATING, so the host should gate this rule on defrost_status. The rule survives a normal defrost only because alarm_delay outlasts it — see Deviations. sat must be trustworthy; nothing in this rule cross-checks it, and a discharge sensor reading 15 °C low fabricates a heating-mode fault on a healthy unit."

@@ -15,6 +15,9 @@ Point dictionary: [`points/hp.points.json`](../../points/hp.points.json).
 | HP-FC-050 | COP degradation vs baseline | 3 | statistical | **verified** |
 | HP-FC-051 | Defrost cycle anomaly | 3 | rule | **verified** |
 | HP-FC-052 | Reversing valve fault | 2 | rule | **verified** |
+| HP-FC-053 | Refrigerant undercharge (superheat/subcooling divergence) | 3 | rule | **verified** |
+| HP-FC-054 | Refrigerant overcharge (subcooling high) | 3 | rule | **verified** |
+| HP-FC-055 | Reversing-valve internal bypass leakage | 3 | rule | **verified** |
 
 Severity and method per the reference's ch.11 cards (its §5.8.4 index carries
 no severity column). HP-FC-050's COP-vs-OAT baseline is host-fitted: the host
@@ -28,3 +31,15 @@ fitted line — the library's first host-learned baseline.
 - RTU-FC-050 (compressor short-cycling) applies to HP equipment per its
   reference card; an HP instance would add defrost handling and is not yet
   scaffolded.
+
+## Refrigerant-side family (library-authored, batch 17)
+
+HP-FC-053/054/055 are grounded in NIST SP 1087 (2008) via the adapt-tier
+program — the library's first refrigerant-side rules, built on the
+suction/liquid-line temperatures and host-derived saturation temperatures
+(P-T lookup) landed in `points/hp.points.json`. All three replace the
+source's conditions-regressed no-fault baseline with fixed commissioning
+placeholders (named simplification, RTU-FC-051 precedent). Wiring notes:
+a charge cluster (HP-FC-053 trigger → HP-FC-050 member) and
+`HP-FC-050 suppressed_by: [HP-FC-053]` are recorded candidates, left
+unwired pending a decision on cross-family suppression conventions.

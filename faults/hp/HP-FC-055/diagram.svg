@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1930 720" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <rect x="12" y="31" width="115" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="69.5" y="50" text-anchor="middle" fill="#1e3a8a">evap_sat_temp</text>
+  <rect x="12" y="171" width="165" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="94.5" y="190" text-anchor="middle" fill="#1e3a8a">comp_discharge_temp</text>
+  <rect x="12" y="399" width="115" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="69.5" y="418" text-anchor="middle" fill="#1e3a8a">cond_sat_temp</text>
+  <rect x="12" y="499" width="100" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="62" y="518" text-anchor="middle" fill="#1e3a8a">liquid_temp</text>
+
+  <!-- commissioned nominals and the subcooling difference -->
+  <rect x="250" y="101" width="240" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="370" y="123" text-anchor="middle" fill="#24292f" font-weight="bold">kEvapNom</text>
+  <text x="370" y="141" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 10 °C</text>
+  <rect x="250" y="221" width="240" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="370" y="243" text-anchor="middle" fill="#24292f" font-weight="bold">kDschNom</text>
+  <text x="370" y="261" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 66 °C</text>
+  <rect x="250" y="291" width="240" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="370" y="313" text-anchor="middle" fill="#24292f" font-weight="bold">kCondNom</text>
+  <text x="370" y="331" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 40 °C</text>
+  <rect x="250" y="471" width="240" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="370" y="493" text-anchor="middle" fill="#24292f" font-weight="bold">subcool</text>
+  <text x="370" y="511" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="250" y="571" width="240" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="370" y="593" text-anchor="middle" fill="#24292f" font-weight="bold">kScNom</text>
+  <text x="370" y="611" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 5 K</text>
+
+  <!-- deviation from nominal, signed so every band is positive -->
+  <rect x="560" y="31" width="130" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="625" y="53" text-anchor="middle" fill="#24292f" font-weight="bold">evapRise</text>
+  <text x="625" y="71" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="560" y="171" width="130" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="625" y="193" text-anchor="middle" fill="#24292f" font-weight="bold">dschRise</text>
+  <text x="625" y="211" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="560" y="371" width="130" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="625" y="393" text-anchor="middle" fill="#24292f" font-weight="bold">condFall</text>
+  <text x="625" y="411" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="560" y="531" width="130" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="625" y="553" text-anchor="middle" fill="#24292f" font-weight="bold">scFall</text>
+  <text x="625" y="571" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+
+  <!-- band tests and the TXV control-limit test -->
+  <rect x="760" y="31" width="240" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="880" y="53" text-anchor="middle" fill="#24292f" font-weight="bold">evapHigh</text>
+  <text x="880" y="71" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 2 K</text>
+  <rect x="760" y="171" width="240" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="880" y="193" text-anchor="middle" fill="#24292f" font-weight="bold">dschHigh</text>
+  <text x="880" y="211" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 5 K</text>
+  <rect x="760" y="371" width="240" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="880" y="393" text-anchor="middle" fill="#24292f" font-weight="bold">condLow</text>
+  <text x="880" y="411" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 2 K</text>
+  <rect x="760" y="531" width="240" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="880" y="553" text-anchor="middle" fill="#24292f" font-weight="bold">scLow</text>
+  <text x="880" y="571" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 1.5 K</text>
+  <rect x="760" y="631" width="240" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="880" y="653" text-anchor="middle" fill="#24292f" font-weight="bold">txvOk</text>
+  <text x="880" y="671" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 0.5 K</text>
+
+  <!-- the pattern must be complete, and evaluable -->
+  <rect x="1070" y="101" width="110" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1125" y="123" text-anchor="middle" fill="#24292f" font-weight="bold">pattUp</text>
+  <text x="1125" y="141" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="1070" y="421" width="110" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1125" y="443" text-anchor="middle" fill="#24292f" font-weight="bold">pattDn</text>
+  <text x="1125" y="461" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="1250" y="261" width="110" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1305" y="283" text-anchor="middle" fill="#24292f" font-weight="bold">patt</text>
+  <text x="1305" y="301" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="1430" y="371" width="110" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1485" y="393" text-anchor="middle" fill="#24292f" font-weight="bold">gate</text>
+  <text x="1485" y="411" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="1610" y="371" width="150" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1685" y="393" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1685" y="411" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 1800 s</text>
+
+  <!-- boundary outputs -->
+  <rect x="1830" y="385" width="60" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1860" y="404" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1830" y="645" width="60" height="30" rx="15" fill="#fef3c7" stroke="#d97706"/>
+  <text x="1860" y="664" text-anchor="middle" fill="#78350f">yTxvOk</text>
+
+  <!-- fan-out trunks -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none">
+    <path d="M 127 414 H 200"/>
+    <path d="M 490 500 H 512"/>
+    <path d="M 1000 660 H 1225"/>
+  </g>
+  <circle cx="200" cy="414" r="3" fill="#7d8590"/>
+  <circle cx="512" cy="500" r="3" fill="#7d8590"/>
+  <circle cx="1225" cy="660" r="3" fill="#7d8590"/>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 127 46 H 558"/>
+    <path d="M 177 186 H 558"/>
+    <path d="M 200 414 H 558"/>
+    <path d="M 200 414 V 486 H 248"/>
+    <path d="M 112 514 H 248"/>
+    <path d="M 490 130 H 522 V 74 H 558"/>
+    <path d="M 490 250 H 522 V 214 H 558"/>
+    <path d="M 490 320 H 522 V 386 H 558"/>
+    <path d="M 490 600 H 530 V 546 H 558"/>
+    <path d="M 512 500 V 574 H 558"/>
+    <path d="M 512 500 H 700 V 660 H 758"/>
+    <path d="M 690 60 H 758"/>
+    <path d="M 690 200 H 758"/>
+    <path d="M 690 400 H 758"/>
+    <path d="M 690 560 H 758"/>
+    <path d="M 1000 60 H 1035 V 116 H 1068"/>
+    <path d="M 1000 200 H 1035 V 144 H 1068"/>
+    <path d="M 1000 400 H 1035 V 436 H 1068"/>
+    <path d="M 1000 560 H 1035 V 464 H 1068"/>
+    <path d="M 1180 130 H 1215 V 276 H 1248"/>
+    <path d="M 1180 450 H 1215 V 304 H 1248"/>
+    <path d="M 1360 290 H 1395 V 386 H 1428"/>
+    <path d="M 1225 660 V 414 H 1428"/>
+    <path d="M 1225 660 H 1828"/>
+    <path d="M 1540 400 H 1608"/>
+    <path d="M 1760 400 H 1828"/>
+  </g>
+
+  <!-- port labels and annotations -->
+  <text x="566" y="42" fill="#7d8590" font-size="9">u1</text>
+  <text x="566" y="86" fill="#7d8590" font-size="9">u2</text>
+  <text x="566" y="182" fill="#7d8590" font-size="9">u1</text>
+  <text x="566" y="226" fill="#7d8590" font-size="9">u2</text>
+  <text x="566" y="382" fill="#7d8590" font-size="9">u1</text>
+  <text x="566" y="426" fill="#7d8590" font-size="9">u2</text>
+  <text x="566" y="542" fill="#7d8590" font-size="9">u1</text>
+  <text x="566" y="586" fill="#7d8590" font-size="9">u2</text>
+  <text x="256" y="482" fill="#7d8590" font-size="9">u1</text>
+  <text x="256" y="526" fill="#7d8590" font-size="9">u2</text>
+  <text x="1076" y="112" fill="#7d8590" font-size="9">u1</text>
+  <text x="1076" y="156" fill="#7d8590" font-size="9">u2</text>
+  <text x="1076" y="432" fill="#7d8590" font-size="9">u1</text>
+  <text x="1076" y="476" fill="#7d8590" font-size="9">u2</text>
+  <text x="250" y="20" fill="#7d8590" font-size="11">commissioned nominals — per unit, per operating condition</text>
+  <text x="1070" y="360" fill="#7d8590" font-size="11">all four deviations, together</text>
+  <text x="1430" y="700" fill="#7d8590" font-size="11">TXV still compensating — false is NO_EVAL</text>
+</svg>
