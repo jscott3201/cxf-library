@@ -14,6 +14,7 @@ source:
   - "HVAC FDD Reference v1.0 §9, AHU-FC-003"
   - "G36 §5.16.14 FC#3"
   - "PNNL-25985 (EEM-01, sensor recalibration)"
+  - "Bushby et al. 2001 (NIST/CEC PIER Project 2.3, APAR rules 26/27 — earliest form of this envelope test)"
 g36: "§5.16.14 FC#3"
 clusters: [CLU-09]
 suppresses: []

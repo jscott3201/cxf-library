@@ -3,6 +3,11 @@
 Air handling unit fault detection rules (`AHU-FC-*`). Source grounding: HVAC
 FDD Reference v1.0 ch.9 (adapted authority — see each card's Deviations
 section) and ASHRAE Guideline 36-2021 §5.16.14 for the 001-range.
+AHU-FC-066–068 are **library-authored extensions** past the reference's
+ch.9 range (which ends at 065), grounded in Bushby, Castro, Schein &
+House (2001), NIST/CEC PIER Project 2.3 — the original APAR rule set —
+with AHU-FC-068 additionally corroborated by PNNL-27338 §3.4 (HW-FC-053
+extension precedent: explicit non-reference sourcing on each card).
 
 Point dictionary: [`points/ahu.points.json`](../../points/ahu.points.json).
 
@@ -41,6 +46,9 @@ Point dictionary: [`points/ahu.points.json`](../../points/ahu.points.json).
 | AHU-FC-063 | Operating mode mismatch | 3 | rule | **verified** |
 | AHU-FC-064 | Excess OA during heating | 3 | rule | **verified** |
 | AHU-FC-065 | Fan at excess static pressure | 3 | rule | **verified** |
+| AHU-FC-066 | SAT too high vs RAT in cooling | 3 | rule | **verified** |
+| AHU-FC-067 | SAT tracking error (ungated, all occupied modes) | 3 | rule | **verified** |
+| AHU-FC-068 | Economizing past changeover | 3 | rule | **verified** |
 
 Reference note: the FDD Reference's index (§5.8.1) lists 31 AHU codes while its
 ch.9 header claims "20 fully specified" — some 0xx cards in the reference are

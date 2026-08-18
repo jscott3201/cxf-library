@@ -1,0 +1,143 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 10800 },
+  "scenarios": [
+    {
+      "name": "sat_tracks_its_setpoint",
+      "description": "Healthy occupied operation: a modulating loop holding 13.2 °C against a 13.0 °C setpoint. The 0.2 K residual is ordinary loop error, well inside the 1.7 K band, and no valve position is needed to say so.",
+      "inputs": { "sat": 13.2, "sat_sp": 13.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 10800, "equals": false }
+      ]
+    },
+    {
+      "name": "mistuned_loop_runs_warm_at_a_part_open_valve",
+      "description": "The case this rule exists for: SAT parked 3 K above a 13.0 °C setpoint with the cooling valve modulating around 60% and never saturating. AHU-FC-013 is structurally blind to it — its second conjunct needs the valve above 99% — and this rule sees it on two temperatures alone. Alarms after the 60 min delay.",
+      "inputs": { "sat": 16.0, "sat_sp": 13.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 10800, "equals": true }
+      ]
+    },
+    {
+      "name": "mistuned_loop_runs_cold",
+      "description": "Same defect with the sign reversed: SAT 2.5 K below setpoint on a loop that never opens its heating valve far enough to trip AHU-FC-007. Pins the Abs — without it half the rule's population would be invisible.",
+      "inputs": { "sat": 10.5, "sat_sp": 13.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 10800, "equals": true }
+      ]
+    },
+    {
+      "name": "edge_positive_gap_at_the_threshold",
+      "description": "Strict boundary, clear side. 14.7 − 13.0 is the closest a realistic temperature pair gets to APAR's 1.7 K threshold from below: the difference evaluates to 1.6999999999999993, one ulp under the parameter, and GreaterThreshold is u > t, so it reads healthy.",
+      "inputs": { "sat": 14.7, "sat_sp": 13.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 10800, "equals": false }
+      ]
+    },
+    {
+      "name": "edge_positive_gap_just_over_the_threshold",
+      "description": "Strict boundary, fault side: the same setpoint with SAT 10 mK warmer puts the gap at 1.71 K, which clears u > t and alarms after the delay.",
+      "inputs": { "sat": 14.71, "sat_sp": 13.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 10800, "equals": true }
+      ]
+    },
+    {
+      "name": "edge_negative_gap_at_the_threshold",
+      "description": "Same boundary on the cold side: sat − sat_sp = −1.6999999999999993, |gap| sits on the line and reads healthy. The band is symmetric, so both signs have to be pinned.",
+      "inputs": { "sat": 13.0, "sat_sp": 14.7 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 10800, "equals": false }
+      ]
+    },
+    {
+      "name": "edge_negative_gap_just_over_the_threshold",
+      "description": "Cold side, fault: sat − sat_sp = −1.71 K. The magnitude clears the threshold and the alarm asserts at the same 10 mK margin the warm side does.",
+      "inputs": { "sat": 13.0, "sat_sp": 14.71 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 10800, "equals": true }
+      ]
+    },
+    {
+      "name": "alarm_asserts_exactly_at_the_delay",
+      "description": "The TrueDelay edge pinned tick by tick rather than with margin: a 3 K miss present from load, false at 3300 s, true at 3600 s. delayOnInit is true, so a miss already there when the controller restarts waits out the full hour instead of alarming on the first tick.",
+      "inputs": { "sat": 16.0, "sat_sp": 13.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 10800, "equals": true }
+      ]
+    },
+    {
+      "name": "miss_clears_one_step_before_the_delay_expires",
+      "description": "The other side of the same edge: the miss holds from 0 s and ends at 3300 s, one step short of the hour. The timer resets on that tick and nothing is ever reported.",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 16.0 },
+          { "t": 3300, "value": 13.2 }
+        ],
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 10800, "equals": false }
+      ]
+    },
+    {
+      "name": "setpoint_reset_step_never_alarms",
+      "description": "A reset schedule steps the setpoint down 3 K at 600 s and the coil takes 2400 s to catch up — 40 minutes of genuine tracking error caused by nothing but the step. Shorter than the hour, so it stays quiet. This transient is why the ungated form carries a longer delay than AHU-FC-007 and AHU-FC-013.",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 16.2 },
+          { "t": 3000, "value": 13.2 }
+        ],
+        "sat_sp": [
+          { "t": 0, "value": 16.0 },
+          { "t": 600, "value": 13.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 10800, "equals": false }
+      ]
+    },
+    {
+      "name": "fault_clears_when_the_loop_is_retuned",
+      "description": "A 3 K miss alarms at 3600 s; at 7200 s the loop is corrected and SAT returns to 13.2 °C. The alarm drops on that tick — assertion waits out the delay, recovery does not.",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 16.0 },
+          { "t": 7200, "value": 13.2 }
+        ],
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3300, "equals": false },
+        { "output": "yFault", "from_s": 3900, "to_s": 6900, "equals": true },
+        { "output": "yFault", "from_s": 7500, "to_s": 10800, "equals": false }
+      ]
+    },
+    {
+      "name": "oscillating_miss_never_alarms",
+      "description": "Pins the blind spot persistence buys. SAT swings between 16.0 °C and 13.2 °C every 20 minutes against a 13.0 °C setpoint — a hunting loop that spends half its day outside the band — and the timer resets on every compliant tick, so this rule stays silent. AHU-FC-056 is the rule that reports it.",
+      "inputs": {
+        "sat": [
+          { "t": 0, "value": 16.0 },
+          { "t": 1200, "value": 13.2 },
+          { "t": 2400, "value": 16.0 },
+          { "t": 3600, "value": 13.2 },
+          { "t": 4800, "value": 16.0 },
+          { "t": 6000, "value": 13.2 },
+          { "t": 7200, "value": 16.0 },
+          { "t": 8400, "value": 13.2 },
+          { "t": 9600, "value": 16.0 }
+        ],
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 10800, "equals": false }
+      ]
+    }
+  ]
+}

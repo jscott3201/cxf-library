@@ -18,7 +18,7 @@ g36: "§5.16.14 FC#12"
 clusters: [CLU-01]
 suppresses: []
 suppressed_by: [AHU-FC-062]
-related: [AHU-FC-050, AHU-FC-005, AHU-FC-013, AHU-FC-062]
+related: [AHU-FC-050, AHU-FC-005, AHU-FC-013, AHU-FC-062, AHU-FC-066]
 playbooks: [simultaneous-hc]
 operating_states: "OS#2-#4 (any cooling-side state) — host-gated"
 preconditions: "Supply fan running, and the unit in one of the cooling-side operating states G36 defines by actuator signature: OS#2 (HC = 0, CC = 0, minimum < OA damper < 100%), OS#3 (HC = 0, CC > 0, OA damper = 100%), or OS#4 (HC = 0, CC > 0, OA damper at minimum). Omit the rule on a unit with no MAT sensor — G36 marks FC#12 `omit if no MAT sensor`, and a MAT inferred from a mixing model rather than measured makes the comparison circular. Suspend evaluation for ModeDelay (30 min) after any mode or operating-state change in a zone group the AHU serves, while actuators are still stroking to their new positions. Silence the rule while AHU-FC-062 is active: a MAT outside the OAT/RAT envelope is not a number to compare anything against. When any gate is unmet the verdict is NO_EVAL, not healthy."

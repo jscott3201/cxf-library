@@ -18,7 +18,7 @@ g36: "§5.16.14 FC#7"
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [AHU-FC-005, AHU-FC-013, AHU-FC-057]
+related: [AHU-FC-005, AHU-FC-013, AHU-FC-057, AHU-FC-066, AHU-FC-067]
 playbooks: []
 operating_states: "OS#1 (heating) — host-gated"
 preconditions: "The unit must have a heating coil; G36 omits FC#7 where there is none. Evaluate only in OS#1, whose actuator signature per G36 Table 5.16.14.2 is heating coil > 0, cooling coil = 0, OA damper at minimum position — in any cooling state SAT is meant to sit below its heating setpoint. Supply fan running, since SAT means nothing in still air. Suspend evaluation for ModeDelay (30 min) after any operating-state change, while the coil is still stroking and SAT still reflects the previous state. sat_sp must be the setpoint the unit is actively controlling to: a host that binds a design constant while the sequence follows a reset schedule is comparing SAT against a number nothing is chasing. When any gate is unmet the verdict is NO_EVAL, not healthy."

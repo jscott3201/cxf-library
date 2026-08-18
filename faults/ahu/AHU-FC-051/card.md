@@ -19,7 +19,7 @@ g36: null
 clusters: [CLU-03]
 suppresses: []
 suppressed_by: []
-related: [AHU-FC-009, AHU-FC-011]
+related: [AHU-FC-009, AHU-FC-011, AHU-FC-068]
 playbooks: [economizer-failure]
 operating_states: "OS 4 (mechanical cooling)"
 preconditions: "Supply fan running. The outdoor/return comparison must be evaluable: |oat - rat| >= TMIN (PNNL-27338 uses 5 °F for its outdoor-air-fraction work), since two sensors reading within their combined error of each other cannot establish which air is cooler. Hosts also gate on OAT sensor quality — a sensor reading high produces this fault's signature with the economizer control working correctly (diagnosis 4). When either gate is unmet the verdict is NO_EVAL, not healthy."
