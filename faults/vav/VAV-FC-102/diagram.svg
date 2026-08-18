@@ -1,0 +1,191 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3040 790" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <rect x="215" y="148" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="300" y="170" text-anchor="middle" fill="#24292f" font-weight="bold">errClg</text>
+  <text x="300" y="188" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="215" y="248" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="300" y="270" text-anchor="middle" fill="#24292f" font-weight="bold">errHtg</text>
+  <text x="300" y="288" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="155" y="438" width="225" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="267.5" y="460" text-anchor="middle" fill="#24292f" font-weight="bold">zero</text>
+  <text x="267.5" y="478" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 0.0</text>
+  <rect x="215" y="508" width="190" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="310" y="530" text-anchor="middle" fill="#24292f" font-weight="bold">occArmed</text>
+  <text x="310" y="548" text-anchor="middle" fill="#57606a" font-size="11">Logical.TrueDelay · 3600 s</text>
+  <rect x="435" y="148" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="520" y="170" text-anchor="middle" fill="#24292f" font-weight="bold">hiPart</text>
+  <text x="520" y="188" text-anchor="middle" fill="#57606a" font-size="11">Reals.Max</text>
+  <rect x="435" y="248" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="520" y="270" text-anchor="middle" fill="#24292f" font-weight="bold">loPart</text>
+  <text x="520" y="288" text-anchor="middle" fill="#57606a" font-size="11">Reals.Min</text>
+  <rect x="435" y="368" width="225" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="547.5" y="390" text-anchor="middle" fill="#24292f" font-weight="bold">meanK</text>
+  <text x="547.5" y="408" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 0.0</text>
+  <rect x="655" y="198" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="740" y="220" text-anchor="middle" fill="#24292f" font-weight="bold">tempErr</text>
+  <text x="740" y="238" text-anchor="middle" fill="#57606a" font-size="11">Reals.Add</text>
+  <rect x="695" y="368" width="225" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="807.5" y="390" text-anchor="middle" fill="#24292f" font-weight="bold">sigmaK</text>
+  <text x="807.5" y="408" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 0.5</text>
+  <rect x="875" y="198" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="960" y="220" text-anchor="middle" fill="#24292f" font-weight="bold">centered</text>
+  <text x="960" y="238" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="955" y="368" width="225" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1067.5" y="390" text-anchor="middle" fill="#24292f" font-weight="bold">slackK</text>
+  <text x="1067.5" y="408" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 0.5</text>
+  <rect x="1095" y="198" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1180" y="220" text-anchor="middle" fill="#24292f" font-weight="bold">zNorm</text>
+  <text x="1180" y="238" text-anchor="middle" fill="#57606a" font-size="11">Reals.Divide</text>
+  <rect x="1315" y="298" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1400" y="320" text-anchor="middle" fill="#24292f" font-weight="bold">negZ</text>
+  <text x="1400" y="338" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="1535" y="30" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1620" y="52" text-anchor="middle" fill="#24292f" font-weight="bold">sInc</text>
+  <text x="1620" y="70" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="1535" y="148" width="190" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1630" y="170" text-anchor="middle" fill="#24292f" font-weight="bold">sPrev</text>
+  <text x="1630" y="188" text-anchor="middle" fill="#57606a" font-size="11">Discrete.UnitDelay · 300 s</text>
+  <rect x="1535" y="578" width="190" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1630" y="600" text-anchor="middle" fill="#24292f" font-weight="bold">tPrev</text>
+  <text x="1630" y="618" text-anchor="middle" fill="#57606a" font-size="11">Discrete.UnitDelay · 300 s</text>
+  <rect x="1535" y="678" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1620" y="700" text-anchor="middle" fill="#24292f" font-weight="bold">tInc</text>
+  <text x="1620" y="718" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="1755" y="30" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1840" y="52" text-anchor="middle" fill="#24292f" font-weight="bold">sAcc</text>
+  <text x="1840" y="70" text-anchor="middle" fill="#57606a" font-size="11">Reals.Add</text>
+  <rect x="1755" y="678" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1840" y="700" text-anchor="middle" fill="#24292f" font-weight="bold">tAcc</text>
+  <text x="1840" y="718" text-anchor="middle" fill="#57606a" font-size="11">Reals.Add</text>
+  <rect x="1975" y="30" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="2060" y="52" text-anchor="middle" fill="#24292f" font-weight="bold">sClamp</text>
+  <text x="2060" y="70" text-anchor="middle" fill="#57606a" font-size="11">Reals.Max</text>
+  <rect x="1975" y="678" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="2060" y="700" text-anchor="middle" fill="#24292f" font-weight="bold">tClamp</text>
+  <text x="2060" y="718" text-anchor="middle" fill="#57606a" font-size="11">Reals.Max</text>
+  <rect x="2195" y="30" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="2280" y="52" text-anchor="middle" fill="#24292f" font-weight="bold">sGate</text>
+  <text x="2280" y="70" text-anchor="middle" fill="#57606a" font-size="11">Reals.Switch</text>
+  <rect x="2195" y="678" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="2280" y="700" text-anchor="middle" fill="#24292f" font-weight="bold">tGate</text>
+  <text x="2280" y="718" text-anchor="middle" fill="#57606a" font-size="11">Reals.Switch</text>
+  <rect x="2415" y="30" width="225" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="2527.5" y="52" text-anchor="middle" fill="#24292f" font-weight="bold">sAlarm</text>
+  <text x="2527.5" y="70" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 5.0</text>
+  <rect x="2415" y="678" width="225" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="2527.5" y="700" text-anchor="middle" fill="#24292f" font-weight="bold">tAlarm</text>
+  <text x="2527.5" y="718" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 5.0</text>
+  <rect x="2695" y="298" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="2780" y="320" text-anchor="middle" fill="#24292f" font-weight="bold">anyAlarm</text>
+  <text x="2780" y="338" text-anchor="middle" fill="#57606a" font-size="11">Logical.Or</text>
+  <rect x="12" y="145" width="175" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="99.5" y="164" text-anchor="middle" fill="#1e3a8a">zone_temp_sp_clg</text>
+  <rect x="12" y="205" width="175" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="99.5" y="224" text-anchor="middle" fill="#1e3a8a">zone_temp</text>
+  <rect x="12" y="265" width="175" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="99.5" y="284" text-anchor="middle" fill="#1e3a8a">zone_temp_sp_htg</text>
+  <rect x="12" y="522" width="175" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="99.5" y="541" text-anchor="middle" fill="#1e3a8a">occ_scheduled</text>
+  <rect x="2915" y="44" width="72" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="2951" y="63" text-anchor="middle" fill="#7f1d1d">yHigh</text>
+  <rect x="2915" y="312" width="76" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="2953" y="331" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="2915" y="692" width="68" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="2949" y="711" text-anchor="middle" fill="#7f1d1d">yLow</text>
+  <rect x="2915" y="522" width="104" height="30" rx="15" fill="#fef3c7" stroke="#d97706"/>
+  <text x="2967" y="541" text-anchor="middle" fill="#78350f">yArmedOk</text>
+
+  <g fill="none" stroke="#7d8590" stroke-width="1.5" marker-end="url(#arrow)">
+    <path d="M 187 160 H 196 V 189 H 215"/>
+    <path d="M 187 220 H 204 V 165 H 215"/>
+    <path d="M 204 220 V 265 H 215"/>
+    <path d="M 187 280 H 196 V 289 H 215"/>
+    <path d="M 187 537 H 215"/>
+    <path d="M 385 177 H 410 V 165 H 435"/>
+    <path d="M 385 277 H 410 V 265 H 435"/>
+    <path d="M 605 177 H 630 V 215 H 655"/>
+    <path d="M 605 277 H 630 V 239 H 655"/>
+    <path d="M 380 467 H 2185"/>
+    <path d="M 400 467 V 189 H 435"/>
+    <path d="M 400 289 H 435"/>
+    <path d="M 1290 467 V 315 H 1315"/>
+    <path d="M 1945 467 V 71 H 1975"/>
+    <path d="M 1945 467 V 719 H 1975"/>
+    <path d="M 2185 467 V 73 H 2195"/>
+    <path d="M 2185 467 V 721 H 2195"/>
+    <path d="M 825 227 H 850 V 215 H 875"/>
+    <path d="M 660 397 H 858 V 239 H 875"/>
+    <path d="M 1045 227 H 1070 V 215 H 1095"/>
+    <path d="M 920 397 H 1078 V 239 H 1095"/>
+    <path d="M 1265 225 H 1300 V 47 H 1535"/>
+    <path d="M 1300 225 V 339 H 1315"/>
+    <path d="M 1485 327 H 1495 V 695 H 1535"/>
+    <path d="M 1180 397 H 1520 V 71 H 1535"/>
+    <path d="M 1520 397 V 719 H 1535"/>
+    <path d="M 405 537 H 2915"/>
+    <path d="M 2170 537 V 59 H 2195"/>
+    <path d="M 2170 537 V 707 H 2195"/>
+    <path d="M 1705 59 H 1720 V 47 H 1755"/>
+    <path d="M 1725 177 H 1740 V 71 H 1755"/>
+    <path d="M 1925 59 H 1938 V 47 H 1975"/>
+    <path d="M 2145 59 H 2155 V 45 H 2195"/>
+    <path d="M 2365 59 H 2415"/>
+    <path d="M 2385 59 V 118 H 1508 V 177 H 1535"/>
+    <path d="M 1705 707 H 1720 V 695 H 1755"/>
+    <path d="M 1725 607 H 1740 V 719 H 1755"/>
+    <path d="M 1925 707 H 1938 V 695 H 1975"/>
+    <path d="M 2145 707 H 2155 V 693 H 2195"/>
+    <path d="M 2365 707 H 2415"/>
+    <path d="M 2385 707 V 648 H 1508 V 607 H 1535"/>
+    <path d="M 2640 59 H 2915"/>
+    <path d="M 2665 59 V 315 H 2695"/>
+    <path d="M 2640 707 H 2915"/>
+    <path d="M 2665 707 V 339 H 2695"/>
+    <path d="M 2865 327 H 2915"/>
+  </g>
+
+  <g fill="#7d8590" font-size="9">
+    <text x="219" y="172">u1</text>
+    <text x="219" y="194">u2</text>
+    <text x="219" y="272">u1</text>
+    <text x="219" y="294">u2</text>
+    <text x="879" y="222">u1</text>
+    <text x="879" y="244">u2</text>
+    <text x="1099" y="222">u1</text>
+    <text x="1099" y="244">u2</text>
+    <text x="1319" y="322">u1</text>
+    <text x="1319" y="344">u2</text>
+    <text x="1539" y="54">u1</text>
+    <text x="1539" y="76">u2</text>
+    <text x="1539" y="702">u1</text>
+    <text x="1539" y="724">u2</text>
+    <text x="2199" y="50">u1</text>
+    <text x="2199" y="64">u2</text>
+    <text x="2199" y="78">u3</text>
+    <text x="2199" y="698">u1</text>
+    <text x="2199" y="712">u2</text>
+    <text x="2199" y="726">u3</text>
+  </g>
+
+  <g fill="#7d8590" font-size="10">
+    <text x="194" y="515">Bool</text>
+    <text x="410" y="530">Bool</text>
+    <text x="2371" y="52">Real</text>
+    <text x="2371" y="700">Real</text>
+    <text x="2646" y="52">Bool</text>
+    <text x="2646" y="700">Bool</text>
+  </g>
+
+  <g fill="#57606a" font-size="11">
+    <text x="1535" y="20">upper chart S — zone above its cooling setpoint</text>
+    <text x="1535" y="668">lower chart T — zone below its heating setpoint</text>
+  </g>
+
+  <text x="215" y="762" fill="#7d8590" font-size="11">sGate and tGate feed their own unit delays: the delay&#8217;s output is last sample&#8217;s sum, which is what makes the loop legal.</text>
+  <text x="215" y="782" fill="#7d8590" font-size="11">The same Switch zeroes the published sum and the delay input together, so an unoccupied tick clears the state rather than hiding it.</text>
+</svg>

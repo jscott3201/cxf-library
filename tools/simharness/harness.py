@@ -484,6 +484,104 @@ def plant_gate_windows(key: str | None, pts: dict, n: int) -> list:
             start = None
     return wins
 
+
+
+# ================================================================ vavcal
+
+def vavcal(b, bdir, out, epw, begin, end, args):
+    """Healthy VAV error-signal statistics for CUSUM calibration.
+
+    Computes, per zone over occupied/fan-on ticks: Temperror (piecewise
+    zone-temp error vs the dual setpoints, VPACC eq. form) and dTerror
+    (terminal discharge temp minus the AHU SAT broadcast, reheat off).
+    Emits vavcal.json with per-channel mean/std medians across zones —
+    the normal-operation statistics NIST/PIER §5.1.5 says k and h must
+    come from.
+    """
+    terms = b.get("AirTerminal:SingleDuct:VAV:Reheat", {})
+    zones = {}
+    for name, t in terms.items():
+        zones[name] = {"out_node": t["air_outlet_node_name"],
+                       "rht_coil": t.get("reheat_coil_name")}
+    stats_b = json.loads(json.dumps(b))
+    for rp in stats_b.get("RunPeriod", {}).values():
+        rp["begin_month"], rp["begin_day_of_month"] = begin
+        rp["end_month"], rp["end_day_of_month"] = end
+    stats_b.setdefault("Output:Variable", {})
+    def req(key, var):
+        n = f"simharness {len(stats_b['Output:Variable'])}"
+        stats_b["Output:Variable"][n] = {"key_value": key, "variable_name": var,
+                                         "reporting_frequency": "Timestep"}
+    req("*", "Zone Mean Air Temperature")
+    req("*", "Zone Thermostat Heating Setpoint Temperature")
+    req("*", "Zone Thermostat Cooling Setpoint Temperature")
+    for z in zones.values():
+        req(z["out_node"], "System Node Temperature")
+        if z["rht_coil"]:
+            req(z["rht_coil"], "Heating Coil Heating Rate")
+    for name, loop in b.get("AirLoopHVAC", {}).items():
+        req(loop["supply_side_outlet_node_names"], "System Node Temperature")
+    pj = out / "patched.epjson"
+    pj.write_text(json.dumps(stats_b))
+    csv_path = out / "ep" / "eplusout.csv"
+    if not (args.reuse and csv_path.is_file()):
+        print(f"vavcal: {len(zones)} terminals; running EnergyPlus…")
+        csv_path = run_energyplus(pj, epw, out / "ep")
+    with open(csv_path) as f:
+        rows = list(csv.reader(f))
+    header, data = rows[0], rows[1:]
+    import statistics as st
+    temperr_stats, dterr_stats = [], []
+    sat_cols = {lp: col(header, b["AirLoopHVAC"][lp]["supply_side_outlet_node_names"],
+                        "System Node Temperature") for lp in b.get("AirLoopHVAC", {})}
+    for tname, z in zones.items():
+        zone_key = None
+        for h in header:
+            up = h.upper()
+            if up.endswith(":Zone Mean Air Temperature [C](TimeStep)".upper()):
+                zk = h.split(":")[0]
+                if zk.upper() in tname.upper() or tname.upper().startswith(zk.upper()):
+                    zone_key = zk
+                    break
+        if not zone_key:
+            continue
+        zt = series(data, col(header, zone_key, "Zone Mean Air Temperature"))
+        hs = series(data, col(header, zone_key, "Zone Thermostat Heating Setpoint Temperature"))
+        cs = series(data, col(header, zone_key, "Zone Thermostat Cooling Setpoint Temperature"))
+        dat = series(data, col(header, z["out_node"], "System Node Temperature"))
+        rht = series(data, col(header, z["rht_coil"], "Heating Coil Heating Rate")) \
+            if z["rht_coil"] else [0.0] * len(zt)
+        lp = None
+        for l in sat_cols:                       # PACU_VAV_bot ↔ "…_bot…"/"…_bottom…"
+            tag = l.upper().split("_")[-1]        # BOT / MID / TOP
+            if tag and (f"_{tag}" in tname.upper() or f"_{tag.lower()}" in tname.lower()
+                        or tag in tname.upper().replace("BOTTOM", "BOT")):
+                lp = l
+                break
+        sat = series(data, sat_cols[lp]) if lp else None
+        te = [ (t - c) if t > c else (t - h) if t < h else 0.0
+               for t, h, c in zip(zt, hs, cs) ]
+        occ = [h > 15.0 for h in hs]     # setback heating setpoint marks unoccupied
+        te_occ = [e for e, o in zip(te, occ) if o]
+        if len(te_occ) > 100:
+            temperr_stats.append((st.mean(te_occ), st.pstdev(te_occ)))
+        if sat:
+            dte = [d_ - s for d_, s, r, o in zip(dat, sat, rht, occ)
+                   if r < 100.0 and o]
+            if len(dte) > 100:
+                dterr_stats.append((st.mean(dte), st.pstdev(dte)))
+    def med(v, i):
+        v = sorted(x[i] for x in v)
+        return round(v[len(v) // 2], 4) if v else None
+    result = {
+        "building": bdir.name, "period": f"{begin}-{end}",
+        "zones_measured": len(temperr_stats),
+        "temperror": {"mean_median": med(temperr_stats, 0), "std_median": med(temperr_stats, 1)},
+        "dterror_reheat_off": {"mean_median": med(dterr_stats, 0), "std_median": med(dterr_stats, 1)},
+    }
+    (out / "vavcal.json").write_text(json.dumps(result, indent=1))
+    print(json.dumps(result, indent=1))
+
 # ---------------------------------------------------------------- main
 
 def main():
@@ -494,7 +592,7 @@ def main():
     runp.add_argument("--out", default=None)
     runp.add_argument("--begin", default="7-6", help="run period start M-D")
     runp.add_argument("--end", default="7-12", help="run period end M-D")
-    runp.add_argument("--mode", default="airloop", choices=["airloop", "plant"])
+    runp.add_argument("--mode", default="airloop", choices=["airloop", "plant", "vavcal"])
     runp.add_argument("--reuse", action="store_true",
                       help="reuse an existing eplusout.csv instead of re-running EnergyPlus")
     runp.add_argument("--faultmodel", default=None, metavar="KIND=DELTA",
@@ -598,6 +696,10 @@ def main():
         for line in log.splitlines():
             if re.search(r"replay/|PASS|FAIL", line):
                 print(line if "replay/" not in line else "  " + line.split("replay/")[-1])
+        return
+
+    if args.mode == "vavcal":
+        vavcal(b, bdir, out, epw, begin, end, args)
         return
 
     loops = loop_nodes(b)

@@ -218,6 +218,55 @@
       },
       "provisional": false,
       "notes": "Brick spelling is Outside_ (Outdoor_Air_Temperature_Sensor does not exist). Role-OutdoorAirIntake is 223P's only outdoor role; used by reference instance oa-temp. [VAV dictionary] Carried from the AHU dictionary (class and pattern are equipment-independent); for a VAV rule the sensor is the site OAT feeding the zone-level season test, not a box-mounted device."
+    },
+    {
+      "name": "vav_dat",
+      "description": "VAV box discharge air temperature (downstream of the reheat coil)",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": "Discharge_Air_Temperature_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty at the terminal discharge",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "Available on many but not all boxes (NIST/PIER 2001 §5.1.4); the reheat-leak CUSUM channel (VAV-FC-103) is the only consumer — boxes without it run the reduced two-channel VPACC per the source's own fallback. EAT is approximated by the AHU's broadcast SAT per the same source."
+    },
+    {
+      "name": "sat",
+      "description": "AHU supply air temperature broadcast to the terminal (EAT approximation)",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": "Supply_Air_Temperature_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty attached to the AHU supply-air OutletConnectionPoint",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Air",
+        "aspects": [
+          "Role-Supply"
+        ]
+      },
+      "provisional": false,
+      "notes": "Duplicate of ahu dict sat per the own-family lint rule. Consumed by VAV-FC-103's dT channel: the terminal's entering air temperature is approximated by the AHU SAT broadcast per NIST/PIER 2001 §5.1.4's own workaround; simulation validates the approximation's bias at < 0.005 degC (harness vavcal)."
+    },
+    {
+      "name": "occ_scheduled",
+      "description": "TRUE while current time falls inside the occupied schedule (host-evaluated)",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": null,
+      "s223": null,
+      "derived": true,
+      "notes": "Duplicate of sys dict occ_scheduled (same host-evaluated schedule boolean). CUSUM rules reset their accumulators in-graph while unoccupied (Switch to zero), per NIST/PIER 2001 §5.1.3: errors are computed only during occupied periods and CUSUMs reset to zero outside them."
     }
   ]
 }

@@ -1,0 +1,137 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 10800 },
+  "scenarios": [
+    {
+      "name": "healthy_noise_below_slack",
+      "description": "Flow error swinging to +/-7 L/s on a 200 L/s setpoint — 2.97 sigma, just inside the k = 3 slack. Neither accumulator ever leaves zero, so no amount of elapsed time produces an alarm. This is the whole point of the slack parameter.",
+      "inputs": {
+        "zone_airflow": [
+          { "t": 0, "value": 207.0 },
+          { "t": 600, "value": 193.0 },
+          { "t": 1800, "value": 206.0 },
+          { "t": 3600, "value": 193.5 },
+          { "t": 5400, "value": 207.0 },
+          { "t": 7200, "value": 193.0 },
+          { "t": 9000, "value": 206.5 }
+        ],
+        "zone_airflow_sp": 200.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 10800, "equals": false },
+        { "output": "yHigh", "from_s": 0, "to_s": 10800, "equals": false },
+        { "output": "yLow", "from_s": 0, "to_s": 10800, "equals": false },
+        { "output": "yOccupiedOk", "from_s": 3720, "to_s": 10800, "equals": true }
+      ]
+    },
+    {
+      "name": "sustained_over_delivery_alarms",
+      "description": "A steady +14.16 L/s (6 sigma) over-delivery on a 200 L/s setpoint — 7% of setpoint, well inside VAV-FC-053's 30% tracking band, so no threshold rule sees it. S climbs 3 per sample from the moment the gate opens and passes h = 20 seven samples later.",
+      "inputs": {
+        "zone_airflow": 214.16,
+        "zone_airflow_sp": 200.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3840, "equals": false },
+        { "output": "yFault", "from_s": 4080, "to_s": 10800, "equals": true },
+        { "output": "yHigh", "from_s": 4080, "to_s": 10800, "equals": true },
+        { "output": "yLow", "from_s": 0, "to_s": 10800, "equals": false }
+      ]
+    },
+    {
+      "name": "sustained_under_delivery_alarms",
+      "description": "The mirror case: a steady -14.16 L/s under-delivery drives T, not S, so the direction flags separate a box delivering too much air from one starving its zone.",
+      "inputs": {
+        "zone_airflow": 185.84,
+        "zone_airflow_sp": 200.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3840, "equals": false },
+        { "output": "yFault", "from_s": 4080, "to_s": 10800, "equals": true },
+        { "output": "yLow", "from_s": 4080, "to_s": 10800, "equals": true },
+        { "output": "yHigh", "from_s": 0, "to_s": 10800, "equals": false }
+      ]
+    },
+    {
+      "name": "occupancy_reset_clears_accumulation",
+      "description": "Same 6 sigma bias as sustained_over_delivery_alarms, which alone alarms at 3960 s. Occupancy drops at 3900 s with S at 18, one sample short of h. The accumulator is forced to zero, and when occupancy returns at 4200 s the rule serves the first hour again before restarting from zero — so the alarm arrives at 8160 s instead.",
+      "inputs": {
+        "zone_airflow": 214.16,
+        "zone_airflow_sp": 200.0,
+        "occ_scheduled": [
+          { "t": 0, "value": true },
+          { "t": 3900, "value": false },
+          { "t": 4200, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 8040, "equals": false },
+        { "output": "yFault", "from_s": 8280, "to_s": 10800, "equals": true },
+        { "output": "yOccupiedOk", "from_s": 3960, "to_s": 7680, "equals": false },
+        { "output": "yOccupiedOk", "from_s": 7860, "to_s": 10800, "equals": true }
+      ]
+    },
+    {
+      "name": "first_hour_excluded",
+      "description": "A 20 sigma flow error present from load. One sample past the gate would carry S to 34, yet nothing asserts for the whole first hour — the exclusion window is honoured against an error large enough to alarm immediately.",
+      "inputs": {
+        "zone_airflow": 247.2,
+        "zone_airflow_sp": 200.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3720, "to_s": 10800, "equals": true },
+        { "output": "yOccupiedOk", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yOccupiedOk", "from_s": 3660, "to_s": 10800, "equals": true }
+      ]
+    },
+    {
+      "name": "alarm_limit_bracketed",
+      "description": "A +9.44 L/s (4 sigma) bias adds exactly 1 to S per sample, walking the accumulator across h one unit at a time: silent at S = 19 (4680 s), asserting at S = 21 (4800 s). The S = 20 sample is skipped because a normalized accumulator cannot be parked exactly on the limit.",
+      "inputs": {
+        "zone_airflow": 209.44,
+        "zone_airflow_sp": 200.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 4680, "equals": false },
+        { "output": "yFault", "from_s": 4800, "to_s": 10800, "equals": true }
+      ]
+    },
+    {
+      "name": "alarm_drains_after_error_clears",
+      "description": "The bias is corrected at 5400 s with S at 87. The alarm does not drop with it: S falls by k = 3 per sample and the rule stays asserted for a further 23 minutes. CUSUM has memory, and a host watching the falling edge is watching the accumulator drain, not the box misbehaving.",
+      "inputs": {
+        "zone_airflow": [
+          { "t": 0, "value": 214.16 },
+          { "t": 5400, "value": 200.0 }
+        ],
+        "zone_airflow_sp": 200.0,
+        "occ_scheduled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 4080, "to_s": 6660, "equals": true },
+        { "output": "yFault", "from_s": 6900, "to_s": 10800, "equals": false }
+      ]
+    },
+    {
+      "name": "unoccupied_stays_silent",
+      "description": "The same 20 sigma error with the box unoccupied all day. Nothing accumulates and nothing asserts — and a false yFault here means NO_EVAL, which yOccupiedOk is what tells the host.",
+      "inputs": {
+        "zone_airflow": 247.2,
+        "zone_airflow_sp": 200.0,
+        "occ_scheduled": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 10800, "equals": false },
+        { "output": "yHigh", "from_s": 0, "to_s": 10800, "equals": false },
+        { "output": "yLow", "from_s": 0, "to_s": 10800, "equals": false },
+        { "output": "yOccupiedOk", "from_s": 0, "to_s": 10800, "equals": false }
+      ]
+    }
+  ]
+}

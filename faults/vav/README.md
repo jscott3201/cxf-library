@@ -20,11 +20,23 @@ Point dictionary: [`points/vav.points.json`](../../points/vav.points.json).
 | VAV-FC-054 | Damper hunting / oscillation | 3 | rule | **verified** |
 | VAV-FC-055 | Reheat waste during cooling season | 3 | rule | **verified** |
 | VAV-FC-100 | Zone temperature sensor drift | 3 | statistical | planned |
+| VAV-FC-101 | VAV airflow tracking CUSUM | 3 | statistical | **verified** |
+| VAV-FC-102 | Zone temperature CUSUM | 3 | statistical | **verified** |
+| VAV-FC-103 | Reheat coil leakage CUSUM | 3 | statistical | **verified** |
 
 Severity and method per the reference's ch.10 cards (its §5.8.2 index carries
 no severity column). VAV-FC-100 is phase 3; its neighbor-comparison method is
 expressible with a host-derived median point and can be authored once the
 phase-3 scope opens.
+
+VAV-FC-101/102/103 are the VPACC trio (NIST/CEC PIER Project 2.3 §5.1):
+two-sided CUSUM charts over the three per-box error signals, the library's
+first feedback-loop topology (`Discrete.UnitDelay` accumulators with in-graph
+occupancy reset). A box without a discharge-air sensor runs 101/102 as the
+source's reduced two-channel VPACC; 103 is the one channel that needs
+`vav_dat`. Parameter defaults are calibrated by the committed harness method
+(tools/simharness `vavcal`) plus the source's Iowa Energy Center campaign, and
+remain per-box commissioning values on every card.
 
 ## Relationships
 
