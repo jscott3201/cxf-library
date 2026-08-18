@@ -34,13 +34,13 @@ Here is a real one — AHU-FC-050, simultaneous heating and cooling:
 
 ## What's inside
 
-- **82 verified fault rules** across eleven equipment families: air handlers
+- **85 verified fault rules** across eleven equipment families: air handlers
   (`faults/ahu/`, 34 — all 31 reference faults plus 3 APAR-grounded
   library extensions), system-level & cross-equipment
   rules (10 — the reference's full ch.16 set plus the library's sensor-health
   family), rooftop units (6), hot water plants (8 — the reference's 3 plus 5
   library-authored loop rules grounded in PNNL-27338), VAV terminal boxes
-  (6), fan coil units (5), chilled water plants (4), heat pumps (3), energy
+  (6), fan coil units (5), chilled water plants (4), heat pumps (6 — the reference's 3 plus the NIST SP 1087 refrigerant-side family), energy
   recovery ventilators (2), VFDs (2), and hydronic pumps (2) — **every fully
   specified fault in the reference is now implemented and engine-verified**,
   plus the library's first grounded extensions beyond it.
