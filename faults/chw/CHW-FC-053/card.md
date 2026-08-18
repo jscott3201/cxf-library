@@ -286,6 +286,13 @@ the marginal generator is dirtiest.
 
 ## Notes
 
+- Source-pointer precision: the reference's ch.13 card cites "PNNL-27338 §3";
+  in PNNL-27338's own numbering the low delta-T algorithm sits in the
+  hot-water-distribution chapter (§4.6), and that document's summary names
+  chilled-water diagnostics as future work — so the citation is an
+  analog/pattern source (the HW delta-T algorithm mirrored to CHW), not a
+  CHW-specific specification (deep-read audit, 2026-08-17).
+
 Read `yLoadOk` before reading `yFault`. A plant that is off, or coasting through
 a mild morning at 25% load, holds `yLoadOk` false for hours at a time, and every
 `yFault = false` underneath it means "not evaluated" rather than "delta-T is
