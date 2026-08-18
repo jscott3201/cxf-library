@@ -23,11 +23,11 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "Fan coil unit point dictionary. All points carry from the AHU dictionary (the FCU is a two-coil air handler in miniature); rat doubles as the coil entering temperature and sat as the leaving temperature for the inactive-coil leak pair (FCU-FC-004/005), per the same proxy-binding note G36 makes for RTU coil temperatures.",
+  "notes": "Fan coil unit point dictionary. All points carry from the AHU dictionary (the FCU is a two-coil air handler in miniature); rat doubles as the coil entering temperature and sat as the leaving temperature for the inactive-coil leak pair (FCU-0004/FCU-0005), per the same proxy-binding note G36 makes for RTU coil temperatures.",
   "points": [
     {
       "name": "operating_state",
-      "description": "Current AHU operating state as reported by the control sequence (host-derived integer). Recommended binding: G36 Section 5.16.14's operating-state index OS#1-OS#5; any stable enumeration works, because the only in-library consumer (AHU-FC-004) counts transitions and never interprets specific values",
+      "description": "Current AHU operating state as reported by the control sequence (host-derived integer). Recommended binding: G36 Section 5.16.14's operating-state index OS#1-OS#5; any stable enumeration works, because the only in-library consumer (AHU-0004) counts transitions and never interprets specific values",
       "kind": "int",
       "unit": "1",
       "qudt_unit": "UNITLESS",
@@ -35,7 +35,7 @@
       "brick": null,
       "s223": null,
       "provisional": true,
-      "notes": "Distinct from expected_mode: that point is what the mode SHOULD be given conditions (AHU-FC-063 compares actuators against it); this one is what the sequence says the state IS (AHU-FC-004 counts how often it changes). Hosts typically read it from the BAS mode/state enum or derive it per G36 Section 5.16.14. Value-level semantics are deliberately unspecified here since only transitions are consumed; a host must simply keep the encoding stable, as any re-mapping mid-stream registers as a spurious transition. [FCU dictionary] Brick class and 223P pattern carried over (equipment-independent); for an FCU the state space is G36 s5.22's OS#1-#4; only transitions are consumed (FCU-FC-001), so any stable enum binds."
+      "notes": "Distinct from expected_mode: that point is what the mode SHOULD be given conditions (AHU-0029 compares actuators against it); this one is what the sequence says the state IS (AHU-0004 counts how often it changes). Hosts typically read it from the BAS mode/state enum or derive it per G36 Section 5.16.14. Value-level semantics are deliberately unspecified here since only transitions are consumed; a host must simply keep the encoding stable, as any re-mapping mid-stream registers as a spurious transition. [FCU dictionary] Brick class and 223P pattern carried over (equipment-independent); for an FCU the state space is G36 s5.22's OS#1-#4; only transitions are consumed (FCU-0001), so any stable enum binds."
     },
     {
       "name": "sat",
@@ -55,7 +55,7 @@
         ]
       },
       "provisional": false,
-      "notes": "Brick Discharge_Air_Temperature_Sensor is brick:aliasOf this class. 223P pattern verbatim from reference instance MultipleZoneAhu-sa-temp; medium comes from hasMedium on the owning ConnectionPoint. [FCU dictionary] Brick class and 223P pattern carried over (equipment-independent); doubles as the coil LEAVING temperature for FCU-FC-004/005."
+      "notes": "Brick Discharge_Air_Temperature_Sensor is brick:aliasOf this class. 223P pattern verbatim from reference instance MultipleZoneAhu-sa-temp; medium comes from hasMedium on the owning ConnectionPoint. [FCU dictionary] Brick class and 223P pattern carried over (equipment-independent); doubles as the coil LEAVING temperature for FCU-0004/FCU-0005."
     },
     {
       "name": "sat_sp",
@@ -95,7 +95,7 @@
         ]
       },
       "provisional": false,
-      "notes": "Verbatim from reference instance MultipleZoneAhu-ra-temp. [FCU dictionary] Brick class and 223P pattern carried over (equipment-independent); the unit's entering (return) air; doubles as coil ENTERING temperature for FCU-FC-004/005."
+      "notes": "Verbatim from reference instance MultipleZoneAhu-ra-temp. [FCU dictionary] Brick class and 223P pattern carried over (equipment-independent); the unit's entering (return) air; doubles as coil ENTERING temperature for FCU-0004/FCU-0005."
     },
     {
       "name": "htg_vlv_cmd",

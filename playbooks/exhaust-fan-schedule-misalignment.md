@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | SYS-FC-053 (exhaust running unoccupied), SYS-FC-057 (exhaust/AHU misalignment), CLU-08 |
+| **Applies to** | SYS-0004 (exhaust running unoccupied), SYS-0008 (exhaust/AHU misalignment), CLU-08 |
 | **Fix complexity** | Remote fix (90%) · On-site (10%) |
 | **Typical time** | 15–30 min remote |
 | **Typical cost** | $0 remote |
@@ -12,14 +12,14 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 173–175).
 
 ## Step 1 — Verify the fault
 
-1. For exhaust running unoccupied (SYS-FC-053):
+1. For exhaust running unoccupied (SYS-0004):
    - Pull a 7-day trend of exhaust fan status overlaid with the building
      occupancy schedule.
    - Confirm the exhaust fan is running during unoccupied periods for more
      than 15 minutes.
    - Check whether the run is a legitimate demand override (e.g., lab
      exhaust, parking garage, kitchen hood).
-2. For exhaust/AHU misalignment (SYS-FC-057):
+2. For exhaust/AHU misalignment (SYS-0008):
    - Compare exhaust fan status to supply fan status over 7 days.
    - Condition 1: exhaust ON but supply OFF — this creates negative building
      pressure, pulling in unconditioned air through the envelope.

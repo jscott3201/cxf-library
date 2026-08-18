@@ -106,7 +106,7 @@
         "aspects": [],
         "enumerationkind": "Binary-OnOff"
       },
-      "notes": "Consumed by the fan short-cycling rule (starts-per-hour edge counting; Logical.Edge Nyquist ceiling window/(2·dt) applies — RTU-FC-050 precedent)."
+      "notes": "Consumed by the fan short-cycling rule (starts-per-hour edge counting; Logical.Edge Nyquist ceiling window/(2·dt) applies — RTU-0001 precedent)."
     }
   ]
 }

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | SYS-FC-054, SYS-FC-055, AHU-FC-002, AHU-FC-003, AHU-FC-008, AHU-FC-010, AHU-FC-062, AHU-FC-066, RTU-FC-052, CLU-09; SYS-FC-058 (flatline), SYS-FC-059 (spike) — library-authored additions, the reference's row predates them |
+| **Applies to** | SYS-0005, SYS-0006, AHU-0002, AHU-0003, AHU-0008, AHU-0010, AHU-0028, AHU-0032, RTU-0003, CLU-09; SYS-0009 (flatline), SYS-0010 (spike) — library-authored additions, the reference's row predates them |
 | **Fix complexity** | On-site service required |
 | **Typical time** | 1–2 h per sensor |
 | **Typical cost** | $50–$200 per sensor (recalibrate or replace) |
@@ -17,7 +17,7 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 165–166).
    manometer; CO₂ → fresh-air baseline (outdoor CO₂ ≈ 420 ppm); humidity →
    sling psychrometer or calibrated RH probe (humidity sensors are the most
    drift-prone, typical lifespan 1–2 years between recalibrations).
-2. If the FDD system's virtual sensor model (SYS-FC-055) shows bias greater
+2. If the FDD system's virtual sensor model (SYS-0006) shows bias greater
    than 1.5 °C, drift is confirmed (virtual sensors demonstrate RMSE ≈
    0.30 °C — Koo & Yoon 2022 — so 1.5 °C is well outside normal error).
 3. A drifted sensor may be triggering false alarms on other rules: if
@@ -39,7 +39,7 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 165–166).
    pressure transducers $80–$200; humidity $50–$150 (most frequent);
    CO₂ $100–$300 (calibrate with a known gas standard or fresh outdoor air).
 3. Verify the reading against the reference instrument before leaving.
-4. For paired installations (SYS-FC-054 cross-validation), recalibrate both
+4. For paired installations (SYS-0005 cross-validation), recalibrate both
    sensors in the pair.
 
 ## Step 4 — Confirm resolution

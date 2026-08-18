@@ -224,7 +224,7 @@ def derive_os(pts: dict) -> list:
     def smooth(sig):
         # majority-of-window, not any-of-window: a single compressor blip
         # must not reclassify half an hour of economizing as OS#3
-        # (fleet-sweep artifact: AHU-FC-011 false cluster, 2026-08-18)
+        # (fleet-sweep artifact: AHU-0011 false cluster, 2026-08-18)
         return [sum(sig[max(0, i - SMOOTH_TICKS):i + 1]) * 2
                 > len(sig[max(0, i - SMOOTH_TICKS):i + 1])
                 for i in range(n)]
@@ -233,7 +233,7 @@ def derive_os(pts: dict) -> list:
     for i in range(n):
         # heating takes precedence outright: under smoothing, htg and clg
         # can overlap at warmup transitions, and evaluating OS#2-4-scoped
-        # rules during actual heating produced the AHU-FC-015 false
+        # rules during actual heating produced the AHU-0015 false
         # cluster (fleet sweep, 2026-08-18)
         if htg[i]:
             os_.append(1)
@@ -337,19 +337,19 @@ def emit_and_replay(building: str, loops_pts: dict, rules: dict, out: Path):
 # ================================================================ plants
 
 PLANT_EXCLUDE = {
-    "CHW-FC-050": "host-fitted kW/ton baseline placeholders — needs a per-plant fit first",
-    "CHW-FC-051": "reset-class: prototype uses a constant scheduled CHW setpoint, fires by construction",
-    "HW-FC-050": "host-fitted baseline placeholders — needs a per-plant fit first",
-    "HW-FC-051": "host-fitted baseline placeholders — needs a per-plant fit first",
-    "HW-FC-057": "reset-class: constant scheduled HW setpoint, fires by construction",
-    "HW-FC-056": "by-construction: constant HWST at low evening load IS the retuning condition it detects (no HWST reset in the prototype); verified firing correctly, Jan week",
+    "CHW-0001": "host-fitted kW/ton baseline placeholders — needs a per-plant fit first",
+    "CHW-0002": "reset-class: prototype uses a constant scheduled CHW setpoint, fires by construction",
+    "HW-0001": "host-fitted baseline placeholders — needs a per-plant fit first",
+    "HW-0002": "host-fitted baseline placeholders — needs a per-plant fit first",
+    "HW-0008": "reset-class: constant scheduled HW setpoint, fires by construction",
+    "HW-0007": "by-construction: constant HWST at low evening load IS the retuning condition it detects (no HWST reset in the prototype); verified firing correctly, Jan week",
 }
 PLANT_MAPPED = {"chwst", "chwrt", "chwst_sp", "chiller_load", "boiler_status",
                 "hw_pump_status", "hws_temp", "hwr_temp", "hws_temp_sp",
                 "hw_pump_vfd_speed", "oat"}
 # rule -> gate key; rules absent here replay ungated (lead margin only):
 # unnecessary-operation rules must NOT be gated on the equipment they accuse.
-PLANT_GATE = {"CHW-FC-053": "chw_load40", "HW-FC-053": "hw_on", "HW-FC-056": "hw_on"}
+PLANT_GATE = {"CHW-0004": "chw_load40", "HW-0004": "hw_on", "HW-0007": "hw_on"}
 PUMP_ON_W = 100.0
 
 
@@ -738,7 +738,7 @@ def main():
     per_rule: dict = {}
     cur = None
     for line in log.splitlines():
-        m = re.search(r"replay/([A-Z]+-FC-\d+)__(\S+)", line)
+        m = re.search(r"replay/([A-Z]+-\d+)__(\S+)", line)
         if m:
             cur = m.groups()
         elif cur and re.search(r"\b(PASS|FAIL)\b", line):

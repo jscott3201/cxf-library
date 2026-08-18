@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | AHU-FC-054, AHU-FC-014, AHU-FC-015, VAV-FC-053 |
+| **Applies to** | AHU-0020, AHU-0014, AHU-0015, VAV-0004 |
 | **Fix complexity** | On-site service required |
 | **Typical time** | 1–4 h on-site |
 | **Typical cost** | $200–$1,200 (actuator + labor) |
@@ -19,8 +19,8 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 159–160).
    glitch — monitor for recurrence. If feedback stays flat regardless of
    command, the actuator or linkage has failed.
 3. Check for downstream faults this actuator causes: a stuck heating valve →
-   simultaneous H&C (AHU-FC-050); a stuck OA damper → economizer failure
-   (AHU-FC-051).
+   simultaneous H&C (AHU-0016); a stuck OA damper → economizer failure
+   (AHU-0017).
 
 ## Step 2 — Remote check (limited options)
 

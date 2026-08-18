@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | VAV-FC-050, VAV-FC-052, VAV-FC-055, VAV-FC-101, VAV-FC-102, VAV-FC-103, SYS-FC-056, CLU-05 |
+| **Applies to** | VAV-0001, VAV-0003, VAV-0006, VAV-0007, VAV-0008, VAV-0009, SYS-0007, CLU-05 |
 | **Fix complexity** | Remote fix |
 | **Typical time** | 15 min per box (can be done in batch on most BAS platforms) |
 | **Typical cost** | $0 |
@@ -29,7 +29,7 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 160–161).
      may be too low. *(Library note: PNNL-27338 §2.2.2–2.2.3's own
      form is a two-quantity test — zones-with-reheat-open fraction above 25%
      AND fleet-average valve command above 50%; the single-predicate gloss
-     here is the reference's simplification. See AHU-FC-053's Deviations.)*
+     here is the reference's simplification. See AHU-0019's Deviations.)*
    - Only 1–3 boxes flagged → a zone-level configuration problem.
 
 ## Step 2 — Remote fix
@@ -40,12 +40,12 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 160–161).
    be higher than necessary. G36 recommends a minimum of 20% of design
    airflow or the ventilation minimum, whichever is greater.
 2. If the reheat valve is open while the zone is already satisfied
-   (VAV-FC-052): command the valve to 0% and watch the zone temperature
+   (VAV-0003): command the valve to 0% and watch the zone temperature
    response. If the temperature continues to rise, the valve is physically
    stuck — see the [stuck-actuator](stuck-actuator.md) playbook.
 3. Enable a summer reheat lockout if not already active: when outdoor air is
    above 21 °C (70 °F) and the zone is satisfied, disable the reheat valve
-   entirely. SYS-FC-056 specifically detects zone reheat active during warm
+   entirely. SYS-0007 specifically detects zone reheat active during warm
    weather (~20% of buildings).
 4. For buildings with many flagged boxes, consider a dual-maximum control
    strategy — separate heating-maximum and cooling-maximum airflow setpoints

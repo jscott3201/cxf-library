@@ -1,0 +1,108 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 5400 },
+  "scenarios": [
+    {
+      "name": "heating_state_with_the_cooling_coil_off",
+      "description": "OS#1: a 18 °C mixture leaves the unit at 19 °C. The only thing the air crossed between the two sensors was the supply fan, so it gained dTSF = 1 °C and the cooling coil took nothing back. `drop` = mat − sat = −1 °C, the healthy signature of an inactive cooling coil on a draw-through unit",
+      "inputs": { "mat": 18.0, "sat": 19.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "drop_exactly_at_threshold",
+      "description": "Threshold edge: mat − sat = 4.1623 °C exactly, the composed sqrt(eCCET² + eCCLT²) + dTSF allowance. `dropBig` is a strict `>`, so a drop sitting precisely on the allowance reads healthy — G36's `≥` would report it (see Deviations)",
+      "inputs": { "mat": 20.0, "sat": 15.8377 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "drop_just_over_threshold",
+      "description": "Threshold edge, other side: mat − sat = 4.2623 °C clears the strict comparison on the first tick and the alarm asserts one alarm_delay (1800 s) later",
+      "inputs": { "mat": 20.0, "sat": 15.7377 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "chilled_water_valve_leaking_during_heating",
+      "description": "OS#1 with the cooling valve commanded 0%: a 20 °C mixture arrives at the supply sensor at 12 °C. Adding the fan's own 1 °C rise back, the coil is pulling roughly 9 °C out of air the heating coil is simultaneously paying to warm. AHU-0016 cannot see this — the cooling command reads zero and the water is flowing anyway",
+      "inputs": { "mat": 20.0, "sat": 12.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "sat_sensor_reading_low",
+      "description": "Same 6 °C signature with the chilled-water plant off for the season and the valve verified shut: nothing is removing heat, and the supply sensor is what is wrong. The rule reports the contradiction and cannot say which of the two sensors is lying — G36 lists both sensor errors ahead of the valve in its diagnosis order",
+      "inputs": { "mat": 21.0, "sat": 15.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "modest_drop_below_shipped_default",
+      "description": "A real but small leak: measured mat − sat = 3.5 °C, which after adding the fan's 1 °C rise back is a true coil drop of about 4.5 °C. The shipped 4.1623 °C threshold is measured against mat − sat, so it demands a true drop of ~5.16 °C and stays silent here. A site that retunes to sqrt(10) − 1 = 2.1623 (keeping the mat/sat binding but dropping the fan-heat term from the allowance) catches this leak; the shipped default is deliberately the quieter one",
+      "inputs": { "mat": 20.0, "sat": 16.5 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "transient_clears_before_alarm_delay",
+      "description": "Transient: an 8 °C drop persists for 1200 s while chilled water still standing in a just-closed coil boils off, then SAT returns to mat + fan heat. Anything shorter than alarm_delay never reaches the operator",
+      "inputs": {
+        "mat": 20.0,
+        "sat": [
+          { "t": 0, "value": 12.0 },
+          { "t": 1200, "value": 19.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "fault_clears_on_recovery",
+      "description": "A sustained 8 °C drop alarms at 1800 s; the leaking valve is isolated at t = 3000 and SAT climbs back to mat + fan heat. `TrueDelay` has no off-delay, so the alarm drops on that tick",
+      "inputs": {
+        "mat": 20.0,
+        "sat": [
+          { "t": 0, "value": 12.0 },
+          { "t": 3000, "value": 19.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 2700, "equals": true },
+        { "output": "yFault", "from_s": 3300, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "oscillating_drop_never_alarms",
+      "description": "A DX stage short-cycling on a 10-minute period swings the drop between 8 °C and −1 °C. Its mean is well outside the allowance and G36's 5-minute rolling average would report the fault, but persistence restarts on every compliant tick, so this rule stays silent — the limit of substituting TrueDelay for averaging (see Deviations)",
+      "inputs": {
+        "mat": 20.0,
+        "sat": [
+          { "t": 0, "value": 12.0 },
+          { "t": 600, "value": 21.0 },
+          { "t": 1200, "value": 12.0 },
+          { "t": 1800, "value": 21.0 },
+          { "t": 2400, "value": 12.0 },
+          { "t": 3000, "value": 21.0 },
+          { "t": 3600, "value": 12.0 },
+          { "t": 4200, "value": 21.0 },
+          { "t": 4800, "value": 12.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    }
+  ]
+}

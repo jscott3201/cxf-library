@@ -1,0 +1,741 @@
+{
+  "schema": "cxf-library/registry/v1",
+  "rules": [
+    {
+      "id": "AHU-0001",
+      "family": "ahu",
+      "name": "Duct static pressure too low at full fan speed",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-001"
+    },
+    {
+      "id": "AHU-0002",
+      "family": "ahu",
+      "name": "Mixed air temperature too low",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-002"
+    },
+    {
+      "id": "AHU-0003",
+      "family": "ahu",
+      "name": "Mixed air temperature too high",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-003"
+    },
+    {
+      "id": "AHU-0004",
+      "family": "ahu",
+      "name": "Excessive operating state changes per hour",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-004"
+    },
+    {
+      "id": "AHU-0005",
+      "family": "ahu",
+      "name": "SAT too low vs MAT in heating",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-005"
+    },
+    {
+      "id": "AHU-0006",
+      "family": "ahu",
+      "name": "OA fraction deviation",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-006"
+    },
+    {
+      "id": "AHU-0007",
+      "family": "ahu",
+      "name": "SAT too low at full heating",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-007"
+    },
+    {
+      "id": "AHU-0008",
+      "family": "ahu",
+      "name": "SAT \u2260 MAT in economizer mode",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-008"
+    },
+    {
+      "id": "AHU-0009",
+      "family": "ahu",
+      "name": "OAT too high for free cooling",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-009"
+    },
+    {
+      "id": "AHU-0010",
+      "family": "ahu",
+      "name": "OAT \u2260 MAT in mechanical + economizer cooling",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-010"
+    },
+    {
+      "id": "AHU-0011",
+      "family": "ahu",
+      "name": "OAT too low for mechanical cooling",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-011"
+    },
+    {
+      "id": "AHU-0012",
+      "family": "ahu",
+      "name": "SAT too high vs MAT in cooling",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-012"
+    },
+    {
+      "id": "AHU-0013",
+      "family": "ahu",
+      "name": "SAT too high at full cooling",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-013"
+    },
+    {
+      "id": "AHU-0014",
+      "family": "ahu",
+      "name": "Inactive cooling coil temperature drop",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-014"
+    },
+    {
+      "id": "AHU-0015",
+      "family": "ahu",
+      "name": "Inactive heating coil temperature rise",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-015"
+    },
+    {
+      "id": "AHU-0016",
+      "family": "ahu",
+      "name": "Simultaneous heating and cooling",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-050"
+    },
+    {
+      "id": "AHU-0017",
+      "family": "ahu",
+      "name": "Economizer not operational when favorable",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-051"
+    },
+    {
+      "id": "AHU-0018",
+      "family": "ahu",
+      "name": "Unoccupied override \u2014 equipment running during off-hours",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-052"
+    },
+    {
+      "id": "AHU-0019",
+      "family": "ahu",
+      "name": "Supply air temperature setpoint too low (over-cooling)",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-053"
+    },
+    {
+      "id": "AHU-0020",
+      "family": "ahu",
+      "name": "Stuck or failed actuator",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-054"
+    },
+    {
+      "id": "AHU-0021",
+      "family": "ahu",
+      "name": "Excess outdoor air during occupied hours",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-055"
+    },
+    {
+      "id": "AHU-0022",
+      "family": "ahu",
+      "name": "Supply air temperature hunting / oscillation",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": "AHU-FC-056"
+    },
+    {
+      "id": "AHU-0023",
+      "family": "ahu",
+      "name": "Supply air temperature reset not functioning",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": "AHU-FC-057"
+    },
+    {
+      "id": "AHU-0024",
+      "family": "ahu",
+      "name": "Duct static pressure reset not functioning",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": "AHU-FC-058"
+    },
+    {
+      "id": "AHU-0025",
+      "family": "ahu",
+      "name": "Heating or cooling coil lockout not active by OAT",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-059"
+    },
+    {
+      "id": "AHU-0026",
+      "family": "ahu",
+      "name": "Outdoor air damper not closed during unoccupied periods",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-060"
+    },
+    {
+      "id": "AHU-0027",
+      "family": "ahu",
+      "name": "Manual override detected on critical control point",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-061"
+    },
+    {
+      "id": "AHU-0028",
+      "family": "ahu",
+      "name": "Mixing box damper fault \u2014 MAT outside the OAT/RAT envelope",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-062"
+    },
+    {
+      "id": "AHU-0029",
+      "family": "ahu",
+      "name": "AHU operating mode mismatch",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-063"
+    },
+    {
+      "id": "AHU-0030",
+      "family": "ahu",
+      "name": "Excess outdoor air during heating mode",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-064"
+    },
+    {
+      "id": "AHU-0031",
+      "family": "ahu",
+      "name": "Supply fan operating at excessive static pressure",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-065"
+    },
+    {
+      "id": "AHU-0032",
+      "family": "ahu",
+      "name": "SAT too high vs RAT in cooling",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-066"
+    },
+    {
+      "id": "AHU-0033",
+      "family": "ahu",
+      "name": "Supply air temperature tracking error",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-067"
+    },
+    {
+      "id": "AHU-0034",
+      "family": "ahu",
+      "name": "Economizing past changeover",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "AHU-FC-068"
+    },
+    {
+      "id": "CHW-0001",
+      "family": "chw",
+      "name": "Chiller efficiency (kW/ton) degradation",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": "CHW-FC-050"
+    },
+    {
+      "id": "CHW-0002",
+      "family": "chw",
+      "name": "CHWST reset not functioning",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": "CHW-FC-051"
+    },
+    {
+      "id": "CHW-0003",
+      "family": "chw",
+      "name": "CHW loop DP reset not functioning",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": "CHW-FC-052"
+    },
+    {
+      "id": "CHW-0004",
+      "family": "chw",
+      "name": "Chilled water low delta-T syndrome",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "CHW-FC-053"
+    },
+    {
+      "id": "CHW-0005",
+      "family": "chw",
+      "name": "Chiller condenser approach high",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "CHW-FC-054"
+    },
+    {
+      "id": "ERV-0001",
+      "family": "erv",
+      "name": "Sensible effectiveness degradation",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": "ERV-FC-050"
+    },
+    {
+      "id": "ERV-0002",
+      "family": "erv",
+      "name": "Frost protection not engaging",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "ERV-FC-051"
+    },
+    {
+      "id": "FCU-0001",
+      "family": "fcu",
+      "name": "Excessive operating state changes",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "FCU-FC-001"
+    },
+    {
+      "id": "FCU-0002",
+      "family": "fcu",
+      "name": "SAT too low in full heating",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "FCU-FC-002"
+    },
+    {
+      "id": "FCU-0003",
+      "family": "fcu",
+      "name": "SAT too high in full cooling",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "FCU-FC-003"
+    },
+    {
+      "id": "FCU-0004",
+      "family": "fcu",
+      "name": "Inactive cooling coil temperature drop (leak)",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "FCU-FC-004"
+    },
+    {
+      "id": "FCU-0005",
+      "family": "fcu",
+      "name": "Inactive heating coil temperature rise (leak)",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "FCU-FC-005"
+    },
+    {
+      "id": "HP-0001",
+      "family": "hp",
+      "name": "COP degradation vs baseline",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": "HP-FC-050"
+    },
+    {
+      "id": "HP-0002",
+      "family": "hp",
+      "name": "Defrost cycle anomaly",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "HP-FC-051"
+    },
+    {
+      "id": "HP-0003",
+      "family": "hp",
+      "name": "Reversing valve fault",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "HP-FC-052"
+    },
+    {
+      "id": "HP-0004",
+      "family": "hp",
+      "name": "Refrigerant undercharge \u2014 superheat/subcooling divergence",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "HP-FC-053"
+    },
+    {
+      "id": "HP-0005",
+      "family": "hp",
+      "name": "Refrigerant overcharge \u2014 high liquid subcooling",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "HP-FC-054"
+    },
+    {
+      "id": "HP-0006",
+      "family": "hp",
+      "name": "Reversing-valve internal bypass leakage",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "HP-FC-055"
+    },
+    {
+      "id": "HW-0001",
+      "family": "hw",
+      "name": "Boiler short-cycling",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "HW-FC-050"
+    },
+    {
+      "id": "HW-0002",
+      "family": "hw",
+      "name": "Boiler efficiency degradation",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": "HW-FC-051"
+    },
+    {
+      "id": "HW-0003",
+      "family": "hw",
+      "name": "Boiler or HW pump operating above OAT lockout temperature",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "HW-FC-052"
+    },
+    {
+      "id": "HW-0004",
+      "family": "hw",
+      "name": "HW loop low delta-T",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "HW-FC-053"
+    },
+    {
+      "id": "HW-0005",
+      "family": "hw",
+      "name": "HW loop DP too high (pump speed vs mild OAT)",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "HW-FC-054"
+    },
+    {
+      "id": "HW-0006",
+      "family": "hw",
+      "name": "HW loop DP reset not functioning",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": "HW-FC-055"
+    },
+    {
+      "id": "HW-0007",
+      "family": "hw",
+      "name": "HW supply temperature too high at low load",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "HW-FC-056"
+    },
+    {
+      "id": "HW-0008",
+      "family": "hw",
+      "name": "HWS temperature reset not functioning",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": "HW-FC-057"
+    },
+    {
+      "id": "PMP-0001",
+      "family": "pmp",
+      "name": "Pump commanded on, no flow detected",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "PMP-FC-050"
+    },
+    {
+      "id": "PMP-0002",
+      "family": "pmp",
+      "name": "Pump deadheading (high DP, low/no flow)",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "PMP-FC-051"
+    },
+    {
+      "id": "RTU-0001",
+      "family": "rtu",
+      "name": "Compressor short-cycling",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "RTU-FC-050"
+    },
+    {
+      "id": "RTU-0002",
+      "family": "rtu",
+      "name": "Evaporator coil fouling \u2014 reduced temperature split",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": "RTU-FC-051"
+    },
+    {
+      "id": "RTU-0003",
+      "family": "rtu",
+      "name": "Discharge and mixed air temperature inconsistency (AFDD0)",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "RTU-FC-052"
+    },
+    {
+      "id": "RTU-0004",
+      "family": "rtu",
+      "name": "Economizer not modulating properly",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "RTU-FC-053"
+    },
+    {
+      "id": "RTU-0005",
+      "family": "rtu",
+      "name": "Excess outdoor air intake",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "RTU-FC-054"
+    },
+    {
+      "id": "RTU-0006",
+      "family": "rtu",
+      "name": "Insufficient ventilation air",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "RTU-FC-055"
+    },
+    {
+      "id": "SYS-0001",
+      "family": "sys",
+      "name": "CHW flow with no cooling demand",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "SYS-FC-050"
+    },
+    {
+      "id": "SYS-0002",
+      "family": "sys",
+      "name": "HW flow with no heating demand",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "SYS-FC-051"
+    },
+    {
+      "id": "SYS-0003",
+      "family": "sys",
+      "name": "Lighting on with no occupancy",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "SYS-FC-052"
+    },
+    {
+      "id": "SYS-0004",
+      "family": "sys",
+      "name": "Exhaust fan running during unoccupied hours",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "SYS-FC-053"
+    },
+    {
+      "id": "SYS-0005",
+      "family": "sys",
+      "name": "Sensor drift via cross-validation (paired sensors)",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "SYS-FC-054"
+    },
+    {
+      "id": "SYS-0006",
+      "family": "sys",
+      "name": "Virtual sensor drift detection",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": "SYS-FC-055"
+    },
+    {
+      "id": "SYS-0007",
+      "family": "sys",
+      "name": "Zone heating active during summer / warm weather",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "SYS-FC-056"
+    },
+    {
+      "id": "SYS-0008",
+      "family": "sys",
+      "name": "Exhaust fan schedule misalignment with AHU",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "SYS-FC-057"
+    },
+    {
+      "id": "SYS-0009",
+      "family": "sys",
+      "name": "Sensor flatline while equipment active",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "SYS-FC-058"
+    },
+    {
+      "id": "SYS-0010",
+      "family": "sys",
+      "name": "Sensor spike / rate-of-change violation",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "SYS-FC-059"
+    },
+    {
+      "id": "TOWER-0001",
+      "family": "tower",
+      "name": "Tower approach high at fan capacity",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "TOWER-FC-050"
+    },
+    {
+      "id": "TOWER-0002",
+      "family": "tower",
+      "name": "Tower range collapse",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "TOWER-FC-051"
+    },
+    {
+      "id": "TOWER-0003",
+      "family": "tower",
+      "name": "Tower fan short-cycling",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "TOWER-FC-052"
+    },
+    {
+      "id": "VAV-0001",
+      "family": "vav",
+      "name": "VAV minimum airflow setpoint too high",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "VAV-FC-050"
+    },
+    {
+      "id": "VAV-0002",
+      "family": "vav",
+      "name": "Rogue zone driving AHU reset",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "VAV-FC-051"
+    },
+    {
+      "id": "VAV-0003",
+      "family": "vav",
+      "name": "Reheat valve open with zone satisfied",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "VAV-FC-052"
+    },
+    {
+      "id": "VAV-0004",
+      "family": "vav",
+      "name": "VAV airflow tracking error",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "VAV-FC-053"
+    },
+    {
+      "id": "VAV-0005",
+      "family": "vav",
+      "name": "VAV damper hunting or oscillation",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "VAV-FC-054"
+    },
+    {
+      "id": "VAV-0006",
+      "family": "vav",
+      "name": "Reheat waste during cooling season",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "VAV-FC-055"
+    },
+    {
+      "id": "VAV-0007",
+      "family": "vav",
+      "name": "VAV airflow tracking CUSUM",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": "VAV-FC-101"
+    },
+    {
+      "id": "VAV-0008",
+      "family": "vav",
+      "name": "Zone temperature CUSUM",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": "VAV-FC-102"
+    },
+    {
+      "id": "VAV-0009",
+      "family": "vav",
+      "name": "Reheat coil leakage CUSUM",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": "VAV-FC-103"
+    },
+    {
+      "id": "VFD-0001",
+      "family": "vfd",
+      "name": "Command vs feedback deviation",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "VFD-FC-050"
+    },
+    {
+      "id": "VFD-0002",
+      "family": "vfd",
+      "name": "At minimum speed with load unsatisfied",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": "VFD-FC-051"
+    }
+  ]
+}

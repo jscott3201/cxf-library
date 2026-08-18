@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | ERV-FC-050 |
+| **Applies to** | ERV-0001 |
 | **Fix complexity** | On-site service required |
 | **Typical time** | 2–4 h |
 | **Typical cost** | $200–$1,000 (cleaning) / $2,000–$5,000 (wheel or core replacement) |

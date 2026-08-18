@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | VFD-FC-050, VFD-FC-051 (library addition — the reference's line names only VFD-FC-050 and the pump rules), PMP-FC-050, PMP-FC-051 |
+| **Applies to** | VFD-0001, VFD-0002 (library addition — the reference's line names only VFD-0001 and the pump rules), PMP-0001, PMP-0002 |
 | **Fix complexity** | On-site service required |
 | **Typical time** | 2–4 h |
 | **Typical cost** | $200–$2,000 |
@@ -11,11 +11,11 @@
 Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 167–168).
 
 The pump rules named above are verified in this library:
-[PMP-FC-050](../faults/pmp/PMP-FC-050/card.md) and
-[PMP-FC-051](../faults/pmp/PMP-FC-051/card.md) (family index:
+[PMP-0001](../faults/pmp/PMP-0001/card.md) and
+[PMP-0002](../faults/pmp/PMP-0002/card.md) (family index:
 [faults/pmp](../faults/pmp/README.md)).
 
-## Step 1 — VFD command/feedback deviation (VFD-FC-050)
+## Step 1 — VFD command/feedback deviation (VFD-0001)
 
 1. Check VFD input and output power — calculate drive efficiency.
 2. Check harmonic distortion levels.
@@ -26,7 +26,7 @@ The pump rules named above are verified in this library:
 5. If the VFD is failing, replace it: $500–$2,000 depending on motor
    horsepower.
 
-## Step 2 — Pump on with no flow / deadheading (PMP-FC-050, PMP-FC-051)
+## Step 2 — Pump on with no flow / deadheading (PMP-0001, PMP-0002)
 
 1. **Remote fix:** check the differential pressure setpoint — it may be set
    too high, forcing the pump to work against closed valves.

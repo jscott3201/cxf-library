@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | AHU-FC-052, AHU-FC-060, AHU-FC-061, SYS-FC-052, SYS-FC-053, CLU-04, CLU-08 |
+| **Applies to** | AHU-0018, AHU-0026, AHU-0027, SYS-0003, SYS-0004, CLU-04, CLU-08 |
 | **Fix complexity** | Remote fix (95%) · On-site (5%) |
 | **Typical time** | 15–30 min remote |
 | **Typical cost** | $0 |
@@ -57,5 +57,5 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 157–159).
 
 1. Monitor fan status during 3 consecutive unoccupied periods.
 2. All after-hours faults should clear within 24–48 hours.
-3. Verify lighting (SYS-FC-052) and exhaust fans (SYS-FC-053) also shut down
+3. Verify lighting (SYS-0003) and exhaust fans (SYS-0004) also shut down
    on the corrected schedule — these often share the same root cause.

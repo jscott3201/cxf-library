@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | SYS-FC-056, CLU-05 |
+| **Applies to** | SYS-0007, CLU-05 |
 | **Fix complexity** | Remote fix (85%) · On-site (15%) |
 | **Typical time** | 15–30 min remote |
 | **Typical cost** | $0 remote / $200–$600 on-site (stuck valve) |

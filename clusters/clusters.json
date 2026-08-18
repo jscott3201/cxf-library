@@ -5,15 +5,15 @@
     {
       "id": "CLU-01",
       "name": "Simultaneous Heating & Cooling",
-      "trigger": "AHU-FC-050",
+      "trigger": "AHU-0016",
       "members": [
-        "AHU-FC-004",
-        "AHU-FC-005",
-        "AHU-FC-012",
-        "AHU-FC-059",
-        "AHU-FC-063",
-        "FCU-FC-001",
-        "AHU-FC-066"
+        "AHU-0004",
+        "AHU-0005",
+        "AHU-0012",
+        "AHU-0025",
+        "AHU-0029",
+        "FCU-0001",
+        "AHU-0032"
       ],
       "playbook": "simultaneous-hc",
       "prevalence": "common",
@@ -22,11 +22,11 @@
     {
       "id": "CLU-02",
       "name": "Missing Reset Strategy",
-      "trigger": "AHU-FC-057",
+      "trigger": "AHU-0023",
       "members": [
-        "AHU-FC-058",
-        "AHU-FC-053",
-        "AHU-FC-065"
+        "AHU-0024",
+        "AHU-0019",
+        "AHU-0031"
       ],
       "playbook": "missing-reset",
       "prevalence": "74% of buildings (PNNL 151-building study)",
@@ -35,11 +35,11 @@
     {
       "id": "CLU-03",
       "name": "Economizer Failure",
-      "trigger": "AHU-FC-051",
+      "trigger": "AHU-0017",
       "members": [
-        "AHU-FC-009",
-        "AHU-FC-011",
-        "RTU-FC-053"
+        "AHU-0009",
+        "AHU-0011",
+        "RTU-0004"
       ],
       "playbook": "economizer-failure",
       "prevalence": "54% of RTUs (Cowan 2004)",
@@ -48,11 +48,11 @@
     {
       "id": "CLU-04",
       "name": "After-Hours Operation",
-      "trigger": "AHU-FC-052",
+      "trigger": "AHU-0018",
       "members": [
-        "SYS-FC-052",
-        "SYS-FC-053",
-        "AHU-FC-060"
+        "SYS-0003",
+        "SYS-0004",
+        "AHU-0026"
       ],
       "playbook": "after-hours-operation",
       "prevalence": "~15%",
@@ -61,10 +61,10 @@
     {
       "id": "CLU-05",
       "name": "Zone Heating & Cooling Conflict",
-      "trigger": "VAV-FC-055",
+      "trigger": "VAV-0006",
       "members": [
-        "VAV-FC-052",
-        "SYS-FC-056"
+        "VAV-0003",
+        "SYS-0007"
       ],
       "playbook": "vav-min-flow-reheat",
       "prevalence": "common",
@@ -73,12 +73,12 @@
     {
       "id": "CLU-06",
       "name": "Chilled Water Plant Inefficiency",
-      "trigger": "CHW-FC-050",
+      "trigger": "CHW-0001",
       "members": [
-        "CHW-FC-051",
-        "CHW-FC-052",
-        "CHW-FC-053",
-        "CHW-FC-054"
+        "CHW-0002",
+        "CHW-0003",
+        "CHW-0004",
+        "CHW-0005"
       ],
       "playbook": "chiller-efficiency",
       "prevalence": null,
@@ -87,9 +87,9 @@
     {
       "id": "CLU-07",
       "name": "Unnecessary Plant Operation",
-      "trigger": "SYS-FC-050",
+      "trigger": "SYS-0001",
       "members": [
-        "SYS-FC-051"
+        "SYS-0002"
       ],
       "playbook": "unnecessary-plant-operation",
       "prevalence": null,
@@ -98,10 +98,10 @@
     {
       "id": "CLU-08",
       "name": "Schedule Dysfunction",
-      "trigger": "AHU-FC-052",
+      "trigger": "AHU-0018",
       "members": [
-        "SYS-FC-057",
-        "SYS-FC-053"
+        "SYS-0008",
+        "SYS-0004"
       ],
       "playbook": "exhaust-fan-schedule-misalignment",
       "prevalence": "~15%",
@@ -110,14 +110,14 @@
     {
       "id": "CLU-09",
       "name": "Sensor Integrity Failure",
-      "trigger": "SYS-FC-054",
+      "trigger": "SYS-0005",
       "members": [
-        "AHU-FC-062",
-        "AHU-FC-002",
-        "AHU-FC-003",
-        "SYS-FC-055",
-        "SYS-FC-058",
-        "SYS-FC-059"
+        "AHU-0028",
+        "AHU-0002",
+        "AHU-0003",
+        "SYS-0006",
+        "SYS-0009",
+        "SYS-0010"
       ],
       "playbook": "sensor-drift",
       "prevalence": "~15%",
@@ -126,11 +126,11 @@
     {
       "id": "CLU-10",
       "name": "Condenser-Side Degradation",
-      "description": "Tower heat-rejection capability loss and chiller condenser fouling share causes (scale, fouling, airflow/waterflow deficiency) and one investigation path: the tower-side vs tube-side split. Fixing the condenser-side root typically clears the chiller efficiency symptom (CLU-06 overlap via CHW-FC-054).",
-      "trigger": "TOWER-FC-050",
+      "description": "Tower heat-rejection capability loss and chiller condenser fouling share causes (scale, fouling, airflow/waterflow deficiency) and one investigation path: the tower-side vs tube-side split. Fixing the condenser-side root typically clears the chiller efficiency symptom (CLU-06 overlap via CHW-0005).",
+      "trigger": "TOWER-0001",
       "members": [
-        "TOWER-FC-051",
-        "CHW-FC-054"
+        "TOWER-0002",
+        "CHW-0005"
       ],
       "playbook": "cooling-tower-performance",
       "prevalence": "unpublished (library-authored family)",

@@ -28,9 +28,9 @@ jobs:
         working-directory: cxf-library
         run: python3 tools/lint/svg_fitment.py
 
-      - name: id band lint
+      - name: registry lint
         working-directory: cxf-library
-        run: python3 tools/lint/id_bands.py
+        run: python3 tools/lint/registry.py
 
       - uses: dtolnay/rust-toolchain@stable
 

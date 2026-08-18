@@ -23,7 +23,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "Hot water / boiler plant point dictionary (reference ch.14, HW-FC-050..052). Owning equipment: brick:Boiler (verified in Brick 1.4.4; brick:Natural_Gas_Boiler for the gas-fired subclass). Multi-boiler plants bind per boiler; the OAT lockout rule (HW-FC-052) is plant-level and may bind the OR of boiler statuses plus the lead HW pump. EXPANSION 2026-08-17: six loop-side points added for the PNNL-27338-grounded HW-FC-053..057 batch (library-authored rules; the reference's ch.14 covers only FC-050..052).",
+  "notes": "Hot water / boiler plant point dictionary (reference ch.14, HW-0001..052). Owning equipment: brick:Boiler (verified in Brick 1.4.4; brick:Natural_Gas_Boiler for the gas-fired subclass). Multi-boiler plants bind per boiler; the OAT lockout rule (HW-0003) is plant-level and may bind the OR of boiler statuses plus the lead HW pump. EXPANSION 2026-08-17: six loop-side points added for the PNNL-27338-grounded HW-0004..057 batch (library-authored rules; the reference's ch.14 covers only FC-050..052).",
   "points": [
     {
       "name": "boiler_status",
@@ -42,7 +42,7 @@
         "enumerationkind": "Binary-OnOff"
       },
       "provisional": false,
-      "notes": "brick:Run_Status grep-verified, isPointOf brick:Boiler (verified). Reference Haystack markers: boiler, run. 'Firing' vs 'enabled' matters for HW-FC-050's start counting: bind the FIRING/flame status where available — an enable status hides burner cycling and undercounts starts (comp_status OR-undercount precedent). Consumed by HW-FC-050 (edge counting) and HW-FC-052 (lockout)."
+      "notes": "brick:Run_Status grep-verified, isPointOf brick:Boiler (verified). Reference Haystack markers: boiler, run. 'Firing' vs 'enabled' matters for HW-0001's start counting: bind the FIRING/flame status where available — an enable status hides burner cycling and undercounts starts (comp_status OR-undercount precedent). Consumed by HW-0001 (edge counting) and HW-0003 (lockout)."
     },
     {
       "name": "thermal_power",
@@ -60,7 +60,7 @@
         "aspects": []
       },
       "provisional": true,
-      "notes": "brick:Thermal_Power_Sensor grep-verified (carried from hp thermal_power), but marked provisional: few boiler plants meter thermal output directly — usually host-derived from HW flow x deltaT x cp. HW-FC-051's efficiency numerator; same derivation caveat as chw chiller_tons."
+      "notes": "brick:Thermal_Power_Sensor grep-verified (carried from hp thermal_power), but marked provisional: few boiler plants meter thermal output directly — usually host-derived from HW flow x deltaT x cp. HW-0002's efficiency numerator; same derivation caveat as chw chiller_tons."
     },
     {
       "name": "fuel_power",
@@ -78,7 +78,7 @@
         "aspects": []
       },
       "provisional": true,
-      "notes": "No Brick 1.4.4 class for fuel INPUT POWER: brick:Natural_Gas_Usage_Sensor and Natural_Gas_Flow_Sensor (both verified present) meter volume/flow, not kW. Binding derives kW from fuel flow x HHV (or LHV — pick ONE convention and keep the baseline consistent, else HW-FC-051's efficiency shifts ~10% between conventions). HW-FC-051's efficiency denominator and its divide guard."
+      "notes": "No Brick 1.4.4 class for fuel INPUT POWER: brick:Natural_Gas_Usage_Sensor and Natural_Gas_Flow_Sensor (both verified present) meter volume/flow, not kW. Binding derives kW from fuel flow x HHV (or LHV — pick ONE convention and keep the baseline consistent, else HW-0002's efficiency shifts ~10% between conventions). HW-0002's efficiency denominator and its divide guard."
     },
     {
       "name": "boiler_firing_rate",
@@ -96,7 +96,7 @@
         "aspects": []
       },
       "provisional": true,
-      "notes": "No Brick 1.4.4 percent-firing-rate class (chiller_load precedent for a null mapping). Modulating burners expose this on the burner controller. HW-FC-051's single baseline regressor."
+      "notes": "No Brick 1.4.4 percent-firing-rate class (chiller_load precedent for a null mapping). Modulating burners expose this on the burner controller. HW-0002's single baseline regressor."
     },
     {
       "name": "hw_pump_status",
@@ -115,7 +115,7 @@
         "enumerationkind": "Binary-OnOff"
       },
       "provisional": false,
-      "notes": "brick:Pump_On_Off_Status grep-verified (carried from pmp pump_status). Second branch of HW-FC-052's lockout OR — pumps circulating above lockout waste energy even with the boiler off."
+      "notes": "brick:Pump_On_Off_Status grep-verified (carried from pmp pump_status). Second branch of HW-0003's lockout OR — pumps circulating above lockout waste energy even with the boiler off."
     },
     {
       "name": "oat",
@@ -133,7 +133,7 @@
         "aspects": []
       },
       "provisional": false,
-      "notes": "Carried from the ahu/erv dictionaries (brick:Outside_Air_Temperature_Sensor, grep-verified there). HW-FC-052's lockout comparator; its diagnosis list includes an OAT sensor reading low — pair with sensor-health rules when phase 3 opens."
+      "notes": "Carried from the ahu/erv dictionaries (brick:Outside_Air_Temperature_Sensor, grep-verified there). HW-0003's lockout comparator; its diagnosis list includes an OAT sensor reading low — pair with sensor-health rules when phase 3 opens."
     },
     {
       "name": "hws_temp",
@@ -153,7 +153,7 @@
         ]
       },
       "provisional": false,
-      "notes": "brick:Hot_Water_Supply_Temperature_Sensor grep-verified. HW-FC-053's delta-T minuend and HW-FC-056's comparator."
+      "notes": "brick:Hot_Water_Supply_Temperature_Sensor grep-verified. HW-0004's delta-T minuend and HW-0007's comparator."
     },
     {
       "name": "hwr_temp",
@@ -173,7 +173,7 @@
         ]
       },
       "provisional": false,
-      "notes": "brick:Hot_Water_Return_Temperature_Sensor grep-verified. HW-FC-053's delta-T subtrahend."
+      "notes": "brick:Hot_Water_Return_Temperature_Sensor grep-verified. HW-0004's delta-T subtrahend."
     },
     {
       "name": "hws_temp_sp",
@@ -194,7 +194,7 @@
         ]
       },
       "provisional": false,
-      "notes": "brick:Leaving_Hot_Water_Temperature_Setpoint grep-verified (Brick 1.4.4 has no generic non-domestic supply-setpoint class; the boiler-leaving form is the honest match). HW-FC-057 watches this point's RANGE (AHU-FC-057/CHW-FC-051 idiom)."
+      "notes": "brick:Leaving_Hot_Water_Temperature_Setpoint grep-verified (Brick 1.4.4 has no generic non-domestic supply-setpoint class; the boiler-leaving form is the honest match). HW-0008 watches this point's RANGE (AHU-0023/CHW-0002 idiom)."
     },
     {
       "name": "hw_dp",
@@ -214,7 +214,7 @@
         ]
       },
       "provisional": false,
-      "notes": "brick:Hot_Water_Differential_Pressure_Sensor grep-verified. Context point for the DP rules; HW-FC-054's primary evidence is pump speed, not DP itself."
+      "notes": "brick:Hot_Water_Differential_Pressure_Sensor grep-verified. Context point for the DP rules; HW-0005's primary evidence is pump speed, not DP itself."
     },
     {
       "name": "hw_dp_sp",
@@ -235,7 +235,7 @@
         ]
       },
       "provisional": false,
-      "notes": "brick:Hot_Water_Differential_Pressure_Setpoint grep-verified. HW-FC-055 watches this point's RANGE (AHU-FC-058/CHW-FC-052 idiom)."
+      "notes": "brick:Hot_Water_Differential_Pressure_Setpoint grep-verified. HW-0006 watches this point's RANGE (AHU-0024/CHW-0003 idiom)."
     },
     {
       "name": "hw_pump_vfd_speed",
@@ -253,7 +253,7 @@
         "aspects": []
       },
       "provisional": false,
-      "notes": "brick:Motor_Speed_Sensor grep-verified (same mapping as vfd_speed in points/vfd.points.json). HW-FC-054/056's load proxy per PNNL-27338's pump-speed heuristics."
+      "notes": "brick:Motor_Speed_Sensor grep-verified (same mapping as vfd_speed in points/vfd.points.json). HW-0005/HW-0007's load proxy per PNNL-27338's pump-speed heuristics."
     }
   ]
 }

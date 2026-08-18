@@ -19,7 +19,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "System-level / cross-equipment point dictionary. The sensor-health rules (SYS-FC-054/100/101) bind ROLE POINTS, not canonical equipment points — the documented exception to the canonical-name convention (SCHEMA.md points contract; decided 2026-08-17, internal sensor-health design note §3). The reference's own SYS-FC-054 card does the same ('varies by application'). The host's instance configuration records which real point each role is bound to; that same record drives the adjudicates NO_EVAL fan-out. Role entries carry brick/s223 null — the semantics belong to whatever the role is bound to. The reference ch.16 waste/schedule rules (SYS-FC-050..053/056/057) bind CANONICAL cross-equipment points (grounded below); SYS-FC-055 binds the physical_sensor/virtual_value role pair. Points that also exist in equipment dicts (oat, sf_status, rht_vlv_cmd) are duplicated here with matched groundings because lint resolves a card's points against its own family dictionary.",
+  "notes": "System-level / cross-equipment point dictionary. The sensor-health rules (SYS-0005/SYS-0009/SYS-0010) bind ROLE POINTS, not canonical equipment points — the documented exception to the canonical-name convention (SCHEMA.md points contract; decided 2026-08-17, internal sensor-health design note §3). The reference's own SYS-0005 card does the same ('varies by application'). The host's instance configuration records which real point each role is bound to; that same record drives the adjudicates NO_EVAL fan-out. Role entries carry brick/s223 null — the semantics belong to whatever the role is bound to. The reference ch.16 waste/schedule rules (SYS-0001..SYS-0004, SYS-0007, SYS-0008) bind CANONICAL cross-equipment points (grounded below); SYS-0006 binds the physical_sensor/virtual_value role pair. Points that also exist in equipment dicts (oat, sf_status, rht_vlv_cmd) are duplicated here with matched groundings because lint resolves a card's points against its own family dictionary.",
   "points": [
     {
       "name": "sensor_value",
@@ -34,18 +34,18 @@
     },
     {
       "name": "sensor_value_a",
-      "description": "ROLE: primary sensor of a redundancy pair (SYS-FC-054)",
+      "description": "ROLE: primary sensor of a redundancy pair (SYS-0005)",
       "kind": "real",
       "unit": "varies",
       "qudt_unit": null,
       "brick": null,
       "s223": null,
       "provisional": true,
-      "notes": "Role point; the reference's own required-points table for SYS-FC-054 lists sensor_a/sensor_b with 'varies by application'. Pair members must share quantity kind and units at binding."
+      "notes": "Role point; the reference's own required-points table for SYS-0005 lists sensor_a/sensor_b with 'varies by application'. Pair members must share quantity kind and units at binding."
     },
     {
       "name": "sensor_value_b",
-      "description": "ROLE: reference sensor of a redundancy pair (SYS-FC-054)",
+      "description": "ROLE: reference sensor of a redundancy pair (SYS-0005)",
       "kind": "real",
       "unit": "varies",
       "qudt_unit": null,
@@ -67,7 +67,7 @@
     },
     {
       "name": "physical_sensor",
-      "description": "ROLE: the physical sensor cross-checked against a virtual-sensor prediction (SYS-FC-055)",
+      "description": "ROLE: the physical sensor cross-checked against a virtual-sensor prediction (SYS-0006)",
       "kind": "real",
       "unit": "varies",
       "qudt_unit": null,
@@ -78,7 +78,7 @@
     },
     {
       "name": "virtual_value",
-      "description": "ROLE: host-computed virtual-sensor prediction of the bound physical_sensor (SYS-FC-055)",
+      "description": "ROLE: host-computed virtual-sensor prediction of the bound physical_sensor (SYS-0006)",
       "kind": "real",
       "unit": "varies",
       "qudt_unit": null,
@@ -86,7 +86,7 @@
       "s223": null,
       "derived": true,
       "provisional": true,
-      "notes": "Host-derived role point: the host evaluates a regression model (reference: Ridge trained over a learning period on 3+ correlated features) each tick and exposes the prediction as this point. The graph computes only the residual statistics — model training/inference is host-side, per the host-fitted baseline convention (SCHEMA.md; HP-FC-050/VAV-FC-050 precedent)."
+      "notes": "Host-derived role point: the host evaluates a regression model (reference: Ridge trained over a learning period on 3+ correlated features) each tick and exposes the prediction as this point. The graph computes only the residual statistics — model training/inference is host-side, per the host-fitted baseline convention (SCHEMA.md; HP-0001/VAV-0001 precedent)."
     },
     {
       "name": "chw_flow",
@@ -165,7 +165,7 @@
       "brick": null,
       "s223": null,
       "derived": true,
-      "notes": "The reference's in_occupied_schedule(current_time, occ_schedule) is a calendar function; the graph has no clock, so the host evaluates the schedule and exposes the boolean. Same treatment as AHU-FC-052's occupancy gate."
+      "notes": "The reference's in_occupied_schedule(current_time, occ_schedule) is a calendar function; the graph has no clock, so the host evaluates the schedule and exposes the boolean. Same treatment as AHU-0018's occupancy gate."
     },
     {
       "name": "lighting_status",
@@ -222,7 +222,7 @@
     },
     {
       "name": "sf_status",
-      "description": "Supply fan run status of the paired AHU (SYS-FC-057)",
+      "description": "Supply fan run status of the paired AHU (SYS-0008)",
       "kind": "bool",
       "unit": "bool",
       "qudt_unit": null,
@@ -236,7 +236,7 @@
         "aspects": [],
         "enumerationkind": "Binary-OnOff"
       },
-      "notes": "Duplicate of points/ahu.points.json sf_status — SYS-FC-057 is a cross-equipment rule instantiated per exhaust-fan/AHU pair."
+      "notes": "Duplicate of points/ahu.points.json sf_status — SYS-0008 is a cross-equipment rule instantiated per exhaust-fan/AHU pair."
     },
     {
       "name": "demand_override_active",
@@ -250,7 +250,7 @@
     },
     {
       "name": "rht_vlv_cmd",
-      "description": "Zone reheat valve command (SYS-FC-056, instantiated per zone)",
+      "description": "Zone reheat valve command (SYS-0007, instantiated per zone)",
       "kind": "real",
       "unit": "%",
       "qudt_unit": "PERCENT",
@@ -263,7 +263,7 @@
         "medium": null,
         "aspects": []
       },
-      "notes": "Duplicate of points/vav.points.json rht_vlv_cmd — the reference files SYS-FC-056 under SYS but scopes it to VAV/FCU zones; bind per zone."
+      "notes": "Duplicate of points/vav.points.json rht_vlv_cmd — the reference files SYS-0007 under SYS but scopes it to VAV/FCU zones; bind per zone."
     },
     {
       "name": "oat",

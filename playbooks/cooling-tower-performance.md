@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | TOWER-FC-050 (approach high at capacity), TOWER-FC-051 (range collapse), TOWER-FC-052 (fan short-cycling), CHW-FC-054 (condenser approach high) |
+| **Applies to** | TOWER-0001 (approach high at capacity), TOWER-0002 (range collapse), TOWER-0003 (fan short-cycling), CHW-0005 (condenser approach high) |
 | **Fix complexity** | On-site (70%) · Remote fix (30%) |
 | **Typical time** | 1–4 h on-site; 15–30 min remote |
 | **Typical cost** | $0 remote / $300–$3,000 on-site (cleaning, water treatment, fan drive service) |
@@ -16,18 +16,18 @@ paraphrased; plus this library's 4-climate simulation envelope study
 
 ## Step 1 — Verify the fault
 
-1. For approach-high (TOWER-FC-050): confirm the tower fan is at or near
+1. For approach-high (TOWER-0001): confirm the tower fan is at or near
    full speed — approach is only diagnostic at capacity; VFD modulation
    legitimately lets approach ride high at part load (healthy un-gated
    spread observed 1.6–13.3 °C across climates).
 2. Trend approach (leaving water − outdoor wet-bulb) against the
    commissioned full-load baseline; compare same-season history.
-3. For range-collapse (TOWER-FC-051): check condenser water flow first — a
+3. For range-collapse (TOWER-0002): check condenser water flow first — a
    flow increase mimics range collapse without any tower degradation.
-4. For fan short-cycling (TOWER-FC-052): confirm ≥ 4–5 starts/hour
+4. For fan short-cycling (TOWER-0003): confirm ≥ 4–5 starts/hour
    sustained (PNNL O&M guides' motor-protection trigger) and rule out an
    aggressive basin/leaving-temperature deadband before blaming the drive.
-5. For condenser approach (CHW-FC-054): confirm at the chiller —
+5. For condenser approach (CHW-0005): confirm at the chiller —
    saturated condensing temperature minus leaving condenser water
    temperature against the commissioned band.
 
