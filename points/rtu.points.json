@@ -23,7 +23,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "RTU (packaged rooftop unit) point dictionary. Shared air-side points carry their Brick classes and 223P patterns from the AHU dictionary (see per-point notes); the owning equipment class is brick:Rooftop_Unit / brick:RTU (both verified in Brick 1.4.4). RTU-specific points (comp_status, comp_stage, htg_status) are grep-verified against Brick 1.4.4 but have no reference-model instance check, hence provisional. cond_leaving_temp (RTU-FC-100) is deferred with that fault.",
+  "notes": "RTU (packaged rooftop unit) point dictionary. Shared air-side points carry their Brick classes and 223P patterns from the AHU dictionary (see per-point notes); the owning equipment class is brick:Rooftop_Unit / brick:RTU (both verified in Brick 1.4.4). RTU-specific points (comp_status, comp_stage, htg_status) are grep-verified against Brick 1.4.4 but have no reference-model instance check, hence provisional. cond_leaving_temp (RTU-0007) is deferred with that fault.",
   "points": [
     {
       "name": "sat",
@@ -178,7 +178,7 @@
         "enumerationkind": "Binary-OnOff"
       },
       "provisional": true,
-      "notes": "Brick 1.4.4 has no Compressor_Run_Status class; the honest mapping is the generic On_Off_Status attached via isPointOf to brick:Compressor (class verified). On multi-compressor units, rules that ask whether ANY compressor is running (RTU-FC-052) may bind the OR of the individual statuses; RTU-FC-050 counts rising edges, and an OR UNDERCOUNTS cycling — a lag-compressor start while the lead is already running never moves the OR, so a two-stage unit can short-cycle its lag circuit and read healthy. Bind RTU-FC-050 per compressor. 223P pattern mirrors sf_status's Binary-OnOff enumeration; no packaged-unit reference instance checked."
+      "notes": "Brick 1.4.4 has no Compressor_Run_Status class; the honest mapping is the generic On_Off_Status attached via isPointOf to brick:Compressor (class verified). On multi-compressor units, rules that ask whether ANY compressor is running (RTU-0003) may bind the OR of the individual statuses; RTU-0001 counts rising edges, and an OR UNDERCOUNTS cycling — a lag-compressor start while the lead is already running never moves the OR, so a two-stage unit can short-cycle its lag circuit and read healthy. Bind RTU-0001 per compressor. 223P pattern mirrors sf_status's Binary-OnOff enumeration; no packaged-unit reference instance checked."
     },
     {
       "name": "comp_stage",
@@ -196,7 +196,7 @@
         "aspects": []
       },
       "provisional": true,
-      "notes": "brick:Stages_Status is verified in Brick 1.4.4 ('Indicates which stage a control loop or equipment is in') - an exact fit. Second integer point in the library (after operating_state); stage 0 means no compressor running. RTU-FC-051 interprets stages 1 and 2 against per-stage baselines and reports stages outside {1,2} as not evaluable via its yStageOk output; hosts with more stages extend by rebinding the baseline constants."
+      "notes": "brick:Stages_Status is verified in Brick 1.4.4 ('Indicates which stage a control loop or equipment is in') - an exact fit. Second integer point in the library (after operating_state); stage 0 means no compressor running. RTU-0002 interprets stages 1 and 2 against per-stage baselines and reports stages outside {1,2} as not evaluable via its yStageOk output; hosts with more stages extend by rebinding the baseline constants."
     },
     {
       "name": "htg_status",
@@ -215,7 +215,7 @@
         "enumerationkind": "Binary-OnOff"
       },
       "provisional": true,
-      "notes": "brick:Heating_Start_Stop_Status verified in Brick 1.4.4 (subclass of Start_Stop_Status). Alternative for sites tagging the element itself: generic On_Off_Status isPointOf the burner/heater equipment. For staged gas heat bind the OR of stage statuses - RTU-FC-052 only asks whether ANY heat is active."
+      "notes": "brick:Heating_Start_Stop_Status verified in Brick 1.4.4 (subclass of Start_Stop_Status). Alternative for sites tagging the element itself: generic On_Off_Status isPointOf the burner/heater equipment. For staged gas heat bind the OR of stage statuses - RTU-0003 only asks whether ANY heat is active."
     }
   ]
 }

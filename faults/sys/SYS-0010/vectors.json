@@ -1,0 +1,198 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 1800
+  },
+  "scenarios": [
+    {
+      "name": "steady_reading_and_the_unit_delay_warmup_artifact",
+      "description": "A still 22 degC reading, and the block-level artifact this rule is built around. UnitDelay seeds both state words from y_start (0.0, the CDL default), so at t = 0 the graph computes |22 - 0| = 22 degC - more than twice max_step_per_sample, a fabricated spike on every load. yHistoryOk is false across the whole seed window and yFault never asserts.",
+      "inputs": {
+        "sensor_value": 22.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yHistoryOk", "from_s": 0, "to_s": 60, "equals": false },
+        { "output": "yHistoryOk", "from_s": 120, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "identical_step_after_the_warmup_gate_opens",
+      "description": "The pair for the scenario above: the same 22 degC step arrives at t = 120, the tick history_warmup expires, where the delay line is guaranteed to hold a real sample. Identical arithmetic, opposite verdict - which is what proves the gate masks a fabrication rather than swallowing findings. The alarm is exactly one tick wide because the reading stays at its new value.",
+      "inputs": {
+        "sensor_value": [
+          { "t": 0, "value": 22.0 },
+          { "t": 120, "value": 44.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 60, "equals": false },
+        { "output": "yFault", "from_s": 120, "to_s": 120, "equals": true },
+        { "output": "yFault", "from_s": 180, "to_s": 1800, "equals": false },
+        { "output": "yHistoryOk", "from_s": 0, "to_s": 60, "equals": false },
+        { "output": "yHistoryOk", "from_s": 120, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "genuine_step_inside_the_warmup_gate_is_not_reported",
+      "description": "The price of the gate, pinned rather than hidden: these vectors start on a sample boundary, so the delay line already holds a real sample at t = 60 and this 22 degC step is genuine - and it is suppressed anyway, because history_warmup covers the worst case (a rule loaded between sample instants, where the seed survives two full periods) rather than the best. One sample of blindness per load, in exchange for never fabricating one.",
+      "inputs": {
+        "sensor_value": [
+          { "t": 0, "value": 22.0 },
+          { "t": 60, "value": 44.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yHistoryOk", "from_s": 0, "to_s": 60, "equals": false },
+        { "output": "yHistoryOk", "from_s": 120, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "single_sample_outlier_reported_on_both_edges",
+      "description": "The classic spike: one bad sample of 60 degC at t = 600 in an otherwise still 22 degC signal. It violates the bound twice - on the way out and on the way back - so the alarm is two ticks wide. A rule with a persistence timer on the fault path would read the first edge as noise and never assert.",
+      "inputs": {
+        "sensor_value": [
+          { "t": 0, "value": 22.0 },
+          { "t": 600, "value": 60.0 },
+          { "t": 660, "value": 22.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 540, "equals": false },
+        { "output": "yFault", "from_s": 600, "to_s": 660, "equals": true },
+        { "output": "yFault", "from_s": 720, "to_s": 1800, "equals": false },
+        { "output": "yHistoryOk", "from_s": 120, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "units_change_is_one_tick_wide",
+      "description": "The level-shift archetype, and the reason this rule carries no persistence timer: a 12.8 degC supply reading is re-served as the 55 that was its degF value, and stays there. The bound is violated on exactly ONE tick, because the sample after the shift is compared against the shifted value. Any TrueDelay on the fault path erases this whole class of fault - units changes, rescaled transmitters, points rebound by a controller download.",
+      "inputs": {
+        "sensor_value": [
+          { "t": 0, "value": 12.8 },
+          { "t": 600, "value": 55.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 540, "equals": false },
+        { "output": "yFault", "from_s": 600, "to_s": 600, "equals": true },
+        { "output": "yFault", "from_s": 660, "to_s": 1800, "equals": false },
+        { "output": "yHistoryOk", "from_s": 0, "to_s": 60, "equals": false },
+        { "output": "yHistoryOk", "from_s": 120, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "step_exactly_on_the_bound_reads_clear",
+      "description": "Threshold edge, on the line: 22.0 -> 32.0 degC is a step of exactly max_step_per_sample. Reals.GreaterThreshold is strict, so a step landing on the bound is not above it and nothing is reported.",
+      "inputs": {
+        "sensor_value": [
+          { "t": 0, "value": 22.0 },
+          { "t": 600, "value": 32.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yHistoryOk", "from_s": 120, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "step_just_under_the_bound_reads_clear",
+      "description": "Threshold edge from below: 22.0 -> 31.9 degC, a tenth of a kelvin short of the bound, still clear.",
+      "inputs": {
+        "sensor_value": [
+          { "t": 0, "value": 22.0 },
+          { "t": 600, "value": 31.9 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yHistoryOk", "from_s": 120, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "step_just_over_the_bound_is_reported",
+      "description": "Threshold edge from above: 22.0 -> 32.1 degC asserts for the one tick that carries the step. All three sides of the bound are pinned so the strictness cannot change silently.",
+      "inputs": {
+        "sensor_value": [
+          { "t": 0, "value": 22.0 },
+          { "t": 600, "value": 32.1 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 540, "equals": false },
+        { "output": "yFault", "from_s": 600, "to_s": 600, "equals": true },
+        { "output": "yFault", "from_s": 660, "to_s": 1800, "equals": false },
+        { "output": "yHistoryOk", "from_s": 120, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "downward_step_is_reported_the_same_as_an_upward_one",
+      "description": "Reals.Abs throws the sign away: 22.0 -> 4.0 degC is an 18 K collapse, reported exactly as an 18 K jump would be. A sensor whose signal conditioning fails low reads as clearly as one that rails high, and the output cannot say which happened.",
+      "inputs": {
+        "sensor_value": [
+          { "t": 0, "value": 22.0 },
+          { "t": 600, "value": 4.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 540, "equals": false },
+        { "output": "yFault", "from_s": 600, "to_s": 600, "equals": true },
+        { "output": "yFault", "from_s": 660, "to_s": 1800, "equals": false },
+        { "output": "yHistoryOk", "from_s": 120, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "ramp_under_the_bound_every_tick_is_invisible",
+      "description": "The blind spot, pinned rather than left for a site to discover: five consecutive 5 K steps carry the reading from 22 to 47 degC in five minutes - two and a half times the bound in total, and physically impossible in a duct - and every individual step is under max_step_per_sample, so the rule is silent. A step bound sees steps. Drift and ramps belong to SYS-0005.",
+      "inputs": {
+        "sensor_value": [
+          { "t": 0, "value": 22.0 },
+          { "t": 600, "value": 27.0 },
+          { "t": 660, "value": 32.0 },
+          { "t": 720, "value": 37.0 },
+          { "t": 780, "value": 42.0 },
+          { "t": 840, "value": 47.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yHistoryOk", "from_s": 120, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "two_outliers_report_independently",
+      "description": "Recovery: the rule holds no latch and accumulates no timer, so a second outlier fifteen minutes after the first is reported on its own merits and the quiet stretch between them reads clean. The host owns any dwell it wants on top - the graph reports the ticks the physics was violated and nothing else.",
+      "inputs": {
+        "sensor_value": [
+          { "t": 0, "value": 22.0 },
+          { "t": 300, "value": 60.0 },
+          { "t": 360, "value": 22.0 },
+          { "t": 1200, "value": 60.0 },
+          { "t": 1260, "value": 22.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 240, "equals": false },
+        { "output": "yFault", "from_s": 300, "to_s": 360, "equals": true },
+        { "output": "yFault", "from_s": 420, "to_s": 1140, "equals": false },
+        { "output": "yFault", "from_s": 1200, "to_s": 1260, "equals": true },
+        { "output": "yFault", "from_s": 1320, "to_s": 1800, "equals": false },
+        { "output": "yHistoryOk", "from_s": 120, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "small_magnitude_binding_has_no_warmup_artifact_to_mask",
+      "description": "Whether the y_start seed fabricates a spike at all depends on the bound point's magnitude: a signal that lives near zero - a differential pressure at rest, a valve position, a flow at no load - starts within the bound and would never have alarmed on tick one. The gate does not care, and that is the point: masking is unconditional, so the card does not have to reason about every binding's zero.",
+      "inputs": {
+        "sensor_value": 5.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yHistoryOk", "from_s": 0, "to_s": 60, "equals": false },
+        { "output": "yHistoryOk", "from_s": 120, "to_s": 1800, "equals": true }
+      ]
+    }
+  ]
+}

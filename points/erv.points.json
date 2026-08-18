@@ -23,7 +23,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "Energy recovery ventilator point dictionary. Exhaust-side verified in Brick 1.4.4; the post-recovery outdoor-air temperature has no Brick class and is provisional. The sensible-effectiveness computation (ERV-FC-050) uses the three ERV-local temperatures; oat is the site sensor used by frost protection (ERV-FC-051) and typically coincides with erv_oa_entering_temp when the ERV inlet sensor is the site sensor.",
+  "notes": "Energy recovery ventilator point dictionary. Exhaust-side verified in Brick 1.4.4; the post-recovery outdoor-air temperature has no Brick class and is provisional. The sensible-effectiveness computation (ERV-0001) uses the three ERV-local temperatures; oat is the site sensor used by frost protection (ERV-0002) and typically coincides with erv_oa_entering_temp when the ERV inlet sensor is the site sensor.",
   "points": [
     {
       "name": "erv_oa_entering_temp",
@@ -41,7 +41,7 @@
         "aspects": []
       },
       "provisional": false,
-      "notes": "brick:Outside_Air_Temperature_Sensor (verified via the AHU oat entry); position it upstream of the wheel/exchanger. The effectiveness denominator is (erv_exhaust_temp - this), so its accuracy bounds ERV-FC-050 directly."
+      "notes": "brick:Outside_Air_Temperature_Sensor (verified via the AHU oat entry); position it upstream of the wheel/exchanger. The effectiveness denominator is (erv_exhaust_temp - this), so its accuracy bounds ERV-0001 directly."
     },
     {
       "name": "erv_oa_leaving_temp",
@@ -97,7 +97,7 @@
         ]
       },
       "provisional": false,
-      "notes": "Brick spelling is Outside_ (Outdoor_Air_Temperature_Sensor does not exist). Role-OutdoorAirIntake is 223P's only outdoor role; used by reference instance oa-temp. [ERV dictionary] Brick class and 223P pattern carried over (equipment-independent); consumed by ERV-FC-051's frost test; on many units the same physical sensor as erv_oa_entering_temp."
+      "notes": "Brick spelling is Outside_ (Outdoor_Air_Temperature_Sensor does not exist). Role-OutdoorAirIntake is 223P's only outdoor role; used by reference instance oa-temp. [ERV dictionary] Brick class and 223P pattern carried over (equipment-independent); consumed by ERV-0002's frost test; on many units the same physical sensor as erv_oa_entering_temp."
     },
     {
       "name": "erv_frost_prot",

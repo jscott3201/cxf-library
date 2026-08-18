@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | CHW-FC-053, related to CHW-FC-050; HW-FC-053 — library-authored HW-side addition, the reference's row names only the CHW rule |
+| **Applies to** | CHW-0004, related to CHW-0001; HW-0004 — library-authored HW-side addition, the reference's row names only the CHW rule |
 | **Fix complexity** | Remote + on-site |
 | **Typical time** | 2–8 h (investigation across multiple air handler coils) |
 | **Typical cost** | $0–$2,000 (depends on root cause) |

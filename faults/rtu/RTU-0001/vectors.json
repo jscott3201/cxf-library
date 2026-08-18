@@ -1,0 +1,342 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 14400 },
+  "scenarios": [
+    {
+      "name": "three_starts_per_hour",
+      "description": "Reference vector: normal cycling, three starts an hour. The compressor is idle for the first 20 minutes, then runs 8 minutes and rests 12 — a 20-minute cycle, twice the 10-minute minimum interval the 6/h ceiling encodes. The rolling count holds at 3.0 for the whole run, including the warm-up window, where three starts an hour also happens to be the extrapolated pace",
+      "inputs": {
+        "comp_status": [
+          { "t": 0, "value": false },
+          { "t": 1200, "value": true },
+          { "t": 1680, "value": false },
+          { "t": 2400, "value": true },
+          { "t": 2880, "value": false },
+          { "t": 3600, "value": true },
+          { "t": 4080, "value": false },
+          { "t": 4800, "value": true },
+          { "t": 5280, "value": false },
+          { "t": 6000, "value": true },
+          { "t": 6480, "value": false },
+          { "t": 7200, "value": true },
+          { "t": 7680, "value": false },
+          { "t": 8400, "value": true },
+          { "t": 8880, "value": false },
+          { "t": 9600, "value": true },
+          { "t": 10080, "value": false },
+          { "t": 10800, "value": true },
+          { "t": 11280, "value": false },
+          { "t": 12000, "value": true },
+          { "t": 12480, "value": false },
+          { "t": 13200, "value": true },
+          { "t": 13680, "value": false },
+          { "t": 14400, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 14400, "equals": false }
+      ]
+    },
+    {
+      "name": "single_long_run",
+      "description": "Reference vector: one start, one long run. The compressor starts at t=1200 and runs to the horizon. count peaks at 3.0 (the warm-up extrapolation of one start in 20 minutes) and decays from there; one start can never reach the 6/h ceiling",
+      "inputs": {
+        "comp_status": [
+          { "t": 0, "value": false },
+          { "t": 1200, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 14400, "equals": false }
+      ]
+    },
+    {
+      "name": "startup_pulse_is_inert",
+      "description": "Startup artifact: comp_status is already true when the rule loads, so Logical.Edge sees u true against pre_u_start = false and emits a rising edge on tick 0. It costs nothing — MovingAverage integrates u*dt and dt is zero on the first tick, so the pulse encloses no area and count stays at 0.0 for the whole run",
+      "inputs": {
+        "comp_status": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 14400, "equals": false }
+      ]
+    },
+    {
+      "name": "short_cycling_ten_per_hour",
+      "description": "Reference vector: short-cycling at ten starts an hour. The unit is off for the first hour (so the verdict rests on a completed-window count, not on the warm-up extrapolation), then runs 2 minutes and rests 4 — a 6-minute cycle. The seventh start enters the trailing hour at t=5760 and count steps to 7.0; yFault follows one alarm_delay later at t=6660, and the count settles at exactly 10.0",
+      "inputs": {
+        "comp_status": [
+          { "t": 0, "value": false },
+          { "t": 3600, "value": true },
+          { "t": 3720, "value": false },
+          { "t": 3960, "value": true },
+          { "t": 4080, "value": false },
+          { "t": 4320, "value": true },
+          { "t": 4440, "value": false },
+          { "t": 4680, "value": true },
+          { "t": 4800, "value": false },
+          { "t": 5040, "value": true },
+          { "t": 5160, "value": false },
+          { "t": 5400, "value": true },
+          { "t": 5520, "value": false },
+          { "t": 5760, "value": true },
+          { "t": 5880, "value": false },
+          { "t": 6120, "value": true },
+          { "t": 6240, "value": false },
+          { "t": 6480, "value": true },
+          { "t": 6600, "value": false },
+          { "t": 6840, "value": true },
+          { "t": 6960, "value": false },
+          { "t": 7200, "value": true },
+          { "t": 7320, "value": false },
+          { "t": 7560, "value": true },
+          { "t": 7680, "value": false },
+          { "t": 7920, "value": true },
+          { "t": 8040, "value": false },
+          { "t": 8280, "value": true },
+          { "t": 8400, "value": false },
+          { "t": 8640, "value": true },
+          { "t": 8760, "value": false },
+          { "t": 9000, "value": true },
+          { "t": 9120, "value": false },
+          { "t": 9360, "value": true },
+          { "t": 9480, "value": false },
+          { "t": 9720, "value": true },
+          { "t": 9840, "value": false },
+          { "t": 10080, "value": true },
+          { "t": 10200, "value": false },
+          { "t": 10440, "value": true },
+          { "t": 10560, "value": false },
+          { "t": 10800, "value": true },
+          { "t": 10920, "value": false },
+          { "t": 11160, "value": true },
+          { "t": 11280, "value": false },
+          { "t": 11520, "value": true },
+          { "t": 11640, "value": false },
+          { "t": 11880, "value": true },
+          { "t": 12000, "value": false },
+          { "t": 12240, "value": true },
+          { "t": 12360, "value": false },
+          { "t": 12600, "value": true },
+          { "t": 12720, "value": false },
+          { "t": 12960, "value": true },
+          { "t": 13080, "value": false },
+          { "t": 13320, "value": true },
+          { "t": 13440, "value": false },
+          { "t": 13680, "value": true },
+          { "t": 13800, "value": false },
+          { "t": 14040, "value": true },
+          { "t": 14160, "value": false },
+          { "t": 14400, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 6600, "equals": false },
+        { "output": "yFault", "from_s": 6720, "to_s": 14400, "equals": true }
+      ]
+    },
+    {
+      "name": "six_starts_per_hour_stays_clear",
+      "description": "Boundary, low side. The compressor runs 2 minutes every 10 — exactly six starts an hour, the reference's minimum recommended interval met exactly. count lands on exactly 6.0 (60.0 x 6 x 60 / 3600 is exact in IEEE-754) and max_starts_per_hour is a strict `>`, so six starts an hour reads clear. During the warm-up window the extrapolated pace is 6.0 or a hair under, never above",
+      "inputs": {
+        "comp_status": [
+          { "t": 0, "value": false },
+          { "t": 600, "value": true },
+          { "t": 720, "value": false },
+          { "t": 1200, "value": true },
+          { "t": 1320, "value": false },
+          { "t": 1800, "value": true },
+          { "t": 1920, "value": false },
+          { "t": 2400, "value": true },
+          { "t": 2520, "value": false },
+          { "t": 3000, "value": true },
+          { "t": 3120, "value": false },
+          { "t": 3600, "value": true },
+          { "t": 3720, "value": false },
+          { "t": 4200, "value": true },
+          { "t": 4320, "value": false },
+          { "t": 4800, "value": true },
+          { "t": 4920, "value": false },
+          { "t": 5400, "value": true },
+          { "t": 5520, "value": false },
+          { "t": 6000, "value": true },
+          { "t": 6120, "value": false },
+          { "t": 6600, "value": true },
+          { "t": 6720, "value": false },
+          { "t": 7200, "value": true },
+          { "t": 7320, "value": false },
+          { "t": 7800, "value": true },
+          { "t": 7920, "value": false },
+          { "t": 8400, "value": true },
+          { "t": 8520, "value": false },
+          { "t": 9000, "value": true },
+          { "t": 9120, "value": false },
+          { "t": 9600, "value": true },
+          { "t": 9720, "value": false },
+          { "t": 10200, "value": true },
+          { "t": 10320, "value": false },
+          { "t": 10800, "value": true },
+          { "t": 10920, "value": false },
+          { "t": 11400, "value": true },
+          { "t": 11520, "value": false },
+          { "t": 12000, "value": true },
+          { "t": 12120, "value": false },
+          { "t": 12600, "value": true },
+          { "t": 12720, "value": false },
+          { "t": 13200, "value": true },
+          { "t": 13320, "value": false },
+          { "t": 13800, "value": true },
+          { "t": 13920, "value": false },
+          { "t": 14400, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 14400, "equals": false }
+      ]
+    },
+    {
+      "name": "seven_starts_per_hour_trips",
+      "description": "Boundary, high side. Same shape as the six-per-hour case with one more start folded into each hour: cycles of 9 and 8 minutes, seven starts per hour, repeating on a 3600 s pattern so every trailing hour holds exactly seven. The seventh start enters the window at t=6720, count steps from 6.0 to 7.0, and yFault asserts one alarm_delay later at t=7620",
+      "inputs": {
+        "comp_status": [
+          { "t": 0, "value": false },
+          { "t": 3600, "value": true },
+          { "t": 3720, "value": false },
+          { "t": 4140, "value": true },
+          { "t": 4260, "value": false },
+          { "t": 4680, "value": true },
+          { "t": 4800, "value": false },
+          { "t": 5160, "value": true },
+          { "t": 5280, "value": false },
+          { "t": 5700, "value": true },
+          { "t": 5820, "value": false },
+          { "t": 6240, "value": true },
+          { "t": 6360, "value": false },
+          { "t": 6720, "value": true },
+          { "t": 6840, "value": false },
+          { "t": 7200, "value": true },
+          { "t": 7320, "value": false },
+          { "t": 7740, "value": true },
+          { "t": 7860, "value": false },
+          { "t": 8280, "value": true },
+          { "t": 8400, "value": false },
+          { "t": 8760, "value": true },
+          { "t": 8880, "value": false },
+          { "t": 9300, "value": true },
+          { "t": 9420, "value": false },
+          { "t": 9840, "value": true },
+          { "t": 9960, "value": false },
+          { "t": 10320, "value": true },
+          { "t": 10440, "value": false },
+          { "t": 10800, "value": true },
+          { "t": 10920, "value": false },
+          { "t": 11340, "value": true },
+          { "t": 11460, "value": false },
+          { "t": 11880, "value": true },
+          { "t": 12000, "value": false },
+          { "t": 12360, "value": true },
+          { "t": 12480, "value": false },
+          { "t": 12900, "value": true },
+          { "t": 13020, "value": false },
+          { "t": 13440, "value": true },
+          { "t": 13560, "value": false },
+          { "t": 13920, "value": true },
+          { "t": 14040, "value": false },
+          { "t": 14400, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7560, "equals": false },
+        { "output": "yFault", "from_s": 7680, "to_s": 14400, "equals": true }
+      ]
+    },
+    {
+      "name": "cycling_stops_alarm_clears",
+      "description": "Recovery. Ten short cycles between t=3600 and t=6840 push count to 10.0 and yFault asserts at t=6660; then the compressor settles into one long run. The count does not drop at once — it decays as starts age out of the trailing hour, one per 360 s — and reaches 6.0 at t=8280, where the strict threshold goes false and the alarm clears on that same tick, since TrueDelay has no off-delay",
+      "inputs": {
+        "comp_status": [
+          { "t": 0, "value": false },
+          { "t": 3600, "value": true },
+          { "t": 3720, "value": false },
+          { "t": 3960, "value": true },
+          { "t": 4080, "value": false },
+          { "t": 4320, "value": true },
+          { "t": 4440, "value": false },
+          { "t": 4680, "value": true },
+          { "t": 4800, "value": false },
+          { "t": 5040, "value": true },
+          { "t": 5160, "value": false },
+          { "t": 5400, "value": true },
+          { "t": 5520, "value": false },
+          { "t": 5760, "value": true },
+          { "t": 5880, "value": false },
+          { "t": 6120, "value": true },
+          { "t": 6240, "value": false },
+          { "t": 6480, "value": true },
+          { "t": 6600, "value": false },
+          { "t": 6840, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 6600, "equals": false },
+        { "output": "yFault", "from_s": 6720, "to_s": 8160, "equals": true },
+        { "output": "yFault", "from_s": 8340, "to_s": 14400, "equals": false }
+      ]
+    },
+    {
+      "name": "warmup_rate_asserts",
+      "description": "Startup artifact, and the reason the host must report NO_EVAL for the first count_window: two starts two minutes apart read as a 40/h pace, because the growing-window divisor is elapsed time rather than count_window. cntHigh is true from t=60, and unlike AHU-0004 (where alarm_delay equals count_window) this rule's 900 s delay expires long before the window fills, so yFault asserts at t=960 on the strength of two starts. The reading decays as the window grows and falls to 6.0 at t=1200, clearing the alarm",
+      "inputs": {
+        "comp_status": [
+          { "t": 0, "value": false },
+          { "t": 60, "value": true },
+          { "t": 120, "value": false },
+          { "t": 180, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 900, "equals": false },
+        { "output": "yFault", "from_s": 1020, "to_s": 1080, "equals": true },
+        { "output": "yFault", "from_s": 1260, "to_s": 14400, "equals": false }
+      ]
+    },
+    {
+      "name": "startup_spike_clears",
+      "description": "Transient shorter than alarm_delay. A single start one tick after load extrapolates to a 60/h pace, so cntHigh is true from t=60, but the reading decays with the growing window and drops to 6.0 at t=600. cntHigh held for 480 s, barely half the alarm_delay, so nothing asserts — the same single-start history as single_long_run, seen from inside the warm-up window",
+      "inputs": {
+        "comp_status": [
+          { "t": 0, "value": false },
+          { "t": 60, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 14400, "equals": false }
+      ]
+    },
+    {
+      "name": "spread_burst_clears_before_delay",
+      "description": "Transient in the steady-state regime. Seven starts spread evenly over 54 minutes, after an idle first hour: the seventh start pushes count to 7.0 at t=6840, but the first one leaves the trailing hour at t=7200 and the count falls back to 6.0. cntHigh held for 300 s against a 900 s alarm_delay, so nothing asserts. How long a crossing survives is count_window minus the span of the starts that caused it, which is why a tight burst alarms and a spread-out one does not",
+      "inputs": {
+        "comp_status": [
+          { "t": 0, "value": false },
+          { "t": 3600, "value": true },
+          { "t": 3720, "value": false },
+          { "t": 4140, "value": true },
+          { "t": 4260, "value": false },
+          { "t": 4680, "value": true },
+          { "t": 4800, "value": false },
+          { "t": 5220, "value": true },
+          { "t": 5340, "value": false },
+          { "t": 5760, "value": true },
+          { "t": 5880, "value": false },
+          { "t": 6300, "value": true },
+          { "t": 6420, "value": false },
+          { "t": 6840, "value": true },
+          { "t": 6960, "value": false }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 14400, "equals": false }
+      ]
+    }
+  ]
+}

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | RTU-FC-050, RTU-FC-051, RTU-FC-100 |
+| **Applies to** | RTU-0001, RTU-0002, RTU-0007 |
 | **Fix complexity** | On-site service required |
 | **Typical time** | 1–4 h on-site |
 | **Typical cost** | $100–$500 (cleaning/filter) / $500–$2,000 (capacitor/charge) / $2,000–$8,000 (compressor) |
@@ -12,18 +12,18 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 168–169).
 
 ## Step 1 — Verify the fault
 
-1. **Compressor short-cycling (RTU-FC-050):** pull the compressor run status
+1. **Compressor short-cycling (RTU-0001):** pull the compressor run status
    trend and count starts per hour — more than 6 starts/hr indicates
    short-cycling. Check minimum on-time per cycle: less than 5 minutes is
    abnormal. (Albayati et al. 2023 achieved 95.7% accuracy on RTU fault
    classification with semi-supervised learning; the trend check remains the
    ground truth.)
-2. **Evaporator fouling (RTU-FC-051):** calculate the temperature split
+2. **Evaporator fouling (RTU-0002):** calculate the temperature split
    RAT − SAT during steady-state cooling and compare to the baseline split
    for the current compressor stage. A 25% or greater reduction indicates
    fouling. Typical baselines: 8 °C (14 °F) at stage 1, 12 °C (22 °F) at
    stage 2.
-3. **Condenser fouling (RTU-FC-100):** measure condenser leaving air
+3. **Condenser fouling (RTU-0007):** measure condenser leaving air
    temperature minus OAT and compare to baseline for the current stage and
    OAT. A 30% or greater increase indicates fouling.
 
@@ -50,7 +50,7 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 168–169).
       the coil, mimicking fouling.
    4. Check for ice on the coil — icing indicates low refrigerant charge or
       a failed defrost cycle.
-3. **Condenser fouling (RTU-FC-100):**
+3. **Condenser fouling (RTU-0007):**
    1. Inspect the condenser coil from outside the unit — cottonwood seeds,
       leaves, and debris are the most common culprits.
    2. Clean the coil from the inside out with a garden hose or pressure
@@ -65,7 +65,7 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 168–169).
    than 6 starts/hr with minimum 5-minute on-time.
 2. **Evaporator fouling:** recalculate the temperature split — it should
    return to within 15% of baseline. (Note: this resolution target is
-   tighter than RTU-FC-051's 25% alarm threshold — the fault clears well
+   tighter than RTU-0002's 25% alarm threshold — the fault clears well
    before the coil is fully recovered, so confirm against the 15% target,
    not against the alarm clearing.)
 3. **Condenser fouling:** recalculate the condenser split — it should return

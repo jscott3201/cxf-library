@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 270" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs: plant flow, and the host-derived served-set valve maximum -->
+  <g>
+    <rect x="12" y="60" width="150" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="87" y="79" text-anchor="middle" fill="#1e3a8a">hw_flow</text>
+    <rect x="12" y="170" width="150" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="87" y="189" text-anchor="middle" fill="#1e3a8a">ahu_htg_vlv_max</text>
+  </g>
+
+  <!-- the two conjuncts -->
+  <rect x="210" y="46" width="260" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="340" y="68" text-anchor="middle" fill="#24292f" font-weight="bold">flowHigh</text>
+  <text x="340" y="86" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 5.0 L/s</text>
+
+  <rect x="210" y="156" width="260" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="340" y="178" text-anchor="middle" fill="#24292f" font-weight="bold">valvesShut</text>
+  <text x="340" y="196" text-anchor="middle" fill="#57606a" font-size="11">Reals.LessThreshold · t = 2.0 %</text>
+
+  <!-- conjunction -->
+  <rect x="540" y="101" width="130" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="605" y="123" text-anchor="middle" fill="#24292f" font-weight="bold">both</text>
+  <text x="605" y="141" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <!-- the reference's AlarmDelay -->
+  <rect x="740" y="101" width="160" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="820" y="123" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="820" y="141" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 900 s</text>
+
+  <!-- boundary output -->
+  <rect x="966" y="115" width="80" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1006" y="134" text-anchor="middle" fill="#7f1d1d">yFault</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 162 75 H 206"/>
+    <path d="M 162 185 H 206"/>
+    <path d="M 470 75 H 505 V 116 H 536"/>
+    <path d="M 470 185 H 505 V 144 H 536"/>
+    <path d="M 670 130 H 736"/>
+    <path d="M 900 130 H 962"/>
+  </g>
+
+  <!-- signal type hints -->
+  <text x="168" y="70" fill="#7d8590" font-size="10">Real</text>
+  <text x="168" y="180" fill="#7d8590" font-size="10">Real</text>
+  <text x="476" y="70" fill="#7d8590" font-size="10">Bool</text>
+  <text x="476" y="180" fill="#7d8590" font-size="10">Bool</text>
+
+  <text x="12" y="240" fill="#7d8590" font-size="11">ahu_htg_vlv_max is host-derived: max(htg_vlv_cmd) over the served coils, reheat valves included where the HW plant feeds them</text>
+  <text x="12" y="258" fill="#7d8590" font-size="11">structure mirrors SYS-0001 exactly, as the reference's own tunables row directs</text>
+</svg>

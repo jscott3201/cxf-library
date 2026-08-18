@@ -23,7 +23,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "Chilled water plant point dictionary (reference ch.13, CHW-FC-050..053). Owning equipment: brick:Chiller / brick:Chilled_Water_Loop (both verified in Brick 1.4.4). Plant-level rules: on multi-chiller plants, bind kW/tons/load per chiller instance and the loop temperatures/setpoints per loop. The reference expresses chiller output in tons; the dictionary keeps that unit so the kW/ton quantity matches the trade convention (1 ton = 3.517 kW thermal — conversion belongs at binding, not in the graph).",
+  "notes": "Chilled water plant point dictionary (reference ch.13, CHW-0001..053). Owning equipment: brick:Chiller / brick:Chilled_Water_Loop (both verified in Brick 1.4.4). Plant-level rules: on multi-chiller plants, bind kW/tons/load per chiller instance and the loop temperatures/setpoints per loop. The reference expresses chiller output in tons; the dictionary keeps that unit so the kW/ton quantity matches the trade convention (1 ton = 3.517 kW thermal — conversion belongs at binding, not in the graph).",
   "points": [
     {
       "name": "chiller_kw",
@@ -41,7 +41,7 @@
         "aspects": []
       },
       "provisional": false,
-      "notes": "brick:Active_Power_Sensor grep-verified (same mapping as hp elec_power), isPointOf brick:Chiller (verified). Consumed by CHW-FC-050's kW/ton numerator."
+      "notes": "brick:Active_Power_Sensor grep-verified (same mapping as hp elec_power), isPointOf brick:Chiller (verified). Consumed by CHW-0001's kW/ton numerator."
     },
     {
       "name": "chiller_tons",
@@ -59,7 +59,7 @@
         "aspects": []
       },
       "provisional": true,
-      "notes": "brick:Thermal_Power_Sensor grep-verified, but marked provisional for the unit: the reference (and the kW/ton convention) uses refrigeration tons while most BAS trend kW thermal or derive tons from flow x deltaT. Binding must land on tons (1 ton = 3.517 kW) or CHW-FC-050's kW/ton and its baseline coefficients are silently wrong together. Often a host-derived point (flow x deltaT x cp)."
+      "notes": "brick:Thermal_Power_Sensor grep-verified, but marked provisional for the unit: the reference (and the kW/ton convention) uses refrigeration tons while most BAS trend kW thermal or derive tons from flow x deltaT. Binding must land on tons (1 ton = 3.517 kW) or CHW-0001's kW/ton and its baseline coefficients are silently wrong together. Often a host-derived point (flow x deltaT x cp)."
     },
     {
       "name": "cwst",
@@ -79,7 +79,7 @@
         ]
       },
       "provisional": false,
-      "notes": "brick:Leaving_Condenser_Water_Temperature_Sensor grep-verified. Reference Haystack markers: condenser, water, leaving, temp, sensor. Baseline regressor input for CHW-FC-050 (condenser lift proxy). LOOP-SIDE WARNING: this is the WARM side (chiller-leaving, chiller-to-tower). A future cooling-tower approach rule needs the COLD side (tower-leaving, tower-to-chiller = entering condenser water) — a different point; do not wire a tower rule here by name alone (internal deep-read finding, 2026-08-18)."
+      "notes": "brick:Leaving_Condenser_Water_Temperature_Sensor grep-verified. Reference Haystack markers: condenser, water, leaving, temp, sensor. Baseline regressor input for CHW-0001 (condenser lift proxy). LOOP-SIDE WARNING: this is the WARM side (chiller-leaving, chiller-to-tower). A future cooling-tower approach rule needs the COLD side (tower-leaving, tower-to-chiller = entering condenser water) — a different point; do not wire a tower rule here by name alone (internal deep-read finding, 2026-08-18)."
     },
     {
       "name": "chwst",
@@ -99,7 +99,7 @@
         ]
       },
       "provisional": false,
-      "notes": "brick:Leaving_Chilled_Water_Temperature_Sensor grep-verified. Consumed by CHW-FC-050 (baseline regressor) and CHW-FC-053 (delta-T)."
+      "notes": "brick:Leaving_Chilled_Water_Temperature_Sensor grep-verified. Consumed by CHW-0001 (baseline regressor) and CHW-0004 (delta-T)."
     },
     {
       "name": "chwrt",
@@ -119,7 +119,7 @@
         ]
       },
       "provisional": false,
-      "notes": "brick:Entering_Chilled_Water_Temperature_Sensor grep-verified — 'return' at the plant is 'entering' at the chiller; Brick 1.4.4 also carries Chilled_Water_Return_Temperature_Sensor, but the entering-form matches the chiller-owned binding these rules assume. Consumed by CHW-FC-053."
+      "notes": "brick:Entering_Chilled_Water_Temperature_Sensor grep-verified — 'return' at the plant is 'entering' at the chiller; Brick 1.4.4 also carries Chilled_Water_Return_Temperature_Sensor, but the entering-form matches the chiller-owned binding these rules assume. Consumed by CHW-0004."
     },
     {
       "name": "chiller_load",
@@ -137,7 +137,7 @@
         "aspects": []
       },
       "provisional": true,
-      "notes": "Brick 1.4.4 has no chiller-percent-load class (defrost_status precedent for a null mapping). Typical sources: the chiller's own RLA%/load output, or host-derived tons/design_tons. Evaluability floor for CHW-FC-050 (30%) and CHW-FC-053 (40%); range regressor for CHW-FC-051."
+      "notes": "Brick 1.4.4 has no chiller-percent-load class (defrost_status precedent for a null mapping). Typical sources: the chiller's own RLA%/load output, or host-derived tons/design_tons. Evaluability floor for CHW-0001 (30%) and CHW-0004 (40%); range regressor for CHW-0002."
     },
     {
       "name": "chwst_sp",
@@ -158,7 +158,7 @@
         ]
       },
       "provisional": false,
-      "notes": "brick:Leaving_Chilled_Water_Temperature_Setpoint grep-verified. CHW-FC-051 watches this point's RANGE over the evaluation window — the reset detector reads the setpoint, never the measured temperature (AHU-FC-057 sat_sp precedent)."
+      "notes": "brick:Leaving_Chilled_Water_Temperature_Setpoint grep-verified. CHW-0002 watches this point's RANGE over the evaluation window — the reset detector reads the setpoint, never the measured temperature (AHU-0023 sat_sp precedent)."
     },
     {
       "name": "dp_sp",
@@ -179,7 +179,7 @@
         ]
       },
       "provisional": false,
-      "notes": "brick:Chilled_Water_Differential_Pressure_Setpoint grep-verified. CHW-FC-052 watches this point's range (AHU-FC-058 dsp_sp precedent)."
+      "notes": "brick:Chilled_Water_Differential_Pressure_Setpoint grep-verified. CHW-0003 watches this point's range (AHU-0024 dsp_sp precedent)."
     },
     {
       "name": "chw_valve_max",
@@ -199,7 +199,7 @@
         ]
       },
       "provisional": true,
-      "notes": "HOST-DERIVED (zone_reheat_fraction / satisfied_zone_fraction precedent): the reference's chw_valve_positions is a vector across AHU/FCU cooling coils; the rule needs only its max, so the host binds max() over the coil valve commands it serves. CHW-FC-052's 'no coil starving' conjunct. Engine vector blocks could compute this in-graph once the points contract grows vector bindings (tracked in internal engine-block-inventory research notes).",
+      "notes": "HOST-DERIVED (zone_reheat_fraction / satisfied_zone_fraction precedent): the reference's chw_valve_positions is a vector across AHU/FCU cooling coils; the rule needs only its max, so the host binds max() over the coil valve commands it serves. CHW-0003's 'no coil starving' conjunct. Engine vector blocks could compute this in-graph once the points contract grows vector bindings (tracked in internal engine-block-inventory research notes).",
       "derived": true
     },
     {
@@ -221,7 +221,7 @@
         ]
       },
       "provisional": true,
-      "notes": "Host-derived P-T saturation lookup from measured discharge/liquid pressure (hp dict precedent, duplicated per the lint's own-family resolution rule). Consumed by CHW-FC-054 condenser-approach-high: approach = cond_sat_temp − cwst. Refrigerant-specific lookup is the host's, documented per binding.",
+      "notes": "Host-derived P-T saturation lookup from measured discharge/liquid pressure (hp dict precedent, duplicated per the lint's own-family resolution rule). Consumed by CHW-0005 condenser-approach-high: approach = cond_sat_temp − cwst. Refrigerant-specific lookup is the host's, documented per binding.",
       "derived": true
     }
   ]

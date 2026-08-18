@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | AHU-FC-004, AHU-FC-005, AHU-FC-012, AHU-FC-050, AHU-FC-059, AHU-FC-063, AHU-FC-066, CLU-01 |
+| **Applies to** | AHU-0004, AHU-0005, AHU-0012, AHU-0016, AHU-0025, AHU-0029, AHU-0032, CLU-01 |
 | **Fix complexity** | Remote fix (70%) · On-site service (30%) |
 | **Typical time** | 30 min remote / 2–4 h on-site |
 | **Typical cost** | $0 remote / $200–$1,500 on-site (actuator replacement) |

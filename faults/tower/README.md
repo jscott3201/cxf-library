@@ -1,6 +1,6 @@
 # TOWER Fault Rules
 
-Cooling tower rules (`TOWER-FC-*`) — the library's first **fully
+Cooling tower rules (`TOWER-*`) — the library's first **fully
 library-authored family**: no HVAC FDD Reference chapter covers towers, and
 three deep-read sources (BEE 2006; PNNL-13890; DOE/PNNL O&M Best Practices
 3.0) corroborate mechanisms but publish no approach/range fault magnitudes.
@@ -22,18 +22,18 @@ water) and the `oa_wetbulb` host psychrometric obligation.
 
 | ID | Name | Sev | Method | Status |
 |---|---|---|---|---|
-| TOWER-FC-050 | Tower approach high at fan capacity | 3 | rule | **verified** |
-| TOWER-FC-051 | Tower range collapse | 3 | rule | **verified** |
-| TOWER-FC-052 | Tower fan short-cycling | 3 | rule | **verified** |
+| TOWER-0001 | Tower approach high at fan capacity | 3 | rule | **verified** |
+| TOWER-0002 | Tower range collapse | 3 | rule | **verified** |
+| TOWER-0003 | Tower fan short-cycling | 3 | rule | **verified** |
 
 ## Relationships
 
-- **CLU-10 (Condenser-Side Degradation)**: TOWER-FC-050 is the trigger,
-  TOWER-FC-051 and CHW-FC-054 (chiller condenser approach) the members;
+- **CLU-10 (Condenser-Side Degradation)**: TOWER-0001 is the trigger,
+  TOWER-0002 and CHW-0005 (chiller condenser approach) the members;
   `playbooks/cooling-tower-performance.md` is the family playbook.
-  CHW-FC-054 is the tube-side vs fill-side discriminator: tower approach
+  CHW-0005 is the tube-side vs fill-side discriminator: tower approach
   normal + condenser approach high → clean the tubes, not the fill.
-- **TOWER-FC-052** stays outside CLU-10 — a drive/control fault, not the
+- **TOWER-0003** stays outside CLU-10 — a drive/control fault, not the
   degradation syndrome; it shares the playbook's control-side steps.
 - The pending primary sources when they are acquired: a CTI/ASHRAE tower
   chapter for approach/range fault bands, ASHRAE RP-1043 for the chiller

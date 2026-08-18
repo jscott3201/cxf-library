@@ -2,27 +2,27 @@
 
 | | |
 |---|---|
-| **Applies to** | HP-FC-050 (COP degradation), HP-FC-051 (defrost anomaly), HP-FC-052 (reversing valve), HP-FC-053 (undercharge), HP-FC-054 (overcharge), HP-FC-055 (valve internal leakage) |
+| **Applies to** | HP-0001 (COP degradation), HP-0002 (defrost anomaly), HP-0003 (reversing valve), HP-0004 (undercharge), HP-0005 (overcharge), HP-0006 (valve internal leakage) |
 | **Fix complexity** | On-site service required |
 | **Typical time** | 2–6 h on-site |
 | **Typical cost** | $200–$1,500 (refrigerant/defrost) / $500–$3,000 (reversing valve) / $3,000–$8,000 (compressor) |
-| **Energy impact** | HP-FC-050: 5–25% compressor energy waste from COP degradation. HP-FC-051: 3–10% heating energy from excessive defrost. HP-FC-052: 20–50% of mode energy when running in the wrong mode — this is a critical fault. Barandier (2023) found refrigerant undercharge is the most frequent heat pump fault. |
+| **Energy impact** | HP-0001: 5–25% compressor energy waste from COP degradation. HP-0002: 3–10% heating energy from excessive defrost. HP-0003: 20–50% of mode energy when running in the wrong mode — this is a critical fault. Barandier (2023) found refrigerant undercharge is the most frequent heat pump fault. |
 
 Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 169–170).
 
 ## Step 1 — Verify the fault
 
-1. **COP degradation (HP-FC-050):** calculate measured COP as thermal output
+1. **COP degradation (HP-0001):** calculate measured COP as thermal output
    divided by electrical input and compare it to the baseline regression model
    (COP vs. OAT). A 15% or greater drop below the baseline curve indicates
    degradation. Evaluate heating and cooling modes separately — degradation may
    appear in only one mode. Ensure the baseline R² > 0.6 before trusting the
    comparison.
-2. **Defrost anomaly (HP-FC-051):** count defrost cycles per hour — more than
+2. **Defrost anomaly (HP-0002):** count defrost cycles per hour — more than
    4/hr is excessive. Check individual defrost duration — more than 15 minutes
    per cycle is abnormal. Check for defrost initiating when OAT is above 7 °C
    (45 °F); defrost should not be needed at mild temperatures.
-3. **Reversing valve (HP-FC-052):** after a mode change command, wait 10
+3. **Reversing valve (HP-0003):** after a mode change command, wait 10
    minutes for the system to settle. In cooling mode, SAT should be well below
    RAT — if SAT > RAT, the valve has not switched. In heating mode, SAT should
    be well above RAT — if SAT < RAT, the valve has not switched. This is a

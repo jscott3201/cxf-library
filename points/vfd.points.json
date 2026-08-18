@@ -59,7 +59,7 @@
         "aspects": []
       },
       "provisional": false,
-      "notes": "brick:Motor_Speed_Sensor grep-verified in Brick 1.4.4; brick:Speed_Status is the drive-reported alternative — bind whichever the site trends, but note VFD-FC-050 diagnosis 5 (tachometer failure) argues for the drive-reported value where both exist."
+      "notes": "brick:Motor_Speed_Sensor grep-verified in Brick 1.4.4; brick:Speed_Status is the drive-reported alternative — bind whichever the site trends, but note VFD-0001 diagnosis 5 (tachometer failure) argues for the drive-reported value where both exist."
     },
     {
       "name": "vfd_process_value",
@@ -70,7 +70,7 @@
       "brick": null,
       "s223": null,
       "provisional": true,
-      "notes": "Deliberately generic: the VFD family's rules compare PV against setpoint in whatever unit the loop uses, and VFD-FC-051's pv_error_threshold is set in those same units. Semantic tags belong on the application-specific point (duct static pressure, water differential pressure, ...) that the host binds here."
+      "notes": "Deliberately generic: the VFD family's rules compare PV against setpoint in whatever unit the loop uses, and VFD-0002's pv_error_threshold is set in those same units. Semantic tags belong on the application-specific point (duct static pressure, water differential pressure, ...) that the host binds here."
     },
     {
       "name": "vfd_process_sp",

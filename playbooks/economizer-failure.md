@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | AHU-FC-006, AHU-FC-009, AHU-FC-011, AHU-FC-051, AHU-FC-055, AHU-FC-064, AHU-FC-068, RTU-FC-053, RTU-FC-054, RTU-FC-055, CLU-03 |
+| **Applies to** | AHU-0006, AHU-0009, AHU-0011, AHU-0017, AHU-0021, AHU-0030, AHU-0034, RTU-0004, RTU-0005, RTU-0006, CLU-03 |
 | **Fix complexity** | Remote fix (40%) · Remote + on-site (40%) · On-site only (20%) |
 | **Typical time** | 30 min remote / 1–3 h on-site |
 | **Typical cost** | $0 remote / $100–$400 linkage repair / $500–$1,200 actuator |
@@ -48,7 +48,7 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 156–157).
 4. RTUs: verify barometric relief / power exhaust works — inadequate relief
    creates positive pressure that prevents the damper opening fully.
 5. Inspect damper blade seals — worn seals cause excess outdoor air when
-   commanded closed (RTU-FC-054).
+   commanded closed (RTU-0005).
 
 ## Step 4 — Confirm resolution
 

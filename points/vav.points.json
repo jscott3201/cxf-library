@@ -113,7 +113,7 @@
         "aspects": []
       },
       "provisional": false,
-      "notes": "brick:Supply_Air_Flow_Setpoint grep-verified in Brick 1.4.4. The ACTIVE setpoint the damper loop tracks (after G36 min/max clamping), not the design value — VAV-FC-053 compares measured flow against what the loop is currently trying to do."
+      "notes": "brick:Supply_Air_Flow_Setpoint grep-verified in Brick 1.4.4. The ACTIVE setpoint the damper loop tracks (after G36 min/max clamping), not the design value — VAV-0004 compares measured flow against what the loop is currently trying to do."
     },
     {
       "name": "zone_airflow_sp_min",
@@ -131,7 +131,7 @@
         "aspects": []
       },
       "provisional": false,
-      "notes": "brick:Min_Air_Flow_Setpoint_Limit grep-verified in Brick 1.4.4 — the configured floor, distinct from the active setpoint. VAV-FC-050 reads it as a point so the rule can watch for bad commissioning values without a BAS config export."
+      "notes": "brick:Min_Air_Flow_Setpoint_Limit grep-verified in Brick 1.4.4 — the configured floor, distinct from the active setpoint. VAV-0001 reads it as a point so the rule can watch for bad commissioning values without a BAS config export."
     },
     {
       "name": "zone_dmpr_pos",
@@ -185,7 +185,7 @@
         "aspects": []
       },
       "provisional": true,
-      "notes": "Brick 1.4.4 has no Cooling_Request class; Cooling_Demand_Sensor (verified) is the nearest reading for a continuous 0-100 demand signal. Sites on G36 discrete request COUNTS (integer requests-to-reset) should map 100 to 'importance-weighted requests at max' and note the binding; VAV-FC-051 only tests for saturation at maximum."
+      "notes": "Brick 1.4.4 has no Cooling_Request class; Cooling_Demand_Sensor (verified) is the nearest reading for a continuous 0-100 demand signal. Sites on G36 discrete request COUNTS (integer requests-to-reset) should map 100 to 'importance-weighted requests at max' and note the binding; VAV-0002 only tests for saturation at maximum."
     },
     {
       "name": "satisfied_zone_fraction",
@@ -196,7 +196,7 @@
       "brick": null,
       "s223": null,
       "provisional": true,
-      "notes": "Host-derived aggregate like the AHU dictionary's zone_reheat_fraction and zone_dmpr_pos_max: computed over sibling zones' temperatures and setpoints, range 0-1. Semantic tags belong on the underlying zone points; the aggregation (which zones count, staleness handling) is host configuration. Consumed by VAV-FC-051's most-zones-are-happy test.",
+      "notes": "Host-derived aggregate like the AHU dictionary's zone_reheat_fraction and zone_dmpr_pos_max: computed over sibling zones' temperatures and setpoints, range 0-1. Semantic tags belong on the underlying zone points; the aggregation (which zones count, staleness handling) is host configuration. Consumed by VAV-0002's most-zones-are-happy test.",
       "derived": true
     },
     {
@@ -235,7 +235,7 @@
         "aspects": []
       },
       "provisional": false,
-      "notes": "Available on many but not all boxes (NIST/PIER 2001 §5.1.4); the reheat-leak CUSUM channel (VAV-FC-103) is the only consumer — boxes without it run the reduced two-channel VPACC per the source's own fallback. EAT is approximated by the AHU's broadcast SAT per the same source."
+      "notes": "Available on many but not all boxes (NIST/PIER 2001 §5.1.4); the reheat-leak CUSUM channel (VAV-0009) is the only consumer — boxes without it run the reduced two-channel VPACC per the source's own fallback. EAT is approximated by the AHU's broadcast SAT per the same source."
     },
     {
       "name": "sat",
@@ -255,7 +255,7 @@
         ]
       },
       "provisional": false,
-      "notes": "Duplicate of ahu dict sat per the own-family lint rule. Consumed by VAV-FC-103's dT channel: the terminal's entering air temperature is approximated by the AHU SAT broadcast per NIST/PIER 2001 §5.1.4's own workaround; simulation validates the approximation's bias at < 0.005 degC (harness vavcal)."
+      "notes": "Duplicate of ahu dict sat per the own-family lint rule. Consumed by VAV-0009's dT channel: the terminal's entering air temperature is approximated by the AHU SAT broadcast per NIST/PIER 2001 §5.1.4's own workaround; simulation validates the approximation's bias at < 0.005 degC (harness vavcal)."
     },
     {
       "name": "occ_scheduled",

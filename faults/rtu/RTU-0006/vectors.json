@@ -1,0 +1,154 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 5400 },
+  "scenarios": [
+    {
+      "name": "healthy_minimum_ventilation",
+      "description": "OAF 0.15 exactly on design (oat 2 °C, rat 22 °C, mat 19 °C), occupied with the fan running — the deficit is zero and the rule is silent",
+      "inputs": { "oat": 2.0, "rat": 22.0, "mat": 19.0, "sf_status": true, "occ_schedule": true },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 5400, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_shut_no_outdoor_air",
+      "description": "The failure this rule exists for: OA damper shut, so mat tracks rat (22 °C) and the inferred fraction is 0 against a 0.15 design. Deficit 0.15 > 0.05 and the rule alarms after alarm_delay. AHU-0006 runs the same quotient with a symmetric 0.30 band, whose low side sits below a fraction of −0.15, and reads this same unit as healthy",
+      "inputs": { "oat": 2.0, "rat": 22.0, "mat": 22.0, "sf_status": true, "occ_schedule": true },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 5400, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "unoccupied_deficit_stays_clear",
+      "description": "Same shut damper, unoccupied: the reference scopes under-ventilation to occupied hours because there is nobody to under-ventilate, and the occ_schedule conjunct holds yFault down",
+      "inputs": { "oat": 2.0, "rat": 22.0, "mat": 22.0, "sf_status": true, "occ_schedule": false },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 5400, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "fan_off_deficit_stays_clear",
+      "description": "Same shut damper, occupied, fan off: with no airflow the mixing box delivers nothing to infer a fraction from, and sf_status holds yFault down",
+      "inputs": { "oat": 2.0, "rat": 22.0, "mat": 22.0, "sf_status": false, "occ_schedule": true },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 5400, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "negative_fraction_alarms",
+      "description": "mat 23 °C sits above both rat (22 °C) and oat (2 °C), so the inferred fraction is −0.05 and the deficit reads 0.20. The rule alarms: with honest sensors that is a shut damper plus duct conduction, and with a lying mat it is the reading AHU-0028 suppression exists to silence",
+      "inputs": { "oat": 2.0, "rat": 22.0, "mat": 23.0, "sf_status": true, "occ_schedule": true },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 5400, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "deficit_exactly_at_threshold",
+      "description": "Edge case: OAF 0.10 exactly (oat 2 °C, rat 22 °C, mat 20 °C), so the deficit equals oa_deficit_margin — the strict `>` means no fault",
+      "inputs": { "oat": 2.0, "rat": 22.0, "mat": 20.0, "sf_status": true, "occ_schedule": true },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 5400, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "deficit_just_over_threshold",
+      "description": "Edge case, other side: OAF 0.09 (mat 20.2 °C) puts the deficit at 0.06 and the rule alarms after alarm_delay",
+      "inputs": { "oat": 2.0, "rat": 22.0, "mat": 20.2, "sf_status": true, "occ_schedule": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "small_delta_not_evaluable",
+      "description": "NO_EVAL with the gate doing work: |oat − rat| = 2 °C (oat 20 °C, rat 22 °C) and mat 21.9 °C, so the fraction reads 0.05 and deficitBig is true — an ungated rule would alarm on a mixture the two sources cannot locate; yTempDeltaOk stays false and holds yFault down",
+      "inputs": { "oat": 20.0, "rat": 22.0, "mat": 21.9, "sf_status": true, "occ_schedule": true },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 5400, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "delta_exactly_at_threshold",
+      "description": "Edge case: |oat − rat| = 6.0 °C exactly (oat 16 °C, rat 22 °C) with the damper shut (mat 22 °C) — the strict `>` leaves the rule not evaluable, so a full ventilation deficit still reports NO_EVAL rather than healthy",
+      "inputs": { "oat": 16.0, "rat": 22.0, "mat": 22.0, "sf_status": true, "occ_schedule": true },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 5400, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "delta_just_over_threshold",
+      "description": "Edge case, other side: |oat − rat| = 6.5 °C (oat 15.5 °C, rat 22 °C) with the same shut damper — evaluable, and the deficit alarms after alarm_delay",
+      "inputs": { "oat": 15.5, "rat": 22.0, "mat": 22.0, "sf_status": true, "occ_schedule": true },
+      "expect": [
+        { "output": "yTempDeltaOk", "from_s": 0, "to_s": 5400, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "transient_deficit_clears_before_delay",
+      "description": "Transient: the damper drops to shut at t=600 and returns to minimum at t=1500 — 900 s of deficit, short of alarm_delay, so a damper stroke or a purge cycle never becomes an alarm",
+      "inputs": {
+        "oat": 2.0,
+        "rat": 22.0,
+        "mat": [
+          { "t": 0, "value": 19.0 },
+          { "t": 600, "value": 22.0 },
+          { "t": 1500, "value": 19.0 }
+        ],
+        "sf_status": true,
+        "occ_schedule": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "occupancy_start_restarts_persistence",
+      "description": "The deficit is present from t=0 but the building is unoccupied until t=1200, so the 30-minute clock starts at occupancy rather than at the deficit — the alarm lands at 3000 s, not 1800 s",
+      "inputs": {
+        "oat": 2.0,
+        "rat": 22.0,
+        "mat": 22.0,
+        "sf_status": true,
+        "occ_schedule": [
+          { "t": 0, "value": false },
+          { "t": 1200, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2700, "equals": false },
+        { "output": "yFault", "from_s": 3300, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "recovery_clears_alarm",
+      "description": "Recovery: the shut damper alarms after alarm_delay, then reopens to design minimum at t=3000 (OAF 0.15) — yFault drops on that tick, with no hold-off",
+      "inputs": {
+        "oat": 2.0,
+        "rat": 22.0,
+        "mat": [
+          { "t": 0, "value": 22.0 },
+          { "t": 3000, "value": 19.0 }
+        ],
+        "sf_status": true,
+        "occ_schedule": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 2700, "equals": true },
+        { "output": "yFault", "from_s": 3000, "to_s": 5400, "equals": false }
+      ]
+    }
+  ]
+}

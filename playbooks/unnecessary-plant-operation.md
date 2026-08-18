@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | SYS-FC-050 (CHW flow, no cooling demand), SYS-FC-051 (HW flow, no heating demand), CLU-07 |
+| **Applies to** | SYS-0001 (CHW flow, no cooling demand), SYS-0002 (HW flow, no heating demand), CLU-07 |
 | **Fix complexity** | Remote fix (80%) · On-site (20%) |
 | **Typical time** | 15–30 min remote |
 | **Typical cost** | $0 remote / $200–$800 on-site (valve repair) |
@@ -14,8 +14,8 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 171–172).
 
 1. Confirm CHW or HW flow is present: flow sensor reads above the no-demand
    threshold (typically 10% of design flow).
-2. Confirm that all served AHU valves are closed: every cooling (SYS-FC-050)
-   or heating (SYS-FC-051) valve command is below 2%.
+2. Confirm that all served AHU valves are closed: every cooling (SYS-0001)
+   or heating (SYS-0002) valve command is below 2%.
 3. Check whether the flow is from a leaking bypass valve, a leaking coil
    valve, or simply the pump running when it shouldn't be.
 4. Verify the condition persists for at least 15 minutes — brief transients

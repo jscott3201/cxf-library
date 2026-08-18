@@ -1,0 +1,857 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 300,
+    "horizon_s": 21600
+  },
+  "scenarios": [
+    {
+      "name": "frozen_sensor_with_equipment_running",
+      "description": "The plain fault: the reading never moves while the equipment runs. The alarm lands at 8100 s = flatline_window + alarm_delay measured from t = 0, and that arrival time is itself the pin for Discrete.Sampler emitting the LIVE input on its first tick. A UnitDelay-style y_start = 0 artifact would have made the first baseline 0.0, held stillBand false until the t = 7200 s re-arm, and pushed the alarm out to 15300 s.",
+      "inputs": {
+        "sensor_value": 14.0,
+        "equip_active": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 8400,
+          "to_s": 21600,
+          "equals": true
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 0,
+          "to_s": 6900,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 7500,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "flat_signal_on_idle_equipment_is_not_a_fault",
+      "description": "The gate's whole purpose: an identical frozen reading on stopped equipment is normal, not a sensor fault. yWindowOk never rises, so the host reads NO_EVAL rather than a healthy sensor.",
+      "inputs": {
+        "sensor_value": 14.0,
+        "equip_active": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "equipment_stop_restarts_the_window",
+      "description": "The gate sits inside the dwell, so the window is a window of RUNNING time: a 600 s stop at 5400 s discards the elapsed 5400 s rather than pausing it. The clock restarts at 6000 s, stillHeld matures at 13200 s and the alarm lands at 14100 s.",
+      "inputs": {
+        "sensor_value": 14.0,
+        "equip_active": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 5400,
+            "value": false
+          },
+          {
+            "t": 6000,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 13800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 14400,
+          "to_s": 21600,
+          "equals": true
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 0,
+          "to_s": 12900,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 13500,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "wobble_inside_the_band_still_asserts",
+      "description": "The band is not decorative. A reading stepping 0.15 units either side of its baseline - quantisation and transmitter noise, not process movement - still reads as flatline and alarms on the same 8100 s schedule as a bit-frozen signal. The wobble period divides flatline_window, so every re-arm lands on the low value and the baseline is stable across windows.",
+      "inputs": {
+        "sensor_value": [
+          {
+            "t": 0,
+            "value": 14.0
+          },
+          {
+            "t": 1800,
+            "value": 14.15
+          },
+          {
+            "t": 3600,
+            "value": 14.0
+          },
+          {
+            "t": 5400,
+            "value": 14.15
+          },
+          {
+            "t": 7200,
+            "value": 14.0
+          },
+          {
+            "t": 9000,
+            "value": 14.15
+          },
+          {
+            "t": 10800,
+            "value": 14.0
+          },
+          {
+            "t": 12600,
+            "value": 14.15
+          },
+          {
+            "t": 14400,
+            "value": 14.0
+          },
+          {
+            "t": 16200,
+            "value": 14.15
+          },
+          {
+            "t": 18000,
+            "value": 14.0
+          },
+          {
+            "t": 19800,
+            "value": 14.15
+          },
+          {
+            "t": 21600,
+            "value": 14.0
+          }
+        ],
+        "equip_active": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 8400,
+          "to_s": 21600,
+          "equals": true
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 0,
+          "to_s": 6900,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 7500,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "band_edge_exactly_on_the_line",
+      "description": "stillBand is a strict Reals.LessThreshold: a deviation of exactly flatline_band reads as MOVING, so the rule stays silent. Both values are dyadic, so 14.25 - 14.0 is exactly 0.25 in IEEE-754 and the comparison really does sit on the line rather than near it.",
+      "inputs": {
+        "sensor_value": [
+          {
+            "t": 0,
+            "value": 14.0
+          },
+          {
+            "t": 1800,
+            "value": 14.25
+          },
+          {
+            "t": 3600,
+            "value": 14.0
+          },
+          {
+            "t": 5400,
+            "value": 14.25
+          },
+          {
+            "t": 7200,
+            "value": 14.0
+          },
+          {
+            "t": 9000,
+            "value": 14.25
+          },
+          {
+            "t": 10800,
+            "value": 14.0
+          },
+          {
+            "t": 12600,
+            "value": 14.25
+          },
+          {
+            "t": 14400,
+            "value": 14.0
+          },
+          {
+            "t": 16200,
+            "value": 14.25
+          },
+          {
+            "t": 18000,
+            "value": 14.0
+          },
+          {
+            "t": 19800,
+            "value": 14.25
+          },
+          {
+            "t": 21600,
+            "value": 14.0
+          }
+        ],
+        "equip_active": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 0,
+          "to_s": 6900,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 7500,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "band_edge_a_hair_under",
+      "description": "0.001 below the line: 14.249 against a 14.0 baseline is inside the band, so the same waveform that stayed silent at exactly 0.25 now alarms at 8100 s.",
+      "inputs": {
+        "sensor_value": [
+          {
+            "t": 0,
+            "value": 14.0
+          },
+          {
+            "t": 1800,
+            "value": 14.249
+          },
+          {
+            "t": 3600,
+            "value": 14.0
+          },
+          {
+            "t": 5400,
+            "value": 14.249
+          },
+          {
+            "t": 7200,
+            "value": 14.0
+          },
+          {
+            "t": 9000,
+            "value": 14.249
+          },
+          {
+            "t": 10800,
+            "value": 14.0
+          },
+          {
+            "t": 12600,
+            "value": 14.249
+          },
+          {
+            "t": 14400,
+            "value": 14.0
+          },
+          {
+            "t": 16200,
+            "value": 14.249
+          },
+          {
+            "t": 18000,
+            "value": 14.0
+          },
+          {
+            "t": 19800,
+            "value": 14.249
+          },
+          {
+            "t": 21600,
+            "value": 14.0
+          }
+        ],
+        "equip_active": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 8400,
+          "to_s": 21600,
+          "equals": true
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 0,
+          "to_s": 6900,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 7500,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "band_edge_a_hair_over",
+      "description": "0.001 above the line: 14.251 clears the band, stillBand drops on every high half-cycle and the dwell never completes.",
+      "inputs": {
+        "sensor_value": [
+          {
+            "t": 0,
+            "value": 14.0
+          },
+          {
+            "t": 1800,
+            "value": 14.251
+          },
+          {
+            "t": 3600,
+            "value": 14.0
+          },
+          {
+            "t": 5400,
+            "value": 14.251
+          },
+          {
+            "t": 7200,
+            "value": 14.0
+          },
+          {
+            "t": 9000,
+            "value": 14.251
+          },
+          {
+            "t": 10800,
+            "value": 14.0
+          },
+          {
+            "t": 12600,
+            "value": 14.251
+          },
+          {
+            "t": 14400,
+            "value": 14.0
+          },
+          {
+            "t": 16200,
+            "value": 14.251
+          },
+          {
+            "t": 18000,
+            "value": 14.0
+          },
+          {
+            "t": 19800,
+            "value": 14.251
+          },
+          {
+            "t": 21600,
+            "value": 14.0
+          }
+        ],
+        "equip_active": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 0,
+          "to_s": 6900,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 7500,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "healthy_sensor_tracking_the_process",
+      "description": "The ordinary healthy case - a reading swinging 2.0 units as the process moves under control. Never silent for a full window, never alarms, and yWindowOk is true throughout the run so the silence is a verdict rather than an unasked question.",
+      "inputs": {
+        "sensor_value": [
+          {
+            "t": 0,
+            "value": 14.0
+          },
+          {
+            "t": 1800,
+            "value": 16.0
+          },
+          {
+            "t": 3600,
+            "value": 14.0
+          },
+          {
+            "t": 5400,
+            "value": 16.0
+          },
+          {
+            "t": 7200,
+            "value": 14.0
+          },
+          {
+            "t": 9000,
+            "value": 16.0
+          },
+          {
+            "t": 10800,
+            "value": 14.0
+          },
+          {
+            "t": 12600,
+            "value": 16.0
+          },
+          {
+            "t": 14400,
+            "value": 14.0
+          },
+          {
+            "t": 16200,
+            "value": 16.0
+          },
+          {
+            "t": 18000,
+            "value": 14.0
+          },
+          {
+            "t": 19800,
+            "value": 16.0
+          },
+          {
+            "t": 21600,
+            "value": 14.0
+          }
+        ],
+        "equip_active": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 0,
+          "to_s": 6900,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 7500,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "signal_moves_on_the_maturity_tick",
+      "description": "Delay edge from below: the reading is frozen from t = 0 and jumps 6.0 units at exactly 8100 s, the tick persist matures on. The input is false when the timer comes due, so a full window plus alarm_delay of stillness is never reported.",
+      "inputs": {
+        "sensor_value": [
+          {
+            "t": 0,
+            "value": 14.0
+          },
+          {
+            "t": 8100,
+            "value": 20.0
+          }
+        ],
+        "equip_active": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 0,
+          "to_s": 6900,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 7500,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "signal_moves_one_tick_after_maturity",
+      "description": "Delay edge from above: the same freeze held 300 s longer asserts at exactly 8100 s and clears at 8400 s. The pair makes the T + delayTime boundary observable rather than assumed. After the jump the rule is blind until the next re-arm at 14400 s re-baselines onto 20.0, and the fresh dwell cannot mature before the horizon.",
+      "inputs": {
+        "sensor_value": [
+          {
+            "t": 0,
+            "value": 14.0
+          },
+          {
+            "t": 8400,
+            "value": 20.0
+          }
+        ],
+        "equip_active": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 8100,
+          "to_s": 8100,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 8700,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 0,
+          "to_s": 6900,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 7500,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "slow_drift_reads_as_flatline",
+      "description": "A documented limit, pinned rather than left for a site to find: a reading climbing 0.05 units every 1800 s never travels more than 0.15 from its baseline inside one window, so the rule calls it flatline and alarms at 8100 s. SYS-0009 cannot separate a frozen transmitter from one moving slower than flatline_band per flatline_window; both are sensor findings, and naming which is the redundancy-pair rule's job.",
+      "inputs": {
+        "sensor_value": [
+          {
+            "t": 0,
+            "value": 14.0
+          },
+          {
+            "t": 1800,
+            "value": 14.05
+          },
+          {
+            "t": 3600,
+            "value": 14.1
+          },
+          {
+            "t": 5400,
+            "value": 14.15
+          },
+          {
+            "t": 7200,
+            "value": 14.2
+          },
+          {
+            "t": 9000,
+            "value": 14.25
+          },
+          {
+            "t": 10800,
+            "value": 14.3
+          },
+          {
+            "t": 12600,
+            "value": 14.35
+          },
+          {
+            "t": 14400,
+            "value": 14.4
+          },
+          {
+            "t": 16200,
+            "value": 14.45
+          },
+          {
+            "t": 18000,
+            "value": 14.5
+          },
+          {
+            "t": 19800,
+            "value": 14.55
+          },
+          {
+            "t": 21600,
+            "value": 14.6
+          }
+        ],
+        "equip_active": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 8400,
+          "to_s": 21600,
+          "equals": true
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 0,
+          "to_s": 6900,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 7500,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "rearm_stillness_never_matures",
+      "description": "The Sampler re-arm artifact: at every sample instant the block emits the live input, so the deviation is exactly zero and stillBand reads true no matter how hard the signal is moving. Here the reading climbs 6.0 units every 1800 s and still shows a burst of apparent stillness after each re-arm; the burst is bounded by the sample grid, the dwell needs a full window, and yFault never rises.",
+      "inputs": {
+        "sensor_value": [
+          {
+            "t": 0,
+            "value": 14.0
+          },
+          {
+            "t": 1800,
+            "value": 20.0
+          },
+          {
+            "t": 3600,
+            "value": 26.0
+          },
+          {
+            "t": 5400,
+            "value": 32.0
+          },
+          {
+            "t": 7200,
+            "value": 38.0
+          },
+          {
+            "t": 9000,
+            "value": 44.0
+          },
+          {
+            "t": 10800,
+            "value": 50.0
+          },
+          {
+            "t": 12600,
+            "value": 56.0
+          },
+          {
+            "t": 14400,
+            "value": 62.0
+          },
+          {
+            "t": 16200,
+            "value": 68.0
+          },
+          {
+            "t": 18000,
+            "value": 74.0
+          },
+          {
+            "t": 19800,
+            "value": 80.0
+          },
+          {
+            "t": 21600,
+            "value": 86.0
+          }
+        ],
+        "equip_active": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 0,
+          "to_s": 6900,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 7500,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "equipment_stops_on_the_window_tick",
+      "description": "Window delay edge from below, on the evaluability output: the equipment stops at exactly 7200 s, the tick windowOk matures on. The input is false when the timer comes due, so the rule never claims to have had a complete window of running time.",
+      "inputs": {
+        "sensor_value": 14.0,
+        "equip_active": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 7200,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "equipment_stops_one_tick_after_the_window_tick",
+      "description": "Window delay edge from above: the same run held 300 s longer sets yWindowOk for exactly one tick at 7200 s. yFault stays false because persist still owed 900 s when the gate dropped, which also pins that a true yFault implies a true yWindowOk and never the reverse.",
+      "inputs": {
+        "sensor_value": 14.0,
+        "equip_active": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 7500,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 0,
+          "to_s": 6900,
+          "equals": false
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 7200,
+          "to_s": 7200,
+          "equals": true
+        },
+        {
+          "output": "yWindowOk",
+          "from_s": 7800,
+          "to_s": 21600,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

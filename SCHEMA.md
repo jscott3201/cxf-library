@@ -23,21 +23,27 @@ cxf-library/
 ```
 
 Equipment family keys: `ahu`, `vav`, `rtu`, `hp`, `fcu`, `chw`, `hw`, `erv`,
-`pmp`, `vfd`, `sys`, `tower`. Fault IDs follow `{EQUIP}-FC-{NNN}`; the folder
-name is the fault ID, uppercase. The number encodes the rule's provenance
-band (numbering within a band is arbitrary and IDs are never reused):
+`pmp`, `vfd`, `sys`, `tower`. Fault IDs live in a general namespace:
+`{EQUIP}-{NNNN}` — uppercase family key, four digits, contiguous from `0001`
+per family in authoring order. The folder name is the fault ID. The number
+carries no semantic meaning; provenance lives in each card's `source:` list.
+IDs are stable identifiers and are never reused; renames are exceptional (the
+CXF does not embed the fault ID, so a rename never churns `content_id`, but it
+does break external links and every cross-reference).
 
-| Band | Meaning |
-|---|---|
-| 001–049 | Transcribed from the HVAC FDD Reference / G36-derived; IDs preserve the source's numbering. |
-| 050–099 | Library expansion — research-, standards-, or simulation-backed rules of **any** method (threshold `rule` or `statistical`). |
-| 100–149 | Advanced statistical — sequential/accumulating (e.g. CUSUM) or fleet-relative (e.g. neighbor-median) methods. `method: statistical` required (lint-enforced). |
-| 150–199 | ML-based methods (reserved). |
+**`faults/registry.json`** (`cxf-library/registry/v1`) is the library-wide
+fault-code map: one row per rule — `id`, `family`, `name`, `method`, `status`,
+and `legacy_id` (the rule's pre-2026-08-18 `{EQUIP}-FC-{NNN}` code, for
+continuity with older references). The registry is orchestrator-maintained
+like `clusters/clusters.json`, and `tools/lint/registry.py` enforces in CI
+that it stays a bijection with the fault dirs, that IDs match the format and
+their folder, and that names/statuses match the cards. When a card is added,
+renamed, or changes status, the registry row moves with it in the same PR.
 
-Band placement is set at authoring time and IDs are stable identifiers —
-renames are exceptional (the CXF does not embed the fault ID, so a rename
-never churns `content_id`, but it does break external links and every
-cross-reference).
+Reserved-but-unauthored IDs (a planned rule a README or card already names)
+are allowed: they appear in prose and index tables marked planned/deferred,
+never in the registry, and the next authored rule in that family takes the
+next free number, honoring any reservation.
 
 ## Design stance (why the pieces split this way)
 
@@ -128,7 +134,7 @@ the harness README documents mapping proxies and gating. Cards without
 the block simply have not been swept yet.
 
 **Card style (conciseness contract, adopted 2026-08-18; exemplar:
-`faults/ahu/AHU-FC-050/card.md`).** Cards are clear, concise, and outlay the
+`faults/ahu/AHU-0016/card.md`).** Cards are clear, concise, and outlay the
 conditions — they are specifications, not design journals. Targets:
 Description ≤ ~10 lines; Detection Logic prose ≤ ~15 lines beyond the
 equation and diagram (timing semantics, strictness, deployer must-knows
@@ -166,8 +172,8 @@ Target dialect: the open-control engine's composite subset
   card documents that false means NO_EVAL — the host must consult it before
   interpreting `yFault`. Secondary outputs come in TWO kinds and the card's
   `outputs` prose must say which: **evaluability flags** (`y…Ok` — false
-  means NO_EVAL) and **sub-condition/direction flags** (e.g. SYS-FC-055's
-  `yBias`/`yNoise`, SYS-FC-057's direction flags — diagnostic detail only;
+  means NO_EVAL) and **sub-condition/direction flags** (e.g. SYS-0006's
+  `yBias`/`yNoise`, SYS-0008's direction flags — diagnostic detail only;
   false never means NO_EVAL). Hosts must not treat every non-`yFault`
   boolean as an evaluability gate.
 - No semantic annotations in v1 (see design stance). No `oce.*` class aliases.
@@ -236,7 +242,7 @@ Target dialect: the open-control engine's composite subset
   the same graph deploys against many real points. Role entries carry
   `brick: null, s223: null`; the host's instance configuration records each
   binding, and that record is also what resolves the rule's `adjudicates`
-  target and drives its NO_EVAL fan-out. The reference's own SYS-FC-054 card
+  target and drives its NO_EVAL fan-out. The reference's own SYS-0005 card
   uses the same role form ("varies by application").
 - `derived: true` marks host-computed points rather than physical ones — both
   aggregates (a max or fraction across zones) and physical transforms (e.g.

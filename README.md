@@ -28,9 +28,9 @@ every vector green and the schema lint passes every cross-contract check; the
 engine's exported `content_id` is recorded in the card so the verified bytes
 are identifiable forever.
 
-Here is a real one — AHU-FC-050, simultaneous heating and cooling:
+Here is a real one — AHU-0016, simultaneous heating and cooling:
 
-![AHU-FC-050 block graph](faults/ahu/AHU-FC-050/diagram.svg)
+![AHU-0016 block graph](faults/ahu/AHU-0016/diagram.svg)
 
 ## What's inside
 
@@ -79,7 +79,7 @@ transcription gaps and adopted defaults called out explicitly.
 $EDITOR SCHEMA.md
 
 # run one rule's vectors against the engine (sibling checkout of open-control required)
-cargo run --manifest-path tools/verify/Cargo.toml -- faults/ahu/AHU-FC-050
+cargo run --manifest-path tools/verify/Cargo.toml -- faults/ahu/AHU-0016
 
 # run everything
 cargo run --manifest-path tools/verify/Cargo.toml -- --all

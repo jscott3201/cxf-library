@@ -1,0 +1,202 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 7200 },
+  "scenarios": [
+    {
+      "name": "both_on_occupied",
+      "description": "Reference test-vector row 1 (sf ON, ef ON, occupied): aligned, no fault.",
+      "inputs": { "sf_status": true, "ef_status": true, "occ_scheduled": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yExhaustWithoutSupply", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "ySupplyWithoutExhaust", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "both_off_unoccupied",
+      "description": "Reference test-vector row 2 (sf OFF, ef OFF, unoccupied): aligned, no fault.",
+      "inputs": { "sf_status": false, "ef_status": false, "occ_scheduled": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yExhaustWithoutSupply", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "ySupplyWithoutExhaust", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "exhaust_on_supply_off",
+      "description": "Reference test-vector row 3 (sf OFF, ef ON, unoccupied): condition 1. The branch sustains at 1800 s and the alarm follows 900 s later at 2700 s — the chained delays sum exactly.",
+      "inputs": { "sf_status": false, "ef_status": true, "occ_scheduled": false },
+      "expect": [
+        { "output": "yExhaustWithoutSupply", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yExhaustWithoutSupply", "from_s": 1800, "to_s": 7200, "equals": true },
+        { "output": "ySupplyWithoutExhaust", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 2640, "equals": false },
+        { "output": "yFault", "from_s": 2700, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "supply_on_exhaust_off_occupied",
+      "description": "Reference test-vector row 4 (sf ON, ef OFF, occupied): condition 2, same 1800 + 900 s timing on the mirror branch. The two flags are mutually exclusive by construction.",
+      "inputs": { "sf_status": true, "ef_status": false, "occ_scheduled": true },
+      "expect": [
+        { "output": "ySupplyWithoutExhaust", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "ySupplyWithoutExhaust", "from_s": 1800, "to_s": 7200, "equals": true },
+        { "output": "yExhaustWithoutSupply", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 2640, "equals": false },
+        { "output": "yFault", "from_s": 2700, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "supply_on_exhaust_off_unoccupied",
+      "description": "The occupancy conjunct blocking on its own — the asymmetry between the two conditions. Supply running without exhaust is only a fault during occupied hours; unoccupied it is a normal night-cycle or warmup state.",
+      "inputs": { "sf_status": true, "ef_status": false, "occ_scheduled": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yExhaustWithoutSupply", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "ySupplyWithoutExhaust", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "both_off_during_occupied_hours",
+      "description": "Both fans down inside the occupied schedule. That is somebody else's fault (AHU-0026 and friends) — this rule judges alignment, not whether the equipment should be running at all.",
+      "inputs": { "sf_status": false, "ef_status": false, "occ_scheduled": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yExhaustWithoutSupply", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "ySupplyWithoutExhaust", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "exhaust_stops_on_the_sustain_tick",
+      "description": "The misalignment_duration edge from below: the exhaust fan stops at exactly 1800 s, so the sustain never matures and neither does anything downstream of it.",
+      "inputs": {
+        "sf_status": false,
+        "ef_status": [
+          { "t": 0, "value": true },
+          { "t": 1800, "value": false }
+        ],
+        "occ_scheduled": false
+      },
+      "expect": [
+        { "output": "yExhaustWithoutSupply", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "exhaust_stops_one_tick_after_the_sustain",
+      "description": "The regression test for keeping both published delays: a 31-minute misalignment matures misalignment_duration (one tick of yExhaustWithoutSupply at 1800 s) and dies immediately, so the 900 s alarm hold never runs. A rule that used misalignment_duration alone, with no separate alarm hold, would have alarmed here.",
+      "inputs": {
+        "sf_status": false,
+        "ef_status": [
+          { "t": 0, "value": true },
+          { "t": 1860, "value": false }
+        ],
+        "occ_scheduled": false
+      },
+      "expect": [
+        { "output": "yExhaustWithoutSupply", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yExhaustWithoutSupply", "from_s": 1800, "to_s": 1800, "equals": true },
+        { "output": "yExhaustWithoutSupply", "from_s": 1860, "to_s": 7200, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "misalignment_clears_one_tick_before_the_alarm",
+      "description": "The alarm edge from below: the exhaust fan stops at 2640 s, one tick short of the 2700 s the chain needs, and the fault is never reported.",
+      "inputs": {
+        "sf_status": false,
+        "ef_status": [
+          { "t": 0, "value": true },
+          { "t": 2640, "value": false }
+        ],
+        "occ_scheduled": false
+      },
+      "expect": [
+        { "output": "yExhaustWithoutSupply", "from_s": 1800, "to_s": 2580, "equals": true },
+        { "output": "yExhaustWithoutSupply", "from_s": 2640, "to_s": 7200, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "misalignment_clears_one_tick_after_the_alarm",
+      "description": "The same edge from above: one tick of yFault at 2700 s, then clear.",
+      "inputs": {
+        "sf_status": false,
+        "ef_status": [
+          { "t": 0, "value": true },
+          { "t": 2760, "value": false }
+        ],
+        "occ_scheduled": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2640, "equals": false },
+        { "output": "yFault", "from_s": 2700, "to_s": 2700, "equals": true },
+        { "output": "yFault", "from_s": 2760, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "supply_fan_starts_and_realigns",
+      "description": "Recovery: the exhaust-only alarm asserts at 2700 s and the AHU starts at 3600 s. Both fans running is aligned, so every output drops on that tick — TrueDelay delays the rising edge only.",
+      "inputs": {
+        "ef_status": true,
+        "sf_status": [
+          { "t": 0, "value": false },
+          { "t": 3600, "value": true }
+        ],
+        "occ_scheduled": false
+      },
+      "expect": [
+        { "output": "yExhaustWithoutSupply", "from_s": 1800, "to_s": 3540, "equals": true },
+        { "output": "yExhaustWithoutSupply", "from_s": 3600, "to_s": 7200, "equals": false },
+        { "output": "yFault", "from_s": 2700, "to_s": 3540, "equals": true },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "occupancy_starts_the_supply_only_clock",
+      "description": "The supply-only branch is armed by the schedule, not by the fans. An AHU running with its exhaust off is silent overnight and starts counting when the occupied period opens at 1800 s: sustain at 3600 s, alarm at 4500 s.",
+      "inputs": {
+        "sf_status": true,
+        "ef_status": false,
+        "occ_scheduled": [
+          { "t": 0, "value": false },
+          { "t": 1800, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "ySupplyWithoutExhaust", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "ySupplyWithoutExhaust", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 4440, "equals": false },
+        { "output": "yFault", "from_s": 4500, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "direction_alternates_so_neither_branch_sustains",
+      "description": "The consequence of sustaining each condition separately rather than sustaining their Or. The pair is misaligned on every single tick of this two-hour run, but it flips direction every 20 minutes, so neither branch ever reaches misalignment_duration and nothing is reported. A TrueDelay(1800) placed on Or(C1, C2) instead would have alarmed at 2700 s.",
+      "inputs": {
+        "occ_scheduled": true,
+        "ef_status": [
+          { "t": 0, "value": true },
+          { "t": 1200, "value": false },
+          { "t": 2400, "value": true },
+          { "t": 3600, "value": false },
+          { "t": 4800, "value": true },
+          { "t": 6000, "value": false }
+        ],
+        "sf_status": [
+          { "t": 0, "value": false },
+          { "t": 1200, "value": true },
+          { "t": 2400, "value": false },
+          { "t": 3600, "value": true },
+          { "t": 4800, "value": false },
+          { "t": 6000, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yExhaustWithoutSupply", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "ySupplyWithoutExhaust", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    }
+  ]
+}

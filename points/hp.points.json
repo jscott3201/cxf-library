@@ -41,7 +41,7 @@
         "aspects": []
       },
       "provisional": false,
-      "notes": "brick:Thermal_Power_Sensor grep-verified in Brick 1.4.4. Usually a host-computed virtual point (airflow x cp x deltaT or refrigerant-side); HP-FC-050 consumes it as the COP numerator, and the fit quality of the host's baseline depends on it — treat its provenance as part of the baseline R^2 precondition."
+      "notes": "brick:Thermal_Power_Sensor grep-verified in Brick 1.4.4. Usually a host-computed virtual point (airflow x cp x deltaT or refrigerant-side); HP-0001 consumes it as the COP numerator, and the fit quality of the host's baseline depends on it — treat its provenance as part of the baseline R^2 precondition."
     },
     {
       "name": "elec_power",
@@ -99,7 +99,7 @@
         ]
       },
       "provisional": false,
-      "notes": "Brick Discharge_Air_Temperature_Sensor is brick:aliasOf this class. 223P pattern verbatim from reference instance MultipleZoneAhu-sa-temp; medium comes from hasMedium on the owning ConnectionPoint. [HP dictionary] Brick class and 223P pattern carried over (equipment-independent); for HP-FC-052 the discharge temperature is the reversing-valve witness."
+      "notes": "Brick Discharge_Air_Temperature_Sensor is brick:aliasOf this class. 223P pattern verbatim from reference instance MultipleZoneAhu-sa-temp; medium comes from hasMedium on the owning ConnectionPoint. [HP dictionary] Brick class and 223P pattern carried over (equipment-independent); for HP-0003 the discharge temperature is the reversing-valve witness."
     },
     {
       "name": "comp_status",
@@ -118,7 +118,7 @@
         "enumerationkind": "Binary-OnOff"
       },
       "provisional": true,
-      "notes": "Brick 1.4.4 has no Compressor_Run_Status class; the honest mapping is the generic On_Off_Status attached via isPointOf to brick:Compressor (class verified). On multi-compressor units, rules that ask whether ANY compressor is running (RTU-FC-052) may bind the OR of the individual statuses; RTU-FC-050 counts rising edges, and an OR UNDERCOUNTS cycling — a lag-compressor start while the lead is already running never moves the OR, so a two-stage unit can short-cycle its lag circuit and read healthy. Bind RTU-FC-050 per compressor. 223P pattern mirrors sf_status's Binary-OnOff enumeration; no packaged-unit reference instance checked. [HP dictionary] Brick class and 223P pattern carried over (equipment-independent); same per-compressor binding caveat as RTU-FC-050."
+      "notes": "Brick 1.4.4 has no Compressor_Run_Status class; the honest mapping is the generic On_Off_Status attached via isPointOf to brick:Compressor (class verified). On multi-compressor units, rules that ask whether ANY compressor is running (RTU-0003) may bind the OR of the individual statuses; RTU-0001 counts rising edges, and an OR UNDERCOUNTS cycling — a lag-compressor start while the lead is already running never moves the OR, so a two-stage unit can short-cycle its lag circuit and read healthy. Bind RTU-0001 per compressor. 223P pattern mirrors sf_status's Binary-OnOff enumeration; no packaged-unit reference instance checked. [HP dictionary] Brick class and 223P pattern carried over (equipment-independent); same per-compressor binding caveat as RTU-0001."
     },
     {
       "name": "defrost_status",
@@ -136,7 +136,7 @@
         "aspects": []
       },
       "provisional": true,
-      "notes": "Brick 1.4.4 has no Defrost_Status class (grep-verified absent); bind the BAS/unit defrost-active flag and tag the generic Status pattern. Sampling caveat for HP-FC-051: a defrost cycle shorter than the host tick is invisible to the edge counter — tick well below the ~5-10 min cycle length."
+      "notes": "Brick 1.4.4 has no Defrost_Status class (grep-verified absent); bind the BAS/unit defrost-active flag and tag the generic Status pattern. Sampling caveat for HP-0002: a defrost cycle shorter than the host tick is invisible to the edge counter — tick well below the ~5-10 min cycle length."
     },
     {
       "name": "mode_command",
@@ -154,7 +154,7 @@
         "aspects": []
       },
       "provisional": true,
-      "notes": "brick:Mode_Command grep-verified in Brick 1.4.4. The 1/2 encoding is this library's convention (expected_mode precedent); HP-FC-052 exposes both codes as rule params so hosts with their own enum rebind without editing the graph."
+      "notes": "brick:Mode_Command grep-verified in Brick 1.4.4. The 1/2 encoding is this library's convention (expected_mode precedent); HP-0003 exposes both codes as rule params so hosts with their own enum rebind without editing the graph."
     },
     {
       "name": "suction_temp",
@@ -258,7 +258,7 @@
         ]
       },
       "provisional": true,
-      "notes": "No Brick 1.4.4 class models refrigerant-line temperatures (suction_temp precedent; discharge-AIR classes are the wrong medium). Refrigerant side, hot-gas line between compressor and reversing valve. Consumed by the reversing-valve internal-leakage rule (HP-FC-055): NIST SP 1087 (2008) found leakage raises discharge and evaporating temperature while condensing temperature and subcooling fall, with superheat unaffected."
+      "notes": "No Brick 1.4.4 class models refrigerant-line temperatures (suction_temp precedent; discharge-AIR classes are the wrong medium). Refrigerant side, hot-gas line between compressor and reversing valve. Consumed by the reversing-valve internal-leakage rule (HP-0006): NIST SP 1087 (2008) found leakage raises discharge and evaporating temperature while condensing temperature and subcooling fall, with superheat unaffected."
     }
   ]
 }

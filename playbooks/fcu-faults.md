@@ -2,23 +2,23 @@
 
 | | |
 |---|---|
-| **Applies to** | FCU-FC-001 (cycling), FCU-FC-002 (SAT low heating), FCU-FC-003 (SAT high cooling), FCU-FC-004 (cooling leak), FCU-FC-005 (heating leak) |
+| **Applies to** | FCU-0001 (cycling), FCU-0002 (SAT low heating), FCU-0003 (SAT high cooling), FCU-0004 (cooling leak), FCU-0005 (heating leak) |
 | **Fix complexity** | Remote fix (cycling/leak detection) · On-site (valve replacement) |
 | **Typical time** | 15 min remote / 1–2 h on-site per unit |
 | **Typical cost** | $0 remote / $150–$600 per valve replacement |
-| **Energy impact** | EEM-03 (fix leaking valves): 0.5–5% site energy in cold climates. FCU faults are insidious — each unit wastes a small amount, but hotels and apartments may have hundreds of FCUs. Leaking valves (FCU-FC-004/005) are classified as CRITICAL_WASTE because they represent energy being added and removed simultaneously at the zone level. |
+| **Energy impact** | EEM-03 (fix leaking valves): 0.5–5% site energy in cold climates. FCU faults are insidious — each unit wastes a small amount, but hotels and apartments may have hundreds of FCUs. Leaking valves (FCU-0004/FCU-0005) are classified as CRITICAL_WASTE because they represent energy being added and removed simultaneously at the zone level. |
 
 Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 171–172).
 
 ## Step 1 — Verify the fault
 
-1. **Excessive cycling (FCU-FC-001):** count operating state transitions per
+1. **Excessive cycling (FCU-0001):** count operating state transitions per
    hour — more than 7/hr indicates a problem. The most common cause is a
    narrow deadband between the heating and cooling setpoints.
-2. **SAT deviations (FCU-FC-002/003):** confirm SAT is below setpoint at full
+2. **SAT deviations (FCU-0002/FCU-0003):** confirm SAT is below setpoint at full
    heating (FC-002) or above setpoint at full cooling (FC-003). Rule out
    plant-side issues first — is the HW/CHW supply temperature adequate?
-3. **Leaking valves (FCU-FC-004/005):** with the valve commanded to 0%,
+3. **Leaking valves (FCU-0004/FCU-0005):** with the valve commanded to 0%,
    measure the temperature drop (cooling) or rise (heating) across the coil.
    Any measurable temperature change when the valve is commanded closed
    confirms a leak. In multi-story buildings, check gravity circulation: hot
