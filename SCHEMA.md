@@ -23,7 +23,7 @@ cxf-library/
 ```
 
 Equipment family keys: `ahu`, `vav`, `rtu`, `hp`, `fcu`, `chw`, `hw`, `erv`,
-`pmp`, `vfd`, `sys`. Fault IDs follow `{EQUIP}-FC-{NNN}` (001–049 G36-derived,
+`pmp`, `vfd`, `sys`, `tower`. Fault IDs follow `{EQUIP}-FC-{NNN}` (001–049 G36-derived,
 050–099 research-backed, 100–149 advanced statistical, 150–199 ML) per the HVAC
 FDD Reference; folder name is the fault ID, uppercase.
 

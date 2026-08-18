@@ -77,7 +77,8 @@
       "members": [
         "CHW-FC-051",
         "CHW-FC-052",
-        "CHW-FC-053"
+        "CHW-FC-053",
+        "CHW-FC-054"
       ],
       "playbook": "chiller-efficiency",
       "prevalence": null,
@@ -121,6 +122,19 @@
       "playbook": "sensor-drift",
       "prevalence": "~15%",
       "energy_impact": "prevents false alarms; sensor-dependent"
+    },
+    {
+      "id": "CLU-10",
+      "name": "Condenser-Side Degradation",
+      "description": "Tower heat-rejection capability loss and chiller condenser fouling share causes (scale, fouling, airflow/waterflow deficiency) and one investigation path: the tower-side vs tube-side split. Fixing the condenser-side root typically clears the chiller efficiency symptom (CLU-06 overlap via CHW-FC-054).",
+      "trigger": "TOWER-FC-050",
+      "members": [
+        "TOWER-FC-051",
+        "CHW-FC-054"
+      ],
+      "playbook": "cooling-tower-performance",
+      "prevalence": "unpublished (library-authored family)",
+      "energy_impact": "~2-4% chiller power per degC of added lift (BEE 2006 §3)"
     }
   ]
 }

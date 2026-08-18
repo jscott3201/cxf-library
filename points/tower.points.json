@@ -1,0 +1,112 @@
+{
+  "schema": "cxf-library/points/v1",
+  "equipment": "tower",
+  "namespaces": {
+    "brick": {
+      "iri": "https://brickschema.org/schema/Brick#",
+      "verified_version": "1.4.4"
+    },
+    "s223": {
+      "iri": "http://data.ashrae.org/standard223#",
+      "verified_version": "v1.0.0-2026"
+    },
+    "quantitykind": {
+      "iri": "http://qudt.org/vocab/quantitykind/",
+      "verified_version": "QUDT 3.1.4"
+    },
+    "unit": {
+      "iri": "http://qudt.org/vocab/unit/",
+      "verified_version": "QUDT 3.1.4"
+    }
+  },
+  "notes": "Cooling tower point dictionary (library-authored family, opened 2026-08-18; no reference chapter exists). LOOP-SIDE SEMANTICS: water LEAVING the tower is the COLD side and ENTERS the chiller condenser — so tower_leaving_temp grounds as Entering_Condenser_Water_Temperature_Sensor and tower_entering_temp (warm, chiller-to-tower) as Leaving_Condenser_Water_Temperature_Sensor, the same physical stream as points/chw.points.json cwst (see its loop-side warning). Bind per tower cell where cells are sensed individually; plant-level binding uses the common headers.",
+  "points": [
+    {
+      "name": "tower_leaving_temp",
+      "description": "Tower leaving (cold, basin/sump outlet) condenser water temperature",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": "Entering_Condenser_Water_Temperature_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty on the condenser water entering connection point (tower outlet)",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Water",
+        "aspects": ["entering"]
+      },
+      "notes": "brick:Entering_Condenser_Water_Temperature_Sensor grep-verified. Approach = tower_leaving_temp − oa_wetbulb."
+    },
+    {
+      "name": "tower_entering_temp",
+      "description": "Tower entering (warm, chiller-leaving) condenser water temperature",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": "Leaving_Condenser_Water_Temperature_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty on the condenser water leaving connection point (chiller outlet)",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Water",
+        "aspects": ["leaving"]
+      },
+      "notes": "Same physical stream as chw dict cwst (duplicated per the lint's own-family resolution rule). Range = tower_entering_temp − tower_leaving_temp."
+    },
+    {
+      "name": "oa_wetbulb",
+      "description": "Outdoor air wet-bulb temperature (host-derived psychrometric)",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": "Air_Wet_Bulb_Temperature_Sensor",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty at the outdoor air reference; typically host-computed",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Air",
+        "aspects": []
+      },
+      "derived": true,
+      "notes": "Host-derived when no physical wet-bulb sensor exists (the common case): psychrometric calculation from drybulb + RH + station pressure. A MULTIVARIABLE derivation — harder class than the P-T saturation lookups (hp dict evap_sat_temp precedent) and more error-prone near saturation; the host must document its psychrometric routine and accuracy. Simulation supplies it natively (EnergyPlus Site Outdoor Air Wetbulb)."
+    },
+    {
+      "name": "tower_fan_speed",
+      "description": "Tower fan VFD speed command/feedback",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": "Motor_Speed_Sensor",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the tower fan motor via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
+        "medium": null,
+        "aspects": []
+      },
+      "notes": "Same grounding convention as hw dict hw_pump_vfd_speed. The at-capacity gate for the approach rule: approach is only diagnostic when the fan can no longer compensate (4-climate simulation study: healthy approach spans 1.6-13.3 degC un-gated purely from fan modulation)."
+    },
+    {
+      "name": "tower_fan_status",
+      "description": "Tower fan run status",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Fan_On_Off_Status",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty on the tower Fan via hasProperty",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "notes": "Consumed by the fan short-cycling rule (starts-per-hour edge counting; Logical.Edge Nyquist ceiling window/(2·dt) applies — RTU-FC-050 precedent)."
+    }
+  ]
+}
