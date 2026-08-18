@@ -10,8 +10,10 @@
 
 Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 167–168).
 
-PMP-FC-050 and PMP-FC-051 are a future family here — this library has no
-`PMP-FC-*` rules yet, so the pump IDs above are the reference's own.
+The pump rules named above are verified in this library:
+[PMP-FC-050](../faults/pmp/PMP-FC-050/card.md) and
+[PMP-FC-051](../faults/pmp/PMP-FC-051/card.md) (family index:
+[faults/pmp](../faults/pmp/README.md)).
 
 ## Step 1 — VFD command/feedback deviation (VFD-FC-050)
 
