@@ -1,76 +1,72 @@
 # open-control-library
 
-**An engine-verified library of HVAC fault detection rules, written as CDL
-block graphs and shipped as CXF JSON-LD the
-[open-control engine](https://github.com/jscott3201/open-control-engine) loads
-directly.**
+**Executable, engine-verified HVAC fault detection rules.** Every rule is a
+CDL block graph, shipped as CXF JSON-LD that the
+[open-control engine](https://github.com/jscott3201/open-control-engine)
+loads directly — no code generation, no black box.
+
+📖 **[Browse the library](https://jscott3201.github.io/open-control-library/)** —
+every rule, playbook, and point dictionary, published as a book.
 
 > **Status: early access.** Shared for review ahead of a broader release;
 > content and contracts may still change.
 
 ![Library architecture](assets/architecture.svg)
 
-## What this is
+## Why
 
-Most fault detection and diagnostics (FDD) libraries are papers, spreadsheets,
-or vendor black boxes. This one is executable and auditable end to end. Every
-fault rule is four files that travel together:
+Most FDD libraries are papers, spreadsheets, or vendor black boxes. This one
+runs — and you can audit every step, from the plain-language fault card down
+to the exact logic the engine verified.
 
-| File | Audience | What it carries |
-|---|---|---|
-| `card.md` | humans **and** machines | YAML frontmatter (points, params, severity, suppression, preconditions) + grounded prose: detection logic, diagnoses, energy/emissions impact, and an honest **Deviations** section for every place the rule departs from its source |
-| `rule.cxf.jsonld` | the engine | the detection logic as a CDL composite block — elementary comparison/logic/timing blocks, no code |
-| `vectors.json` | the verifier | executable scenarios that pin every threshold boundary, delay edge, and evaluability gate from both sides |
-| `diagram.svg` | humans | the block graph, drawn |
+## How a rule ships
 
-A rule is only marked **verified** when the engine at a pinned revision replays
-every vector green and the schema lint passes every cross-contract check; the
-engine's exported `content_id` is recorded in the card so the verified bytes
-are identifiable forever.
+Each rule is one folder of four files that travel together:
 
-Here is a real one — AHU-0016, simultaneous heating and cooling:
+| File | What it is |
+|---|---|
+| `card.md` | the fault card — what the rule detects, the points and parameters it needs, likely diagnoses, energy impact, and every judgment call written down |
+| `rule.cxf.jsonld` | the detection logic itself, as elementary CDL blocks |
+| `vectors.json` | executable test scenarios that pin the rule's behavior from both sides of every threshold |
+| `diagram.svg` | the block graph, drawn |
+
+A rule is marked **verified** only when the engine at a pinned revision
+replays every vector green. The engine's `content_id` is stamped on the card,
+so the verified logic stays identifiable forever.
+
+Here's a real one — AHU-0016, simultaneous heating and cooling:
 
 ![AHU-0016 block graph](faults/ahu/AHU-0016/diagram.svg)
 
 ## What's inside
 
-- **92 verified fault rules** across twelve equipment families: air handlers
-  (`faults/ahu/`, 34 — all 31 reference faults plus 3 APAR-grounded
-  library extensions), system-level & cross-equipment
-  rules (10 — the reference's full ch.16 set plus the library's sensor-health
-  family), rooftop units (6), hot water plants (8 — the reference's 3 plus 5
-  library-authored loop rules grounded in PNNL-27338), VAV terminal boxes
-  (9 — the reference's 6 plus the NIST/CEC VPACC CUSUM trio, the library's
-  first feedback-loop topology), fan coil units (5), chilled water plants (4), heat pumps (6 — the reference's 3 plus the NIST SP 1087 refrigerant-side family), energy
-  recovery ventilators (2), VFDs (2), and hydronic pumps (2), and cooling towers (3 — the library's first
-  simulation-grounded family, with CHW at 5) — **every fully
-  specified fault in the reference is now implemented and engine-verified**,
-  plus the library's first grounded extensions beyond it.
-- **Point dictionaries** (`points/`) grounding every canonical point name in
+- **92 verified fault rules** across twelve equipment families — air handlers,
+  VAV boxes, rooftop units, heat pumps, chillers, cooling towers, hot-water
+  plants, fan coils, energy recovery ventilators, pumps, VFDs, and
+  cross-equipment sensor-health rules. The
+  [Fault Code Map](https://jscott3201.github.io/open-control-library/registry.html)
+  lists them all.
+- **Point dictionaries** (`points/`) — every canonical point name grounded in
   Brick 1.4.4 and ASHRAE 223P, so binding a rule to a real building is
   mechanical.
 - **Remediation playbooks** (`playbooks/`) — verify → remote fix → on-site
-  service → confirm resolution, with typical costs and times.
-- **Fault clusters** (`clusters/`) — syndromes that share a root cause, with a
+  service → confirm, with typical costs and times.
+- **Fault clusters** (`clusters/`) — faults that share a root cause, with a
   trigger rule and a fix order.
-- **A conformance harness** (`tools/verify`) and **CI** that re-verifies every
-  rule against the pinned engine on every push.
-- **A generated book** (`tools/book` + mdBook) publishing all of the above —
-  nothing is authored twice.
+- **CI verification** (`tools/verify`) — every push replays every rule
+  against the pinned engine.
+
+Every card cites its sources — standards, research reports, and this
+library's own simulation studies — and records each place the rule departs
+from them. The detail lives on the cards; start with any rule in the book.
 
 ## Design stance
 
-The graph computes *fault-given-valid-data*, and only that. Data quality
-(NO_EVAL), operating-state gating, suppression, and energy accumulation are
-host concerns, declared in card frontmatter for the host to enforce — never
-encoded in the block graph. The engine stays deliberately status-blind, rules
-stay portable, and every judgment call is written down where a reviewer can
+The graph computes *fault-given-valid-data*, and only that. Data quality,
+operating-state gating, and suppression are host concerns, declared on the
+card for the host to enforce — never buried in the logic. Rules stay
+portable, and every judgment call is written down where a reviewer can
 disagree with it.
-
-Grounding: ASHRAE Guideline 36 §5.16.14 (via its public-review addendum text),
-the HVAC FDD Reference v1.0 (a PNNL/LBNL research consolidation), NISTIR 7365
-defaults, and the APAR rule lineage (Schein et al. 2006) — cited per card, with
-transcription gaps and adopted defaults called out explicitly.
 
 ## Quick start
 
@@ -90,12 +86,11 @@ python3 tools/book/generate.py && mdbook serve book --open
 
 ## Layout
 
-- **`SCHEMA.md`** — the normative layout and file contracts. Read this first.
-- **`faults/<equip>/<FAULT-ID>/`** — one folder per rule.
-- **`points/`** — canonical point dictionaries (Brick + 223P tags).
+- **`SCHEMA.md`** — the normative contracts. Read this first.
+- **`faults/<equip>/<FAULT-ID>/`** — one folder per rule; `faults/registry.json` maps them all.
+- **`points/`** — canonical point dictionaries.
 - **`playbooks/`**, **`clusters/`** — remediation workflows and fault syndromes.
-- **`tools/verify`** — engine-backed conformance runner.
-- **`tools/book`**, **`book/`** — documentation generator and mdBook config.
+- **`tools/`** — the verifier, lints, and book generator.
 
 ## License
 

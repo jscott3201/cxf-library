@@ -323,6 +323,33 @@ def main():
     registry = json.loads(
         (REPO / "faults" / "registry.json").read_text(encoding="utf-8")
     )
+
+    # Legacy-URL redirect stubs: pre-renumbering pages redirect to the new
+    # ids so external links keep working (mdBook copies non-md files from
+    # src into the output verbatim).
+    redirect_html = (
+        '<!DOCTYPE html><html><head><meta charset="utf-8">\n'
+        '<meta http-equiv="refresh" content="0; url={new}.html">\n'
+        '<link rel="canonical" href="{new}.html">\n'
+        '<title>{old} moved to {new}</title></head>\n'
+        '<body>This rule is now <a href="{new}.html">{new}</a>.</body></html>\n'
+    )
+    aliases = {
+        # the sys flatline/spike pair carried a brief intermediate id the
+        # registry does not record (renamed twice on 2026-08-18)
+        "SYS-FC-100": "SYS-0009",
+        "SYS-FC-101": "SYS-0010",
+    }
+    for r in registry.get("rules", []):
+        if r.get("legacy_id"):
+            aliases[r["legacy_id"]] = r["id"]
+    for old, new in aliases.items():
+        fam = new.split("-")[0].lower()
+        stub_dir = SRC / "faults" / fam
+        if stub_dir.is_dir():
+            (stub_dir / f"{old}.html").write_text(
+                redirect_html.format(old=old, new=new), encoding="utf-8"
+            )
     reg = ["# Fault Code Map\n",
            "One row per rule, from [`faults/registry.json`](https://github.com/"
            "jscott3201/open-control-library/blob/main/faults/registry.json). "
