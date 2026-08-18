@@ -1,0 +1,119 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 7200 },
+  "scenarios": [
+    {
+      "name": "nominal_subcooling_healthy",
+      "description": "A correctly charged rooftop unit on a warm afternoon: 45 °C condensing saturation against a 37 °C liquid line is 8 K of subcooling, a normal packaged-unit reading and two thirds of the shipped band.",
+      "inputs": { "cond_sat_temp": 45.0, "liquid_temp": 37.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "design_day_lift_same_subcooling_healthy",
+      "description": "Both temperatures 13 K higher — a 40 °C roof, or a condenser the RTU-0007 test would already be reporting — and the same 8 K of subcooling. This rule reads the difference, not the level, so high head pressure on its own is not a charge verdict. Pairs with overcharged_liquid_backs_up: swap the operands and both flip.",
+      "inputs": { "cond_sat_temp": 58.0, "liquid_temp": 50.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "overcharged_liquid_backs_up",
+      "description": "FAULT: excess refrigerant floods the lower condenser circuits and the liquid line leaves at 34 °C against a 50 °C condensing saturation — 16 K of subcooling. Both operands hold from t = 0, so delayOnInit puts the alarm exactly one alarm_delay in.",
+      "inputs": { "cond_sat_temp": 50.0, "liquid_temp": 34.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 900, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "subcooling_exactly_at_the_band",
+      "description": "Threshold edge: 47.0 − 35.0 is exactly subcooling_high_band (12.0 K) and both operands are binary-exact, so this is a true boundary pin rather than a rounding one. The comparison is strict, so a unit sitting precisely on the band reads healthy.",
+      "inputs": { "cond_sat_temp": 47.0, "liquid_temp": 35.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "subcooling_just_above_the_band",
+      "description": "Threshold edge from the other side: 47.2 − 35.0 is 12.2 K, two tenths past the band, and the alarm matures on the normal schedule.",
+      "inputs": { "cond_sat_temp": 47.2, "liquid_temp": 35.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 900, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "two_phase_liquid_line_reads_healthy",
+      "description": "0.2 K of subcooling — a liquid line with no measurable liquid seal, which is where the charge question belongs to RTU-0008 rather than to this card. No evaluability flag is published for it because the verdict is sound: whatever this unit is, it is not overcharged.",
+      "inputs": { "cond_sat_temp": 45.0, "liquid_temp": 44.8 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "ungated_off_cycle_stays_silent",
+      "description": "The host's compressor gate is the one precondition this rule can survive losing. Minutes after a stage drops out, the high side has equalised down to a 30 °C saturation while the liquid line is still holding 45 °C of stored heat: subcooling reads −15 K and the rule is silent. Off-cycle error on this measurement points away from the alarm, which is why the gate stays host-side (see Deviations).",
+      "inputs": { "cond_sat_temp": 30.0, "liquid_temp": 45.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "stage_down_transient_never_alarms",
+      "description": "A two-stage unit unloads to stage 1 at t = 600 s and the condenser is briefly holding more liquid than one compressor needs: 16 K of subcooling for 600 s, back to 8 K at t = 1200 s, 300 s short of alarm_delay. The timer resets on recovery and nothing is reported.",
+      "inputs": {
+        "cond_sat_temp": 45.0,
+        "liquid_temp": [
+          { "t": 0, "value": 37.0 },
+          { "t": 600, "value": 29.0 },
+          { "t": 1200, "value": 37.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "delay_runs_from_the_crossing_not_from_load",
+      "description": "The unit starts at 8 K and crosses the band at t = 1200 s, holding 14 K thereafter. The alarm lands at 1200 + alarm_delay, not at alarm_delay — the persistence window is measured from the crossing.",
+      "inputs": {
+        "cond_sat_temp": 45.0,
+        "liquid_temp": [
+          { "t": 0, "value": 37.0 },
+          { "t": 1200, "value": 31.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2040, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "alarm_clears_after_charge_recovered_to_nameplate",
+      "description": "Recovery: 16 K of subcooling alarms at 900 s, the technician recovers the excess to the nameplate weight at t = 3600 s, and the liquid line returns to 8 K. yFault drops on that tick — TrueDelay only delays the rising edge.",
+      "inputs": {
+        "cond_sat_temp": 50.0,
+        "liquid_temp": [
+          { "t": 0, "value": 34.0 },
+          { "t": 3600, "value": 42.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 900, "to_s": 3540, "equals": true },
+        { "output": "yFault", "from_s": 3660, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "low_ambient_head_pressure_control_alarms_as_designed",
+      "description": "The known false positive, pinned rather than hidden: on a 5 °C morning the head-pressure control has cycled the condenser fans off and is deliberately holding liquid in the coil — 32 °C condensing saturation against a 17 °C liquid line, 15 K of subcooling, and the rule alarms on a correctly charged unit. The host precondition that suspends evaluation while that control is active is what prevents this, and there is no in-graph term that could.",
+      "inputs": { "cond_sat_temp": 32.0, "liquid_temp": 17.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 900, "to_s": 7200, "equals": true }
+      ]
+    }
+  ]
+}

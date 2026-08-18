@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <rect x="12" y="20" width="112" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="68" y="39" text-anchor="middle" fill="#1e3a8a">suction_temp</text>
+  <rect x="12" y="60" width="118" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="71" y="79" text-anchor="middle" fill="#1e3a8a">evap_sat_temp</text>
+  <rect x="12" y="180" width="118" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="71" y="199" text-anchor="middle" fill="#1e3a8a">cond_sat_temp</text>
+  <rect x="12" y="220" width="100" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="62" y="239" text-anchor="middle" fill="#1e3a8a">liquid_temp</text>
+
+  <rect x="200" y="40" width="110" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="255" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">superheat</text>
+  <text x="255" y="80" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="200" y="170" width="110" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="255" y="192" text-anchor="middle" fill="#24292f" font-weight="bold">subcool</text>
+  <text x="255" y="210" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="380" y="40" width="242" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="501" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">shHigh</text>
+  <text x="501" y="80" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 15 °C</text>
+  <rect x="380" y="140" width="216" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="488" y="162" text-anchor="middle" fill="#24292f" font-weight="bold">scLow</text>
+  <text x="488" y="180" text-anchor="middle" fill="#57606a" font-size="11">Reals.LessThreshold · t = 3 °C</text>
+  <rect x="380" y="290" width="230" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="495" y="312" text-anchor="middle" fill="#24292f" font-weight="bold">txvSat</text>
+  <text x="495" y="330" text-anchor="middle" fill="#57606a" font-size="11">Reals.LessThreshold · t = 0.5 °C</text>
+  <rect x="700" y="90" width="92" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="746" y="112" text-anchor="middle" fill="#24292f" font-weight="bold">both</text>
+  <text x="746" y="130" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="850" y="90" width="180" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="940" y="112" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="940" y="130" text-anchor="middle" fill="#57606a" font-size="11">Logical.TrueDelay · 1800 s</text>
+
+  <rect x="1070" y="104" width="62" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1101" y="123" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1070" y="304" width="118" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1129" y="323" text-anchor="middle" fill="#7f1d1d">yTxvSaturated</text>
+
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 124 35 H 160 V 55 H 196"/>
+    <path d="M 130 75 H 164 V 83 H 196"/>
+    <path d="M 130 195 H 164 V 185 H 196"/>
+    <path d="M 112 235 H 160 V 213 H 196"/>
+    <path d="M 310 69 H 376"/>
+    <path d="M 310 199 H 340 V 169 H 376"/>
+    <path d="M 310 199 H 340 V 319 H 376"/>
+    <path d="M 622 69 H 660 V 105 H 696"/>
+    <path d="M 596 169 H 660 V 133 H 696"/>
+    <path d="M 792 119 H 846"/>
+    <path d="M 1030 119 H 1066"/>
+    <path d="M 610 319 H 1066"/>
+  </g>
+
+  <g fill="#7d8590" font-size="9">
+    <text x="204" y="62">u1</text>
+    <text x="204" y="86">u2</text>
+    <text x="204" y="192">u1</text>
+    <text x="204" y="216">u2</text>
+    <text x="704" y="112">u1</text>
+    <text x="704" y="136">u2</text>
+  </g>
+
+  <g fill="#7d8590" font-size="10">
+    <text x="316" y="62">Real</text>
+    <text x="316" y="192">Real</text>
+    <text x="628" y="62">Bool</text>
+    <text x="602" y="162">Bool</text>
+    <text x="616" y="312">Bool</text>
+  </g>
+
+  <text x="200" y="390" fill="#7d8590" font-size="11">The AND is the diagnosis, not a debounce: high superheat with subcooling still high is a liquid-line restriction, not a charge loss.</text>
+  <text x="200" y="408" fill="#7d8590" font-size="11">yTxvSaturated is a sub-condition flag, never an evaluability gate — severe undercharge collapses subcooling, and that is the symptom.</text>
+</svg>

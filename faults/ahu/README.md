@@ -52,6 +52,7 @@ Point dictionary: [`points/ahu.points.json`](../../points/ahu.points.json).
 | AHU-0035 | Supply air temperature too high for the zone population | 3 | rule | **verified** |
 | AHU-0036 | Duct static pressure too low for the zone population | 3 | rule | **verified** |
 | AHU-0037 | Economizing when it should not (damper position) | 3 | rule | **verified** |
+| AHU-0038 | Cooling coil valve-position creep (fouling / authority loss) | 3 | statistical | **verified** |
 
 Reference note: the FDD Reference's index (§5.8.1) lists 31 AHU codes while its
 ch.9 header claims "20 fully specified" — some 0xx cards in the reference are

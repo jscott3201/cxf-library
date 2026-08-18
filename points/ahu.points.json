@@ -429,6 +429,26 @@
       },
       "derived": true,
       "notes": "Aggregate point, the bottom-half mate of zone_dmpr_high_avg (one sorted pass yields both). Consumed by AHU-0036."
+    },
+    {
+      "name": "clg_vlv_baseline",
+      "description": "Expected cooling-coil valve command for the current operating condition (host-fitted baseline)",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty, host-computed",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
+        "medium": null,
+        "aspects": [
+          "derived"
+        ]
+      },
+      "derived": true,
+      "notes": "HOST-DERIVED virtual point (cond_split_baseline precedent): the commissioning-period valve command fitted against the load condition (OAT band and supply setpoint), published for the CURRENT condition each tick. The fit window must be known-clean — a baseline fitted on a fouled coil learns the fouling as normal (the SYS-0006 training caveat). Consumed by AHU-0038: under temperature control a fouling coil holds its heat duty by opening the valve, so the hydraulic excess — not the temperatures — is the observable."
     }
   ]
 }

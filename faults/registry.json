@@ -298,6 +298,14 @@
       "legacy_id": null
     },
     {
+      "id": "AHU-0038",
+      "family": "ahu",
+      "name": "Cooling coil valve-position creep (fouling / authority loss)",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
       "id": "CHW-0001",
       "family": "chw",
       "name": "Chiller efficiency (kW/ton) degradation",
@@ -584,6 +592,22 @@
       "method": "statistical",
       "status": "verified",
       "legacy_id": "RTU-FC-100"
+    },
+    {
+      "id": "RTU-0008",
+      "family": "rtu",
+      "name": "Refrigerant undercharge \u2014 superheat/subcooling divergence",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "RTU-0009",
+      "family": "rtu",
+      "name": "Refrigerant overcharge \u2014 high liquid subcooling",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
     },
     {
       "id": "SYS-0001",

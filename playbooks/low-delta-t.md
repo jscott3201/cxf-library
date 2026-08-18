@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | CHW-0004, related to CHW-0001; HW-0004 — library-authored HW-side addition, the reference's row names only the CHW rule |
+| **Applies to** | CHW-0004, related to CHW-0001; HW-0004 — library-authored HW-side addition, the reference's row names only the CHW rule; AHU-0038 (coil-side hydraulic creep, same discriminators) |
 | **Fix complexity** | Remote + on-site |
 | **Typical time** | 2–8 h (investigation across multiple air handler coils) |
 | **Typical cost** | $0–$2,000 (depends on root cause) |

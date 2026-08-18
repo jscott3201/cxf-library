@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | RTU-0001, RTU-0002, RTU-0007 |
+| **Applies to** | RTU-0001, RTU-0002, RTU-0007, RTU-0008, RTU-0009 |
 | **Fix complexity** | On-site service required |
 | **Typical time** | 1–4 h on-site |
 | **Typical cost** | $100–$500 (cleaning/filter) / $500–$2,000 (capacitor/charge) / $2,000–$8,000 (compressor) |
@@ -26,6 +26,14 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 168–169).
 3. **Condenser fouling (RTU-0007):** measure condenser leaving air
    temperature minus OAT and compare to baseline for the current stage and
    OAT. A 30% or greater increase indicates fouling.
+4. **Refrigerant charge (RTU-0008/0009):** with the compressor settled at a
+   steady stage, measure suction superheat and liquid subcooling at the
+   service ports and compare to the unit's charging chart for the current
+   conditions. High superheat with low subcooling indicates undercharge;
+   subcooling well above the chart with normal-to-low superheat indicates
+   overcharge. Rule out condenser airflow restriction (RTU-0007) first —
+   it moves the same readings; low-ambient head-pressure control can mimic
+   overcharge on a correctly charged unit.
 
 ## Step 2 — On-site service
 

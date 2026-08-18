@@ -20,7 +20,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [HP-0001, HP-0004]
+related: [HP-0001, HP-0004, RTU-0009]
 playbooks: [heat-pump-faults]
 operating_states: "compressor running in steady cooling — the source's tested mode; heating is an authored extension needing its own instance, band and liquid-line sensor (see Deviations)"
 preconditions: "The host gates this rule end to end and there is no in-rule evaluability output: silence outside the gates is NO_EVAL by frontmatter, not a healthy charge. comp_status must have been true continuously for at least 10 min — subcooling on the source's rig took roughly 5-8 min to settle after a start, and a pulling-down circuit reads whatever its transient says. defrost_status must be false, and the host must hold evaluation off for a recovery period after a cycle ends: a reversal drives both temperatures through excursions that have nothing to do with charge. cond_sat_temp is host-derived through a refrigerant P-T lookup, so the lookup must match the refrigerant actually in the machine — the wrong one offsets every subcooling reading by a near-constant the rule cannot distinguish from charge. liquid_temp must be sensed between the condenser outlet and the metering device for the mode being evaluated, with proper pipe contact and insulation. subcooling_high_band must be commissioned against this unit's own target subcooling before any verdict means anything (see Deviations)."

@@ -257,6 +257,90 @@
       },
       "derived": true,
       "notes": "HOST-DERIVED virtual point (evap_sat_temp / zone_reheat_fraction precedent): the reference's baseline_condenser_split(comp_stage, oat) — a per-stage curve against OAT fitted from known-clean operation. The host documents the fit window and guarantees the published value is strictly positive (RTU-0007 divides by it). This is the two-variable baseline that originally deferred the fault; publishing the fit as an ordinary point resolves it."
+    },
+    {
+      "name": "suction_temp",
+      "description": "Compressor suction line refrigerant temperature (surface-mount acceptable)",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Refrigerant",
+        "aspects": [
+          "suction"
+        ]
+      },
+      "provisional": true,
+      "notes": "Mirror of the hp dict entry (duplicated per the lint's own-family resolution rule; same derivation/placement obligations). Consumed by the RTU-0008/0009 charge pair — superheat = suction_temp − evap_sat_temp, subcooling = cond_sat_temp − liquid_temp. Original hp note: No Brick 1.4.4 suction-temperature class (only Refrigerant_Level_Sensor exists refrigerant-side); null mapping per defrost_status precedent. Superheat = suction_temp - evap_sat_temp."
+    },
+    {
+      "name": "liquid_temp",
+      "description": "Liquid line refrigerant temperature (surface-mount acceptable)",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Refrigerant",
+        "aspects": [
+          "liquid-line"
+        ]
+      },
+      "provisional": true,
+      "notes": "Mirror of the hp dict entry (duplicated per the lint's own-family resolution rule; same derivation/placement obligations). Consumed by the RTU-0008/0009 charge pair — superheat = suction_temp − evap_sat_temp, subcooling = cond_sat_temp − liquid_temp. Original hp note: No Brick 1.4.4 class; null mapping. Subcooling = cond_sat_temp - liquid_temp."
+    },
+    {
+      "name": "evap_sat_temp",
+      "description": "Evaporating saturation temperature (HOST-DERIVED: suction pressure via refrigerant P-T lookup, or coil-surface proxy)",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Refrigerant",
+        "aspects": [
+          "evaporating",
+          "derived"
+        ]
+      },
+      "provisional": true,
+      "notes": "Mirror of the hp dict entry (duplicated per the lint's own-family resolution rule; same derivation/placement obligations). Consumed by the RTU-0008/0009 charge pair — superheat = suction_temp − evap_sat_temp, subcooling = cond_sat_temp − liquid_temp. Original hp note: HOST-DERIVED virtual point (zone_reheat_fraction/chw_valve_max precedent): the P-T relationship is refrigerant-specific and lives at the host, never in a rule graph. Derivation MUST match the site's refrigerant.",
+      "derived": true
+    },
+    {
+      "name": "cond_sat_temp",
+      "description": "Condensing saturation temperature (HOST-DERIVED: discharge/liquid pressure via refrigerant P-T lookup)",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Refrigerant",
+        "aspects": [
+          "condensing",
+          "derived"
+        ]
+      },
+      "provisional": true,
+      "notes": "Mirror of the hp dict entry (duplicated per the lint's own-family resolution rule; same derivation/placement obligations). Consumed by the RTU-0008/0009 charge pair — superheat = suction_temp − evap_sat_temp, subcooling = cond_sat_temp − liquid_temp. Original hp note: HOST-DERIVED virtual point, same convention and refrigerant caveat as evap_sat_temp.",
+      "derived": true
     }
   ]
 }

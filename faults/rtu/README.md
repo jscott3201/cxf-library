@@ -20,6 +20,8 @@ Point dictionary: [`points/rtu.points.json`](../../points/rtu.points.json).
 | RTU-0005 | Excess outdoor air | 3 | rule | **verified** |
 | RTU-0006 | Insufficient ventilation | 2 | rule | **verified** |
 | RTU-0007 | Condenser airflow restriction | 3 | statistical | **verified** |
+| RTU-0008 | Refrigerant undercharge — superheat/subcooling divergence | 3 | rule | **verified** |
+| RTU-0009 | Refrigerant overcharge — high liquid subcooling | 3 | rule | **verified** |
 
 Severity and method per the reference's ch.11 cards (its §5.8.3 index carries
 no severity column). RTU-0007 shipped once the host-fitted-baseline
