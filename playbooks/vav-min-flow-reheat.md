@@ -26,7 +26,10 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 160–161).
      (supply air temperature set too low, forcing excess reheat). See the
      [missing-reset](missing-reset.md) playbook. PNNL-27338 AIRCx check: if
      more than 25% of zones have reheat valves open above 50%, the AHU SAT
-     may be too low.
+     may be too low. *(Library note: PNNL-27338 §2.2.2–2.2.3's own
+     form is a two-quantity test — zones-with-reheat-open fraction above 25%
+     AND fleet-average valve command above 50%; the single-predicate gloss
+     here is the reference's simplification. See AHU-FC-053's Deviations.)*
    - Only 1–3 boxes flagged → a zone-level configuration problem.
 
 ## Step 2 — Remote fix

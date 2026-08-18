@@ -24,6 +24,10 @@ jobs:
           ref: ${{ steps.pin.outputs.rev }}
           path: open-control
 
+      - name: svg fitment lint
+        working-directory: cxf-library
+        run: python3 tools/lint/svg_fitment.py
+
       - uses: dtolnay/rust-toolchain@stable
 
       - uses: Swatinem/rust-cache@v2

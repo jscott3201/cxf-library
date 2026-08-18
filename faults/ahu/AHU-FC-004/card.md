@@ -45,7 +45,7 @@ params:
   alarm_delay:
     default: 3600.0
     unit: s
-    description: Continuous fault persistence required before the alarm asserts (60 min)
+    description: "Continuous fault persistence required before the alarm asserts (60 min — the reference ch.9 card's own AlarmDelay for FC#4; G36-2018 Table 5.16.14.5 applies a uniform 30 min AlarmDelay to all fifteen FCs)"
     cxf: persist.delayTime
 energy_impact:
   affected_subsystem: AHU sequencing / actuator wear

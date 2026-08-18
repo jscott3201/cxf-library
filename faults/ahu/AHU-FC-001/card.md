@@ -143,6 +143,15 @@ AHU-FC-065's to claim. Avoided-emissions basis: N/A.
 
 ## Deviations
 
+- **The fan-speed conjunct uses the reference's bare `sf_speed ≥ 99%`.**
+  G36-2018 §5.16.14 FC#1's published form subtracts a VFD speed error
+  allowance: `sf_speed > 99% − eps_VFDSPD`, which at Table 5.16.14.5's
+  default (eps_VFDSPD = 5%) makes the effective floor 94%. The reference
+  ch.9 card simplifies this to a bare 99% and this card follows its primary
+  source; drives that plateau just under 99% will read NO-fault under the
+  shipped default. Retune `speed_full_threshold` toward 94.0 for the G36
+  form (deep-read audit, 2026-08-17).
+
 - **`dsp < dsp_sp − eps_dsp` rewritten in gap form.** The reference compares
   the measurement against an offset setpoint. Implemented that way, `eps_dsp`
   would have to be negated into an `AddParameter` ahead of the comparison;

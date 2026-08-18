@@ -124,6 +124,17 @@ from. Avoided-emissions basis: marginal operating emissions rate (MOER).
 
 ## Deviations
 
+- **The reference's 50% zone-fraction diverges from its own PNNL source.**
+  PNNL-27338 §2.2.2–2.2.3's low-SAT identification is a two-quantity test:
+  the fraction of zones with reheat valves open (>10%) exceeding 25%, AND
+  the fleet-average reheat valve command exceeding 50%. The reference ch.9
+  card collapses this to a single 50% zone-count fraction, and this card
+  follows the reference. Sites wanting the PNNL-literal form should retune
+  `reheat_fraction_threshold` to 0.25 and note the fleet-average magnitude
+  conjunct is not expressible without an additional host-derived point
+  (mean reheat command), which the dictionary does not yet carry
+  (deep-read audit, 2026-08-17).
+
 - **`rht_vlv_cmd_all` (zone array) → host-derived `zone_reheat_fraction`
   (scalar).** The reference counts reheating zones across a per-zone valve
   command array; library v1 avoids array boundary points, so the host counts

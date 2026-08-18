@@ -33,7 +33,7 @@ params:
   mat_tolerance:
     default: 2.0
     unit: "°C"
-    description: Combined sensor accuracy allowance (G36 eps_MAT); MAT may sit this far below the lower envelope bound before it counts as a fault
+    description: "Combined sensor accuracy allowance; MAT may sit this far below the lower envelope bound before it counts as a fault. The 2.0 degC default is the reference ch.9 card's own eps_MAT (4 degF); G36-2018 Table 5.16.14.5 publishes eps_MAT = 3 degC — retune to 3.0 for strict G36 conformance"
     cxf: gapBig.t
   alarm_delay:
     default: 1800.0
