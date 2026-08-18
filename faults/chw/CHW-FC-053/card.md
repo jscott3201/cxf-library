@@ -64,6 +64,13 @@ validation:
   - kind: simulation_fpr
     harness: simharness/v1
     date: 2026-08-18
+    fleet: "DOE prototype OfficeLarge STD2019 x 4 climates (Miami 1A, Tucson 2B, Atlanta 3A, Buffalo 5A), one July + one January week each, plant mode"
+    scenarios: 6
+    failures: 0
+    notes: "windowed wherever chiller load crossed the 40% floor (incl. Miami January); cold-climate January weeks never cross it"
+  - kind: simulation_fpr
+    harness: simharness/v1
+    date: 2026-08-18
     fleet: "DOE prototype OfficeLarge STD2019 Atlanta (IDF 22.1 auto-transitioned to E+ 25.1), one July + one January week, plant mode"
     scenarios: 1
     failures: 0

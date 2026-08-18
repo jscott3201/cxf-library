@@ -98,6 +98,23 @@ non-OAT rules stay correctly silent. Empirical demonstration of the CLU-09
 biased-OAT cascade; recorded as `simulation_tpr` validation blocks
 (failures = missed detections).
 
+## Tower groundwork (condenser-loop stats)
+
+Plant mode also maps the condenser loop (tower-leaving/entering water
+temperatures, per-tower fan power, EnergyPlus's native outdoor wet-bulb)
+and emits `tower_stats.json` per run: approach (= leaving − wet-bulb) and
+range percentiles over tower-on ticks. Four-climate OfficeLarge result —
+healthy-operation approach p50/p95 by run: Miami Jul 1.6/2.3, Atlanta Jul
+2.5/3.2, Tucson Jul 4.6/7.7, Buffalo Jul 4.8/8.5, Miami Jan 3.6/6.9,
+Tucson Jan 11.5/13.3 °C. **Design consequence for the future TOWER
+family: a fixed approach-high threshold is indefensible** — variable-speed
+fans legitimately let approach ride high at part load — so the rule form
+must gate on fan at/near full speed (approach high DESPITE maximum fan =
+capability degradation: fouling, scale, airflow blockage). At design-like
+conditions (Miami July, fans loaded) healthy p95 is ~2.3 °C, so a
+fan-gated threshold of roughly 2× design approach is the starting band;
+per-site commissioning still required.
+
 ## TPR: physics-level FaultModel campaigns (`--faultmodel kind=delta`)
 
 Patches EnergyPlus `FaultModel:*` objects into the epJSON before
