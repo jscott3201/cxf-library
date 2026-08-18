@@ -13,7 +13,7 @@ estimation_method: PROXY_ESTIMATION
 source:
   - "PNNL-27338 §4.3.2 (no DP reset; daily MAX−MIN of the loop DP setpoint against a 2.5 psi range), pp. 4.10-4.11"
   - "PNNL-27338 §4.2.2 (high loop DP), pp. 4.7-4.8 — establishes pump VFD speed as the HW loop's load proxy"
-  - "Deep-read memo: _research/local/deep-reads/pnnl-27338-rcx-measures.md (rule candidate 5)"
+  - "PNNL-27338 (Katipamula et al. 2018) — adapted via an internal paraphrased deep-read digest, not distributed (rule candidate 5)"
   - "Sibling-rule precedent: CHW-FC-052 (window, alarm delay, half-range tolerance), CHW-FC-051 (sampler+dwell activity conjunct and its NO_EVAL output), AHU-FC-058"
   - "Library extension: HVAC FDD Reference v1.0 ch.14 specifies HW-FC-050..052 only — index framing in faults/hw/README.md"
 g36: null

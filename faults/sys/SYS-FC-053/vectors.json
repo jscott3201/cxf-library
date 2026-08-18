@@ -1,0 +1,104 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 3600 },
+  "scenarios": [
+    {
+      "name": "fan_running_during_occupied_hours",
+      "description": "The normal case: the exhaust fan runs inside the occupied schedule.",
+      "inputs": { "ef_status": true, "occ_scheduled": true, "demand_override_active": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "fan_off_during_unoccupied_hours",
+      "description": "The fan conjunct blocking on its own: unoccupied and the fan is off, which is the outcome the rule exists to produce.",
+      "inputs": { "ef_status": false, "occ_scheduled": false, "demand_override_active": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "fan_running_unoccupied_with_no_override",
+      "description": "The reference condition. Fan proven on, outside the schedule, nothing holding it; TrueDelay asserts at exactly alarm_delay (900 s).",
+      "inputs": { "ef_status": true, "occ_scheduled": false, "demand_override_active": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 900, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "demand_override_justifies_the_run",
+      "description": "The override conjunct blocking on its own: same after-hours run, but a demand override (kitchen hood, restroom call, lab purge) is holding the fan on legitimately.",
+      "inputs": { "ef_status": true, "occ_scheduled": false, "demand_override_active": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "fan_stops_on_the_alarm_tick",
+      "description": "The delay edge from below: the fan stops at exactly 900 s, so the condition is false on the tick the delay would have matured and nothing is reported.",
+      "inputs": {
+        "ef_status": [
+          { "t": 0, "value": true },
+          { "t": 900, "value": false }
+        ],
+        "occ_scheduled": false,
+        "demand_override_active": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "fan_stops_one_tick_later",
+      "description": "The same edge from above: one tick of alarm at 900 s, then clear.",
+      "inputs": {
+        "ef_status": [
+          { "t": 0, "value": true },
+          { "t": 960, "value": false }
+        ],
+        "occ_scheduled": false,
+        "demand_override_active": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 900, "to_s": 900, "equals": true },
+        { "output": "yFault", "from_s": 960, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "override_drops_and_starts_the_clock",
+      "description": "A legitimate override expires at 1200 s and the fan keeps running anyway. The 1200 s already elapsed does not count — the alarm lands 900 s after the justification disappears.",
+      "inputs": {
+        "ef_status": true,
+        "occ_scheduled": false,
+        "demand_override_active": [
+          { "t": 0, "value": true },
+          { "t": 1200, "value": false }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2040, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "schedule_resumes_and_clears_the_alarm",
+      "description": "Recovery: the alarm asserts at 900 s and the occupied schedule opens at 1800 s, dropping it on that tick — TrueDelay delays the rising edge only.",
+      "inputs": {
+        "ef_status": true,
+        "occ_scheduled": [
+          { "t": 0, "value": false },
+          { "t": 1800, "value": true }
+        ],
+        "demand_override_active": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 900, "to_s": 1740, "equals": true },
+        { "output": "yFault", "from_s": 1800, "to_s": 3600, "equals": false }
+      ]
+    }
+  ]
+}

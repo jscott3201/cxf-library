@@ -13,7 +13,7 @@ estimation_method: PROXY_ESTIMATION
 source:
   - "PNNL-27338 §4.5.2 (no HW supply-temperature reset; daily MAX−MIN of the HWS setpoint against a 10 °F range), pp. 4.16-4.17"
   - "PNNL-27338 §4.4.2 (high HW supply temperature), pp. 4.12-4.13 — the fault this reset exists to prevent"
-  - "Deep-read memo: _research/local/deep-reads/pnnl-27338-rcx-measures.md (rule candidate 7)"
+  - "PNNL-27338 (Katipamula et al. 2018) — adapted via an internal paraphrased deep-read digest, not distributed (rule candidate 7)"
   - "Sibling-rule precedent: AHU-FC-057 (window, OAT-range evaluability, half-range tolerance), CHW-FC-051 (plant-side binding of the same detector)"
   - "Library extension: HVAC FDD Reference v1.0 ch.14 specifies HW-FC-050..052 only — index framing in faults/hw/README.md"
 g36: null

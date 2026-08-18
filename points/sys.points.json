@@ -19,7 +19,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "System-level / cross-equipment point dictionary. The sensor-health rules (SYS-FC-054/100/101) bind ROLE POINTS, not canonical equipment points — the documented exception to the canonical-name convention (SCHEMA.md points contract; decided 2026-08-17, _research/fc100-sensor-health-design.md §3). The reference's own SYS-FC-054 card does the same ('varies by application'). The host's instance configuration records which real point each role is bound to; that same record drives the adjudicates NO_EVAL fan-out. Role entries carry brick/s223 null — the semantics belong to whatever the role is bound to. Reference ch.16's other rules (SYS-FC-050..053/055..057) will add their own points when that batch opens.",
+  "notes": "System-level / cross-equipment point dictionary. The sensor-health rules (SYS-FC-054/100/101) bind ROLE POINTS, not canonical equipment points — the documented exception to the canonical-name convention (SCHEMA.md points contract; decided 2026-08-17, _research/fc100-sensor-health-design.md §3). The reference's own SYS-FC-054 card does the same ('varies by application'). The host's instance configuration records which real point each role is bound to; that same record drives the adjudicates NO_EVAL fan-out. Role entries carry brick/s223 null — the semantics belong to whatever the role is bound to. The reference ch.16 waste/schedule rules (SYS-FC-050..053/056/057) bind CANONICAL cross-equipment points (grounded below); SYS-FC-055 binds the physical_sensor/virtual_value role pair. Points that also exist in equipment dicts (oat, sf_status, rht_vlv_cmd) are duplicated here with matched groundings because lint resolves a card's points against its own family dictionary.",
   "points": [
     {
       "name": "sensor_value",
@@ -64,6 +64,222 @@
       "s223": null,
       "provisional": true,
       "notes": "Role point: bound to the owning equipment's run/enable status (sf_status, pump_status, boiler_status...). A flat signal on idle equipment is normal; flatline only accuses the sensor while the process should be moving."
+    },
+    {
+      "name": "physical_sensor",
+      "description": "ROLE: the physical sensor cross-checked against a virtual-sensor prediction (SYS-FC-055)",
+      "kind": "real",
+      "unit": "varies",
+      "qudt_unit": null,
+      "brick": null,
+      "s223": null,
+      "provisional": true,
+      "notes": "Role point; the reference's required-points table lists physical_sensor plus 3+ correlated features. Thresholds (bias/noise) are in the BOUND point's units — the reference's defaults are for temperature bindings and MUST be retuned for other quantity kinds. Binding record doubles as the adjudicates target."
+    },
+    {
+      "name": "virtual_value",
+      "description": "ROLE: host-computed virtual-sensor prediction of the bound physical_sensor (SYS-FC-055)",
+      "kind": "real",
+      "unit": "varies",
+      "qudt_unit": null,
+      "brick": null,
+      "s223": null,
+      "derived": true,
+      "provisional": true,
+      "notes": "Host-derived role point: the host evaluates a regression model (reference: Ridge trained over a learning period on 3+ correlated features) each tick and exposes the prediction as this point. The graph computes only the residual statistics — model training/inference is host-side, per the host-fitted baseline convention (SCHEMA.md; HP-FC-050/VAV-FC-050 precedent)."
+    },
+    {
+      "name": "chw_flow",
+      "description": "Chilled water plant supply flow",
+      "kind": "real",
+      "unit": "L/s",
+      "qudt_unit": "L-PER-SEC",
+      "brick": "Chilled_Water_Supply_Flow_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty on the CHW supply segment",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "VolumeFlowRate",
+        "unit": "L-PER-SEC",
+        "medium": "Water-ChilledWater",
+        "aspects": []
+      }
+    },
+    {
+      "name": "hw_flow",
+      "description": "Hot water plant supply flow",
+      "kind": "real",
+      "unit": "L/s",
+      "qudt_unit": "L-PER-SEC",
+      "brick": "Hot_Water_Supply_Flow_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty on the HW supply segment",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "VolumeFlowRate",
+        "unit": "L-PER-SEC",
+        "medium": "Water-HotWater",
+        "aspects": []
+      }
+    },
+    {
+      "name": "ahu_clg_vlv_max",
+      "description": "Maximum cooling-coil valve command across all AHUs served by the CHW plant",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": null,
+      "s223": {
+        "pattern": "host-derived aggregate; no single physical point",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
+        "medium": null,
+        "aspects": ["aggregate-max"]
+      },
+      "derived": true,
+      "notes": "Host computes max(clg_vlv_cmd) over the served-AHU set each tick (chw_valve_max precedent, points/chw.points.json). The reference's all-valves-closed condition is equivalently max(valves) below the closed threshold — one aggregate point instead of a variable-width vector, which the graph cannot express."
+    },
+    {
+      "name": "ahu_htg_vlv_max",
+      "description": "Maximum heating-coil valve command across all AHUs/zones served by the HW plant",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": null,
+      "s223": {
+        "pattern": "host-derived aggregate; no single physical point",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
+        "medium": null,
+        "aspects": ["aggregate-max"]
+      },
+      "derived": true,
+      "notes": "HW mirror of ahu_clg_vlv_max; include reheat valves in the served set where the HW plant feeds zone reheat."
+    },
+    {
+      "name": "occ_scheduled",
+      "description": "TRUE while current time falls inside the occupied schedule (host-evaluated)",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": null,
+      "s223": null,
+      "derived": true,
+      "notes": "The reference's in_occupied_schedule(current_time, occ_schedule) is a calendar function; the graph has no clock, so the host evaluates the schedule and exposes the boolean. Same treatment as AHU-FC-052's occupancy gate."
+    },
+    {
+      "name": "lighting_status",
+      "description": "Lighting circuit on/off status",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "On_Off_Status",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty on the lighting Equipment via hasProperty",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "notes": "Brick 1.4.4 has no lighting-specific run status class; On_Off_Status on the lighting equipment/zone is the closest grounding."
+    },
+    {
+      "name": "occ_sensor",
+      "description": "Occupancy sensor state (TRUE = occupied detected)",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Occupancy_Sensor",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty on the occupancy Sensor via hasProperty",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OccupiedUnoccupied"
+      }
+    },
+    {
+      "name": "ef_status",
+      "description": "Exhaust fan run status",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Fan_On_Off_Status",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty on the Exhaust Fan via hasProperty",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "notes": "Brick 1.4.4 has no exhaust-specific fan status point class (only Exhaust_Fan equipment + enable/disable commands); Fan_On_Off_Status on the Exhaust_Fan equipment is the grounding, matching sf_status convention."
+    },
+    {
+      "name": "sf_status",
+      "description": "Supply fan run status of the paired AHU (SYS-FC-057)",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Fan_On_Off_Status",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty on the Fan via hasProperty",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "notes": "Duplicate of points/ahu.points.json sf_status — SYS-FC-057 is a cross-equipment rule instantiated per exhaust-fan/AHU pair."
+    },
+    {
+      "name": "demand_override_active",
+      "description": "TRUE while a demand-based exhaust override (e.g. kitchen hood, restroom call) legitimately holds the fan on",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": null,
+      "s223": null,
+      "notes": "BAS override flag; no Brick 1.4.4 point class models an override status. Host exposes the controller's override/demand flag directly."
+    },
+    {
+      "name": "rht_vlv_cmd",
+      "description": "Zone reheat valve command (SYS-FC-056, instantiated per zone)",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": "Valve_Position_Command",
+      "s223": {
+        "pattern": "QuantifiableActuatableProperty on the reheat Valve via hasProperty; Actuator actuates the valve",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": []
+      },
+      "notes": "Duplicate of points/vav.points.json rht_vlv_cmd — the reference files SYS-FC-056 under SYS but scopes it to VAV/FCU zones; bind per zone."
+    },
+    {
+      "name": "oat",
+      "description": "Outdoor air temperature",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": "Outside_Air_Temperature_Sensor",
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty at the outdoor-air intake",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Air",
+        "aspects": []
+      }
     }
   ]
 }

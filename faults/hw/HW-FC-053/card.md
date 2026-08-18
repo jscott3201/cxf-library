@@ -13,7 +13,7 @@ estimation_method: PROXY_ESTIMATION
 source:
   - "PNNL-27338 §4.6 (low hot-water loop delta-T, pp. 4.19-4.21) — algorithm, 20 °F design / 10 °F trip pair, and its own note that the test carries no load gate"
   - "PNNL-27338 §4.4 (pp. 4.12-4.13) — the 35% pump-speed line this report uses to mean a lightly loaded HW loop, adopted here as the evaluability floor"
-  - "Deep read: _research/local/deep-reads/pnnl-27338-rcx-measures.md (paraphrased algorithm digest; candidate 8)"
+  - "PNNL-27338 (Katipamula et al. 2018) — adapted via an internal paraphrased deep-read digest, not distributed (paraphrased algorithm digest; candidate 8)"
   - "Sibling precedent: CHW-FC-053 (graph shape, two-parameter trip line, yLoadOk evaluability output), VFD-FC-051 (assembled limit)"
   - "Library extension: the HVAC FDD Reference v1.0 ch.14 specifies only HW-FC-050..052 — see faults/hw/README.md"
 g36: null

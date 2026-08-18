@@ -34,13 +34,15 @@ Here is a real one — AHU-FC-050, simultaneous heating and cooling:
 
 ## What's inside
 
-- **69 verified fault rules** across ten equipment families: air handlers
-  (`faults/ahu/`, all 31 reference faults), rooftop units (6), hot water
-  plants (8 — the reference's 3 plus 5 library-authored loop rules grounded
-  in PNNL-27338), VAV terminal boxes (6), fan coil units (5), chilled water
-  plants (4), heat pumps (3), energy recovery ventilators (2), VFDs (2), and
-  hydronic pumps (2) — every fully specified fault in the reference, plus
-  the library's first grounded extensions beyond it.
+- **79 verified fault rules** across eleven equipment families: air handlers
+  (`faults/ahu/`, all 31 reference faults), system-level & cross-equipment
+  rules (10 — the reference's full ch.16 set plus the library's sensor-health
+  family), rooftop units (6), hot water plants (8 — the reference's 3 plus 5
+  library-authored loop rules grounded in PNNL-27338), VAV terminal boxes
+  (6), fan coil units (5), chilled water plants (4), heat pumps (3), energy
+  recovery ventilators (2), VFDs (2), and hydronic pumps (2) — **every fully
+  specified fault in the reference is now implemented and engine-verified**,
+  plus the library's first grounded extensions beyond it.
 - **Point dictionaries** (`points/`) grounding every canonical point name in
   Brick 1.4.4 and ASHRAE 223P, so binding a rule to a real building is
   mechanical.

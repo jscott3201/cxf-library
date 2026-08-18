@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | VAV-FC-050, VAV-FC-052, VAV-FC-055, CLU-05 |
+| **Applies to** | VAV-FC-050, VAV-FC-052, VAV-FC-055, SYS-FC-056, CLU-05 |
 | **Fix complexity** | Remote fix |
 | **Typical time** | 15 min per box (can be done in batch on most BAS platforms) |
 | **Typical cost** | $0 |

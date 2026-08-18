@@ -152,9 +152,10 @@ result as an order-of-magnitude estimate.
 - **Rolling standard deviation → rolling mean absolute deviation.** The
   reference's logic is `rolling_std(SAT, window) > oscillation_threshold AND
   rolling_std(SAT, window) > k × rolling_std(SAT, long_window)`. The engine's
-  elementary block set has no variance or standard-deviation block, and
-  squaring inside a moving average is not expressible without one. MAD is
-  computed instead, from four `Reals.MovingAverage` instances plus a subtract
+  elementary block set has no variance or standard-deviation block. (Squaring
+  inside a moving average IS expressible — `Reals.Multiply` feeding
+  `Reals.MovingAverage`, the route SYS-FC-055 later took for its variance
+  branch — but this card predates that idiom.) MAD is computed instead, from four `Reals.MovingAverage` instances plus a subtract
   and an absolute value per timescale, exactly as the block graph shows. MAD
   and std are proportional for any fixed waveform, so the **ratio test carries
   over unchanged** — the scale factor appears on both sides of

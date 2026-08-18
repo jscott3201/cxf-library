@@ -101,7 +101,7 @@
         "SYS-FC-057",
         "SYS-FC-053"
       ],
-      "playbook": "after-hours-operation",
+      "playbook": "exhaust-fan-schedule-misalignment",
       "prevalence": "~15%",
       "energy_impact": "3-16% of site energy"
     },

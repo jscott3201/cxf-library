@@ -12,7 +12,7 @@ confidence: MEDIUM
 estimation_method: PROXY_ESTIMATION
 source:
   - "PNNL-27338 §4.2 (high hot-water loop differential pressure, pp. 4.7-4.8) — both thresholds: pump VFD above 45% with outdoor air above 60 °F"
-  - "Deep read: _research/local/deep-reads/pnnl-27338-rcx-measures.md (paraphrased algorithm digest; candidate 4)"
+  - "PNNL-27338 (Katipamula et al. 2018) — adapted via an internal paraphrased deep-read digest, not distributed (paraphrased algorithm digest; candidate 4)"
   - "Sibling precedent: HW-FC-052 (mild-OAT comparator plus TrueDelay), CHW-FC-053 (evaluability output shape), CHW-FC-052 (the DP-reset finding this rule does not duplicate)"
   - "Library extension: the HVAC FDD Reference v1.0 ch.14 specifies only HW-FC-050..052 — see faults/hw/README.md"
 g36: null

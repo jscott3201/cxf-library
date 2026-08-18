@@ -1,0 +1,801 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 21600
+  },
+  "scenarios": [
+    {
+      "name": "virtual_and_physical_agree",
+      "description": "The healthy case: the Ridge model predicts the sensor exactly, so the residual is zero, both statistics are zero and nothing is reported across six hours.",
+      "inputs": {
+        "physical_sensor": 20.0,
+        "virtual_value": 20.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yBias",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yNoise",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "residual_within_the_bias_band",
+      "description": "Ordinary model error: the physical sensor sits 1.0 above the prediction, which is inside bias_threshold and well inside the noise band. Koo & Yoon report an RMSE of 0.30 degC for this kind of model, so a steady 1.0 is a mediocre fit rather than a drifted sensor, and the bias conjunct blocks the fault on its own.",
+      "inputs": {
+        "physical_sensor": 21.0,
+        "virtual_value": 20.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yBias",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yNoise",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "both_track_a_moving_process",
+      "description": "The rule is about the residual, not the level. Sensor and prediction walk 15 -> 22 -> 18 -> 25 degC together; the process moves 10 K and the residual never leaves zero.",
+      "inputs": {
+        "physical_sensor": [
+          {
+            "t": 0,
+            "value": 15.0
+          },
+          {
+            "t": 5400,
+            "value": 22.0
+          },
+          {
+            "t": 10800,
+            "value": 18.0
+          },
+          {
+            "t": 16200,
+            "value": 25.0
+          }
+        ],
+        "virtual_value": [
+          {
+            "t": 0,
+            "value": 15.0
+          },
+          {
+            "t": 5400,
+            "value": 22.0
+          },
+          {
+            "t": 10800,
+            "value": 18.0
+          },
+          {
+            "t": 16200,
+            "value": 25.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yBias",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yNoise",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "calibration_bias_after_a_clean_window",
+      "description": "The flagship bias case, run the honest way: a full clean window first, then the sensor steps 2.5 above the prediction at 3600 s. The window mean migrates linearly rather than jumping, crosses bias_threshold at 5760 s (0.6 of a window after the step, which is 1.5/2.5) and the alarm lands one alarm_delay later at 7560 s. The noise branch stays down throughout — a step contributes at most 6.25/4 to the variance, nowhere near noise_threshold squared — so this is bias-only.",
+      "inputs": {
+        "physical_sensor": [
+          {
+            "t": 0,
+            "value": 20.0
+          },
+          {
+            "t": 3600,
+            "value": 22.5
+          }
+        ],
+        "virtual_value": 20.0
+      },
+      "expect": [
+        {
+          "output": "yBias",
+          "from_s": 0,
+          "to_s": 5700,
+          "equals": false
+        },
+        {
+          "output": "yBias",
+          "from_s": 5760,
+          "to_s": 21600,
+          "equals": true
+        },
+        {
+          "output": "yNoise",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7500,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 7560,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "bias_present_at_load",
+      "description": "The same 2.5 bias, already present when the controller starts. MovingAverage divides by elapsed time until its window fills, so the mean is the live residual within one tick rather than ramping in over an hour: yBias asserts at 60 s and yFault at 1860 s. This is the TrueDelay boundary pinned explicitly — the branch has been true since 60 s, yFault is still false at 1800 s and asserts at exactly 60 + alarm_delay.",
+      "inputs": {
+        "physical_sensor": 22.5,
+        "virtual_value": 20.0
+      },
+      "expect": [
+        {
+          "output": "yBias",
+          "from_s": 0,
+          "to_s": 0,
+          "equals": false
+        },
+        {
+          "output": "yBias",
+          "from_s": 60,
+          "to_s": 21600,
+          "equals": true
+        },
+        {
+          "output": "yNoise",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "bias_exactly_at_the_threshold",
+      "description": "Boundary: a steady residual of exactly bias_threshold (1.5). Reals.GreaterThreshold is strict and CDL Reals has no GreaterEqual, so a sensor sitting exactly on the published band reads healthy forever.",
+      "inputs": {
+        "physical_sensor": 21.5,
+        "virtual_value": 20.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yBias",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yNoise",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "bias_just_above_the_threshold",
+      "description": "The same line from above: a residual of 1.6 asserts the branch at 60 s and the alarm at 1860 s. Koo & Yoon put the reliable detection floor for this method at about 1 degC of bias, and the shipped 1.5 sits above it.",
+      "inputs": {
+        "physical_sensor": 21.6,
+        "virtual_value": 20.0
+      },
+      "expect": [
+        {
+          "output": "yBias",
+          "from_s": 60,
+          "to_s": 21600,
+          "equals": true
+        },
+        {
+          "output": "yNoise",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "noise_burst_without_bias",
+      "description": "Noise-only, and the reason the second branch exists. After a clean window the sensor starts swinging plus and minus 4 around the prediction on a 30-minute square wave: the mean residual stays near zero so the bias branch never moves, while the variance climbs past noise_threshold squared at 5640 s and the alarm lands at 7440 s. This is diagnosis 2 (intermittent failure) rather than diagnosis 1, and the branch outputs are what tell the two apart.",
+      "inputs": {
+        "physical_sensor": [
+          {
+            "t": 0,
+            "value": 20.0
+          },
+          {
+            "t": 3600,
+            "value": 24.0
+          },
+          {
+            "t": 4500,
+            "value": 16.0
+          },
+          {
+            "t": 5400,
+            "value": 24.0
+          },
+          {
+            "t": 6300,
+            "value": 16.0
+          },
+          {
+            "t": 7200,
+            "value": 24.0
+          },
+          {
+            "t": 8100,
+            "value": 16.0
+          },
+          {
+            "t": 9000,
+            "value": 24.0
+          },
+          {
+            "t": 9900,
+            "value": 16.0
+          },
+          {
+            "t": 10800,
+            "value": 24.0
+          },
+          {
+            "t": 11700,
+            "value": 16.0
+          },
+          {
+            "t": 12600,
+            "value": 24.0
+          },
+          {
+            "t": 13500,
+            "value": 16.0
+          },
+          {
+            "t": 14400,
+            "value": 24.0
+          },
+          {
+            "t": 15300,
+            "value": 16.0
+          },
+          {
+            "t": 16200,
+            "value": 24.0
+          },
+          {
+            "t": 17100,
+            "value": 16.0
+          },
+          {
+            "t": 18000,
+            "value": 24.0
+          },
+          {
+            "t": 18900,
+            "value": 16.0
+          },
+          {
+            "t": 19800,
+            "value": 24.0
+          },
+          {
+            "t": 20700,
+            "value": 16.0
+          }
+        ],
+        "virtual_value": 20.0
+      },
+      "expect": [
+        {
+          "output": "yBias",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yNoise",
+          "from_s": 0,
+          "to_s": 5580,
+          "equals": false
+        },
+        {
+          "output": "yNoise",
+          "from_s": 5640,
+          "to_s": 21600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7380,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 7440,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "noise_exactly_at_the_threshold",
+      "description": "Boundary on the noise side, and the vector that pins the squaring. A square wave of amplitude exactly noise_threshold (3.0) has variance exactly noise_threshold squared, the comparison is strict, and the rule stays silent through eighteen thousand seconds of it. Amplitude reads directly as standard deviation for a square wave, which is why this waveform is the one the vectors use.",
+      "inputs": {
+        "physical_sensor": [
+          {
+            "t": 0,
+            "value": 20.0
+          },
+          {
+            "t": 3600,
+            "value": 23.0
+          },
+          {
+            "t": 4500,
+            "value": 17.0
+          },
+          {
+            "t": 5400,
+            "value": 23.0
+          },
+          {
+            "t": 6300,
+            "value": 17.0
+          },
+          {
+            "t": 7200,
+            "value": 23.0
+          },
+          {
+            "t": 8100,
+            "value": 17.0
+          },
+          {
+            "t": 9000,
+            "value": 23.0
+          },
+          {
+            "t": 9900,
+            "value": 17.0
+          },
+          {
+            "t": 10800,
+            "value": 23.0
+          },
+          {
+            "t": 11700,
+            "value": 17.0
+          },
+          {
+            "t": 12600,
+            "value": 23.0
+          },
+          {
+            "t": 13500,
+            "value": 17.0
+          },
+          {
+            "t": 14400,
+            "value": 23.0
+          },
+          {
+            "t": 15300,
+            "value": 17.0
+          },
+          {
+            "t": 16200,
+            "value": 23.0
+          },
+          {
+            "t": 17100,
+            "value": 17.0
+          },
+          {
+            "t": 18000,
+            "value": 23.0
+          },
+          {
+            "t": 18900,
+            "value": 17.0
+          },
+          {
+            "t": 19800,
+            "value": 23.0
+          },
+          {
+            "t": 20700,
+            "value": 17.0
+          }
+        ],
+        "virtual_value": 20.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yBias",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yNoise",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "noise_just_above_the_threshold",
+      "description": "The same line from above: amplitude 3.2 gives a variance of 10.24 against a threshold of 9.0, the noise branch asserts at 6780 s and the alarm at 8580 s. The margin over the 3.0 case is 7% in amplitude and 14% in the compared quantity, which is what squaring the threshold does to the sensitivity near the line.",
+      "inputs": {
+        "physical_sensor": [
+          {
+            "t": 0,
+            "value": 20.0
+          },
+          {
+            "t": 3600,
+            "value": 23.2
+          },
+          {
+            "t": 4500,
+            "value": 16.8
+          },
+          {
+            "t": 5400,
+            "value": 23.2
+          },
+          {
+            "t": 6300,
+            "value": 16.8
+          },
+          {
+            "t": 7200,
+            "value": 23.2
+          },
+          {
+            "t": 8100,
+            "value": 16.8
+          },
+          {
+            "t": 9000,
+            "value": 23.2
+          },
+          {
+            "t": 9900,
+            "value": 16.8
+          },
+          {
+            "t": 10800,
+            "value": 23.2
+          },
+          {
+            "t": 11700,
+            "value": 16.8
+          },
+          {
+            "t": 12600,
+            "value": 23.2
+          },
+          {
+            "t": 13500,
+            "value": 16.8
+          },
+          {
+            "t": 14400,
+            "value": 23.2
+          },
+          {
+            "t": 15300,
+            "value": 16.8
+          },
+          {
+            "t": 16200,
+            "value": 23.2
+          },
+          {
+            "t": 17100,
+            "value": 16.8
+          },
+          {
+            "t": 18000,
+            "value": 23.2
+          },
+          {
+            "t": 18900,
+            "value": 16.8
+          },
+          {
+            "t": 19800,
+            "value": 23.2
+          },
+          {
+            "t": 20700,
+            "value": 16.8
+          }
+        ],
+        "virtual_value": 20.0
+      },
+      "expect": [
+        {
+          "output": "yBias",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yNoise",
+          "from_s": 0,
+          "to_s": 6720,
+          "equals": false
+        },
+        {
+          "output": "yNoise",
+          "from_s": 6780,
+          "to_s": 21600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 8520,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 8580,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "bias_reverses_before_the_alarm_matures",
+      "description": "The alarm needs the disjunction held continuously. A residual of +3 for the first ten minutes takes the bias branch true at 60 s; the residual then reverses to -1 and drags the window mean back through the band at 900 s, well short of the 1860 s the timer needed. The branch drops, the timer resets, and no alarm is ever reported.",
+      "inputs": {
+        "physical_sensor": [
+          {
+            "t": 0,
+            "value": 23.0
+          },
+          {
+            "t": 600,
+            "value": 19.0
+          }
+        ],
+        "virtual_value": 20.0
+      },
+      "expect": [
+        {
+          "output": "yBias",
+          "from_s": 60,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yBias",
+          "from_s": 900,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yNoise",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "residual_cleared_after_the_alarm",
+      "description": "Recovery, and the vector that shows the statistic's memory. The 2.5 bias alarms at 1860 s and a technician recalibrates at 7200 s, taking the residual straight to zero. The alarm does not clear with it: the window still holds the biased hour, the mean decays linearly, and yFault does not drop until 8580 s — 23 minutes after the sensor was fixed. A host that watches for the fault to clear immediately after a repair will conclude the repair failed.",
+      "inputs": {
+        "physical_sensor": [
+          {
+            "t": 0,
+            "value": 22.5
+          },
+          {
+            "t": 7200,
+            "value": 20.0
+          }
+        ],
+        "virtual_value": 20.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 8520,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 8580,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yBias",
+          "from_s": 60,
+          "to_s": 8520,
+          "equals": true
+        },
+        {
+          "output": "yBias",
+          "from_s": 8580,
+          "to_s": 21600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "virtual_model_drifts_instead",
+      "description": "Diagnosis 4 written as arithmetic. The physical sensor is perfect at 20.0 and the model's prediction has fallen to 17.5 because one of its correlated input sensors drifted. Every output tick is identical to bias_present_at_load, where the physical sensor was the faulty one: the rule sees a residual and names the point it was pointed at. This is the residual ambiguity the host has to weigh, and no arrangement of one sensor against one model resolves it.",
+      "inputs": {
+        "physical_sensor": 20.0,
+        "virtual_value": 17.5
+      },
+      "expect": [
+        {
+          "output": "yBias",
+          "from_s": 60,
+          "to_s": 21600,
+          "equals": true
+        },
+        {
+          "output": "yNoise",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "physical_sensor_reads_low",
+      "description": "Sign symmetry: the sensor reads 2.5 BELOW the prediction. Abs throws the sign away, so a transmitter drifting low is detected on the same schedule as one drifting high, and the finding does not say which direction without looking at the trend.",
+      "inputs": {
+        "physical_sensor": 17.5,
+        "virtual_value": 20.0
+      },
+      "expect": [
+        {
+          "output": "yBias",
+          "from_s": 60,
+          "to_s": 21600,
+          "equals": true
+        },
+        {
+          "output": "yNoise",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # HVAC FDD Reference v1.0 — Digest
 
-Source: `/Users/justin/Documents/HVAC_FDD_Reference_v1.0_FINAL.pdf` (Feb 2026, 178 pp).
+Source: HVAC FDD Reference v1.0 (`HVAC_FDD_Reference_v1.0_FINAL.pdf`, Feb 2026, 178 pp; local copy, not distributed).
 Status: **guidance, not final truth** — early-version research paper used to ground our
 CDL-based fault detection work and future agentic fault generation.
 

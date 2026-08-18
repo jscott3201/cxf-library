@@ -10,7 +10,7 @@ sit above 30% prevalence in PNNL's 151-building study.
 Point dictionary: [`points/chw.points.json`](../../points/chw.points.json).
 Supplementary deep-read sources (paraphrase-and-cite only, per the licensing
 rule): G36 cooling-plant AFDD document, ASHRAE RP-1043 chiller FDD review,
-and the chiller-plant entries in `_research/local/paper-triage.md`.
+and the chiller-plant entries in the project’s internal research triage (licensed sources; not distributed).
 
 ## Index
 

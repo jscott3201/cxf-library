@@ -130,7 +130,12 @@ Target dialect: the open-control engine's composite subset
   reference semantics include an in-rule evaluability condition (a NO_EVAL
   test vector), expose it as an additional boolean output (`y…` name); the
   card documents that false means NO_EVAL — the host must consult it before
-  interpreting `yFault`.
+  interpreting `yFault`. Secondary outputs come in TWO kinds and the card's
+  `outputs` prose must say which: **evaluability flags** (`y…Ok` — false
+  means NO_EVAL) and **sub-condition/direction flags** (e.g. SYS-FC-055's
+  `yBias`/`yNoise`, SYS-FC-057's direction flags — diagnostic detail only;
+  false never means NO_EVAL). Hosts must not treat every non-`yFault`
+  boolean as an evaluability gate.
 - No semantic annotations in v1 (see design stance). No `oce.*` class aliases.
 
 ## `vectors.json` contract (`cxf-library/vectors/v1`)
