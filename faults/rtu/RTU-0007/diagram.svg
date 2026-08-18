@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 430" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <rect x="12" y="40" width="150" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="87" y="59" text-anchor="middle" fill="#1e3a8a">cond_leaving_temp</text>
+  <rect x="12" y="100" width="60" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="42" y="119" text-anchor="middle" fill="#1e3a8a">oat</text>
+  <rect x="12" y="190" width="165" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="94.5" y="209" text-anchor="middle" fill="#1e3a8a">cond_split_baseline</text>
+  <rect x="12" y="300" width="100" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="62" y="319" text-anchor="middle" fill="#1e3a8a">comp_status</text>
+
+  <!-- measured split, excess over the host fit, and the ratio -->
+  <rect x="230" y="40" width="130" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="295" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">split</text>
+  <text x="295" y="80" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+
+  <rect x="430" y="40" width="130" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="495" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">excess</text>
+  <text x="495" y="80" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+
+  <rect x="630" y="40" width="120" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="690" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">ratio</text>
+  <text x="690" y="80" text-anchor="middle" fill="#57606a" font-size="11">Reals.Divide</text>
+
+  <rect x="820" y="40" width="240" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="940" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">excessHigh</text>
+  <text x="940" y="80" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 0.30</text>
+
+  <!-- compressor settling gate -->
+  <rect x="380" y="290" width="150" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="455" y="312" text-anchor="middle" fill="#24292f" font-weight="bold">runtimeOk</text>
+  <text x="455" y="330" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 900 s</text>
+
+  <rect x="1130" y="40" width="110" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1185" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">gate</text>
+  <text x="1185" y="80" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <!-- boundary outputs -->
+  <rect x="1310" y="54" width="81" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1350.5" y="73" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1310" y="304" width="100" height="30" rx="15" fill="#fef3c7" stroke="#d97706"/>
+  <text x="1360" y="323" text-anchor="middle" fill="#78350f">yRuntimeOk</text>
+
+  <!-- fan-out trunks -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none">
+    <path d="M 177 205 H 396"/>
+    <path d="M 530 319 H 1090"/>
+  </g>
+  <circle cx="396" cy="205" r="3" fill="#7d8590"/>
+  <circle cx="1090" cy="319" r="3" fill="#7d8590"/>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 162 55 H 226"/>
+    <path d="M 72 115 H 198 V 83 H 226"/>
+    <path d="M 396 205 V 83 H 426"/>
+    <path d="M 396 205 H 596 V 83 H 626"/>
+    <path d="M 360 69 H 396 V 55 H 426"/>
+    <path d="M 560 69 H 596 V 55 H 626"/>
+    <path d="M 750 69 H 816"/>
+    <path d="M 112 315 H 350 V 319 H 376"/>
+    <path d="M 1060 69 H 1105 V 55 H 1126"/>
+    <path d="M 1090 319 V 83 H 1126"/>
+    <path d="M 1090 319 H 1306"/>
+    <path d="M 1240 69 H 1306"/>
+  </g>
+
+  <!-- port labels -->
+  <g fill="#7d8590" font-size="9">
+    <text x="234" y="52">u1</text>
+    <text x="234" y="90">u2</text>
+    <text x="434" y="52">u1</text>
+    <text x="434" y="90">u2</text>
+    <text x="634" y="52">u1</text>
+    <text x="634" y="90">u2</text>
+    <text x="1134" y="52">u1</text>
+    <text x="1134" y="90">u2</text>
+  </g>
+
+  <!-- edge types -->
+  <g fill="#7d8590" font-size="10">
+    <text x="168" y="48">Real</text>
+    <text x="183" y="198">Real</text>
+    <text x="756" y="62">Real</text>
+    <text x="1066" y="62">Bool</text>
+    <text x="118" y="308">Bool</text>
+    <text x="536" y="312">Bool</text>
+  </g>
+
+  <!-- annotations -->
+  <text x="215" y="390" fill="#7d8590" font-size="11">cond_split_baseline is the host&#8217;s per-stage fit against OAT; the graph divides by it and relies on the point contract that it is positive.</text>
+  <text x="215" y="408" fill="#7d8590" font-size="11">runtimeOk is the only timer — it debounces the compressor, not the ratio, so yFault tracks the split tick by tick once the gate is armed.</text>
+</svg>

@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 400" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+  <rect x="12" y="40" width="73" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="48.5" y="59" text-anchor="middle" fill="#1e3a8a">chwst</text>
+  <rect x="12" y="100" width="120" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="72" y="119" text-anchor="middle" fill="#1e3a8a">evap_sat_temp</text>
+  <rect x="12" y="300" width="128" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="76" y="319" text-anchor="middle" fill="#1e3a8a">chiller_load</text>
+  <rect x="200" y="40" width="121" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="260.5" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">approach</text>
+  <text x="260.5" y="80" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="200" y="150" width="260" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="330" y="172" text-anchor="middle" fill="#24292f" font-weight="bold">cleanApproach</text>
+  <text x="330" y="190" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 5 °C</text>
+  <rect x="520" y="150" width="260" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="650" y="172" text-anchor="middle" fill="#24292f" font-weight="bold">approachLimit</text>
+  <text x="650" y="190" text-anchor="middle" fill="#57606a" font-size="11">Reals.MultiplyByParameter · k = 2</text>
+  <rect x="840" y="40" width="130" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="905" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">approachHigh</text>
+  <text x="905" y="80" text-anchor="middle" fill="#57606a" font-size="11">Reals.Greater</text>
+  <rect x="200" y="290" width="247" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="323.5" y="312" text-anchor="middle" fill="#24292f" font-weight="bold">loadOk</text>
+  <text x="323.5" y="330" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 40 %</text>
+  <rect x="1010" y="40" width="101" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1060.5" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">gate</text>
+  <text x="1060.5" y="80" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="1151" y="40" width="147" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1224.5" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1224.5" y="80" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 3600 s</text>
+  <rect x="1330" y="54" width="81" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1370.5" y="73" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1330" y="304" width="89" height="30" rx="15" fill="#fef3c7" stroke="#d97706"/>
+  <text x="1374.5" y="323" text-anchor="middle" fill="#78350f">yLoadOk</text>
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 85 55 H 196"/>
+    <path d="M 132 115 H 168 V 83 H 196"/>
+    <path d="M 140 315 H 178 V 319 H 196"/>
+    <path d="M 460 179 H 516"/>
+    <path d="M 321 69 H 806 V 55 H 836"/>
+    <path d="M 780 179 H 806 V 83 H 836"/>
+    <path d="M 970 69 H 990 V 55 H 1006"/>
+    <path d="M 447 319 H 990 V 83 H 1006"/>
+    <path d="M 447 319 H 1326"/>
+    <path d="M 1111 69 H 1147"/>
+    <path d="M 1298 69 H 1326"/>
+  </g>
+  <g fill="#7d8590" font-size="9">
+    <text x="204" y="58">u1</text>
+    <text x="204" y="90">u2</text>
+    <text x="844" y="58">u1</text>
+    <text x="844" y="90">u2</text>
+    <text x="1014" y="58">u1</text>
+    <text x="1014" y="90">u2</text>
+  </g>
+  <text x="91" y="48" fill="#7d8590" font-size="10">Real</text>
+  <text x="138" y="108" fill="#7d8590" font-size="10">Real</text>
+  <text x="146" y="308" fill="#7d8590" font-size="10">Real</text>
+  <text x="327" y="62" fill="#7d8590" font-size="10">Real</text>
+  <text x="466" y="172" fill="#7d8590" font-size="10">Real</text>
+  <text x="976" y="62" fill="#7d8590" font-size="10">Bool</text>
+  <text x="453" y="312" fill="#7d8590" font-size="10">Bool</text>
+  <text x="1330" y="372" fill="#7d8590" font-size="11">false ⇒ NO_EVAL</text>
+  <text x="12" y="372" fill="#7d8590" font-size="11">approach = chwst − evap_sat_temp: u1 is the water the machine makes, u2 the refrigerant boiling under it, and a clean barrel keeps that gap small.</text>
+  <text x="12" y="390" fill="#7d8590" font-size="11">Single-sided on purpose — a smaller approach is better heat transfer, not a fault — so approachHigh has no low-side twin.</text>
+</svg>

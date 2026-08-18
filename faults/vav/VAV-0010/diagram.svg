@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1660 300" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <rect x="270" y="110" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="355" y="132" text-anchor="middle" fill="#24292f" font-weight="bold">err</text>
+  <text x="355" y="150" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="490" y="30" width="225" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="602.5" y="52" text-anchor="middle" fill="#24292f" font-weight="bold">highCmp</text>
+  <text x="602.5" y="70" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 3.0</text>
+  <rect x="490" y="190" width="250" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="615" y="212" text-anchor="middle" fill="#24292f" font-weight="bold">negErr</text>
+  <text x="615" y="230" text-anchor="middle" fill="#57606a" font-size="11">Reals.MultiplyByParameter · k = -1</text>
+  <rect x="790" y="190" width="225" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="902.5" y="212" text-anchor="middle" fill="#24292f" font-weight="bold">lowCmp</text>
+  <text x="902.5" y="230" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 3.0</text>
+  <rect x="1065" y="110" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1150" y="132" text-anchor="middle" fill="#24292f" font-weight="bold">anyDir</text>
+  <text x="1150" y="150" text-anchor="middle" fill="#57606a" font-size="11">Logical.Or</text>
+  <rect x="1285" y="110" width="190" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1380" y="132" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1380" y="150" text-anchor="middle" fill="#57606a" font-size="11">Logical.TrueDelay · 7200 s</text>
+  <rect x="12" y="92" width="175" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="99.5" y="111" text-anchor="middle" fill="#1e3a8a">zone_temp</text>
+  <rect x="12" y="154" width="215" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="119.5" y="173" text-anchor="middle" fill="#1e3a8a">zone_temp_neighbor_median</text>
+  <rect x="1525" y="44" width="72" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1561" y="63" text-anchor="middle" fill="#7f1d1d">yHigh</text>
+  <rect x="1525" y="124" width="76" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1563" y="143" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1525" y="204" width="68" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1559" y="223" text-anchor="middle" fill="#7f1d1d">yLow</text>
+
+  <g fill="none" stroke="#7d8590" stroke-width="1.5" marker-end="url(#arrow)">
+    <path d="M 187 107 H 240 V 127 H 270"/>
+    <path d="M 227 169 H 248 V 151 H 270"/>
+    <path d="M 440 139 H 465 V 59 H 490"/>
+    <path d="M 465 139 V 219 H 490"/>
+    <path d="M 715 59 H 1525"/>
+    <path d="M 1040 59 V 127 H 1065"/>
+    <path d="M 740 219 H 790"/>
+    <path d="M 1015 219 H 1525"/>
+    <path d="M 1040 219 V 151 H 1065"/>
+    <path d="M 1235 139 H 1285"/>
+    <path d="M 1475 139 H 1525"/>
+  </g>
+
+  <g fill="#7d8590" font-size="9">
+    <text x="274" y="132">u1</text>
+    <text x="274" y="156">u2</text>
+    <text x="1069" y="132">u1</text>
+    <text x="1069" y="156">u2</text>
+  </g>
+
+  <g fill="#7d8590" font-size="10">
+    <text x="446" y="132">Real</text>
+    <text x="721" y="52">Bool</text>
+    <text x="1021" y="212">Bool</text>
+    <text x="1241" y="132">Bool</text>
+  </g>
+
+  <text x="270" y="274" fill="#7d8590" font-size="11">The median is host-computed and self-excluding (points contract): a drifting sensor cannot pull its own reference, and trunk-wide events move both terms and cancel.</text>
+  <text x="270" y="292" fill="#7d8590" font-size="11">The Or feeds one TrueDelay, so a divergence that flips sign without closing is one continuous fault. Both comparisons are strict.</text>
+</svg>

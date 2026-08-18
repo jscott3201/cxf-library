@@ -19,13 +19,14 @@ Point dictionary: [`points/rtu.points.json`](../../points/rtu.points.json).
 | RTU-0004 | Economizer not modulating | 3 | rule | **verified** |
 | RTU-0005 | Excess outdoor air | 3 | rule | **verified** |
 | RTU-0006 | Insufficient ventilation | 2 | rule | **verified** |
-| RTU-0007 | Condenser airflow restriction | 3 | statistical | deferred |
+| RTU-0007 | Condenser airflow restriction | 3 | statistical | **verified** |
 
 Severity and method per the reference's ch.11 cards (its §5.8.3 index carries
-no severity column). RTU-0007 is deferred: its baseline is a function of two
-variables (compressor stage AND outdoor temperature), which needs baseline-
-curve infrastructure the block set does not yet express; it also requires a
-condenser leaving-air temperature sensor most RTUs lack.
+no severity column). RTU-0007 shipped once the host-fitted-baseline
+convention resolved its two-variable (stage AND outdoor temperature) curve
+as the derived point `cond_split_baseline`; its remaining constraint is the
+condenser leaving-air temperature sensor most packaged units lack, declared
+on the card as a retrofit gate rather than a deferral.
 
 ## Relationships
 

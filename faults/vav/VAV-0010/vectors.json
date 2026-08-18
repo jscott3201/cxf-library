@@ -1,0 +1,327 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 10800
+  },
+  "scenarios": [
+    {
+      "name": "zones_agree",
+      "description": "The zone reads 0.4 degC over its neighbor median \u2014 inside any sane drift_threshold. Nothing asserts for three hours.",
+      "inputs": {
+        "zone_temp": 22.4,
+        "zone_temp_neighbor_median": 22.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        },
+        {
+          "output": "yHigh",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        },
+        {
+          "output": "yLow",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "reads_high_drift_alarms",
+      "description": "A 3.5 degC standing excess over the median: yHigh asserts undelayed from the first tick, and yFault exactly at persist_time (delayOnInit = true, divergence present from init).",
+      "inputs": {
+        "zone_temp": 25.5,
+        "zone_temp_neighbor_median": 22.0
+      },
+      "expect": [
+        {
+          "output": "yHigh",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": true
+        },
+        {
+          "output": "yLow",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7140,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 7200,
+          "to_s": 10800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "reads_low_drift_alarms",
+      "description": "The mirror direction, 3.5 degC under the median through the in-graph negation: yLow undelayed, yFault at persist_time.",
+      "inputs": {
+        "zone_temp": 18.5,
+        "zone_temp_neighbor_median": 22.0
+      },
+      "expect": [
+        {
+          "output": "yLow",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": true
+        },
+        {
+          "output": "yHigh",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7140,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 7200,
+          "to_s": 10800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "threshold_equality_is_silent",
+      "description": "Exactly drift_threshold apart on each side in turn (+3.0 then -3.0). Both comparisons are strict, so equality reads healthy and nothing ever accumulates toward an alarm.",
+      "inputs": {
+        "zone_temp": [
+          {
+            "t": 0,
+            "value": 25.0
+          },
+          {
+            "t": 5400,
+            "value": 19.0
+          }
+        ],
+        "zone_temp_neighbor_median": 22.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        },
+        {
+          "output": "yHigh",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        },
+        {
+          "output": "yLow",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "transient_never_alarms",
+      "description": "A one-hour 4.5 degC excursion \u2014 a real disturbance, not drift. yHigh reports it live; the excursion ends before persist_time and yFault stays silent.",
+      "inputs": {
+        "zone_temp": [
+          {
+            "t": 0,
+            "value": 26.5
+          },
+          {
+            "t": 3600,
+            "value": 22.0
+          }
+        ],
+        "zone_temp_neighbor_median": 22.0
+      },
+      "expect": [
+        {
+          "output": "yHigh",
+          "from_s": 0,
+          "to_s": 3540,
+          "equals": true
+        },
+        {
+          "output": "yHigh",
+          "from_s": 3600,
+          "to_s": 10800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "direction_flip_keeps_persistence",
+      "description": "Divergence flips sign at one hour without ever closing. The Or sits before the delay, so the persistence survives the flip and yFault still asserts at persist_time from the start \u2014 a sensor that is simply wrong, whichever way, is one fault.",
+      "inputs": {
+        "zone_temp": [
+          {
+            "t": 0,
+            "value": 26.0
+          },
+          {
+            "t": 3600,
+            "value": 18.0
+          }
+        ],
+        "zone_temp_neighbor_median": 22.0
+      },
+      "expect": [
+        {
+          "output": "yHigh",
+          "from_s": 0,
+          "to_s": 3540,
+          "equals": true
+        },
+        {
+          "output": "yHigh",
+          "from_s": 3600,
+          "to_s": 10800,
+          "equals": false
+        },
+        {
+          "output": "yLow",
+          "from_s": 0,
+          "to_s": 3540,
+          "equals": false
+        },
+        {
+          "output": "yLow",
+          "from_s": 3600,
+          "to_s": 10800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7140,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 7200,
+          "to_s": 10800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "median_moves_with_zone",
+      "description": "A building-wide swing: the zone climbs 5 degC and the neighbor median climbs with it. The subtraction sees only the small residual, which is the point of a fleet-relative reference \u2014 trunk-level events move both terms.",
+      "inputs": {
+        "zone_temp": [
+          {
+            "t": 0,
+            "value": 23.0
+          },
+          {
+            "t": 5400,
+            "value": 28.0
+          }
+        ],
+        "zone_temp_neighbor_median": [
+          {
+            "t": 0,
+            "value": 22.8
+          },
+          {
+            "t": 5400,
+            "value": 27.6
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        },
+        {
+          "output": "yHigh",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        },
+        {
+          "output": "yLow",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "recovery_resets_delay",
+      "description": "Divergence holds for 100 minutes, closes for 10, then returns. TrueDelay starts over on the false gap, so the second run has not reached persist_time by the horizon: no alarm without CONTINUOUS divergence.",
+      "inputs": {
+        "zone_temp": [
+          {
+            "t": 0,
+            "value": 26.0
+          },
+          {
+            "t": 6000,
+            "value": 22.0
+          },
+          {
+            "t": 6600,
+            "value": 26.0
+          }
+        ],
+        "zone_temp_neighbor_median": 22.0
+      },
+      "expect": [
+        {
+          "output": "yHigh",
+          "from_s": 0,
+          "to_s": 5940,
+          "equals": true
+        },
+        {
+          "output": "yHigh",
+          "from_s": 6000,
+          "to_s": 6540,
+          "equals": false
+        },
+        {
+          "output": "yHigh",
+          "from_s": 6600,
+          "to_s": 10800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

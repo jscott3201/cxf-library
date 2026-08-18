@@ -223,6 +223,28 @@
       "provisional": true,
       "notes": "Host-derived P-T saturation lookup from measured discharge/liquid pressure (hp dict precedent, duplicated per the lint's own-family resolution rule). Consumed by CHW-0005 condenser-approach-high: approach = cond_sat_temp − cwst. Refrigerant-specific lookup is the host's, documented per binding.",
       "derived": true
+    },
+    {
+      "name": "evap_sat_temp",
+      "description": "Evaporating saturation temperature (HOST-DERIVED: suction pressure via refrigerant P-T lookup, or coil-surface proxy)",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Refrigerant",
+        "aspects": [
+          "evaporating",
+          "derived"
+        ]
+      },
+      "provisional": true,
+      "notes": "Mirror of the hp dict entry (duplicated per the lint's own-family resolution rule; same refrigerant P-T host obligation — the lookup is refrigerant-specific and lives at the host). CHW-0006 evaporator approach = chwst − evap_sat_temp; healthy approach is small and positive, and tube fouling or low charge widens it.",
+      "derived": true
     }
   ]
 }

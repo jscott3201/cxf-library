@@ -117,7 +117,8 @@
         "AHU-0003",
         "SYS-0006",
         "SYS-0009",
-        "SYS-0010"
+        "SYS-0010",
+        "VAV-0010"
       ],
       "playbook": "sensor-drift",
       "prevalence": "~15%",
@@ -134,7 +135,7 @@
       ],
       "playbook": "cooling-tower-performance",
       "prevalence": "unpublished (library-authored family)",
-      "energy_impact": "~2-4% chiller power per degC of added lift (BEE 2006 §3)"
+      "energy_impact": "~2-4% chiller power per degC of added lift (BEE 2006 \u00a73)"
     }
   ]
 }

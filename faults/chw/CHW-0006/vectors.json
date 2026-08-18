@@ -1,0 +1,256 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 7200
+  },
+  "scenarios": [
+    {
+      "name": "clean_evaporator_at_load",
+      "description": "NO_FAULT: 7 °C leaving chilled water against 5 °C saturated suction is a 2 K approach — a healthy flooded barrel — at 60% load. The approach conjunct blocks alone, and the machine is evaluable and silent.",
+      "inputs": {
+        "chwst": 7.0,
+        "evap_sat_temp": 5.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "fouled_evaporator_at_load",
+      "description": "FAULT: the same 7 °C leaving water against −5 °C saturated suction is a 12 K approach at 60% load — the machine is pulling its suction 12 K below the water it makes. The alarm lands at exactly alarm_delay because delayOnInit holds the condition from the first tick.",
+      "inputs": {
+        "chwst": 7.0,
+        "evap_sat_temp": -5.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "high_approach_at_low_load",
+      "description": "NO_EVAL: the same 12 K approach at 20% load. The load conjunct blocks alone, and yLoadOk = false is what tells the host that the silence is not a healthy verdict — at part load a clean barrel and a fouled one both make small approaches.",
+      "inputs": {
+        "chwst": 7.0,
+        "evap_sat_temp": -5.0,
+        "chiller_load": 20.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "approach_exactly_at_the_band",
+      "description": "Boundary, bit-exact: 7.0 − (−3.0) is exactly 10.0 and 5.0 × 2.0 is the same double, so the approach sits exactly on the band. Reals.Greater is strict, so exactly-at-the-band reads healthy.",
+      "inputs": {
+        "chwst": 7.0,
+        "evap_sat_temp": -3.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "approach_just_above_the_band",
+      "description": "Boundary from above: −3.01 °C saturated suction clears the strict comparison by 10 mK and alarms on the normal schedule.",
+      "inputs": {
+        "chwst": 7.0,
+        "evap_sat_temp": -3.01,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "approach_just_below_the_band",
+      "description": "Boundary from below: −2.99 °C saturated suction is 10 mK inside the band and never alarms, however marginal the machine's evaporator is.",
+      "inputs": {
+        "chwst": 7.0,
+        "evap_sat_temp": -2.99,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "load_exactly_at_the_evaluability_floor",
+      "description": "Boundary on the other conjunct: load is exactly min_load_for_eval (40%) with a 12 K approach. Reals.GreaterThreshold is strict, so exactly-at-the-floor is NO_EVAL.",
+      "inputs": {
+        "chwst": 7.0,
+        "evap_sat_temp": -5.0,
+        "chiller_load": 40.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "load_just_below_the_evaluability_floor",
+      "description": "39.9% load with the same widened approach: still NO_EVAL.",
+      "inputs": {
+        "chwst": 7.0,
+        "evap_sat_temp": -5.0,
+        "chiller_load": 39.9
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "load_just_above_the_evaluability_floor",
+      "description": "40.1% load with the same widened approach: evaluable, and the alarm lands at exactly alarm_delay. One tenth of a percent of chiller load is the whole difference between this scenario and the previous one.",
+      "inputs": {
+        "chwst": 7.0,
+        "evap_sat_temp": -5.0,
+        "chiller_load": 40.1
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "low_approach_is_never_a_fault",
+      "description": "Single-sidedness pinned: a 0.5 K approach — better heat transfer than the commissioned barrel, or a lightly fouled machine after a tube cleaning — is silent at full evaluability. The rule has no low-side comparison, by design.",
+      "inputs": {
+        "chwst": 7.0,
+        "evap_sat_temp": 6.5,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "negative_approach_reads_healthy",
+      "description": "Blind spot, pinned: saturated suction reported ABOVE the leaving chilled water is thermodynamically impossible in steady state and can only be a bad P-T lookup or a mis-calibrated sensor. The rule is single-sided, so it reads healthy and says nothing. A host wanting that check reads the approach itself.",
+      "inputs": {
+        "chwst": 7.0,
+        "evap_sat_temp": 8.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "approach_widens_mid_run",
+      "description": "A machine holding a 2 K approach loses it at t = 1800 s — chilled water flow falling away, or refrigerant charge migrating out of the barrel. The alarm lands at exactly 5400 s: the mid-run rising edge carries the same T + delayTime arithmetic as the init case.",
+      "inputs": {
+        "chwst": 7.0,
+        "evap_sat_temp": [
+          { "t": 0, "value": 5.0 },
+          { "t": 1800, "value": -5.0 }
+        ],
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5340, "equals": false },
+        { "output": "yFault", "from_s": 5400, "to_s": 7200, "equals": true },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "approach_recovers_after_alarm",
+      "description": "Recovery: the alarm asserts at 3600 s and the evaporator is cleaned — or the charge is restored, or the pump comes back — at t = 5400 s. TrueDelay passes the falling edge with no delay, so yFault drops on that tick.",
+      "inputs": {
+        "chwst": 7.0,
+        "evap_sat_temp": [
+          { "t": 0, "value": -5.0 },
+          { "t": 5400, "value": 5.0 }
+        ],
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 5340, "equals": true },
+        { "output": "yFault", "from_s": 5400, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "load_drops_after_alarm",
+      "description": "The evaluability release: an alarming machine unloads to 20% at t = 5400 s with the widened approach unchanged. yFault and yLoadOk fall on the same tick, and only the pair tells the host that the chiller unloaded rather than that the evaporator recovered.",
+      "inputs": {
+        "chwst": 7.0,
+        "evap_sat_temp": -5.0,
+        "chiller_load": [
+          { "t": 0, "value": 60.0 },
+          { "t": 5400, "value": 20.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 5340, "equals": true },
+        { "output": "yFault", "from_s": 5400, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 5340, "equals": true },
+        { "output": "yLoadOk", "from_s": 5400, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "intermittent_high_approach_never_alarms",
+      "description": "Approach alternating between 12 K and 2 K every 1200 s — a hunting expansion device, or a machine cycling between capacity steps. No single episode reaches alarm_delay, so nothing fires. Persistence is not averaging: a machine spending half its day at 12 K is a real finding this rule cannot make.",
+      "inputs": {
+        "chwst": 7.0,
+        "evap_sat_temp": [
+          { "t": 0, "value": -5.0 },
+          { "t": 1200, "value": 5.0 },
+          { "t": 2400, "value": -5.0 },
+          { "t": 3600, "value": 5.0 },
+          { "t": 4800, "value": -5.0 },
+          { "t": 6000, "value": 5.0 }
+        ],
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "chilled_water_return_bound_by_mistake",
+      "description": "Blind spot, pinned: chwst is bound to the return (chiller-entering, warm) water instead of the leaving water. The measured difference then carries the evaporator range as well as the approach — 12.0 − 1.0 = 11.0 K on a machine whose real approach is 6 K — and the rule alarms permanently on an evaporator inside its band. The mirror of CHW-0005's condenser-side mis-binding, and the same repair: check which side of the barrel the point is bound to.",
+      "inputs": {
+        "chwst": 12.0,
+        "evap_sat_temp": 1.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "saturation_lookup_biased_high_hides_the_fault",
+      "description": "The opposite blind spot, pinned: a P-T lookup run against the wrong refrigerant biases evap_sat_temp several kelvin high, so a machine at a true 12 K approach reports 7 K and reads healthy for as long as the mis-binding lasts. Nothing in the graph can see the derivation, so the failure is silent in the false-negative direction.",
+      "inputs": {
+        "chwst": 7.0,
+        "evap_sat_temp": 0.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    }
+  ]
+}

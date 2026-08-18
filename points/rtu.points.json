@@ -23,7 +23,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "RTU (packaged rooftop unit) point dictionary. Shared air-side points carry their Brick classes and 223P patterns from the AHU dictionary (see per-point notes); the owning equipment class is brick:Rooftop_Unit / brick:RTU (both verified in Brick 1.4.4). RTU-specific points (comp_status, comp_stage, htg_status) are grep-verified against Brick 1.4.4 but have no reference-model instance check, hence provisional. cond_leaving_temp (RTU-0007) is deferred with that fault.",
+  "notes": "RTU (packaged rooftop unit) point dictionary. Shared air-side points carry their Brick classes and 223P patterns from the AHU dictionary (see per-point notes); the owning equipment class is brick:Rooftop_Unit / brick:RTU (both verified in Brick 1.4.4). RTU-specific points (comp_status, comp_stage, htg_status) are grep-verified against Brick 1.4.4 but have no reference-model instance check, hence provisional.",
   "points": [
     {
       "name": "sat",
@@ -216,6 +216,47 @@
       },
       "provisional": true,
       "notes": "brick:Heating_Start_Stop_Status verified in Brick 1.4.4 (subclass of Start_Stop_Status). Alternative for sites tagging the element itself: generic On_Off_Status isPointOf the burner/heater equipment. For staged gas heat bind the OR of stage statuses - RTU-0003 only asks whether ANY heat is active."
+    },
+    {
+      "name": "cond_leaving_temp",
+      "description": "Condenser leaving air temperature (air discharged off the condenser coil)",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": {
+        "pattern": "Sensor observes QuantifiableObservableProperty on the condenser air leaving connection point",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Air",
+        "aspects": [
+          "leaving",
+          "condenser"
+        ]
+      },
+      "provisional": true,
+      "notes": "No exact Brick 1.4.4 class found for condenser LEAVING air (brick: null, refrigerant-side precedent from the hp dict). Most packaged RTUs lack this sensor — the original deferral reason for RTU-0007; a strap-on or discharge-plenum probe retrofit is the usual binding. Condenser split = cond_leaving_temp − oat."
+    },
+    {
+      "name": "cond_split_baseline",
+      "description": "Expected condenser air-temperature split for the current compressor stage and OAT (host-fitted baseline)",
+      "kind": "real",
+      "unit": "K",
+      "qudt_unit": "K",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty, host-computed",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "TemperatureDifference",
+        "unit": "K",
+        "medium": null,
+        "aspects": [
+          "derived"
+        ]
+      },
+      "derived": true,
+      "notes": "HOST-DERIVED virtual point (evap_sat_temp / zone_reheat_fraction precedent): the reference's baseline_condenser_split(comp_stage, oat) — a per-stage curve against OAT fitted from known-clean operation. The host documents the fit window and guarantees the published value is strictly positive (RTU-0007 divides by it). This is the two-variable baseline that originally deferred the fault; publishing the fit as an ordinary point resolves it."
     }
   ]
 }

@@ -267,6 +267,26 @@
       "s223": null,
       "derived": true,
       "notes": "Duplicate of sys dict occ_scheduled (same host-evaluated schedule boolean). CUSUM rules reset their accumulators in-graph while unoccupied (Switch to zero), per NIST/PIER 2001 §5.1.3: errors are computed only during occupied periods and CUSUMs reset to zero outside them."
+    },
+    {
+      "name": "zone_temp_neighbor_median",
+      "description": "Median zone temperature across the sibling zones served by the same AHU, excluding this zone",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty, host-computed aggregate",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Air",
+        "aspects": [
+          "derived"
+        ]
+      },
+      "derived": true,
+      "notes": "HOST-DERIVED aggregate (zone_dmpr_pos_max / satisfied_zone_fraction precedent), computed PER INSTANCE: the median EXCLUDES the adjudicated zone, so one drifting sensor cannot pull its own reference (self-exclusion matters most in small fleets). Host obligations: document the sibling population and its size — a median over fewer than ~5 zones is fragile and the instance should not be created below that; zones with legitimately divergent setpoints (server rooms, vestibules) are excluded from the population, not compensated. Consumed by VAV-0010."
     }
   ]
 }
