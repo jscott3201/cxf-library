@@ -84,6 +84,20 @@ fault by construction; excluded from FPR claims, useful as a
 known-positive. Reset-family rules are likewise excluded (constant-setpoint
 baselines read "reset absent" by construction).
 
+## TPR: sensor-bias campaigns (`--bias point=delta`, `--reuse`)
+
+Injects a bias into the replayed inputs of an already-simulated healthy run
+(the faulted-sensor-as-seen-by-FDD case; zero EnergyPlus time). FAILs are
+DETECTIONS; attribution requires differencing against the healthy baseline
+(rules that fail on the healthy run — the DCV pair — are confounded and
+excluded). First campaign, +/-3 degC OAT bias (OfficeMedium-4004, July):
+the envelope family and the direction-appropriate economizer rule catch the
+bias in both directions — +3: AHU-FC-062 (3/3), 002 (3/3), 068 (3/3,
+~2.3 h); -3: 051 (3/3, ~40 min), 003 (2/3), 062 (2/3) — while a dozen
+non-OAT rules stay correctly silent. Empirical demonstration of the CLU-09
+biased-OAT cascade; recorded as `simulation_tpr` validation blocks
+(failures = missed detections).
+
 ## Plant mode (DOE prototypes)
 
 `--mode plant` maps CHW/HW plant loops instead of air loops: loop

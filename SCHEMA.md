@@ -107,7 +107,7 @@ left to right.
 
 **`validation:` (optional frontmatter block, adopted 2026-08-18).** Records
 empirical validation runs against the card's rule. A list; each entry:
-`kind` (`simulation_fpr` | `simulation_tpr`), `harness` (e.g.
+`kind` (`simulation_fpr` | `simulation_tpr` — for `simulation_tpr`, `failures` counts MISSED detections), `harness` (e.g.
 `simharness/v1`), `date`, `fleet` (one-line description of buildings ×
 climates × period), `scenarios` (count), `failures` (count), optional
 `notes` (one line, e.g. the finding a failure represents). Results are
