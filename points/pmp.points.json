@@ -1,0 +1,103 @@
+{
+  "schema": "cxf-library/points/v1",
+  "equipment": "pmp",
+  "namespaces": {
+    "brick": {
+      "iri": "https://brickschema.org/schema/Brick#",
+      "verified_version": "1.4.4"
+    },
+    "s223": {
+      "iri": "http://data.ashrae.org/standard223#",
+      "verified_version": "v1.0.0-2026"
+    },
+    "s223_g36": {
+      "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#",
+      "verified_version": "v1.0.0-2026"
+    },
+    "quantitykind": {
+      "iri": "http://qudt.org/vocab/quantitykind/",
+      "verified_version": "QUDT 3.1.4"
+    },
+    "unit": {
+      "iri": "http://qudt.org/vocab/unit/",
+      "verified_version": "QUDT 3.1.4"
+    }
+  },
+  "notes": "Hydronic pump point dictionary (reference ch.15, PMP-FC-050/051). Loop-agnostic: the same four points serve CHW, HW, and condenser-water pumps; owning equipment is brick:Pump (verified in Brick 1.4.4; use the loop-specific subclass at binding time if the site model has one). The reference states no_flow/deadhead thresholds as percent-of-design; the rules carry absolute-unit parameters, so binding a site means converting design flow/head into the loop's own units first — the same site-specific placeholder discipline as VAV-FC-050's ventilation_requirement.",
+  "points": [
+    {
+      "name": "pump_cmd",
+      "description": "Pump run command (true = commanded on)",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Start_Stop_Command",
+      "s223": {
+        "pattern": "EnumeratedActuatableProperty on the Pump via hasProperty",
+        "property_class": "EnumeratedActuatableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": false,
+      "notes": "brick:Start_Stop_Command grep-verified in Brick 1.4.4, attached via isPointOf to brick:Pump (verified). Reference Haystack markers: pump, cmd. Consumed by PMP-FC-050's command conjunct."
+    },
+    {
+      "name": "pump_status",
+      "description": "Pump run status feedback (true = proven running)",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Pump_On_Off_Status",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty on the Pump via hasProperty",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": false,
+      "notes": "brick:Pump_On_Off_Status grep-verified in Brick 1.4.4 (pump-specific status class exists, unlike the compressor case). Reference Haystack markers: pump, run. Typical source is a current switch or VFD run feedback; PMP-FC-050 requires BOTH cmd and status true, so a failed status sensor reads as NO_EVAL at the host, not as a fault."
+    },
+    {
+      "name": "pump_flow",
+      "description": "Pump-associated water flow",
+      "kind": "real",
+      "unit": "L/s",
+      "qudt_unit": "L-PER-SEC",
+      "brick": "Water_Flow_Sensor",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the Pump's discharge segment via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "VolumeFlowRate",
+        "unit": "L-PER-SEC",
+        "medium": "Water",
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "brick:Water_Flow_Sensor grep-verified in Brick 1.4.4. Reference Haystack markers: water, flow, sensor. The reference's no_flow_threshold (5% of design) and deadhead_flow_threshold (10% of design) are percent-of-design; rules ship absolute L/s placeholders that MUST be set from the loop's design flow at binding."
+    },
+    {
+      "name": "pump_dp",
+      "description": "Pump differential pressure (discharge minus suction, or loop DP where that is what the site trends)",
+      "kind": "real",
+      "unit": "kPa",
+      "qudt_unit": "KiloPA",
+      "brick": "Water_Differential_Pressure_Sensor",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty across the Pump via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "PressureDifference",
+        "unit": "KiloPA",
+        "medium": "Water",
+        "aspects": ["differential"]
+      },
+      "provisional": true,
+      "notes": "brick:Water_Differential_Pressure_Sensor grep-verified in Brick 1.4.4, but marked provisional because sites trend this two ways — across the pump (deadhead reads HIGH) or across the loop/decoupler (deadhead may read high or low depending on tap location). PMP-FC-051's logic assumes the ACROSS-THE-PUMP reading; binding a loop-DP point instead inverts the diagnosis and must be caught at binding review. deadhead_dp_threshold (150% of design head) ships as an absolute kPa placeholder."
+    }
+  ]
+}

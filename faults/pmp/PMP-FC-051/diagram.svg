@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1220 340" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <rect x="12" y="36" width="104" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="64" y="55" text-anchor="middle" fill="#1e3a8a">pump_status</text>
+  <rect x="12" y="156" width="72" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="48" y="175" text-anchor="middle" fill="#1e3a8a">pump_dp</text>
+  <rect x="12" y="266" width="88" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="56" y="285" text-anchor="middle" fill="#1e3a8a">pump_flow</text>
+
+  <rect x="200" y="142" width="275" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="337.5" y="164" text-anchor="middle" fill="#24292f" font-weight="bold">dpHigh</text>
+  <text x="337.5" y="182" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 300.0 kPa</text>
+  <rect x="200" y="252" width="275" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="337.5" y="274" text-anchor="middle" fill="#24292f" font-weight="bold">lowFlow</text>
+  <text x="337.5" y="292" text-anchor="middle" fill="#57606a" font-size="11">Reals.LessThreshold · t = 2.0 L/s</text>
+  <rect x="560" y="197" width="110" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="615" y="219" text-anchor="middle" fill="#24292f" font-weight="bold">hydraulic</text>
+  <text x="615" y="237" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="760" y="197" width="97" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="808.5" y="219" text-anchor="middle" fill="#24292f" font-weight="bold">gate</text>
+  <text x="808.5" y="237" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="920" y="197" width="137" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="988.5" y="219" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="988.5" y="237" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 300 s</text>
+
+  <rect x="1120" y="211" width="75" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1157.5" y="230" text-anchor="middle" fill="#7f1d1d">yFault</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 84 171 H 196"/>
+    <path d="M 100 281 H 196"/>
+    <path d="M 475 171 H 516 V 212 H 556"/>
+    <path d="M 475 281 H 528 V 240 H 556"/>
+    <path d="M 116 51 H 720 V 212 H 756"/>
+    <path d="M 670 226 H 700 V 240 H 756"/>
+    <path d="M 857 226 H 916"/>
+    <path d="M 1057 226 H 1116"/>
+  </g>
+  <text x="122" y="45" fill="#7d8590" font-size="10">Bool</text>
+  <text x="90" y="165" fill="#7d8590" font-size="10">Real</text>
+  <text x="106" y="275" fill="#7d8590" font-size="10">Real</text>
+  <text x="483" y="163" fill="#7d8590" font-size="10">Bool</text>
+  <text x="483" y="273" fill="#7d8590" font-size="10">Bool</text>
+  <text x="678" y="218" fill="#7d8590" font-size="10">Bool</text>
+  <text x="206" y="153" fill="#7d8590" font-size="9">u</text>
+  <text x="206" y="263" fill="#7d8590" font-size="9">u</text>
+  <text x="566" y="208" fill="#7d8590" font-size="9">u1</text>
+  <text x="566" y="252" fill="#7d8590" font-size="9">u2</text>
+  <text x="766" y="208" fill="#7d8590" font-size="9">u1</text>
+  <text x="766" y="252" fill="#7d8590" font-size="9">u2</text>
+</svg>

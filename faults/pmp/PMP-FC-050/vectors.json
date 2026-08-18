@@ -1,0 +1,227 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 1800
+  },
+  "scenarios": [
+    {
+      "name": "normal_operation",
+      "description": "The reference's published vector 1: pump commanded on, proven running, 3.2 L/s of flow. Well above the 1.0 L/s no-flow line, so the rule is live and silent. yRunOk is false only on the init tick, while the 60 s flow_check_delay rides out the start transient.",
+      "inputs": {
+        "pump_cmd": true,
+        "pump_status": true,
+        "pump_flow": 3.2
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yRunOk", "from_s": 0, "to_s": 0, "equals": false },
+        { "output": "yRunOk", "from_s": 60, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "no_flow_pump_running",
+      "description": "The reference's published vector 2: commanded on, proven running, zero flow. The run condition settles at exactly 60 s and the alarm lands at exactly 360 s — flow_check_delay plus alarm_delay, the two delays adding exactly.",
+      "inputs": {
+        "pump_cmd": true,
+        "pump_status": true,
+        "pump_flow": 0.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 300, "equals": false },
+        { "output": "yFault", "from_s": 360, "to_s": 1800, "equals": true },
+        { "output": "yRunOk", "from_s": 0, "to_s": 0, "equals": false },
+        { "output": "yRunOk", "from_s": 60, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "pump_off",
+      "description": "The reference's published vector 3: pump off, no flow, expected NO_EVAL. yRunOk is false for the whole run, which is how the host distinguishes this from a healthy pump — an idle pump makes no flow and that means nothing.",
+      "inputs": {
+        "pump_cmd": false,
+        "pump_status": false,
+        "pump_flow": 0.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yRunOk", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "flow_exactly_at_threshold",
+      "description": "Boundary: flow sits exactly on no_flow_threshold (1.0 L/s). CDL Reals has no LessEqual, so the comparison is strict and exactly 1.0 is not 'no flow'.",
+      "inputs": {
+        "pump_cmd": true,
+        "pump_status": true,
+        "pump_flow": 1.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yRunOk", "from_s": 60, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "flow_just_below_threshold",
+      "description": "Boundary from below: 0.9 L/s clears the strict comparison and alarms on the same 360 s schedule as zero flow.",
+      "inputs": {
+        "pump_cmd": true,
+        "pump_status": true,
+        "pump_flow": 0.9
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 300, "equals": false },
+        { "output": "yFault", "from_s": 360, "to_s": 1800, "equals": true },
+        { "output": "yRunOk", "from_s": 60, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "flow_just_above_threshold",
+      "description": "Boundary from above: 1.1 L/s is flow, however little, and never alarms.",
+      "inputs": {
+        "pump_cmd": true,
+        "pump_status": true,
+        "pump_flow": 1.1
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yRunOk", "from_s": 60, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "commanded_on_but_not_running",
+      "description": "Commanded on with status false and zero flow. This is a real failure — a pump that will not start — and it is not this one: yRunOk is false, so the verdict is NO_EVAL rather than 'no flow detected'. No library rule covers it today (see Deviations).",
+      "inputs": {
+        "pump_cmd": true,
+        "pump_status": false,
+        "pump_flow": 0.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yRunOk", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "running_while_commanded_off",
+      "description": "The other mismatch: status true against a command of off, zero flow. A welded contactor or a hand-off-auto switch left in hand. Also NO_EVAL here — the reference's equation requires both conjuncts and this rule reports on neither mismatch.",
+      "inputs": {
+        "pump_cmd": false,
+        "pump_status": true,
+        "pump_flow": 0.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yRunOk", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "flow_in_the_deadhead_band",
+      "description": "1.5 L/s: above this rule's 5%-of-design no-flow line and below PMP-FC-051's 10%-of-design deadhead line. Silent here by design; PMP-FC-051 is the rule that reports this band when the pump DP is also high.",
+      "inputs": {
+        "pump_cmd": true,
+        "pump_status": true,
+        "pump_flow": 1.5
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yRunOk", "from_s": 60, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "flow_lost_mid_run",
+      "description": "A pump running normally loses its flow at t=600 s. The run condition settled long ago, so only alarm_delay is left to run and the alarm lands at exactly 900 s. This is the vector that pins the structure: with flow_check_delay applied to the whole conjunction instead of to the run condition, the alarm would come at 960 s and this window would fail.",
+      "inputs": {
+        "pump_cmd": true,
+        "pump_status": true,
+        "pump_flow": [
+          { "t": 0, "value": 3.2 },
+          { "t": 600, "value": 0.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 900, "to_s": 1800, "equals": true },
+        { "output": "yRunOk", "from_s": 60, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "intermittent_flow_never_alarms",
+      "description": "Flow alternating between zero and 3.2 L/s every 240 s — an air-locked pump that keeps catching prime, or a flow meter dropping out. No single no-flow episode reaches alarm_delay, so nothing ever fires. Persistence is not averaging: a pump delivering flow half the time is a real finding this rule cannot make.",
+      "inputs": {
+        "pump_cmd": true,
+        "pump_status": true,
+        "pump_flow": [
+          { "t": 0, "value": 0.0 },
+          { "t": 240, "value": 3.2 },
+          { "t": 480, "value": 0.0 },
+          { "t": 720, "value": 3.2 },
+          { "t": 960, "value": 0.0 },
+          { "t": 1200, "value": 3.2 },
+          { "t": 1440, "value": 0.0 },
+          { "t": 1680, "value": 3.2 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yRunOk", "from_s": 60, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "flow_returns_after_alarm",
+      "description": "Recovery: the alarm asserts at 360 s and the pump picks up flow at t=900 s. TrueDelay passes the falling edge with no delay, so yFault drops on that tick and the accumulated time is discarded.",
+      "inputs": {
+        "pump_cmd": true,
+        "pump_status": true,
+        "pump_flow": [
+          { "t": 0, "value": 0.0 },
+          { "t": 900, "value": 3.2 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 300, "equals": false },
+        { "output": "yFault", "from_s": 360, "to_s": 840, "equals": true },
+        { "output": "yFault", "from_s": 900, "to_s": 1800, "equals": false },
+        { "output": "yRunOk", "from_s": 60, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "status_drops_after_alarm",
+      "description": "The evaluability release: an alarming pump loses its run status at t=900 s. yFault and yRunOk go false on the same tick and only the pair tells the host that the pump stopped rather than started delivering — the analogue of VFD-FC-050's command_drops_below_floor_after_alarm.",
+      "inputs": {
+        "pump_cmd": true,
+        "pump_status": [
+          { "t": 0, "value": true },
+          { "t": 900, "value": false }
+        ],
+        "pump_flow": 0.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 300, "equals": false },
+        { "output": "yFault", "from_s": 360, "to_s": 840, "equals": true },
+        { "output": "yFault", "from_s": 900, "to_s": 1800, "equals": false },
+        { "output": "yRunOk", "from_s": 60, "to_s": 840, "equals": true },
+        { "output": "yRunOk", "from_s": 900, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "pump_starts_dry_mid_run",
+      "description": "The pump starts at t=600 s into a system that never produces flow. yRunOk asserts at exactly 660 s (60 s after the rising edge) and yFault at exactly 960 s — mid-run edges carry the same exact arithmetic as the init case.",
+      "inputs": {
+        "pump_cmd": [
+          { "t": 0, "value": false },
+          { "t": 600, "value": true }
+        ],
+        "pump_status": [
+          { "t": 0, "value": false },
+          { "t": 600, "value": true }
+        ],
+        "pump_flow": 0.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 900, "equals": false },
+        { "output": "yFault", "from_s": 960, "to_s": 1800, "equals": true },
+        { "output": "yRunOk", "from_s": 0, "to_s": 600, "equals": false },
+        { "output": "yRunOk", "from_s": 660, "to_s": 1800, "equals": true }
+      ]
+    }
+  ]
+}

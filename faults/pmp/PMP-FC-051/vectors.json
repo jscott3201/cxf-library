@@ -1,0 +1,220 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 1800
+  },
+  "scenarios": [
+    {
+      "name": "normal_operation",
+      "description": "Pump running, 200 kPa across it, 8.0 L/s moving. Below the DP line and well above the flow line — the ordinary state of a healthy loop.",
+      "inputs": {
+        "pump_status": true,
+        "pump_dp": 200.0,
+        "pump_flow": 8.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "deadheading",
+      "description": "The fault: pump running, 350 kPa across it, zero flow. Every terminal valve is shut and the pump is churning water into heat. The alarm lands at exactly 300 s.",
+      "inputs": {
+        "pump_status": true,
+        "pump_dp": 350.0,
+        "pump_flow": 0.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 240, "equals": false },
+        { "output": "yFault", "from_s": 300, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "dp_exactly_at_threshold",
+      "description": "Boundary: DP sits exactly on deadhead_dp_threshold (300.0 kPa) with no flow. CDL Reals has no GreaterEqual, so the comparison is strict and exactly 300.0 is not high DP.",
+      "inputs": {
+        "pump_status": true,
+        "pump_dp": 300.0,
+        "pump_flow": 0.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "dp_just_above_threshold",
+      "description": "Boundary from above: 300.1 kPa clears the strict comparison and alarms on the ordinary 300 s schedule.",
+      "inputs": {
+        "pump_status": true,
+        "pump_dp": 300.1,
+        "pump_flow": 0.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 240, "equals": false },
+        { "output": "yFault", "from_s": 300, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "dp_just_below_threshold",
+      "description": "Boundary from below: 299.9 kPa with zero flow is silent here. A pump that has lost its impeller sits in this region, and PMP-FC-050 is the rule that reports it.",
+      "inputs": {
+        "pump_status": true,
+        "pump_dp": 299.9,
+        "pump_flow": 0.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "flow_exactly_at_threshold",
+      "description": "Boundary: flow sits exactly on deadhead_flow_threshold (2.0 L/s) against high DP. Strict LessThreshold, so exactly 2.0 is not low flow.",
+      "inputs": {
+        "pump_status": true,
+        "pump_dp": 350.0,
+        "pump_flow": 2.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "flow_just_below_threshold",
+      "description": "Boundary from below: 1.9 L/s against high DP is a partial deadhead — a couple of bypass paths still open — and it alarms.",
+      "inputs": {
+        "pump_status": true,
+        "pump_dp": 350.0,
+        "pump_flow": 1.9
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 240, "equals": false },
+        { "output": "yFault", "from_s": 300, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "flow_just_above_threshold",
+      "description": "Boundary from above: 2.1 L/s against the same high DP never alarms.",
+      "inputs": {
+        "pump_status": true,
+        "pump_dp": 350.0,
+        "pump_flow": 2.1
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "stopped_pump_reading_header_dp",
+      "description": "A standby pump, stopped, with its DP tap reading 350 kPa of header pressure the running pump is making, and no flow of its own. The status conjunct is the only thing standing between that geometry and a permanent false alarm — which is exactly why the point dictionary marks pump_dp provisional.",
+      "inputs": {
+        "pump_status": false,
+        "pump_dp": 350.0,
+        "pump_flow": 0.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "impeller_failure_signature",
+      "description": "Pump running, no flow, and only 40 kPa across it: the pump is turning and making no head. Broken coupling, failed impeller, or an air lock. Silent here and loud on PMP-FC-050 — the DP term is what separates the two diagnoses, and this is the vector that proves it.",
+      "inputs": {
+        "pump_status": true,
+        "pump_dp": 40.0,
+        "pump_flow": 0.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "high_dp_at_normal_flow",
+      "description": "350 kPa with 8.0 L/s moving: a loop simply running at high head, which is a DP-reset opportunity and not a fault. Both conjuncts are required and only one holds.",
+      "inputs": {
+        "pump_status": true,
+        "pump_dp": 350.0,
+        "pump_flow": 8.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "valve_closure_transient",
+      "description": "A four-minute deadhead at t=300 s — every zone valve closing together on a morning setback, then reopening. Shorter than alarm_delay, so nothing fires and the accumulated time is discarded on the release.",
+      "inputs": {
+        "pump_status": true,
+        "pump_dp": [
+          { "t": 0, "value": 200.0 },
+          { "t": 300, "value": 350.0 },
+          { "t": 540, "value": 200.0 }
+        ],
+        "pump_flow": [
+          { "t": 0, "value": 8.0 },
+          { "t": 300, "value": 0.5 },
+          { "t": 540, "value": 8.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "deadhead_starts_mid_run",
+      "description": "A healthy loop deadheads at t=600 s. The alarm lands at exactly 900 s — alarm_delay measured from the rising edge, not from init.",
+      "inputs": {
+        "pump_status": true,
+        "pump_dp": [
+          { "t": 0, "value": 200.0 },
+          { "t": 600, "value": 350.0 }
+        ],
+        "pump_flow": [
+          { "t": 0, "value": 8.0 },
+          { "t": 600, "value": 0.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 840, "equals": false },
+        { "output": "yFault", "from_s": 900, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "valves_open_after_alarm",
+      "description": "Recovery: the alarm asserts at 300 s and someone opens the isolation valve at t=900 s. DP falls, flow returns, and yFault drops on that tick.",
+      "inputs": {
+        "pump_status": true,
+        "pump_dp": [
+          { "t": 0, "value": 350.0 },
+          { "t": 900, "value": 180.0 }
+        ],
+        "pump_flow": [
+          { "t": 0, "value": 0.0 },
+          { "t": 900, "value": 8.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 240, "equals": false },
+        { "output": "yFault", "from_s": 300, "to_s": 840, "equals": true },
+        { "output": "yFault", "from_s": 900, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "status_drops_after_alarm",
+      "description": "A deadheading pump trips out at t=900 s — which is what a deadheaded pump eventually does. yFault goes false with the status and the host must read that as NO_EVAL, not as a resolved fault; the DP and flow signature has not changed at all.",
+      "inputs": {
+        "pump_status": [
+          { "t": 0, "value": true },
+          { "t": 900, "value": false }
+        ],
+        "pump_dp": 350.0,
+        "pump_flow": 0.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 240, "equals": false },
+        { "output": "yFault", "from_s": 300, "to_s": 840, "equals": true },
+        { "output": "yFault", "from_s": 900, "to_s": 1800, "equals": false }
+      ]
+    }
+  ]
+}
