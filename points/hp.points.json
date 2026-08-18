@@ -258,7 +258,7 @@
         ]
       },
       "provisional": true,
-      "notes": "No Brick 1.4.4 class models refrigerant-line temperatures (suction_temp precedent; discharge-AIR classes are the wrong medium). Refrigerant side, hot-gas line between compressor and reversing valve. Consumed by the reversing-valve internal-leakage rule (HP-FC-055): NIST SP 1087 (2012) found leakage raises discharge and evaporating temperature while condensing temperature and subcooling fall, with superheat unaffected."
+      "notes": "No Brick 1.4.4 class models refrigerant-line temperatures (suction_temp precedent; discharge-AIR classes are the wrong medium). Refrigerant side, hot-gas line between compressor and reversing valve. Consumed by the reversing-valve internal-leakage rule (HP-FC-055): NIST SP 1087 (2008) found leakage raises discharge and evaporating temperature while condensing temperature and subcooling fall, with superheat unaffected."
     }
   ]
 }

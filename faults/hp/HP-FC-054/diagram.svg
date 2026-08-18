@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 200" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+  <rect x="12" y="55" width="116" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="70" y="74" text-anchor="middle" fill="#1e3a8a">cond_sat_temp</text>
+  <rect x="12" y="115" width="100" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="62" y="134" text-anchor="middle" fill="#1e3a8a">liquid_temp</text>
+  <rect x="200" y="66" width="112" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="256" y="88" text-anchor="middle" fill="#24292f" font-weight="bold">subcool</text>
+  <text x="256" y="106" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="372" y="66" width="244" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="494" y="88" text-anchor="middle" fill="#24292f" font-weight="bold">scHigh</text>
+  <text x="494" y="106" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 12 °C</text>
+  <rect x="676" y="66" width="140" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="746" y="88" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="746" y="106" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 1800 s</text>
+  <rect x="876" y="80" width="81" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="916.5" y="99" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 128 70 H 170 V 80 H 196"/>
+    <path d="M 112 130 H 170 V 110 H 196"/>
+    <path d="M 312 95 H 368"/>
+    <path d="M 616 95 H 672"/>
+    <path d="M 816 95 H 872"/>
+  </g>
+  <text x="134" y="63" fill="#7d8590" font-size="10">Real</text>
+  <text x="118" y="123" fill="#7d8590" font-size="10">Real</text>
+  <text x="320" y="88" fill="#7d8590" font-size="10">Real</text>
+  <text x="624" y="88" fill="#7d8590" font-size="10">Bool</text>
+  <text x="200" y="166" fill="#7d8590" font-size="11">subcool.y = cond_sat_temp − liquid_temp (liquid subcooling, °C)</text>
+</svg>

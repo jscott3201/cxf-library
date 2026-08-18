@@ -1,0 +1,161 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 300, "horizon_s": 7200 },
+  "scenarios": [
+    {
+      "name": "correctly_charged_unit",
+      "description": "Nominal cooling operation: 11 °C of suction superheat against a 15 °C band and 9 °C of subcooling against a 3 °C band. Neither conjunct holds, and the liquid line is comfortably single-phase.",
+      "inputs": { "suction_temp": 16.0, "evap_sat_temp": 5.0, "cond_sat_temp": 39.0, "liquid_temp": 30.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yTxvSaturated", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "undercharge_with_liquid_still_subcooled",
+      "description": "The signature: 20 °C superheat with subcooling collapsed to 1.5 °C. Both conjuncts hold from t=0, so delayOnInit puts the alarm one alarm_delay in. Subcooling is still above the two-phase floor, so yTxvSaturated stays false — the fault does not depend on it.",
+      "inputs": { "suction_temp": 25.0, "evap_sat_temp": 5.0, "cond_sat_temp": 31.5, "liquid_temp": 30.0 },
+      "expect": [
+        { "output": "yTxvSaturated", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "high_superheat_with_high_subcooling_is_not_undercharge",
+      "description": "The discriminator the subcooling conjunct exists for: 20 °C superheat with subcooling raised to 12 °C is the liquid-line-restriction pattern, where refrigerant backs up ahead of the restriction. Superheat alone would call this a charge fault; the AND does not.",
+      "inputs": { "suction_temp": 25.0, "evap_sat_temp": 5.0, "cond_sat_temp": 42.0, "liquid_temp": 30.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yTxvSaturated", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "low_subcooling_alone_while_the_valve_compensates",
+      "description": "Subcooling down to 1 °C with superheat held at a normal 11 °C — the expansion valve is still doing its job. This is the in-control-zone undercharge pattern, and this rule deliberately does not fire on it (see Deviations); the superheat conjunct blocks alone.",
+      "inputs": { "suction_temp": 16.0, "evap_sat_temp": 5.0, "cond_sat_temp": 31.0, "liquid_temp": 30.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yTxvSaturated", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "superheat_exactly_at_the_band",
+      "description": "Threshold edge: superheat is exactly superheat_high_band (20.0 − 5.0 = 15.0, binary-exact) with subcooling already low. The comparison is a strict `>`, so a unit sitting precisely on the band reads healthy.",
+      "inputs": { "suction_temp": 20.0, "evap_sat_temp": 5.0, "cond_sat_temp": 31.0, "liquid_temp": 30.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "superheat_just_above_the_band",
+      "description": "Threshold edge from the other side: 15.25 °C of superheat, a quarter of a degree over the band, and the alarm matures after alarm_delay.",
+      "inputs": { "suction_temp": 20.25, "evap_sat_temp": 5.0, "cond_sat_temp": 31.0, "liquid_temp": 30.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "subcooling_exactly_at_the_band",
+      "description": "Threshold edge: subcooling is exactly subcooling_low_band (33.0 − 30.0 = 3.0, binary-exact) with superheat well over its band. The comparison is a strict `<`, so a unit precisely on the band reads healthy.",
+      "inputs": { "suction_temp": 25.0, "evap_sat_temp": 5.0, "cond_sat_temp": 33.0, "liquid_temp": 30.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "subcooling_just_below_the_band",
+      "description": "Threshold edge from the other side: 2.75 °C of subcooling clears the band and the alarm matures.",
+      "inputs": { "suction_temp": 25.0, "evap_sat_temp": 5.0, "cond_sat_temp": 32.75, "liquid_temp": 30.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "subcooling_exactly_at_the_two_phase_floor",
+      "description": "Evaluability-flag edge: subcooling is exactly subcooling_two_phase_floor (30.5 − 30.0 = 0.5, binary-exact). The floor test is a strict `<`, so yTxvSaturated is false — and the fault asserts anyway, because the flag is a sub-condition, not a gate.",
+      "inputs": { "suction_temp": 25.0, "evap_sat_temp": 5.0, "cond_sat_temp": 30.5, "liquid_temp": 30.0 },
+      "expect": [
+        { "output": "yTxvSaturated", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "subcooling_below_the_two_phase_floor",
+      "description": "The card's design point, and the other side of the floor edge: 0.25 °C of subcooling means the liquid line is no longer measurably subcooled, the valve is at its limit, and this is a severe charge loss. yTxvSaturated goes true and yFault still asserts — a host that treated the flag as an evaluability gate would go silent on the worst case this rule exists for.",
+      "inputs": { "suction_temp": 25.0, "evap_sat_temp": 5.0, "cond_sat_temp": 30.25, "liquid_temp": 30.0 },
+      "expect": [
+        { "output": "yTxvSaturated", "from_s": 0, "to_s": 7200, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "timer_starts_when_the_second_conjunct_arrives",
+      "description": "Subcooling is low from t=0 but superheat only crosses its band at t=1200 s, as the charge loss deepens past the point where the valve can keep holding superheat. The persistence window runs from the conjunction, not from the first symptom, so the alarm lands at 3000 s.",
+      "inputs": {
+        "evap_sat_temp": 5.0,
+        "cond_sat_temp": 31.0,
+        "liquid_temp": 30.0,
+        "suction_temp": [
+          { "t": 0, "value": 16.0 },
+          { "t": 1200, "value": 25.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2700, "equals": false },
+        { "output": "yFault", "from_s": 3300, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "transient_superheat_excursion_never_alarms",
+      "description": "Superheat spikes over its band for 1500 s — a load step, or a thermostatic valve hunting after a capacity change — and settles back 300 s short of alarm_delay. The timer resets on the recovery and nothing is reported.",
+      "inputs": {
+        "evap_sat_temp": 5.0,
+        "cond_sat_temp": 31.0,
+        "liquid_temp": 30.0,
+        "suction_temp": [
+          { "t": 0, "value": 16.0 },
+          { "t": 900, "value": 25.0 },
+          { "t": 2400, "value": 16.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "alarm_clears_after_the_charge_is_restored",
+      "description": "Recovery: the divergence alarms at 1800 s, a technician weighs in the missing charge at t = 3600 s, and both readings return to nominal. yFault drops on that same tick — TrueDelay only delays the rising edge.",
+      "inputs": {
+        "evap_sat_temp": 5.0,
+        "liquid_temp": 30.0,
+        "suction_temp": [
+          { "t": 0, "value": 25.0 },
+          { "t": 3600, "value": 16.0 }
+        ],
+        "cond_sat_temp": [
+          { "t": 0, "value": 31.0 },
+          { "t": 3600, "value": 39.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1500, "equals": false },
+        { "output": "yFault", "from_s": 2100, "to_s": 3300, "equals": true },
+        { "output": "yFault", "from_s": 3900, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "idle_unit_reads_healthy_and_the_flag_reads_saturated",
+      "description": "Why the compressor-running precondition is host-enforced rather than optional: with the unit off, all four temperatures equalise, superheat and subcooling both collapse to zero, and the graph reports no fault while yTxvSaturated reads true. Neither answer means anything about the refrigerant charge.",
+      "inputs": { "suction_temp": 22.0, "evap_sat_temp": 22.0, "cond_sat_temp": 22.0, "liquid_temp": 22.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yTxvSaturated", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    }
+  ]
+}

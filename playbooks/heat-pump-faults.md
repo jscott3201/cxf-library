@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | HP-FC-050 (COP degradation), HP-FC-051 (defrost anomaly), HP-FC-052 (reversing valve) |
+| **Applies to** | HP-FC-050 (COP degradation), HP-FC-051 (defrost anomaly), HP-FC-052 (reversing valve), HP-FC-053 (undercharge), HP-FC-054 (overcharge), HP-FC-055 (valve internal leakage) |
 | **Fix complexity** | On-site service required |
 | **Typical time** | 2–6 h on-site |
 | **Typical cost** | $200–$1,500 (refrigerant/defrost) / $500–$3,000 (reversing valve) / $3,000–$8,000 (compressor) |
