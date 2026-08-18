@@ -1,0 +1,433 @@
+{
+  "@context": {
+    "S231": "http://data.ashrae.org/S231P#",
+    "base": "urn:cxf-library:sys-fc-100#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100",
+      "@type": "S231:Block",
+      "S231:label": "sys_fc_100",
+      "S231:containsBlock": [
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.sensRef"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.dev"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.devAbs"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillBand"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillAndActive"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillHeld"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.persist"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.windowOk"
+        }
+      ],
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.sensor_value"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.equip_active"
+        }
+      ],
+      "S231:hasOutput": [
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.yFault"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.yWindowOk"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.sensRef",
+      "@type": "urn:cxf-library:sys-fc-100#Buildings.Controls.OBC.CDL.Discrete.Sampler",
+      "S231:label": "sensRef",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.sensRef.samplePeriod"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.sensRef.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.sensRef.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.sensRef.samplePeriod",
+      "S231:value": {
+        "@value": "7200.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.sensRef.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.sensRef.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.dev.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.dev",
+      "@type": "urn:cxf-library:sys-fc-100#Buildings.Controls.OBC.CDL.Reals.Subtract",
+      "S231:label": "dev",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.dev.u1"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.dev.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.dev.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.dev.u1",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.dev.u2",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.dev.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.devAbs.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.devAbs",
+      "@type": "urn:cxf-library:sys-fc-100#Buildings.Controls.OBC.CDL.Reals.Abs",
+      "S231:label": "devAbs",
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.devAbs.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.devAbs.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.devAbs.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.devAbs.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillBand.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillBand",
+      "@type": "urn:cxf-library:sys-fc-100#Buildings.Controls.OBC.CDL.Reals.LessThreshold",
+      "S231:label": "stillBand",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillBand.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillBand.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillBand.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillBand.t",
+      "S231:value": {
+        "@value": "0.25",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillBand.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillBand.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillAndActive.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillAndActive",
+      "@type": "urn:cxf-library:sys-fc-100#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "stillAndActive",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillAndActive.u1"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillAndActive.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillAndActive.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillAndActive.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillAndActive.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillAndActive.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillHeld.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillHeld",
+      "@type": "urn:cxf-library:sys-fc-100#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "stillHeld",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillHeld.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillHeld.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillHeld.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillHeld.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillHeld.delayTime",
+      "S231:value": {
+        "@value": "7200.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillHeld.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillHeld.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillHeld.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.persist.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.persist",
+      "@type": "urn:cxf-library:sys-fc-100#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "persist",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.persist.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.persist.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.persist.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.persist.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.persist.delayTime",
+      "S231:value": {
+        "@value": "900.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.persist.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.persist.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.persist.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.yFault"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.windowOk",
+      "@type": "urn:cxf-library:sys-fc-100#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "windowOk",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.windowOk.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.windowOk.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.windowOk.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.windowOk.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.windowOk.delayTime",
+      "S231:value": {
+        "@value": "7200.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.windowOk.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.windowOk.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.windowOk.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.yWindowOk"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.sensor_value",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.sensRef.u"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.dev.u1"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.equip_active",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.stillAndActive.u2"
+        },
+        {
+          "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.windowOk.u"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.yFault",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:sys-fc-100#sys_fc_100.yWindowOk",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    }
+  ]
+}

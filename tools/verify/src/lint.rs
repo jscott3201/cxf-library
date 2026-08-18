@@ -186,6 +186,28 @@ pub fn lint_fault_dir(dir: &Path, repo_root: &Path) -> Result<LintReport, String
         }
     }
 
+    // --- adjudicates (sensor-health meta-rules; SCHEMA.md frontmatter table) ---
+    if let Some(adj) = fm.get("adjudicates") {
+        match adj.get("verdict").and_then(|v| v.as_str()) {
+            Some("invalid_while_active") | Some("ambiguous") => {}
+            other => errors.push(format!(
+                "adjudicates.verdict must be invalid_while_active|ambiguous, got {other:?}"
+            )),
+        }
+        let adj_points = yaml_str_list(adj, "points");
+        if adj_points.is_empty() {
+            errors.push("adjudicates.points is empty".into());
+        }
+        for p in &adj_points {
+            // A rule can only adjudicate a point it actually consumes.
+            if !card_points.contains(p) {
+                errors.push(format!(
+                    "adjudicates point `{p}` is not among the card's own points"
+                ));
+            }
+        }
+    }
+
     // --- CXF cross-checks ---
     let rule_path = dir.join("rule.cxf.jsonld");
     let rule: serde_json::Value = std::fs::read(&rule_path)

@@ -1,0 +1,359 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 10800
+  },
+  "scenarios": [
+    {
+      "name": "pair_agrees",
+      "description": "Both members of the pair read the same air within their combined accuracy: 15.0 against 14.6 is a 0.4-unit spread, well inside drift_threshold. Silent for three hours.",
+      "inputs": {
+        "sensor_value_a": 15.0,
+        "sensor_value_b": 14.6
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "member_a_reads_high",
+      "description": "sensor_value_a sits 4.0 units above sensor_value_b. The divergence clears the threshold on the first tick, sustained matures at 3600 s and persist at 5400 s.",
+      "inputs": {
+        "sensor_value_a": 19.0,
+        "sensor_value_b": 15.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5340,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 5400,
+          "to_s": 10800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "member_b_reads_high",
+      "description": "The mirror of member_a_reads_high, and the vector-level statement of verdict: ambiguous. sensor_value_b is now the high one and every output tick is byte-identical to the previous scenario \u2014 Abs discards the sign, so the rule cannot name which member drifted and does not pretend to.",
+      "inputs": {
+        "sensor_value_a": 15.0,
+        "sensor_value_b": 19.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5340,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 5400,
+          "to_s": 10800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "divergence_exactly_at_the_threshold",
+      "description": "Boundary: 17.0 against 15.0 is a divergence of exactly drift_threshold (2.0). Reals.GreaterThreshold is strict and CDL Reals has no GreaterEqual, so exactly on the line reads healthy.",
+      "inputs": {
+        "sensor_value_a": 17.0,
+        "sensor_value_b": 15.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "divergence_just_below_the_threshold",
+      "description": "The same line from below: 1.9 units apart, never reported.",
+      "inputs": {
+        "sensor_value_a": 16.9,
+        "sensor_value_b": 15.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "divergence_just_above_the_threshold",
+      "description": "The same line from above: 2.1 units apart, alarm at 5400 s.",
+      "inputs": {
+        "sensor_value_a": 17.1,
+        "sensor_value_b": 15.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5340,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 5400,
+          "to_s": 10800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "both_members_drift_together",
+      "description": "The blind spot, pinned rather than left to be discovered on site: both sensors read 25.0 while the air they share is at 15. A common-mode error \u2014 one calibration batch, one supply voltage, one wrong scaling constant \u2014 cancels in the subtraction and this rule is silent through all of it.",
+      "inputs": {
+        "sensor_value_a": 25.0,
+        "sensor_value_b": 25.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "slow_drift_crosses_the_threshold",
+      "description": "The reason the shape exists. sensor_value_a walks away from its partner over 90 minutes \u2014 15.0, 16.0, 17.5, 19.0 \u2014 and crosses drift_threshold at t=3600 s, so the alarm lands at 9000 s. Neither a flatline test nor a spike test can see this: the signal is never still and never fast.",
+      "inputs": {
+        "sensor_value_a": [
+          {
+            "t": 0,
+            "value": 15.0
+          },
+          {
+            "t": 1800,
+            "value": 16.0
+          },
+          {
+            "t": 3600,
+            "value": 17.5
+          },
+          {
+            "t": 5400,
+            "value": 19.0
+          }
+        ],
+        "sensor_value_b": 15.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 8940,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 9000,
+          "to_s": 10800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "divergence_shorter_than_both_delays",
+      "description": "A 75-minute divergence: long enough to mature sustained (60 min) and 15 of the further 30 minutes persist needs. No alarm. With the reference's drift_duration alone \u2014 one combined delay instead of the chain \u2014 this fires at 3600 s, which is what makes it the regression test for the two-delay structure.",
+      "inputs": {
+        "sensor_value_a": [
+          {
+            "t": 0,
+            "value": 19.0
+          },
+          {
+            "t": 4500,
+            "value": 15.0
+          }
+        ],
+        "sensor_value_b": 15.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "divergence_clears_on_the_maturity_tick",
+      "description": "The delay edge from below: the pair reconverges at exactly 5400 s. TrueDelay asserts at T + delayTime and the falling edge passes through both delays with no lag, so the two land on the same tick and the fault is never reported.",
+      "inputs": {
+        "sensor_value_a": [
+          {
+            "t": 0,
+            "value": 19.0
+          },
+          {
+            "t": 5400,
+            "value": 15.0
+          }
+        ],
+        "sensor_value_b": 15.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "divergence_clears_one_tick_later",
+      "description": "The same edge from above: reconvergence one tick later leaves exactly one tick of alarm at 5400 s. The realized test is therefore 'diverged for strictly more than drift_duration + alarm_delay' at tick resolution.",
+      "inputs": {
+        "sensor_value_a": [
+          {
+            "t": 0,
+            "value": 19.0
+          },
+          {
+            "t": 5460,
+            "value": 15.0
+          }
+        ],
+        "sensor_value_b": 15.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5340,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 5400,
+          "to_s": 5400,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 5460,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "divergence_dips_and_restarts_the_clock",
+      "description": "Continuous means continuous. The pair converges for ten minutes at t=1800 s, which discards the elapsed time rather than pausing it, and the alarm lands a full 5400 s after the second crossing at 2400 s.",
+      "inputs": {
+        "sensor_value_a": [
+          {
+            "t": 0,
+            "value": 19.0
+          },
+          {
+            "t": 1800,
+            "value": 15.0
+          },
+          {
+            "t": 2400,
+            "value": 19.0
+          }
+        ],
+        "sensor_value_b": 15.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 7800,
+          "to_s": 10800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "pair_reconverges_after_alarm",
+      "description": "Recovery: the alarm asserts at 5400 s and someone applies a BAS offset at 7200 s, bringing the members within 0.2 units. Both delays drop on that tick \u2014 TrueDelay delays the rising edge only.",
+      "inputs": {
+        "sensor_value_a": [
+          {
+            "t": 0,
+            "value": 19.0
+          },
+          {
+            "t": 7200,
+            "value": 15.2
+          }
+        ],
+        "sensor_value_b": 15.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5340,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 5400,
+          "to_s": 7140,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 7200,
+          "to_s": 10800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "percent_binding_at_the_shipped_default",
+      "description": "The units warning made executable. Two humidity transmitters bound as the pair, 44.0 %RH against 40.0 %RH: the graph has no units, so the shipped 2.0 temperature placeholder alarms on a 4-point spread the reference's own 5% default would have cleared. A binding that does not retune drift_threshold gets a rule it did not ask for.",
+      "inputs": {
+        "sensor_value_a": 44.0,
+        "sensor_value_b": 40.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5340,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 5400,
+          "to_s": 10800,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}
