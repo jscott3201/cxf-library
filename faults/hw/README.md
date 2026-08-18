@@ -24,6 +24,7 @@ paraphrase-and-cite only.
 | HW-0006 | HW loop DP reset not functioning | 3 | statistical | **verified** |
 | HW-0007 | HW supply temperature too high at low load | 3 | rule | **verified** |
 | HW-0008 | HWS temperature reset not functioning | 3 | statistical | **verified** |
+| HW-0009 | Boiler proof-of-operation failure | 2 | rule | **verified** |
 
 Severity and method for FC-050–052 per the reference's ch.14 cards.
 FC-053–057 are **library-authored** rules grounded in PNNL-27338's hot-water

@@ -1,0 +1,471 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 5,
+    "horizon_s": 1800
+  },
+  "scenarios": [
+    {
+      "name": "agreement_in_both_states_is_silent",
+      "description": "Command and status agree through a full on-period and the stop at t = 900 lands on both points in the same tick. Neither direction ever sees a mismatch.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 900,
+            "value": false
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 900,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "fail_to_start_asserts_at_start_proof_time",
+      "description": "Commanded on at t = 300 and the status never comes. The start branch matures exactly at start_proof_time: false through 310, true from 315 \u2014 G36 \u00a75.16.13.2's 15 s window, transcribed.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          }
+        ],
+        "sf_status": false
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 310,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 315,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 315,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "unexpected_run_asserts_at_stop_proof_time",
+      "description": "The mirror: status rises at t = 300 with the command held off \u2014 HAND at the starter or a welded contactor. The stop branch matures at the same 15 s.",
+      "inputs": {
+        "sf_cmd": false,
+        "sf_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 310,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 315,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 315,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "healthy_start_proves_inside_the_window",
+      "description": "Status follows the command 10 s later \u2014 a clean DI on a fast starter. The mismatch dies before the 15 s window matures and nothing asserts.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 310,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "healthy_stop_coasts_down_inside_the_window",
+      "description": "Command drops at t = 300 and the status follows 10 s later as the wheel spins down past the device's threshold. Silent.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 300,
+            "value": false
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 310,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "command_flip_inside_the_window_restarts_the_timer",
+      "description": "The command pulses off for one tick mid-proof and returns. TrueDelay starts over on the false gap: the alarm that would have landed at 315 lands at 335 instead.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 310,
+            "value": false
+          },
+          {
+            "t": 320,
+            "value": true
+          }
+        ],
+        "sf_status": false
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 330,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 335,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "direction_flip_never_asserts_both",
+      "description": "A standing fail-to-start becomes an unexpected run at t = 600 when command and status swap in one tick. The flags hand over with a real 15 s gap in yFault between them; both are never true together \u2014 the negated command term makes it structural.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 15,
+          "to_s": 595,
+          "equals": true
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 600,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 595,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 615,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 15,
+          "to_s": 595,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 600,
+          "to_s": 610,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 615,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "restart_into_an_unexpected_run_serves_the_full_window",
+      "description": "The rule loads with status already on and command off \u2014 a controller restart into a fan someone left in HAND. delayOnInit = true serves the full window from init: false through 10, true from 15.",
+      "inputs": {
+        "sf_cmd": false,
+        "sf_status": true
+      },
+      "expect": [
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 10,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 15,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "status_chatter_never_matures",
+      "description": "A current switch chattering on 10 s half-periods against a held-on command. No mismatch survives 15 s continuously, so nothing asserts \u2014 deliberately the opposite of Logical.Proof's both-outputs-latch behavior on this trace.",
+      "inputs": {
+        "sf_cmd": true,
+        "sf_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 10,
+            "value": true
+          },
+          {
+            "t": 20,
+            "value": false
+          },
+          {
+            "t": 30,
+            "value": true
+          },
+          {
+            "t": 40,
+            "value": false
+          },
+          {
+            "t": 50,
+            "value": true
+          },
+          {
+            "t": 60,
+            "value": false
+          },
+          {
+            "t": 70,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "slow_status_device_alarms_at_the_shipped_default",
+      "description": "A belt-drive fan on a 45 s accel ramp against the transcribed 15 s window: the start alarm fires at 315 and self-clears at 345 when the status finally latches. The shipped default manufactures this transient on every start of a slow device \u2014 the params say raise start_proof_time past the ramp; this vector pins what happens if nobody does.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 345,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 310,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 315,
+          "to_s": 340,
+          "equals": true
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 345,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 315,
+          "to_s": 340,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 345,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

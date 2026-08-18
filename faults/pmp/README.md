@@ -16,6 +16,7 @@ Loop-agnostic: the same rules bind to CHW, HW, or condenser-water pumps.
 |---|---|---|---|---|
 | PMP-0001 | Pump commanded on, no flow detected | 2 | rule | **verified** |
 | PMP-0002 | Pump deadheading (high DP, low/no flow) | 2 | rule | **verified** |
+| PMP-0003 | Pump proof-of-operation failure | 2 | rule | **verified** |
 
 Severity and method per the reference's ch.15 cards. Both are Phase 2,
 Category PROTECTIVE — the savings line is 100% of pump energy while active,

@@ -1,0 +1,558 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 5,
+    "horizon_s": 1800
+  },
+  "scenarios": [
+    {
+      "name": "agreement_running_stays_silent",
+      "description": "Commanded on and proven running for the whole horizon. Agreement is silence: neither direction can accumulate and yFault never asserts.",
+      "inputs": {
+        "pump_cmd": true,
+        "pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "agreement_stopped_stays_silent",
+      "description": "Commanded off and proven off \u2014 a standby pump on a lead/lag set, or any pump overnight. The other agreeing state, equally silent.",
+      "inputs": {
+        "pump_cmd": false,
+        "pump_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "fail_to_start_asserts_at_start_proof_time",
+      "description": "Commanded on from init, never proves running \u2014 a tripped overload or an open disconnect. delayOnInit = true serves the full start_proof_time, so the edge lands exactly at G36's 15 s and not on tick zero.",
+      "inputs": {
+        "pump_cmd": true,
+        "pump_status": false
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 10,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 15,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 10,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 15,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "unexpected_run_asserts_at_stop_proof_time",
+      "description": "Proven running against a command of off from init \u2014 a hand-off-auto switch left in HAND. The edge lands exactly at G36's separate 60 s window for this direction, four times the start window.",
+      "inputs": {
+        "pump_cmd": false,
+        "pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 55,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 60,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 55,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 60,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "run_proof_lost_mid_cycle",
+      "description": "A pump running normally loses its proof at 300 s \u2014 a coupling shears, an overload trips on a hot afternoon. The window is measured from the event, not from init: the alarm lands at 315 s.",
+      "inputs": {
+        "pump_cmd": true,
+        "pump_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 300,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 310,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 315,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "normal_start_and_stop_lag_stay_silent",
+      "description": "Status lags the start command by 10 s and the stop command by 45 s \u2014 both inside their published windows, which is what the windows are for. Nothing asserts.",
+      "inputs": {
+        "pump_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 60,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          }
+        ],
+        "pump_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 70,
+            "value": true
+          },
+          {
+            "t": 645,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "vfd_ramp_alarms_at_the_shipped_default",
+      "description": "The retune obligation, pinned rather than hidden: a 30 s VFD acceleration ramp before a DP-switch status makes is LONGER than G36's 15 s, so the shipped default alarms on a healthy start and clears itself when the status arrives. Hosts on polled points or slow ramps must raise start_proof_time (see preconditions).",
+      "inputs": {
+        "pump_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 30,
+            "value": true
+          }
+        ],
+        "pump_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 60,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 40,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 45,
+          "to_s": 55,
+          "equals": true
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 60,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "command_flip_during_start_window_resets_timer",
+      "description": "The command drops 5 s into an unproven start and returns at 10 s. TrueDelay starts the window over, so the alarm lands at 25 s rather than at 15 s: proof time means CONTINUOUS mismatch.",
+      "inputs": {
+        "pump_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 5,
+            "value": false
+          },
+          {
+            "t": 10,
+            "value": true
+          }
+        ],
+        "pump_status": false
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 20,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 25,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "direction_flip_reserves_the_new_window",
+      "description": "A pump running in HAND is commanded on at 600 s while the starter, now on a tripped overload, stops proving. The unexpected-run flag drops on the same tick the fail-to-start condition begins, the new direction serves its own 15 s window, and yFault is false in between. The two flags are never true together \u2014 mutual exclusivity is structural, not timed.",
+      "inputs": {
+        "pump_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          }
+        ],
+        "pump_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 55,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 60,
+          "to_s": 595,
+          "equals": true
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 600,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 610,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 615,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 60,
+          "to_s": 595,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 600,
+          "to_s": 610,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 615,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "chattering_status_never_matures",
+      "description": "A marginal current switch makes and breaks every 10 s for five minutes against a steady on command, then settles made. No mismatch is ever continuous for start_proof_time, so the rule stays silent \u2014 CDL.Logical.Proof latches BOTH of its outputs on this trace (probe-verified at the pin; see Deviations).",
+      "inputs": {
+        "pump_cmd": true,
+        "pump_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 10,
+            "value": false
+          },
+          {
+            "t": 20,
+            "value": true
+          },
+          {
+            "t": 30,
+            "value": false
+          },
+          {
+            "t": 40,
+            "value": true
+          },
+          {
+            "t": 50,
+            "value": false
+          },
+          {
+            "t": 60,
+            "value": true
+          },
+          {
+            "t": 70,
+            "value": false
+          },
+          {
+            "t": 80,
+            "value": true
+          },
+          {
+            "t": 90,
+            "value": false
+          },
+          {
+            "t": 100,
+            "value": true
+          },
+          {
+            "t": 110,
+            "value": false
+          },
+          {
+            "t": 120,
+            "value": true
+          },
+          {
+            "t": 130,
+            "value": false
+          },
+          {
+            "t": 140,
+            "value": true
+          },
+          {
+            "t": 150,
+            "value": false
+          },
+          {
+            "t": 160,
+            "value": true
+          },
+          {
+            "t": 170,
+            "value": false
+          },
+          {
+            "t": 180,
+            "value": true
+          },
+          {
+            "t": 190,
+            "value": false
+          },
+          {
+            "t": 200,
+            "value": true
+          },
+          {
+            "t": 210,
+            "value": false
+          },
+          {
+            "t": 220,
+            "value": true
+          },
+          {
+            "t": 230,
+            "value": false
+          },
+          {
+            "t": 240,
+            "value": true
+          },
+          {
+            "t": 250,
+            "value": false
+          },
+          {
+            "t": 260,
+            "value": true
+          },
+          {
+            "t": 270,
+            "value": false
+          },
+          {
+            "t": 280,
+            "value": true
+          },
+          {
+            "t": 290,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

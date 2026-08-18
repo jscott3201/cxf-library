@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | VFD-0001, VFD-0002 (library addition — the reference's line names only VFD-0001 and the pump rules), PMP-0001, PMP-0002 |
+| **Applies to** | VFD-0001, VFD-0002 (library addition — the reference's line names only VFD-0001 and the pump rules), PMP-0001, PMP-0002, AHU-0039, PMP-0003 |
 | **Fix complexity** | On-site service required |
 | **Typical time** | 2–4 h |
 | **Typical cost** | $200–$2,000 |

@@ -1,0 +1,143 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 30,
+    "horizon_s": 1800
+  },
+  "scenarios": [
+    {
+      "name": "fires_as_commanded_stays_silent",
+      "description": "Enabled and firing. Command and status agree, so neither direction ever accumulates.",
+      "inputs": {
+        "boiler_cmd": true,
+        "boiler_status": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yFailToStart", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yUnexpectedRun", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "off_as_commanded_stays_silent",
+      "description": "Boiler disabled and dark — the other agreeing state. Silence here is the rule reporting a healthy plant, not an absent verdict.",
+      "inputs": {
+        "boiler_cmd": false,
+        "boiler_status": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yFailToStart", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yUnexpectedRun", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "fail_to_start_asserts_at_start_proof_time",
+      "description": "Enabled and never proves firing — a burner-management lockout. yFailToStart asserts at exactly start_proof_time (300 s) and delayOnInit = true serves that window from the first tick.",
+      "inputs": {
+        "boiler_cmd": true,
+        "boiler_status": false
+      },
+      "expect": [
+        { "output": "yFailToStart", "from_s": 0, "to_s": 270, "equals": false },
+        { "output": "yFailToStart", "from_s": 300, "to_s": 1800, "equals": true },
+        { "output": "yUnexpectedRun", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 270, "equals": false },
+        { "output": "yFault", "from_s": 300, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "unexpected_run_asserts_at_stop_proof_time",
+      "description": "Firing with no enable — burner in HAND, a welded contactor, or a status stuck true. yUnexpectedRun asserts at exactly stop_proof_time (120 s), the shorter of the two windows.",
+      "inputs": {
+        "boiler_cmd": false,
+        "boiler_status": true
+      },
+      "expect": [
+        { "output": "yUnexpectedRun", "from_s": 0, "to_s": 90, "equals": false },
+        { "output": "yUnexpectedRun", "from_s": 120, "to_s": 1800, "equals": true },
+        { "output": "yFailToStart", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 90, "equals": false },
+        { "output": "yFault", "from_s": 120, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "normal_light_off_inside_the_window_stays_silent",
+      "description": "The case start_proof_time exists for: enabled at t = 0, flame proven at 240 s after prepurge, pilot and flame establishing. A healthy burner-management cycle is not a fault.",
+      "inputs": {
+        "boiler_cmd": true,
+        "boiler_status": [
+          { "t": 0, "value": false },
+          { "t": 240, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yFailToStart", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yUnexpectedRun", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "enable_dropped_mid_window_restarts_the_proof",
+      "description": "A command flip inside the proof window: the plant stages the boiler off at 180 s and back on at 240 s while it never fires. The timer restarts from the second rising edge, so the alarm lands at 540 s (240 + 300), not at 300 s.",
+      "inputs": {
+        "boiler_cmd": [
+          { "t": 0, "value": true },
+          { "t": 180, "value": false },
+          { "t": 240, "value": true }
+        ],
+        "boiler_status": false
+      },
+      "expect": [
+        { "output": "yFailToStart", "from_s": 0, "to_s": 510, "equals": false },
+        { "output": "yFailToStart", "from_s": 540, "to_s": 1800, "equals": true },
+        { "output": "yUnexpectedRun", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 510, "equals": false },
+        { "output": "yFault", "from_s": 540, "to_s": 1800, "equals": true }
+      ]
+    },
+    {
+      "name": "flame_pulse_clears_and_restarts_the_proof",
+      "description": "Lockout-retry: the boiler stays enabled, holds a proven flame from 600 to 660 s, then drops out again. Each proof clears the alarm and restarts the window, so a boiler cycling on its own safety retries flickers here and is counted properly by HW-0001.",
+      "inputs": {
+        "boiler_cmd": true,
+        "boiler_status": [
+          { "t": 0, "value": false },
+          { "t": 600, "value": true },
+          { "t": 690, "value": false }
+        ]
+      },
+      "expect": [
+        { "output": "yFailToStart", "from_s": 0, "to_s": 270, "equals": false },
+        { "output": "yFailToStart", "from_s": 300, "to_s": 570, "equals": true },
+        { "output": "yFailToStart", "from_s": 600, "to_s": 960, "equals": false },
+        { "output": "yFailToStart", "from_s": 990, "to_s": 1800, "equals": true },
+        { "output": "yUnexpectedRun", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "hand_switch_flip_never_asserts_both_directions",
+      "description": "The mismatch changes direction at 1200 s — the BAS drops the enable as someone puts the burner in HAND. yFailToStart falls on the same tick the command falls and yUnexpectedRun starts its own window from zero, so the two flags are never true together; yFault goes quiet for the 120 s between them.",
+      "inputs": {
+        "boiler_cmd": [
+          { "t": 0, "value": true },
+          { "t": 1200, "value": false }
+        ],
+        "boiler_status": [
+          { "t": 0, "value": false },
+          { "t": 1200, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFailToStart", "from_s": 0, "to_s": 270, "equals": false },
+        { "output": "yFailToStart", "from_s": 300, "to_s": 1170, "equals": true },
+        { "output": "yFailToStart", "from_s": 1200, "to_s": 1800, "equals": false },
+        { "output": "yUnexpectedRun", "from_s": 0, "to_s": 1290, "equals": false },
+        { "output": "yUnexpectedRun", "from_s": 1320, "to_s": 1800, "equals": true },
+        { "output": "yFault", "from_s": 300, "to_s": 1170, "equals": true },
+        { "output": "yFault", "from_s": 1200, "to_s": 1290, "equals": false },
+        { "output": "yFault", "from_s": 1320, "to_s": 1800, "equals": true }
+      ]
+    }
+  ]
+}
