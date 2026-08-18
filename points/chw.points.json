@@ -74,7 +74,9 @@
         "quantitykind": "Temperature",
         "unit": "DEG_C",
         "medium": "Water",
-        "aspects": ["leaving"]
+        "aspects": [
+          "leaving"
+        ]
       },
       "provisional": false,
       "notes": "brick:Leaving_Condenser_Water_Temperature_Sensor grep-verified. Reference Haystack markers: condenser, water, leaving, temp, sensor. Baseline regressor input for CHW-FC-050 (condenser lift proxy)."
@@ -92,7 +94,9 @@
         "quantitykind": "Temperature",
         "unit": "DEG_C",
         "medium": "Water",
-        "aspects": ["leaving"]
+        "aspects": [
+          "leaving"
+        ]
       },
       "provisional": false,
       "notes": "brick:Leaving_Chilled_Water_Temperature_Sensor grep-verified. Consumed by CHW-FC-050 (baseline regressor) and CHW-FC-053 (delta-T)."
@@ -110,7 +114,9 @@
         "quantitykind": "Temperature",
         "unit": "DEG_C",
         "medium": "Water",
-        "aspects": ["entering"]
+        "aspects": [
+          "entering"
+        ]
       },
       "provisional": false,
       "notes": "brick:Entering_Chilled_Water_Temperature_Sensor grep-verified — 'return' at the plant is 'entering' at the chiller; Brick 1.4.4 also carries Chilled_Water_Return_Temperature_Sensor, but the entering-form matches the chiller-owned binding these rules assume. Consumed by CHW-FC-053."
@@ -146,7 +152,10 @@
         "quantitykind": "Temperature",
         "unit": "DEG_C",
         "medium": "Water",
-        "aspects": ["leaving", "setpoint"]
+        "aspects": [
+          "leaving",
+          "setpoint"
+        ]
       },
       "provisional": false,
       "notes": "brick:Leaving_Chilled_Water_Temperature_Setpoint grep-verified. CHW-FC-051 watches this point's RANGE over the evaluation window — the reset detector reads the setpoint, never the measured temperature (AHU-FC-057 sat_sp precedent)."
@@ -164,7 +173,10 @@
         "quantitykind": "PressureDifference",
         "unit": "KiloPA",
         "medium": "Water",
-        "aspects": ["differential", "setpoint"]
+        "aspects": [
+          "differential",
+          "setpoint"
+        ]
       },
       "provisional": false,
       "notes": "brick:Chilled_Water_Differential_Pressure_Setpoint grep-verified. CHW-FC-052 watches this point's range (AHU-FC-058 dsp_sp precedent)."
@@ -182,10 +194,13 @@
         "quantitykind": "DimensionlessRatio",
         "unit": "PERCENT",
         "medium": null,
-        "aspects": ["aggregate-max"]
+        "aspects": [
+          "aggregate-max"
+        ]
       },
       "provisional": true,
-      "notes": "HOST-DERIVED (zone_reheat_fraction / satisfied_zone_fraction precedent): the reference's chw_valve_positions is a vector across AHU/FCU cooling coils; the rule needs only its max, so the host binds max() over the coil valve commands it serves. CHW-FC-052's 'no coil starving' conjunct. Engine vector blocks could compute this in-graph once the points contract grows vector bindings — see _research/local/engine-block-inventory-fdd-candidates.md."
+      "notes": "HOST-DERIVED (zone_reheat_fraction / satisfied_zone_fraction precedent): the reference's chw_valve_positions is a vector across AHU/FCU cooling coils; the rule needs only its max, so the host binds max() over the coil valve commands it serves. CHW-FC-052's 'no coil starving' conjunct. Engine vector blocks could compute this in-graph once the points contract grows vector bindings — see _research/local/engine-block-inventory-fdd-candidates.md.",
+      "derived": true
     }
   ]
 }

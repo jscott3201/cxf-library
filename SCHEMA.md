@@ -65,6 +65,7 @@ YAML frontmatter followed by Markdown prose. Frontmatter fields:
 | `clusters` | list | | Cluster IDs this rule participates in |
 | `suppresses` | list | | Rule IDs silenced while this fault is active |
 | `suppressed_by` | list | | Rule IDs that silence this rule when active |
+| `adjudicates` | map | | Sensor-health rules only: `{points: [...], verdict: invalid_while_active \| ambiguous}` — the canonical point(s) whose data validity this rule judges. Hosts derive the NO_EVAL fan-out from downstream cards' `points` lists (point-keyed, so it stays complete as rules are added — never a hand-written rule list). `invalid_while_active`: treat the point as invalid for all consumers while this fault asserts; `ambiguous`: a redundancy-pair rule that cannot name which member drifted. |
 | `related` | list | | Co-occurring rules (informational) |
 | `playbooks` | list | ✓ | Playbook slugs in `playbooks/` |
 | `operating_states` | string | ✓ | Applicable states (`all` or list, prose ok) |
@@ -190,9 +191,13 @@ Target dialect: the open-control engine's composite subset
 
 - `name` is the library-wide canonical identifier (snake_case; suffixes: none =
   measured, `_sp` setpoint, `_cmd` command, `_status` status, `_fbk` feedback).
-- `derived: true` marks host-computed aggregates (e.g. a max across zones)
-  rather than physical points; the entry's `notes` say where the underlying
-  points' semantic tags live.
+- `derived: true` marks host-computed points rather than physical ones — both
+  aggregates (a max or fraction across zones) and physical transforms (e.g.
+  saturation temperatures from pressure via a refrigerant P-T lookup). The
+  entry's `notes` must state the derivation and its site-specific inputs
+  (which refrigerant, which underlying points); rules consume derived points
+  exactly like physical ones, and the derivation itself never appears in a
+  rule graph.
 - A top-level `namespaces` map records the exact ontology IRIs and the versions
   the terms were verified against.
 - `brick`: verified Brick class local name (namespace

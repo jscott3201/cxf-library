@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1140 320" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <rect x="12" y="94" width="145" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="84.5" y="113" text-anchor="middle" fill="#1e3a8a">hw_pump_vfd_speed</text>
+  <rect x="12" y="254" width="74" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="49" y="273" text-anchor="middle" fill="#1e3a8a">hws_temp</text>
+
+  <!-- evaluability: the loop is actually circulating -->
+  <rect x="210" y="30" width="256" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="338" y="52" text-anchor="middle" fill="#24292f" font-weight="bold">circulating</text>
+  <text x="338" y="70" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 10.0 %</text>
+
+  <!-- light load -->
+  <rect x="210" y="110" width="256" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="338" y="132" text-anchor="middle" fill="#24292f" font-weight="bold">lowSpeed</text>
+  <text x="338" y="150" text-anchor="middle" fill="#57606a" font-size="11">Reals.LessThreshold · t = 35.0 %</text>
+
+  <!-- full-temperature water -->
+  <rect x="210" y="210" width="256" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="338" y="232" text-anchor="middle" fill="#24292f" font-weight="bold">hotSupply</text>
+  <text x="338" y="250" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 54.4 °C</text>
+
+  <rect x="540" y="64" width="104" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="592" y="86" text-anchor="middle" fill="#24292f" font-weight="bold">lightLoad</text>
+  <text x="592" y="104" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <rect x="700" y="140" width="104" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="752" y="162" text-anchor="middle" fill="#24292f" font-weight="bold">overTemp</text>
+  <text x="752" y="180" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <rect x="860" y="140" width="134" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="927" y="162" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="927" y="180" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 3600 s</text>
+
+  <!-- boundary outputs -->
+  <rect x="1030" y="154" width="69" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1064.5" y="173" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1030" y="30" width="80" height="30" rx="15" fill="#fef3c7" stroke="#d97706"/>
+  <text x="1070" y="49" text-anchor="middle" fill="#78350f">yLoopOk</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 157 113 H 180 V 59 H 206"/>
+    <path d="M 157 113 H 180 V 139 H 206"/>
+    <path d="M 86 273 H 180 V 239 H 206"/>
+    <path d="M 466 59 H 506 V 79 H 536"/>
+    <path d="M 466 139 H 506 V 107 H 536"/>
+    <path d="M 644 93 H 666 V 154 H 696"/>
+    <path d="M 466 239 H 666 V 184 H 696"/>
+    <path d="M 804 169 H 856"/>
+    <path d="M 994 169 H 1026"/>
+    <path d="M 466 59 H 1000 V 45 H 1026"/>
+  </g>
+
+  <!-- signal type hints -->
+  <text x="163" y="104" fill="#7d8590" font-size="10">Real</text>
+  <text x="92" y="264" fill="#7d8590" font-size="10">Real</text>
+  <text x="472" y="52" fill="#7d8590" font-size="10">Bool</text>
+  <text x="472" y="132" fill="#7d8590" font-size="10">Bool</text>
+  <text x="472" y="232" fill="#7d8590" font-size="10">Bool</text>
+  <text x="650" y="86" fill="#7d8590" font-size="10">Bool</text>
+  <text x="810" y="162" fill="#7d8590" font-size="10">Bool</text>
+  <text x="546" y="75" fill="#7d8590" font-size="9">u1</text>
+  <text x="546" y="119" fill="#7d8590" font-size="9">u2</text>
+  <text x="706" y="151" fill="#7d8590" font-size="9">u1</text>
+  <text x="706" y="195" fill="#7d8590" font-size="9">u2</text>
+  <text x="1000" y="76" fill="#7d8590" font-size="11">false ⇒ NO_EVAL</text>
+</svg>

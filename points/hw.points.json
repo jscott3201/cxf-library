@@ -23,7 +23,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "Hot water / boiler plant point dictionary (reference ch.14, HW-FC-050..052). Owning equipment: brick:Boiler (verified in Brick 1.4.4; brick:Natural_Gas_Boiler for the gas-fired subclass). Multi-boiler plants bind per boiler; the OAT lockout rule (HW-FC-052) is plant-level and may bind the OR of boiler statuses plus the lead HW pump.",
+  "notes": "Hot water / boiler plant point dictionary (reference ch.14, HW-FC-050..052). Owning equipment: brick:Boiler (verified in Brick 1.4.4; brick:Natural_Gas_Boiler for the gas-fired subclass). Multi-boiler plants bind per boiler; the OAT lockout rule (HW-FC-052) is plant-level and may bind the OR of boiler statuses plus the lead HW pump. EXPANSION 2026-08-17: six loop-side points added for the PNNL-27338-grounded HW-FC-053..057 batch (library-authored rules; the reference's ch.14 covers only FC-050..052).",
   "points": [
     {
       "name": "boiler_status",
@@ -134,6 +134,126 @@
       },
       "provisional": false,
       "notes": "Carried from the ahu/erv dictionaries (brick:Outside_Air_Temperature_Sensor, grep-verified there). HW-FC-052's lockout comparator; its diagnosis list includes an OAT sensor reading low — pair with sensor-health rules when phase 3 opens."
+    },
+    {
+      "name": "hws_temp",
+      "description": "Hot water supply temperature (loop supply / boiler leaving)",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": "Hot_Water_Supply_Temperature_Sensor",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Water",
+        "aspects": [
+          "supply"
+        ]
+      },
+      "provisional": false,
+      "notes": "brick:Hot_Water_Supply_Temperature_Sensor grep-verified. HW-FC-053's delta-T minuend and HW-FC-056's comparator."
+    },
+    {
+      "name": "hwr_temp",
+      "description": "Hot water return temperature",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": "Hot_Water_Return_Temperature_Sensor",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Water",
+        "aspects": [
+          "return"
+        ]
+      },
+      "provisional": false,
+      "notes": "brick:Hot_Water_Return_Temperature_Sensor grep-verified. HW-FC-053's delta-T subtrahend."
+    },
+    {
+      "name": "hws_temp_sp",
+      "description": "Hot water supply temperature setpoint",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": "Leaving_Hot_Water_Temperature_Setpoint",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "property_class": "QuantifiableActuatableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Water",
+        "aspects": [
+          "supply",
+          "setpoint"
+        ]
+      },
+      "provisional": false,
+      "notes": "brick:Leaving_Hot_Water_Temperature_Setpoint grep-verified (Brick 1.4.4 has no generic non-domestic supply-setpoint class; the boiler-leaving form is the honest match). HW-FC-057 watches this point's RANGE (AHU-FC-057/CHW-FC-051 idiom)."
+    },
+    {
+      "name": "hw_dp",
+      "description": "HW loop differential pressure",
+      "kind": "real",
+      "unit": "kPa",
+      "qudt_unit": "KiloPA",
+      "brick": "Hot_Water_Differential_Pressure_Sensor",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "PressureDifference",
+        "unit": "KiloPA",
+        "medium": "Water",
+        "aspects": [
+          "differential"
+        ]
+      },
+      "provisional": false,
+      "notes": "brick:Hot_Water_Differential_Pressure_Sensor grep-verified. Context point for the DP rules; HW-FC-054's primary evidence is pump speed, not DP itself."
+    },
+    {
+      "name": "hw_dp_sp",
+      "description": "HW loop differential pressure setpoint",
+      "kind": "real",
+      "unit": "kPa",
+      "qudt_unit": "KiloPA",
+      "brick": "Hot_Water_Differential_Pressure_Setpoint",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "property_class": "QuantifiableActuatableProperty",
+        "quantitykind": "PressureDifference",
+        "unit": "KiloPA",
+        "medium": "Water",
+        "aspects": [
+          "differential",
+          "setpoint"
+        ]
+      },
+      "provisional": false,
+      "notes": "brick:Hot_Water_Differential_Pressure_Setpoint grep-verified. HW-FC-055 watches this point's RANGE (AHU-FC-058/CHW-FC-052 idiom)."
+    },
+    {
+      "name": "hw_pump_vfd_speed",
+      "description": "HW pump VFD speed feedback (0-100%)",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": "Motor_Speed_Sensor",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "brick:Motor_Speed_Sensor grep-verified (same mapping as vfd_speed in points/vfd.points.json). HW-FC-054/056's load proxy per PNNL-27338's pump-speed heuristics."
     }
   ]
 }

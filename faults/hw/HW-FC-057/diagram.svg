@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1750 430" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <rect x="12" y="80" width="130" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="77" y="99" text-anchor="middle" fill="#1e3a8a">hws_temp_sp</text>
+  <rect x="12" y="300" width="130" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="77" y="319" text-anchor="middle" fill="#1e3a8a">oat</text>
+
+  <!-- setpoint chain -->
+  <rect x="180" y="40" width="160" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="260" y="60" text-anchor="middle" fill="#24292f" font-weight="bold">spRef</text>
+  <text x="260" y="78" text-anchor="middle" fill="#57606a" font-size="11">Sampler · 7 d</text>
+
+  <rect x="400" y="80" width="130" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="465" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">spDev</text>
+  <text x="465" y="118" text-anchor="middle" fill="#57606a" font-size="11">Subtract</text>
+
+  <rect x="570" y="80" width="90" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="615" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">spAbs</text>
+  <text x="615" y="118" text-anchor="middle" fill="#57606a" font-size="11">Abs</text>
+
+  <rect x="700" y="80" width="190" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="795" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">spFlat</text>
+  <text x="795" y="118" text-anchor="middle" fill="#57606a" font-size="11">LessThreshold · 2.75 °C</text>
+
+  <rect x="930" y="80" width="170" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1015" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">spFlatHeld</text>
+  <text x="1015" y="118" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 7 d</text>
+
+  <!-- outdoor-air chain -->
+  <rect x="180" y="260" width="160" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="260" y="280" text-anchor="middle" fill="#24292f" font-weight="bold">oatRef</text>
+  <text x="260" y="298" text-anchor="middle" fill="#57606a" font-size="11">Sampler · 7 d</text>
+
+  <rect x="400" y="300" width="130" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="465" y="320" text-anchor="middle" fill="#24292f" font-weight="bold">oatDev</text>
+  <text x="465" y="338" text-anchor="middle" fill="#57606a" font-size="11">Subtract</text>
+
+  <rect x="570" y="300" width="90" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="615" y="320" text-anchor="middle" fill="#24292f" font-weight="bold">oatAbs</text>
+  <text x="615" y="338" text-anchor="middle" fill="#57606a" font-size="11">Abs</text>
+
+  <rect x="700" y="300" width="190" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="795" y="320" text-anchor="middle" fill="#24292f" font-weight="bold">oatFlat</text>
+  <text x="795" y="338" text-anchor="middle" fill="#57606a" font-size="11">LessThreshold · 4 °C</text>
+
+  <rect x="930" y="300" width="170" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1015" y="320" text-anchor="middle" fill="#24292f" font-weight="bold">oatFlatHeld</text>
+  <text x="1015" y="338" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 7 d</text>
+
+  <rect x="1140" y="300" width="100" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1190" y="320" text-anchor="middle" fill="#24292f" font-weight="bold">oatVaried</text>
+  <text x="1190" y="338" text-anchor="middle" fill="#57606a" font-size="11">Not</text>
+
+  <!-- conjunction + persistence -->
+  <rect x="1280" y="150" width="140" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1350" y="170" text-anchor="middle" fill="#24292f" font-weight="bold">flatAndEval</text>
+  <text x="1350" y="188" text-anchor="middle" fill="#57606a" font-size="11">And</text>
+
+  <rect x="1470" y="150" width="160" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1550" y="170" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1550" y="188" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 24 h</text>
+
+  <!-- boundary outputs -->
+  <rect x="1650" y="160" width="90" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1695" y="179" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1280" y="380" width="140" height="30" rx="15" fill="#fef3c7" stroke="#d97706"/>
+  <text x="1350" y="399" text-anchor="middle" fill="#78350f">yOatVaried</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 142 95 H 160 V 65 H 178"/>
+    <path d="M 142 95 H 380 V 93 H 398"/>
+    <path d="M 340 65 H 380 V 117 H 398"/>
+    <path d="M 530 105 H 568"/>
+    <path d="M 660 105 H 698"/>
+    <path d="M 890 105 H 928"/>
+    <path d="M 1100 105 H 1245 V 168 H 1278"/>
+
+    <path d="M 142 315 H 160 V 285 H 178"/>
+    <path d="M 142 315 H 380 V 313 H 398"/>
+    <path d="M 340 285 H 380 V 337 H 398"/>
+    <path d="M 530 325 H 568"/>
+    <path d="M 660 325 H 698"/>
+    <path d="M 890 325 H 928"/>
+    <path d="M 1100 325 H 1138"/>
+    <path d="M 1240 325 H 1258 V 182 H 1278"/>
+    <path d="M 1240 325 H 1258 V 395 H 1278"/>
+
+    <path d="M 1420 175 H 1468"/>
+    <path d="M 1630 175 H 1648"/>
+  </g>
+
+  <!-- annotation -->
+  <text x="1130" y="378" fill="#7d8590" font-size="11">false ⇒ NO_EVAL</text>
+</svg>

@@ -1,0 +1,509 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 300,
+    "horizon_s": 9000
+  },
+  "scenarios": [
+    {
+      "name": "heating_season_high_load",
+      "description": "A January afternoon: the loop is drawing everything the plant can make, pumps at 70% and supply water at 71 degC. Full-temperature water at full flow is the plant doing its job.",
+      "inputs": {
+        "hw_pump_vfd_speed": 70.0,
+        "hws_temp": 71.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": false
+        },
+        {
+          "output": "yLoopOk",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "mild_day_supply_temperature_reset_down",
+      "description": "The healthy version of the fault's own weather: pumps loafing at 22% because the building barely needs heat, and a working reset has taken the supply water down to 49 degC to match. Low load is not the finding; low load with hot water is.",
+      "inputs": {
+        "hw_pump_vfd_speed": 22.0,
+        "hws_temp": 49.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": false
+        },
+        {
+          "output": "yLoopOk",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "low_load_with_full_temperature_water",
+      "description": "The fault as PNNL-27338 4.4.2 states it: pumps at 20% and supply water at 60 degC, held for the full alarm_delay. The boiler is making design-day water for a loop that is barely drawing, and the alarm asserts at t = 3600 s.",
+      "inputs": {
+        "hw_pump_vfd_speed": 20.0,
+        "hws_temp": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 9000,
+          "equals": true
+        },
+        {
+          "output": "yLoopOk",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "pump_speed_exactly_at_the_low_load_threshold",
+      "description": "Speed boundary, on the line: 35.0% with 60 degC water. `Reals.LessThreshold` is strict, so 35.0 is not below 35.0 and the loop does not count as lightly loaded.",
+      "inputs": {
+        "hw_pump_vfd_speed": 35.0,
+        "hws_temp": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": false
+        },
+        {
+          "output": "yLoopOk",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "pump_speed_one_tenth_below_the_low_load_threshold",
+      "description": "Speed boundary, from below: 34.9% is lightly loaded, so the same 60 degC supply water alarms at 3600 s.",
+      "inputs": {
+        "hw_pump_vfd_speed": 34.9,
+        "hws_temp": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 9000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "pump_speed_one_tenth_above_the_low_load_threshold",
+      "description": "Speed boundary, from above: 35.1% and nothing is reported. With the on-the-line case, this pins the threshold from all three sides.",
+      "inputs": {
+        "hw_pump_vfd_speed": 35.1,
+        "hws_temp": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "hws_temp_exactly_at_the_high_supply_threshold",
+      "description": "Temperature boundary, on the line: supply water at exactly 54.4 degC with the pumps at 20%. `Reals.GreaterThreshold` is strict, so the plant reads clear. Both the vector and the parameter spell 54.4, so the two are the same double and the comparison is decided by strictness rather than by rounding.",
+      "inputs": {
+        "hw_pump_vfd_speed": 20.0,
+        "hws_temp": 54.4
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "hws_temp_one_tenth_above_the_high_supply_threshold",
+      "description": "Temperature boundary, from above: a tenth of a degree warmer at 54.5 degC, same light load, and the alarm arrives at 3600 s.",
+      "inputs": {
+        "hw_pump_vfd_speed": 20.0,
+        "hws_temp": 54.5
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 9000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "hws_temp_one_tenth_below_the_high_supply_threshold",
+      "description": "Temperature boundary, from below: 54.3 degC reads clear, which with the two vectors above pins this threshold from all three sides.",
+      "inputs": {
+        "hw_pump_vfd_speed": 20.0,
+        "hws_temp": 54.3
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "pump_speed_exactly_at_the_evaluability_floor",
+      "description": "Evaluability boundary, on the line: 10.0% is not above 10.0%, so the loop is not judged to be circulating. yLoopOk is false for the whole run and the 60 degC supply water is never assessed.",
+      "inputs": {
+        "hw_pump_vfd_speed": 10.0,
+        "hws_temp": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": false
+        },
+        {
+          "output": "yLoopOk",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "pump_speed_one_tenth_below_the_evaluability_floor",
+      "description": "Evaluability boundary, from below: 9.9% with hot water. Same verdict and same reason — a drive at its lowest command is not evidence that the loop is moving water past the coils.",
+      "inputs": {
+        "hw_pump_vfd_speed": 9.9,
+        "hws_temp": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": false
+        },
+        {
+          "output": "yLoopOk",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "pump_speed_one_tenth_above_the_evaluability_floor",
+      "description": "Evaluability boundary, from above: 10.1% is circulating, so the same hot water is now a finding and alarms at 3600 s. The floor is pinned from all three sides.",
+      "inputs": {
+        "hw_pump_vfd_speed": 10.1,
+        "hws_temp": 60.0
+      },
+      "expect": [
+        {
+          "output": "yLoopOk",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 9000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "pump_off_with_hot_standing_water",
+      "description": "The false positive the evaluability floor exists to prevent: an overnight setback with the pumps stopped and 65 degC water still standing in the boiler. Speed reads 0%, which is below 35% and would otherwise satisfy the reference's two-condition test for as long as the water stays hot. yLoopOk is false, so the host reads NO_EVAL rather than a fault.",
+      "inputs": {
+        "hw_pump_vfd_speed": 0.0,
+        "hws_temp": 65.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": false
+        },
+        {
+          "output": "yLoopOk",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "supply_temperature_climbs_mid_run",
+      "description": "A reset schedule losing its way: the loop sits at 20% all morning with 50 degC water, and at t = 1800 s the supply temperature climbs to 60 degC. The clock starts at the crossing, not at the start of the run, so the alarm lands at 5400 s.",
+      "inputs": {
+        "hw_pump_vfd_speed": 20.0,
+        "hws_temp": [
+          {
+            "t": 0,
+            "value": 50.0
+          },
+          {
+            "t": 1800,
+            "value": 60.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 5700,
+          "to_s": 9000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "pump_speed_rises_and_restarts_the_clock",
+      "description": "Persistence is continuous, not accumulated. A morning pickup takes the pumps to 40% for 600 s at t = 1800 s and the elapsed time is discarded rather than paused: the alarm lands at 6000 s, one full alarm_delay after the loop settles back to 20%.",
+      "inputs": {
+        "hws_temp": 60.0,
+        "hw_pump_vfd_speed": [
+          {
+            "t": 0,
+            "value": 20.0
+          },
+          {
+            "t": 1800,
+            "value": 40.0
+          },
+          {
+            "t": 2400,
+            "value": 20.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5700,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 6300,
+          "to_s": 9000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "condition_ends_on_the_maturity_tick",
+      "description": "Delay edge from below: the condition holds from t = 0 and the supply temperature drops to 50 degC at exactly 3600 s, the tick the timer matures on. The input is false when the timer comes due, so a full hour of overheated water is never reported.",
+      "inputs": {
+        "hw_pump_vfd_speed": 20.0,
+        "hws_temp": [
+          {
+            "t": 0,
+            "value": 60.0
+          },
+          {
+            "t": 3600,
+            "value": 50.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "condition_ends_one_tick_later",
+      "description": "Delay edge from above: the same run held 300 s longer asserts at exactly 3600 s and clears at 3900 s. With the vector above, both sides of the delay edge are pinned.",
+      "inputs": {
+        "hw_pump_vfd_speed": 20.0,
+        "hws_temp": [
+          {
+            "t": 0,
+            "value": 60.0
+          },
+          {
+            "t": 3900,
+            "value": 50.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3600,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 9000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "supply_temperature_resets_down_after_the_alarm",
+      "description": "Recovery, and the operator's confirmation that a reset schedule took: the supply setpoint comes down and the water follows to 48 degC at t = 5400 s. yFault falls on that tick with no release delay, and yLoopOk stays true throughout — the loop was circulating the whole time, so the clearing verdict is a real one.",
+      "inputs": {
+        "hw_pump_vfd_speed": 20.0,
+        "hws_temp": [
+          {
+            "t": 0,
+            "value": 60.0
+          },
+          {
+            "t": 5400,
+            "value": 48.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 5100,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 5400,
+          "to_s": 9000,
+          "equals": false
+        },
+        {
+          "output": "yLoopOk",
+          "from_s": 0,
+          "to_s": 9000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "pump_stops_after_the_alarm",
+      "description": "The other way yFault falls, and the reason yLoopOk is a boundary output: the water stays at 60 degC but the pumps stop at t = 5400 s. yFault clears exactly as it does when the temperature resets down, and only yLoopOk says which of the two happened — here, nothing was fixed and the loop simply stopped being evaluable.",
+      "inputs": {
+        "hws_temp": 60.0,
+        "hw_pump_vfd_speed": [
+          {
+            "t": 0,
+            "value": 20.0
+          },
+          {
+            "t": 5400,
+            "value": 0.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3900,
+          "to_s": 5100,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 5400,
+          "to_s": 9000,
+          "equals": false
+        },
+        {
+          "output": "yLoopOk",
+          "from_s": 0,
+          "to_s": 5100,
+          "equals": true
+        },
+        {
+          "output": "yLoopOk",
+          "from_s": 5400,
+          "to_s": 9000,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}
