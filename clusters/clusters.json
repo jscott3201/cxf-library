@@ -6,7 +6,14 @@
       "id": "CLU-01",
       "name": "Simultaneous Heating & Cooling",
       "trigger": "AHU-FC-050",
-      "members": ["AHU-FC-004", "AHU-FC-005", "AHU-FC-012", "AHU-FC-059", "AHU-FC-063"],
+      "members": [
+        "AHU-FC-004",
+        "AHU-FC-005",
+        "AHU-FC-012",
+        "AHU-FC-059",
+        "AHU-FC-063",
+        "FCU-FC-001"
+      ],
       "playbook": "simultaneous-hc",
       "prevalence": "common",
       "energy_impact": "15-40% of AHU energy"
@@ -15,7 +22,11 @@
       "id": "CLU-02",
       "name": "Missing Reset Strategy",
       "trigger": "AHU-FC-057",
-      "members": ["AHU-FC-058", "AHU-FC-053", "AHU-FC-065"],
+      "members": [
+        "AHU-FC-058",
+        "AHU-FC-053",
+        "AHU-FC-065"
+      ],
       "playbook": "missing-reset",
       "prevalence": "74% of buildings (PNNL 151-building study)",
       "energy_impact": "5-20% of site energy"
@@ -24,7 +35,11 @@
       "id": "CLU-03",
       "name": "Economizer Failure",
       "trigger": "AHU-FC-051",
-      "members": ["AHU-FC-009", "AHU-FC-011", "RTU-FC-053"],
+      "members": [
+        "AHU-FC-009",
+        "AHU-FC-011",
+        "RTU-FC-053"
+      ],
       "playbook": "economizer-failure",
       "prevalence": "54% of RTUs (Cowan 2004)",
       "energy_impact": "5-20% of cooling energy"
@@ -33,7 +48,11 @@
       "id": "CLU-04",
       "name": "After-Hours Operation",
       "trigger": "AHU-FC-052",
-      "members": ["SYS-FC-052", "SYS-FC-053", "AHU-FC-060"],
+      "members": [
+        "SYS-FC-052",
+        "SYS-FC-053",
+        "AHU-FC-060"
+      ],
       "playbook": "after-hours-operation",
       "prevalence": "~15%",
       "energy_impact": "3-16% of site energy"
@@ -42,7 +61,10 @@
       "id": "CLU-05",
       "name": "Zone Heating & Cooling Conflict",
       "trigger": "VAV-FC-055",
-      "members": ["VAV-FC-052", "SYS-FC-056"],
+      "members": [
+        "VAV-FC-052",
+        "SYS-FC-056"
+      ],
       "playbook": "vav-min-flow-reheat",
       "prevalence": "common",
       "energy_impact": "5-20% of zone energy"
@@ -51,7 +73,11 @@
       "id": "CLU-06",
       "name": "Chilled Water Plant Inefficiency",
       "trigger": "CHW-FC-050",
-      "members": ["CHW-FC-051", "CHW-FC-052", "CHW-FC-053"],
+      "members": [
+        "CHW-FC-051",
+        "CHW-FC-052",
+        "CHW-FC-053"
+      ],
       "playbook": "chiller-efficiency",
       "prevalence": null,
       "energy_impact": "5-15% of chiller energy"
@@ -60,7 +86,9 @@
       "id": "CLU-07",
       "name": "Unnecessary Plant Operation",
       "trigger": "SYS-FC-050",
-      "members": ["SYS-FC-051"],
+      "members": [
+        "SYS-FC-051"
+      ],
       "playbook": "unnecessary-plant-operation",
       "prevalence": null,
       "energy_impact": "100% of plant energy while active"
@@ -69,7 +97,10 @@
       "id": "CLU-08",
       "name": "Schedule Dysfunction",
       "trigger": "AHU-FC-052",
-      "members": ["SYS-FC-057", "SYS-FC-053"],
+      "members": [
+        "SYS-FC-057",
+        "SYS-FC-053"
+      ],
       "playbook": "after-hours-operation",
       "prevalence": "~15%",
       "energy_impact": "3-16% of site energy"
@@ -78,7 +109,12 @@
       "id": "CLU-09",
       "name": "Sensor Integrity Failure",
       "trigger": "AHU-FC-062",
-      "members": ["AHU-FC-002", "AHU-FC-003", "SYS-FC-054", "SYS-FC-055"],
+      "members": [
+        "AHU-FC-002",
+        "AHU-FC-003",
+        "SYS-FC-054",
+        "SYS-FC-055"
+      ],
       "playbook": "sensor-drift",
       "prevalence": "~15%",
       "energy_impact": "prevents false alarms; sensor-dependent"

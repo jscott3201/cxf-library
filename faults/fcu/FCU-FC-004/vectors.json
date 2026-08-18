@@ -1,0 +1,475 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 5400
+  },
+  "scenarios": [
+    {
+      "name": "healthy_unit_shows_fan_heat_only",
+      "description": "Both valves shut and the fan running: 22.0 \u00b0C room air arrives at the discharge sensor at 22.5 \u00b0C. The only thing the air crossed was the fan, which put its shaft work into the stream, and the cooling coil took nothing back. `drop` = rat \u2212 sat = \u22120.5 \u00b0C, the healthy signature of a tight chilled-water valve",
+      "inputs": {
+        "clg_vlv_cmd": 0.0,
+        "sat": 22.5,
+        "rat": 22.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "drop_just_below_threshold",
+      "description": "One tenth inside the allowance: rat \u2212 sat = 2.9 \u00b0C at a valve commanded shut. Silent \u2014 and worth reading with the fan-heat direction in mind, because the fan warms the air between the two sensors, so a measured 2.9 \u00b0C is a true coil drop of nearly 4 \u00b0C that this rule does not report (see Deviations)",
+      "inputs": {
+        "clg_vlv_cmd": 0.0,
+        "sat": 19.1,
+        "rat": 22.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "drop_exactly_at_threshold",
+      "description": "Threshold edge: rat \u2212 sat = 3.0 \u00b0C exactly. `dropBig` is a strict `>`, which is the comparison the reference writes, so a drop sitting precisely on inactive_coil_threshold reads healthy",
+      "inputs": {
+        "clg_vlv_cmd": 0.0,
+        "sat": 19.0,
+        "rat": 22.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "drop_just_over_threshold",
+      "description": "Threshold edge, other side: rat \u2212 sat = 3.1 \u00b0C clears the strict comparison on the first tick, and with delayOnInit the alarm asserts at exactly one alarm_delay (1800 s)",
+      "inputs": {
+        "clg_vlv_cmd": 0.0,
+        "sat": 18.9,
+        "rat": 22.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 5400,
+          "equals": true
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "cmd_just_below_closed_threshold",
+      "description": "Command edge: a 6 \u00b0C drop with clg_vlv_cmd at 0.9%. Below cmd_closed_threshold the valve counts as shut, so yCmdOk holds and the alarm lands after alarm_delay. Between 0% and 1% a leak and a trickle of commanded flow are indistinguishable to this rule",
+      "inputs": {
+        "clg_vlv_cmd": 0.9,
+        "sat": 16.0,
+        "rat": 22.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 5400,
+          "equals": true
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "cmd_exactly_at_closed_threshold",
+      "description": "Command edge: the same 6 \u00b0C drop with the command sitting on exactly 1.0%. `vlvShut` is a strict `<`, so the valve does not count as shut, yCmdOk goes false, and the rule has no verdict \u2014 the host reports NO_EVAL rather than health",
+      "inputs": {
+        "clg_vlv_cmd": 1.0,
+        "sat": 16.0,
+        "rat": 22.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "cmd_just_above_closed_threshold",
+      "description": "Command edge, third side: 1.1% with the same drop. Silent for the same reason, and pinned so a future retune of cmd_closed_threshold cannot move the boundary unnoticed",
+      "inputs": {
+        "clg_vlv_cmd": 1.1,
+        "sat": 16.0,
+        "rat": 22.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "valve_open_and_cooling_normally",
+      "description": "A fan coil doing its job: the valve is commanded 60% open and pulls 24 \u00b0C room air down to 14 \u00b0C. The largest drop in the set raises nothing, because yCmdOk is false and this rule has nothing to say about a coil that was asked to cool",
+      "inputs": {
+        "clg_vlv_cmd": 60.0,
+        "sat": 14.0,
+        "rat": 24.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "chilled_water_valve_leaking_through",
+      "description": "The motivating case: the valve is commanded 0% and 22 \u00b0C room air still arrives at 16 \u00b0C. Correcting for the fan's own rise, the coil is pulling something over 6 \u00b0C out of air nobody asked to cool \u2014 a worn seat, an actuator short of its close position, or a three-way bypass that is not sealing",
+      "inputs": {
+        "clg_vlv_cmd": 0.0,
+        "sat": 16.0,
+        "rat": 22.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 5400,
+          "equals": true
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "leak_starts_mid_run",
+      "description": "A rising edge mid-run rather than at load: the unit runs healthy on fan heat alone and the riser is pressurized at t = 600 s, after which the drop holds at 6 \u00b0C. The alarm lands at exactly 600 + 1800 = 2400 s",
+      "inputs": {
+        "clg_vlv_cmd": 0.0,
+        "sat": [
+          {
+            "t": 0,
+            "value": 22.5
+          },
+          {
+            "t": 600,
+            "value": 16.0
+          }
+        ],
+        "rat": 22.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2340,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 2400,
+          "to_s": 5400,
+          "equals": true
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "transient_clears_before_alarm_delay",
+      "description": "Transient: a 6 \u00b0C drop persists for 1200 s while the chilled water standing in a just-closed coil gives up its cold, then the discharge returns to room air plus fan heat. Anything shorter than alarm_delay never reaches the operator, which is the delay's main job on this fault",
+      "inputs": {
+        "clg_vlv_cmd": 0.0,
+        "sat": [
+          {
+            "t": 0,
+            "value": 16.0
+          },
+          {
+            "t": 1200,
+            "value": 22.5
+          }
+        ],
+        "rat": 22.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "fault_clears_on_recovery",
+      "description": "A sustained 6 \u00b0C drop alarms at 1800 s; the coil is isolated at t = 3000 s and the discharge climbs back to room air plus fan heat. `TrueDelay` has no off-delay, so the alarm drops on that tick and the accumulated time is discarded",
+      "inputs": {
+        "clg_vlv_cmd": 0.0,
+        "sat": [
+          {
+            "t": 0,
+            "value": 16.0
+          },
+          {
+            "t": 3000,
+            "value": 22.5
+          }
+        ],
+        "rat": 22.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 2940,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 3000,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "zone_calls_for_cooling_before_alarm",
+      "description": "Recovery through the command term: the drop never changes, but the zone calls for cooling at t = 1200 s and the valve opens to 40%. yCmdOk goes false, persistence restarts, and the leak that was 10 minutes from being reported is not reported. On a unit cycling in and out of cooling, this rule only ever sees leaks that outlast a full closed period",
+      "inputs": {
+        "clg_vlv_cmd": [
+          {
+            "t": 0,
+            "value": 0.0
+          },
+          {
+            "t": 1200,
+            "value": 40.0
+          }
+        ],
+        "sat": 16.0,
+        "rat": 22.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 1200,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "fan_off_standing_water_reads_as_a_leak",
+      "description": "The known hole, pinned so it cannot change silently: with the fan stopped, the discharge sensor sits in still air over a coil full of chilled water and reads 15 \u00b0C while the return sensor reads the room at 22 \u00b0C. No air is moving and nothing is being wasted, but the rule alarms. The FCU point dictionary carries no fan status for the graph to read, so this gate is the host's \u2014 see preconditions",
+      "inputs": {
+        "clg_vlv_cmd": 0.0,
+        "sat": 15.0,
+        "rat": 22.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 5400,
+          "equals": true
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "oscillating_drop_never_alarms",
+      "description": "A leak modulated by riser pressure swings the drop between 6 \u00b0C and \u22120.5 \u00b0C on a 20-minute period. Its mean is well outside the allowance and a 5-minute rolling average would report the fault, but persistence restarts on every compliant tick, so this rule stays silent \u2014 the limit of substituting TrueDelay for averaging (see Deviations)",
+      "inputs": {
+        "clg_vlv_cmd": 0.0,
+        "sat": [
+          {
+            "t": 0,
+            "value": 16.0
+          },
+          {
+            "t": 600,
+            "value": 22.5
+          },
+          {
+            "t": 1200,
+            "value": 16.0
+          },
+          {
+            "t": 1800,
+            "value": 22.5
+          },
+          {
+            "t": 2400,
+            "value": 16.0
+          },
+          {
+            "t": 3000,
+            "value": 22.5
+          },
+          {
+            "t": 3600,
+            "value": 16.0
+          },
+          {
+            "t": 4200,
+            "value": 22.5
+          },
+          {
+            "t": 4800,
+            "value": 16.0
+          }
+        ],
+        "rat": 22.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        },
+        {
+          "output": "yCmdOk",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}

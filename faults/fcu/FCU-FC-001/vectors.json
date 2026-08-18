@@ -1,0 +1,1431 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 180,
+    "horizon_s": 21600
+  },
+  "scenarios": [
+    {
+      "name": "stable_state",
+      "description": "The unit holds one operating state for the whole run. operating_state equals chg.pre_u_start, so Integers.Change never pulses and the rolling count sits at zero. yWindowFull is pinned on both sides of its only edge: false through 3420 s, true from exactly 3600 s, which is the tick the moving average's divisor becomes count_window rather than elapsed time",
+      "inputs": {
+        "operating_state": 0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yWindowFull",
+          "from_s": 0,
+          "to_s": 3420,
+          "equals": false
+        },
+        {
+          "output": "yWindowFull",
+          "from_s": 3600,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "startup_pulse_is_inert",
+      "description": "operating_state is a constant 3, which differs from chg.pre_u_start (0), so Integers.Change emits a spurious pulse on tick 0. It costs nothing: MovingAverage integrates u.dt and dt is zero on the first tick, so the pulse encloses no area and count stays at 0.0 for the whole run",
+      "inputs": {
+        "operating_state": 3
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "four_transitions_per_hour",
+      "description": "The unit walks OS 1-2-3-4-1 every 900 s: four transitions an hour, ordinary for a zone tracking load. count holds at exactly 4.0 once the window has filled and yFault never rises",
+      "inputs": {
+        "operating_state": [
+          {
+            "t": 0,
+            "value": 1
+          },
+          {
+            "t": 900,
+            "value": 2
+          },
+          {
+            "t": 1800,
+            "value": 3
+          },
+          {
+            "t": 2700,
+            "value": 4
+          },
+          {
+            "t": 3600,
+            "value": 1
+          },
+          {
+            "t": 4500,
+            "value": 2
+          },
+          {
+            "t": 5400,
+            "value": 3
+          },
+          {
+            "t": 6300,
+            "value": 4
+          },
+          {
+            "t": 7200,
+            "value": 1
+          },
+          {
+            "t": 8100,
+            "value": 2
+          },
+          {
+            "t": 9000,
+            "value": 3
+          },
+          {
+            "t": 9900,
+            "value": 4
+          },
+          {
+            "t": 10800,
+            "value": 1
+          },
+          {
+            "t": 11700,
+            "value": 2
+          },
+          {
+            "t": 12600,
+            "value": 3
+          },
+          {
+            "t": 13500,
+            "value": 4
+          },
+          {
+            "t": 14400,
+            "value": 1
+          },
+          {
+            "t": 15300,
+            "value": 2
+          },
+          {
+            "t": 16200,
+            "value": 3
+          },
+          {
+            "t": 17100,
+            "value": 4
+          },
+          {
+            "t": 18000,
+            "value": 1
+          },
+          {
+            "t": 18900,
+            "value": 2
+          },
+          {
+            "t": 19800,
+            "value": 3
+          },
+          {
+            "t": 20700,
+            "value": 4
+          },
+          {
+            "t": 21600,
+            "value": 1
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "seven_per_hour_stays_clear",
+      "description": "Boundary, low side. Seven transitions on consecutive ticks at the top of every hour, so every completed trailing hour holds exactly seven. count lands on exactly 7.0 and os_max is a strict '>', so seven an hour reads clear forever. The first hour reads 20.0 - the extrapolated pace of a seven-tick burst - and yWindowFull is false there, which is precisely the case the window gate exists to swallow",
+      "inputs": {
+        "operating_state": [
+          {
+            "t": 0,
+            "value": 2
+          },
+          {
+            "t": 180,
+            "value": 1
+          },
+          {
+            "t": 360,
+            "value": 2
+          },
+          {
+            "t": 540,
+            "value": 1
+          },
+          {
+            "t": 720,
+            "value": 2
+          },
+          {
+            "t": 900,
+            "value": 1
+          },
+          {
+            "t": 1080,
+            "value": 2
+          },
+          {
+            "t": 3600,
+            "value": 1
+          },
+          {
+            "t": 3780,
+            "value": 2
+          },
+          {
+            "t": 3960,
+            "value": 1
+          },
+          {
+            "t": 4140,
+            "value": 2
+          },
+          {
+            "t": 4320,
+            "value": 1
+          },
+          {
+            "t": 4500,
+            "value": 2
+          },
+          {
+            "t": 4680,
+            "value": 1
+          },
+          {
+            "t": 7200,
+            "value": 2
+          },
+          {
+            "t": 7380,
+            "value": 1
+          },
+          {
+            "t": 7560,
+            "value": 2
+          },
+          {
+            "t": 7740,
+            "value": 1
+          },
+          {
+            "t": 7920,
+            "value": 2
+          },
+          {
+            "t": 8100,
+            "value": 1
+          },
+          {
+            "t": 8280,
+            "value": 2
+          },
+          {
+            "t": 10800,
+            "value": 1
+          },
+          {
+            "t": 10980,
+            "value": 2
+          },
+          {
+            "t": 11160,
+            "value": 1
+          },
+          {
+            "t": 11340,
+            "value": 2
+          },
+          {
+            "t": 11520,
+            "value": 1
+          },
+          {
+            "t": 11700,
+            "value": 2
+          },
+          {
+            "t": 11880,
+            "value": 1
+          },
+          {
+            "t": 14400,
+            "value": 2
+          },
+          {
+            "t": 14580,
+            "value": 1
+          },
+          {
+            "t": 14760,
+            "value": 2
+          },
+          {
+            "t": 14940,
+            "value": 1
+          },
+          {
+            "t": 15120,
+            "value": 2
+          },
+          {
+            "t": 15300,
+            "value": 1
+          },
+          {
+            "t": 15480,
+            "value": 2
+          },
+          {
+            "t": 18000,
+            "value": 1
+          },
+          {
+            "t": 18180,
+            "value": 2
+          },
+          {
+            "t": 18360,
+            "value": 1
+          },
+          {
+            "t": 18540,
+            "value": 2
+          },
+          {
+            "t": 18720,
+            "value": 1
+          },
+          {
+            "t": 18900,
+            "value": 2
+          },
+          {
+            "t": 19080,
+            "value": 1
+          },
+          {
+            "t": 21600,
+            "value": 2
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yWindowFull",
+          "from_s": 0,
+          "to_s": 3420,
+          "equals": false
+        },
+        {
+          "output": "yWindowFull",
+          "from_s": 3600,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "eight_per_hour_trips",
+      "description": "Boundary, high side. The same shape with eight transitions an hour: count sits on exactly 8.0 from the first completed window. gate rises at 3600 s (the tick yWindowFull matures, cntHigh already being true) and yFault follows one alarm_delay later at exactly 7200 s - the earliest instant this rule can assert anything",
+      "inputs": {
+        "operating_state": [
+          {
+            "t": 0,
+            "value": 2
+          },
+          {
+            "t": 180,
+            "value": 1
+          },
+          {
+            "t": 360,
+            "value": 2
+          },
+          {
+            "t": 540,
+            "value": 1
+          },
+          {
+            "t": 720,
+            "value": 2
+          },
+          {
+            "t": 900,
+            "value": 1
+          },
+          {
+            "t": 1080,
+            "value": 2
+          },
+          {
+            "t": 1260,
+            "value": 1
+          },
+          {
+            "t": 3600,
+            "value": 2
+          },
+          {
+            "t": 3780,
+            "value": 1
+          },
+          {
+            "t": 3960,
+            "value": 2
+          },
+          {
+            "t": 4140,
+            "value": 1
+          },
+          {
+            "t": 4320,
+            "value": 2
+          },
+          {
+            "t": 4500,
+            "value": 1
+          },
+          {
+            "t": 4680,
+            "value": 2
+          },
+          {
+            "t": 4860,
+            "value": 1
+          },
+          {
+            "t": 7200,
+            "value": 2
+          },
+          {
+            "t": 7380,
+            "value": 1
+          },
+          {
+            "t": 7560,
+            "value": 2
+          },
+          {
+            "t": 7740,
+            "value": 1
+          },
+          {
+            "t": 7920,
+            "value": 2
+          },
+          {
+            "t": 8100,
+            "value": 1
+          },
+          {
+            "t": 8280,
+            "value": 2
+          },
+          {
+            "t": 8460,
+            "value": 1
+          },
+          {
+            "t": 10800,
+            "value": 2
+          },
+          {
+            "t": 10980,
+            "value": 1
+          },
+          {
+            "t": 11160,
+            "value": 2
+          },
+          {
+            "t": 11340,
+            "value": 1
+          },
+          {
+            "t": 11520,
+            "value": 2
+          },
+          {
+            "t": 11700,
+            "value": 1
+          },
+          {
+            "t": 11880,
+            "value": 2
+          },
+          {
+            "t": 12060,
+            "value": 1
+          },
+          {
+            "t": 14400,
+            "value": 2
+          },
+          {
+            "t": 14580,
+            "value": 1
+          },
+          {
+            "t": 14760,
+            "value": 2
+          },
+          {
+            "t": 14940,
+            "value": 1
+          },
+          {
+            "t": 15120,
+            "value": 2
+          },
+          {
+            "t": 15300,
+            "value": 1
+          },
+          {
+            "t": 15480,
+            "value": 2
+          },
+          {
+            "t": 15660,
+            "value": 1
+          },
+          {
+            "t": 18000,
+            "value": 2
+          },
+          {
+            "t": 18180,
+            "value": 1
+          },
+          {
+            "t": 18360,
+            "value": 2
+          },
+          {
+            "t": 18540,
+            "value": 1
+          },
+          {
+            "t": 18720,
+            "value": 2
+          },
+          {
+            "t": 18900,
+            "value": 1
+          },
+          {
+            "t": 19080,
+            "value": 2
+          },
+          {
+            "t": 19260,
+            "value": 1
+          },
+          {
+            "t": 21600,
+            "value": 2
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7020,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 7380,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "sustained_thrash_at_nyquist_ceiling",
+      "description": "operating_state alternates on every tick - 20 transitions an hour at the 180 s tick, which is exactly the change-counter ceiling count_window/dt. count reads 20.0 and cannot read higher however fast the real unit cycles; the rule still trips at 7200 s, the same instant as the eight-per-hour case, because the alarm path is limited by the window and the delay rather than by how far above os_max the count sits",
+      "inputs": {
+        "operating_state": [
+          {
+            "t": 0,
+            "value": 2
+          },
+          {
+            "t": 180,
+            "value": 1
+          },
+          {
+            "t": 360,
+            "value": 2
+          },
+          {
+            "t": 540,
+            "value": 1
+          },
+          {
+            "t": 720,
+            "value": 2
+          },
+          {
+            "t": 900,
+            "value": 1
+          },
+          {
+            "t": 1080,
+            "value": 2
+          },
+          {
+            "t": 1260,
+            "value": 1
+          },
+          {
+            "t": 1440,
+            "value": 2
+          },
+          {
+            "t": 1620,
+            "value": 1
+          },
+          {
+            "t": 1800,
+            "value": 2
+          },
+          {
+            "t": 1980,
+            "value": 1
+          },
+          {
+            "t": 2160,
+            "value": 2
+          },
+          {
+            "t": 2340,
+            "value": 1
+          },
+          {
+            "t": 2520,
+            "value": 2
+          },
+          {
+            "t": 2700,
+            "value": 1
+          },
+          {
+            "t": 2880,
+            "value": 2
+          },
+          {
+            "t": 3060,
+            "value": 1
+          },
+          {
+            "t": 3240,
+            "value": 2
+          },
+          {
+            "t": 3420,
+            "value": 1
+          },
+          {
+            "t": 3600,
+            "value": 2
+          },
+          {
+            "t": 3780,
+            "value": 1
+          },
+          {
+            "t": 3960,
+            "value": 2
+          },
+          {
+            "t": 4140,
+            "value": 1
+          },
+          {
+            "t": 4320,
+            "value": 2
+          },
+          {
+            "t": 4500,
+            "value": 1
+          },
+          {
+            "t": 4680,
+            "value": 2
+          },
+          {
+            "t": 4860,
+            "value": 1
+          },
+          {
+            "t": 5040,
+            "value": 2
+          },
+          {
+            "t": 5220,
+            "value": 1
+          },
+          {
+            "t": 5400,
+            "value": 2
+          },
+          {
+            "t": 5580,
+            "value": 1
+          },
+          {
+            "t": 5760,
+            "value": 2
+          },
+          {
+            "t": 5940,
+            "value": 1
+          },
+          {
+            "t": 6120,
+            "value": 2
+          },
+          {
+            "t": 6300,
+            "value": 1
+          },
+          {
+            "t": 6480,
+            "value": 2
+          },
+          {
+            "t": 6660,
+            "value": 1
+          },
+          {
+            "t": 6840,
+            "value": 2
+          },
+          {
+            "t": 7020,
+            "value": 1
+          },
+          {
+            "t": 7200,
+            "value": 2
+          },
+          {
+            "t": 7380,
+            "value": 1
+          },
+          {
+            "t": 7560,
+            "value": 2
+          },
+          {
+            "t": 7740,
+            "value": 1
+          },
+          {
+            "t": 7920,
+            "value": 2
+          },
+          {
+            "t": 8100,
+            "value": 1
+          },
+          {
+            "t": 8280,
+            "value": 2
+          },
+          {
+            "t": 8460,
+            "value": 1
+          },
+          {
+            "t": 8640,
+            "value": 2
+          },
+          {
+            "t": 8820,
+            "value": 1
+          },
+          {
+            "t": 9000,
+            "value": 2
+          },
+          {
+            "t": 9180,
+            "value": 1
+          },
+          {
+            "t": 9360,
+            "value": 2
+          },
+          {
+            "t": 9540,
+            "value": 1
+          },
+          {
+            "t": 9720,
+            "value": 2
+          },
+          {
+            "t": 9900,
+            "value": 1
+          },
+          {
+            "t": 10080,
+            "value": 2
+          },
+          {
+            "t": 10260,
+            "value": 1
+          },
+          {
+            "t": 10440,
+            "value": 2
+          },
+          {
+            "t": 10620,
+            "value": 1
+          },
+          {
+            "t": 10800,
+            "value": 2
+          },
+          {
+            "t": 10980,
+            "value": 1
+          },
+          {
+            "t": 11160,
+            "value": 2
+          },
+          {
+            "t": 11340,
+            "value": 1
+          },
+          {
+            "t": 11520,
+            "value": 2
+          },
+          {
+            "t": 11700,
+            "value": 1
+          },
+          {
+            "t": 11880,
+            "value": 2
+          },
+          {
+            "t": 12060,
+            "value": 1
+          },
+          {
+            "t": 12240,
+            "value": 2
+          },
+          {
+            "t": 12420,
+            "value": 1
+          },
+          {
+            "t": 12600,
+            "value": 2
+          },
+          {
+            "t": 12780,
+            "value": 1
+          },
+          {
+            "t": 12960,
+            "value": 2
+          },
+          {
+            "t": 13140,
+            "value": 1
+          },
+          {
+            "t": 13320,
+            "value": 2
+          },
+          {
+            "t": 13500,
+            "value": 1
+          },
+          {
+            "t": 13680,
+            "value": 2
+          },
+          {
+            "t": 13860,
+            "value": 1
+          },
+          {
+            "t": 14040,
+            "value": 2
+          },
+          {
+            "t": 14220,
+            "value": 1
+          },
+          {
+            "t": 14400,
+            "value": 2
+          },
+          {
+            "t": 14580,
+            "value": 1
+          },
+          {
+            "t": 14760,
+            "value": 2
+          },
+          {
+            "t": 14940,
+            "value": 1
+          },
+          {
+            "t": 15120,
+            "value": 2
+          },
+          {
+            "t": 15300,
+            "value": 1
+          },
+          {
+            "t": 15480,
+            "value": 2
+          },
+          {
+            "t": 15660,
+            "value": 1
+          },
+          {
+            "t": 15840,
+            "value": 2
+          },
+          {
+            "t": 16020,
+            "value": 1
+          },
+          {
+            "t": 16200,
+            "value": 2
+          },
+          {
+            "t": 16380,
+            "value": 1
+          },
+          {
+            "t": 16560,
+            "value": 2
+          },
+          {
+            "t": 16740,
+            "value": 1
+          },
+          {
+            "t": 16920,
+            "value": 2
+          },
+          {
+            "t": 17100,
+            "value": 1
+          },
+          {
+            "t": 17280,
+            "value": 2
+          },
+          {
+            "t": 17460,
+            "value": 1
+          },
+          {
+            "t": 17640,
+            "value": 2
+          },
+          {
+            "t": 17820,
+            "value": 1
+          },
+          {
+            "t": 18000,
+            "value": 2
+          },
+          {
+            "t": 18180,
+            "value": 1
+          },
+          {
+            "t": 18360,
+            "value": 2
+          },
+          {
+            "t": 18540,
+            "value": 1
+          },
+          {
+            "t": 18720,
+            "value": 2
+          },
+          {
+            "t": 18900,
+            "value": 1
+          },
+          {
+            "t": 19080,
+            "value": 2
+          },
+          {
+            "t": 19260,
+            "value": 1
+          },
+          {
+            "t": 19440,
+            "value": 2
+          },
+          {
+            "t": 19620,
+            "value": 1
+          },
+          {
+            "t": 19800,
+            "value": 2
+          },
+          {
+            "t": 19980,
+            "value": 1
+          },
+          {
+            "t": 20160,
+            "value": 2
+          },
+          {
+            "t": 20340,
+            "value": 1
+          },
+          {
+            "t": 20520,
+            "value": 2
+          },
+          {
+            "t": 20700,
+            "value": 1
+          },
+          {
+            "t": 20880,
+            "value": 2
+          },
+          {
+            "t": 21060,
+            "value": 1
+          },
+          {
+            "t": 21240,
+            "value": 2
+          },
+          {
+            "t": 21420,
+            "value": 1
+          },
+          {
+            "t": 21600,
+            "value": 2
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7020,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 7380,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "warmup_burst_masked_by_window_gate",
+      "description": "Startup artifact: nine transitions inside the first half hour read as a 20/hr pace while the moving average is still dividing by elapsed time. cntHigh is true from the second tick, but yWindowFull is false until 3600 s so gate stays down. At 3600 s the completed window genuinely holds nine transitions and gate rises - then the burst ages out and the count falls to 7.0 by 3960 s, so gate was true at two ticks out of the 3600 s alarm_delay and nothing is ever reported",
+      "inputs": {
+        "operating_state": [
+          {
+            "t": 0,
+            "value": 1
+          },
+          {
+            "t": 180,
+            "value": 2
+          },
+          {
+            "t": 360,
+            "value": 1
+          },
+          {
+            "t": 540,
+            "value": 2
+          },
+          {
+            "t": 720,
+            "value": 1
+          },
+          {
+            "t": 900,
+            "value": 2
+          },
+          {
+            "t": 1080,
+            "value": 1
+          },
+          {
+            "t": 1260,
+            "value": 2
+          },
+          {
+            "t": 1440,
+            "value": 1
+          },
+          {
+            "t": 1620,
+            "value": 2
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        },
+        {
+          "output": "yWindowFull",
+          "from_s": 0,
+          "to_s": 3420,
+          "equals": false
+        },
+        {
+          "output": "yWindowFull",
+          "from_s": 3600,
+          "to_s": 21600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "thrash_stops_before_delay",
+      "description": "Transient: fourteen transitions from 3600 s to 5940 s, then the unit settles. count crosses os_max at 4860 s and decays back through 7.0 at 8280 s as the pulses leave the trailing hour, so gate held from 4860 s to 8100 s - 3240 s, ninety percent of alarm_delay - and yFault never rises. This is the vector that fails first if persist is given an off-delay or if the count is made to decay any slower",
+      "inputs": {
+        "operating_state": [
+          {
+            "t": 0,
+            "value": 1
+          },
+          {
+            "t": 3600,
+            "value": 2
+          },
+          {
+            "t": 3780,
+            "value": 1
+          },
+          {
+            "t": 3960,
+            "value": 2
+          },
+          {
+            "t": 4140,
+            "value": 1
+          },
+          {
+            "t": 4320,
+            "value": 2
+          },
+          {
+            "t": 4500,
+            "value": 1
+          },
+          {
+            "t": 4680,
+            "value": 2
+          },
+          {
+            "t": 4860,
+            "value": 1
+          },
+          {
+            "t": 5040,
+            "value": 2
+          },
+          {
+            "t": 5220,
+            "value": 1
+          },
+          {
+            "t": 5400,
+            "value": 2
+          },
+          {
+            "t": 5580,
+            "value": 1
+          },
+          {
+            "t": 5760,
+            "value": 2
+          },
+          {
+            "t": 5940,
+            "value": 1
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 21600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "burst_ages_out_of_window",
+      "description": "A two-hour thrash (3600 s to 10800 s) is long enough: gate rises at 4860 s and yFault asserts at 8460 s. When the thrash stops the count does not drop at once - it decays as pulses leave the trailing hour, reaching 7.0 at 13140 s, and the alarm clears on that tick because TrueDelay has no off-delay",
+      "inputs": {
+        "operating_state": [
+          {
+            "t": 0,
+            "value": 1
+          },
+          {
+            "t": 3600,
+            "value": 2
+          },
+          {
+            "t": 3780,
+            "value": 1
+          },
+          {
+            "t": 3960,
+            "value": 2
+          },
+          {
+            "t": 4140,
+            "value": 1
+          },
+          {
+            "t": 4320,
+            "value": 2
+          },
+          {
+            "t": 4500,
+            "value": 1
+          },
+          {
+            "t": 4680,
+            "value": 2
+          },
+          {
+            "t": 4860,
+            "value": 1
+          },
+          {
+            "t": 5040,
+            "value": 2
+          },
+          {
+            "t": 5220,
+            "value": 1
+          },
+          {
+            "t": 5400,
+            "value": 2
+          },
+          {
+            "t": 5580,
+            "value": 1
+          },
+          {
+            "t": 5760,
+            "value": 2
+          },
+          {
+            "t": 5940,
+            "value": 1
+          },
+          {
+            "t": 6120,
+            "value": 2
+          },
+          {
+            "t": 6300,
+            "value": 1
+          },
+          {
+            "t": 6480,
+            "value": 2
+          },
+          {
+            "t": 6660,
+            "value": 1
+          },
+          {
+            "t": 6840,
+            "value": 2
+          },
+          {
+            "t": 7020,
+            "value": 1
+          },
+          {
+            "t": 7200,
+            "value": 2
+          },
+          {
+            "t": 7380,
+            "value": 1
+          },
+          {
+            "t": 7560,
+            "value": 2
+          },
+          {
+            "t": 7740,
+            "value": 1
+          },
+          {
+            "t": 7920,
+            "value": 2
+          },
+          {
+            "t": 8100,
+            "value": 1
+          },
+          {
+            "t": 8280,
+            "value": 2
+          },
+          {
+            "t": 8460,
+            "value": 1
+          },
+          {
+            "t": 8640,
+            "value": 2
+          },
+          {
+            "t": 8820,
+            "value": 1
+          },
+          {
+            "t": 9000,
+            "value": 2
+          },
+          {
+            "t": 9180,
+            "value": 1
+          },
+          {
+            "t": 9360,
+            "value": 2
+          },
+          {
+            "t": 9540,
+            "value": 1
+          },
+          {
+            "t": 9720,
+            "value": 2
+          },
+          {
+            "t": 9900,
+            "value": 1
+          },
+          {
+            "t": 10080,
+            "value": 2
+          },
+          {
+            "t": 10260,
+            "value": 1
+          },
+          {
+            "t": 10440,
+            "value": 2
+          },
+          {
+            "t": 10620,
+            "value": 1
+          },
+          {
+            "t": 10800,
+            "value": 2
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 8280,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 8640,
+          "to_s": 12780,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 13320,
+          "to_s": 21600,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

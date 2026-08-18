@@ -34,10 +34,10 @@ Here is a real one — AHU-FC-050, simultaneous heating and cooling:
 
 ## What's inside
 
-- **43 verified fault rules** (and counting) across air handlers
-  (`faults/ahu/`, all 31 reference faults), rooftop units (`faults/rtu/`), and
-  VAV terminal boxes (`faults/vav/`) — heat pump, fan coil, energy recovery,
-  and VFD families in progress.
+- **55 verified fault rules** across seven equipment families: air handlers
+  (`faults/ahu/`, all 31 reference faults), rooftop units (6), VAV terminal
+  boxes (6), fan coil units (5), heat pumps (3), energy recovery ventilators
+  (2), and VFDs (2) — every base fault in the reference, engine-verified.
 - **Point dictionaries** (`points/`) grounding every canonical point name in
   Brick 1.4.4 and ASHRAE 223P, so binding a rule to a real building is
   mechanical.
