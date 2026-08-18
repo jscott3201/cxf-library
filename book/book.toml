@@ -9,6 +9,7 @@ language = "en"
 create-missing = false
 
 [output.html]
+additional-css = ["custom.css"]
 default-theme = "rust"
 preferred-dark-theme = "navy"
 git-repository-url = "https://github.com/jscott3201/open-control-library"

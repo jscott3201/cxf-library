@@ -1,0 +1,9 @@
+/* Block diagrams carry explicit pixel width/height (injected by
+   tools/book/generate.py from their viewBox) so <img> embeds have an
+   intrinsic size. Scale them to the text column, keeping aspect ratio —
+   without height:auto the pixel height attribute would win when max-width
+   clamps the width, distorting wide graphs. */
+.content img {
+    max-width: 100%;
+    height: auto;
+}
