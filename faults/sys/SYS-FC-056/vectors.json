@@ -1,0 +1,320 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 5400
+  },
+  "scenarios": [
+    {
+      "name": "winter_reheat_normal",
+      "description": "Reheat doing its job in cold weather: the valve is 60% open at 5 degC outdoors. The heating conjunct is satisfied and the weather conjunct is not, so nothing is reported.",
+      "inputs": {
+        "rht_vlv_cmd": 60.0,
+        "oat": 5.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "warm_weather_reheat_active",
+      "description": "The fault: 45% reheat at 26 degC outdoors. Both conjuncts hold from the first tick and the alarm lands at exactly alarm_delay.",
+      "inputs": {
+        "rht_vlv_cmd": 45.0,
+        "oat": 26.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "warm_weather_valve_closed",
+      "description": "The reheat conjunct blocking on its own: 26 degC outdoors with the reheat valve shut. Warm weather is not a fault; reheat during warm weather is.",
+      "inputs": {
+        "rht_vlv_cmd": 0.0,
+        "oat": 26.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "cold_weather_reheat_wide_open",
+      "description": "The weather conjunct blocking on its own: the valve is 100% open at -5 degC. This is the zone working, and the mirror of warm_weather_valve_closed.",
+      "inputs": {
+        "rht_vlv_cmd": 100.0,
+        "oat": -5.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "reheat_exactly_at_the_threshold",
+      "description": "Boundary: the valve sits on exactly reheat_active_threshold (10.0%) in warm weather. Reals.GreaterThreshold is strict and CDL Reals has no GreaterEqual, so exactly on the line reads as closed and the rule stays silent.",
+      "inputs": {
+        "rht_vlv_cmd": 10.0,
+        "oat": 26.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "reheat_just_above_the_threshold",
+      "description": "The same line from above: 10.1% of valve travel at 26 degC alarms at 1800 s. Leakage past a shut valve is not this rule's business, and 10% is where the reference draws that line.",
+      "inputs": {
+        "rht_vlv_cmd": 10.1,
+        "oat": 26.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "oat_exactly_at_the_lockout",
+      "description": "Boundary on the weather side: OAT sits on exactly zone_heating_lockout_temp (21.0 degC) with the valve at 45%. Strict again, so 21.0 is not yet warm weather.",
+      "inputs": {
+        "rht_vlv_cmd": 45.0,
+        "oat": 21.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "oat_just_above_the_lockout",
+      "description": "The same line from above: 21.1 degC alarms at 1800 s.",
+      "inputs": {
+        "rht_vlv_cmd": 45.0,
+        "oat": 21.1
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "morning_warmup_into_a_hot_afternoon",
+      "description": "The realistic trace: the zone is reheating at 18 degC outdoors and the weather crosses the lockout at 600 s. The timer starts on that crossing, not at t=0, so the alarm lands at 2400 s.",
+      "inputs": {
+        "rht_vlv_cmd": 45.0,
+        "oat": [
+          {
+            "t": 0,
+            "value": 18.0
+          },
+          {
+            "t": 600,
+            "value": 25.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2340,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 2400,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "valve_closes_on_the_maturity_tick",
+      "description": "The delay edge from below: the valve shuts at exactly 1800 s. TrueDelay asserts at T + delayTime and drops a falling edge with no lag, so the two land on the same tick and the fault is never reported.",
+      "inputs": {
+        "rht_vlv_cmd": [
+          {
+            "t": 0,
+            "value": 45.0
+          },
+          {
+            "t": 1800,
+            "value": 0.0
+          }
+        ],
+        "oat": 26.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "valve_closes_one_tick_later",
+      "description": "The same edge from above: the valve shuts one tick after maturity, leaving exactly one tick of alarm at 1800 s. The realized test is 'both conditions held for strictly more than alarm_delay' at tick resolution.",
+      "inputs": {
+        "rht_vlv_cmd": [
+          {
+            "t": 0,
+            "value": 45.0
+          },
+          {
+            "t": 1860,
+            "value": 0.0
+          }
+        ],
+        "oat": 26.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "cloud_cover_restarts_the_clock",
+      "description": "Sustained means continuous. OAT drops back under the lockout for ten minutes at 900 s, which discards the elapsed time rather than pausing it, and the alarm lands a full 1800 s after the second crossing at 1500 s.",
+      "inputs": {
+        "rht_vlv_cmd": 45.0,
+        "oat": [
+          {
+            "t": 0,
+            "value": 26.0
+          },
+          {
+            "t": 900,
+            "value": 19.0
+          },
+          {
+            "t": 1500,
+            "value": 26.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3300,
+          "to_s": 5400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "lockout_programmed_after_the_alarm",
+      "description": "Recovery: the alarm asserts at 1800 s, someone adds the OAT lockout to the zone sequence at 3600 s and the valve drives shut. The fault clears on that tick — TrueDelay delays the rising edge only.",
+      "inputs": {
+        "rht_vlv_cmd": [
+          {
+            "t": 0,
+            "value": 45.0
+          },
+          {
+            "t": 3600,
+            "value": 0.0
+          }
+        ],
+        "oat": 26.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 3540,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 3600,
+          "to_s": 5400,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

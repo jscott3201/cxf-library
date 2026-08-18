@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 300" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs: the circuit, plus the two independent occupancy witnesses -->
+  <g>
+    <rect x="12" y="38" width="150" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="87" y="57" text-anchor="middle" fill="#1e3a8a">lighting_status</text>
+    <rect x="12" y="118" width="150" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="87" y="137" text-anchor="middle" fill="#1e3a8a">occ_sensor</text>
+    <rect x="12" y="198" width="150" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="87" y="217" text-anchor="middle" fill="#1e3a8a">occ_scheduled</text>
+  </g>
+
+  <!-- both witnesses must say the space is empty -->
+  <rect x="210" y="106" width="110" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="265" y="128" text-anchor="middle" fill="#24292f" font-weight="bold">notSensed</text>
+  <text x="265" y="146" text-anchor="middle" fill="#57606a" font-size="11">Logical.Not</text>
+
+  <rect x="210" y="186" width="110" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="265" y="208" text-anchor="middle" fill="#24292f" font-weight="bold">notSched</text>
+  <text x="265" y="226" text-anchor="middle" fill="#57606a" font-size="11">Logical.Not</text>
+
+  <rect x="370" y="146" width="140" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="440" y="168" text-anchor="middle" fill="#24292f" font-weight="bold">unoccupied</text>
+  <text x="440" y="186" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <rect x="560" y="92" width="140" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="630" y="114" text-anchor="middle" fill="#24292f" font-weight="bold">litUnocc</text>
+  <text x="630" y="132" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <!-- the reference's only tunable -->
+  <rect x="750" y="92" width="170" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="835" y="114" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="835" y="132" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 1800 s</text>
+
+  <!-- boundary output -->
+  <rect x="960" y="104" width="70" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="995" y="123" text-anchor="middle" fill="#7f1d1d">yFault</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 162 53 H 530 V 105 H 556"/>
+    <path d="M 162 133 H 186 V 120 H 206"/>
+    <path d="M 162 213 H 206"/>
+    <path d="M 320 133 H 344 V 160 H 366"/>
+    <path d="M 320 213 H 344 V 186 H 366"/>
+    <path d="M 510 173 H 530 V 133 H 556"/>
+    <path d="M 700 119 H 746"/>
+    <path d="M 920 119 H 956"/>
+  </g>
+
+  <!-- port hints where two wires meet one block -->
+  <text x="536" y="101" fill="#7d8590" font-size="9">u1</text>
+  <text x="536" y="147" fill="#7d8590" font-size="9">u2</text>
+  <text x="348" y="156" fill="#7d8590" font-size="9">u1</text>
+  <text x="348" y="200" fill="#7d8590" font-size="9">u2</text>
+
+  <text x="210" y="272" fill="#7d8590" font-size="11">every signal is Boolean — three conjuncts, one 30-minute delay, no threshold to retune</text>
+  <text x="210" y="290" fill="#7d8590" font-size="11">any conjunct going false drops a live alarm on the same tick: TrueDelay delays the rise only</text>
+</svg>

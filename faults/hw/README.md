@@ -8,7 +8,7 @@ fixes in the whole catalog (>25% prevalence, 100% of plant energy wasted
 while active).
 
 Point dictionary: [`points/hw.points.json`](../../points/hw.points.json).
-Supplementary deep-read sources per `_research/local/paper-triage.md`
+Supplementary deep-read sources per the project’s internal research triage (licensed sources; not distributed)
 (G36 heating-plant AFDD document, FEMP O&M guide, PNNL-13890) —
 paraphrase-and-cite only.
 
@@ -27,8 +27,8 @@ paraphrase-and-cite only.
 
 Severity and method for FC-050–052 per the reference's ch.14 cards.
 FC-053–057 are **library-authored** rules grounded in PNNL-27338's hot-water
-distribution measure-identification algorithms (§4; deep-read memo in
-`_research/local/deep-reads/pnnl-27338-rcx-measures.md`) — the reference's
+distribution measure-identification algorithms (§4; adapted via an internal
+paraphrased deep-read digest, not distributed) — the reference's
 ch.14 specifies only three rules, so these five extend the family under the
 same numbering with explicit non-reference sourcing; severities are
 library-assigned by analogy to the AHU/CHW siblings.

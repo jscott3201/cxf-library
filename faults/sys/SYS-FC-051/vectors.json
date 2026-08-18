@@ -1,0 +1,320 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 3600
+  },
+  "scenarios": [
+    {
+      "name": "plant_shut_down_with_no_demand",
+      "description": "The healthy no-demand case: every heating valve is shut and the HW loop is shut down with it. Residual flow of 0.5 L/s is well under the no-demand threshold, so the flow conjunct blocks the fault on its own.",
+      "inputs": {
+        "hw_flow": 0.5,
+        "ahu_htg_vlv_max": 0.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "flow_with_real_heating_demand",
+      "description": "The other healthy case: 40 L/s circulating while the busiest heating valve sits at 65%. One perimeter zone calling for reheat is enough to justify the whole loop, and the valve conjunct blocks the fault on its own.",
+      "inputs": {
+        "hw_flow": 40.0,
+        "ahu_htg_vlv_max": 65.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "flow_with_every_valve_shut",
+      "description": "The fault: 12 L/s moving through the distribution loop while the maximum heating valve command across every served coil is 0%. Both conjuncts hold from the first tick, so persist matures at exactly 900 s.",
+      "inputs": {
+        "hw_flow": 12.0,
+        "ahu_htg_vlv_max": 0.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 900,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "flow_exactly_at_the_no_demand_threshold",
+      "description": "Boundary from the reference's own strict inequality: flow sitting at exactly no_demand_flow_threshold (5.0 L/s) is not above it. Reals.GreaterThreshold is strict, which is what the reference writes for this term, so the loop reads healthy.",
+      "inputs": {
+        "hw_flow": 5.0,
+        "ahu_htg_vlv_max": 0.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "flow_just_above_the_no_demand_threshold",
+      "description": "The same line from above: 5.1 L/s against a 5.0 L/s threshold with every valve shut, alarm at 900 s. Whether a real plant is faulted at 0.1 L/s of margin is a question about the fitted threshold, not about the rule.",
+      "inputs": {
+        "hw_flow": 5.1,
+        "ahu_htg_vlv_max": 0.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 900,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "valve_max_exactly_at_the_closed_threshold",
+      "description": "The strict-comparison deviation, pinned. The reference writes htg_vlv_cmd <= valve_closed_threshold; CDL Reals has no LessEqual, so the shipped test is a strict LessThreshold at 2.0 and a served set whose maximum sits at exactly 2.0% reads as demand rather than as closed. The pin is on the conservative side: no alarm.",
+      "inputs": {
+        "hw_flow": 12.0,
+        "ahu_htg_vlv_max": 2.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "valve_max_just_below_the_closed_threshold",
+      "description": "The same line from below: a maximum of 1.9% is inside the closed band, so the fault matures at 900 s. The gap between this scenario and the previous one is the whole cost of the strict pin.",
+      "inputs": {
+        "hw_flow": 12.0,
+        "ahu_htg_vlv_max": 1.9
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 900,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "one_open_valve_holds_the_aggregate_up",
+      "description": "The reference's all(...) quantifier written as a maximum: one zone reheat valve is trimming at 8% while every other heating valve is shut, so the aggregate never enters the closed band and the plant is serving a real load. On a HW loop that feeds VAV reheat this is the scenario the host's aggregate most often gets wrong, because the reheat valves are counted in hundreds and live on the zone controllers rather than on the AHU.",
+      "inputs": {
+        "hw_flow": 12.0,
+        "ahu_htg_vlv_max": 8.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "demand_stops_while_the_pump_runs",
+      "description": "The transition the rule exists to catch: the last zone comes off heat at t=600 s as the building warms up, but the HW pump keeps 12 L/s moving. The delay starts on that tick, so the alarm lands at 1500 s rather than at 900 s.",
+      "inputs": {
+        "hw_flow": 12.0,
+        "ahu_htg_vlv_max": [
+          {
+            "t": 0,
+            "value": 65.0
+          },
+          {
+            "t": 600,
+            "value": 0.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1440,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1500,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "demand_returns_before_the_delay_matures",
+      "description": "A 14-minute lull in the heating load is not a fault. A reheat valve reopens to 30% at 840 s, one tick short of maturity, and shuts again at 1200 s. Continuous means continuous: the elapsed time is discarded rather than paused, so the alarm lands a full 900 s after the second shut, at 2100 s.",
+      "inputs": {
+        "hw_flow": 12.0,
+        "ahu_htg_vlv_max": [
+          {
+            "t": 0,
+            "value": 0.0
+          },
+          {
+            "t": 840,
+            "value": 30.0
+          },
+          {
+            "t": 1200,
+            "value": 0.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2040,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 2100,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "demand_returns_on_the_maturity_tick",
+      "description": "The delay edge from below: a valve reopens at exactly 900 s. TrueDelay asserts at exactly T + delayTime and the falling edge passes straight through, so the two land on the same tick and the fault is never reported.",
+      "inputs": {
+        "hw_flow": 12.0,
+        "ahu_htg_vlv_max": [
+          {
+            "t": 0,
+            "value": 0.0
+          },
+          {
+            "t": 900,
+            "value": 30.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "demand_returns_one_tick_after_maturity",
+      "description": "The same edge from above: the valve reopens one tick later and leaves exactly one tick of alarm at 900 s. The realized test is therefore 'no demand with flow for strictly more than alarm_delay' at tick resolution.",
+      "inputs": {
+        "hw_flow": 12.0,
+        "ahu_htg_vlv_max": [
+          {
+            "t": 0,
+            "value": 0.0
+          },
+          {
+            "t": 960,
+            "value": 30.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 900,
+          "to_s": 900,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "pump_stops_and_the_fault_clears",
+      "description": "Recovery: the alarm asserts at 900 s, someone stops the HW pump at 1800 s, and flow falls to 0.5 L/s. TrueDelay delays the rising edge only, so the finding drops on that tick with no lag.",
+      "inputs": {
+        "hw_flow": [
+          {
+            "t": 0,
+            "value": 12.0
+          },
+          {
+            "t": 1800,
+            "value": 0.5
+          }
+        ],
+        "ahu_htg_vlv_max": 0.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 900,
+          "to_s": 1740,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1800,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

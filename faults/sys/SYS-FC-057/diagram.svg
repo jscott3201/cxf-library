@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1580 370" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs: each fan status feeds its own condition and negates the other's -->
+  <g>
+    <rect x="12" y="60" width="160" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="92" y="79" text-anchor="middle" fill="#1e3a8a">ef_status</text>
+    <rect x="12" y="190" width="160" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="92" y="209" text-anchor="middle" fill="#1e3a8a">sf_status</text>
+    <rect x="12" y="300" width="160" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="92" y="319" text-anchor="middle" fill="#1e3a8a">occ_scheduled</text>
+  </g>
+
+  <rect x="230" y="96" width="110" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="285" y="118" text-anchor="middle" fill="#24292f" font-weight="bold">notSf</text>
+  <text x="285" y="136" text-anchor="middle" fill="#57606a" font-size="11">Logical.Not</text>
+
+  <rect x="230" y="236" width="110" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="285" y="258" text-anchor="middle" fill="#24292f" font-weight="bold">notEf</text>
+  <text x="285" y="276" text-anchor="middle" fill="#57606a" font-size="11">Logical.Not</text>
+
+  <!-- condition 1: exhaust running, supply off (no occupancy qualifier) -->
+  <rect x="400" y="46" width="150" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="475" y="68" text-anchor="middle" fill="#24292f" font-weight="bold">efOnly</text>
+  <text x="475" y="86" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <rect x="610" y="46" width="180" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="700" y="68" text-anchor="middle" fill="#24292f" font-weight="bold">efOnlyHeld</text>
+  <text x="700" y="86" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 1800 s</text>
+
+  <!-- condition 2: supply running, exhaust off, occupied -->
+  <rect x="400" y="186" width="150" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="475" y="208" text-anchor="middle" fill="#24292f" font-weight="bold">sfNoEf</text>
+  <text x="475" y="226" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <rect x="610" y="216" width="160" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="690" y="238" text-anchor="middle" fill="#24292f" font-weight="bold">sfOnlyOcc</text>
+  <text x="690" y="256" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <rect x="830" y="216" width="180" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="920" y="238" text-anchor="middle" fill="#24292f" font-weight="bold">sfOnlyHeld</text>
+  <text x="920" y="256" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 1800 s</text>
+
+  <!-- join, then the shared alarm delay -->
+  <rect x="1070" y="120" width="160" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1150" y="142" text-anchor="middle" fill="#24292f" font-weight="bold">anyMisalign</text>
+  <text x="1150" y="160" text-anchor="middle" fill="#57606a" font-size="11">Logical.Or</text>
+
+  <rect x="1280" y="120" width="170" height="54" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1365" y="142" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1365" y="160" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 900 s</text>
+
+  <!-- boundary outputs: the alarm, plus the two direction flags -->
+  <rect x="846" y="20" width="200" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="946" y="39" text-anchor="middle" fill="#7f1d1d">yExhaustWithoutSupply</text>
+
+  <rect x="1066" y="290" width="200" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1166" y="309" text-anchor="middle" fill="#7f1d1d">ySupplyWithoutExhaust</text>
+
+  <rect x="1490" y="132" width="70" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1525" y="151" text-anchor="middle" fill="#7f1d1d">yFault</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 172 75 H 376 V 59 H 396"/>
+    <path d="M 172 75 H 196 V 263 H 226"/>
+    <path d="M 172 205 H 376 V 199 H 396"/>
+    <path d="M 172 205 H 210 V 123 H 226"/>
+    <path d="M 340 123 H 376 V 87 H 396"/>
+    <path d="M 340 263 H 376 V 227 H 396"/>
+    <path d="M 550 73 H 606"/>
+    <path d="M 550 213 H 586 V 233 H 606"/>
+    <path d="M 172 315 H 586 V 261 H 606"/>
+    <path d="M 790 73 H 816 V 35 H 842"/>
+    <path d="M 790 73 H 1046 V 133 H 1066"/>
+    <path d="M 770 243 H 826"/>
+    <path d="M 1010 243 H 1036 V 305 H 1062"/>
+    <path d="M 1010 243 H 1046 V 161 H 1066"/>
+    <path d="M 1230 147 H 1276"/>
+    <path d="M 1450 147 H 1486"/>
+  </g>
+
+  <!-- port hints where two wires meet one block -->
+  <text x="380" y="55" fill="#7d8590" font-size="9">u1</text>
+  <text x="380" y="101" fill="#7d8590" font-size="9">u2</text>
+  <text x="380" y="195" fill="#7d8590" font-size="9">u1</text>
+  <text x="380" y="241" fill="#7d8590" font-size="9">u2</text>
+  <text x="590" y="229" fill="#7d8590" font-size="9">u1</text>
+  <text x="590" y="275" fill="#7d8590" font-size="9">u2</text>
+  <text x="1050" y="129" fill="#7d8590" font-size="9">u1</text>
+  <text x="1050" y="175" fill="#7d8590" font-size="9">u2</text>
+
+  <text x="230" y="345" fill="#7d8590" font-size="11">each condition sustains on its own branch, then the Or feeds one alarm delay: a steady branch asserts at T+2700 s</text>
+  <text x="230" y="363" fill="#7d8590" font-size="11">sustaining the Or instead would catch a pair that flips direction every 20 min — this graph, per the reference, does not</text>
+</svg>

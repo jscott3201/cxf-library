@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 270" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs: one zone's reheat valve, and the weather -->
+  <rect x="12" y="50" width="140" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="82" y="69" text-anchor="middle" fill="#1e3a8a">rht_vlv_cmd</text>
+  <rect x="12" y="150" width="140" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="82" y="169" text-anchor="middle" fill="#1e3a8a">oat</text>
+
+  <!-- the two conjuncts: heat is on, and the weather does not want it -->
+  <rect x="210" y="36" width="270" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="345" y="58" text-anchor="middle" fill="#24292f" font-weight="bold">rhtOn</text>
+  <text x="345" y="76" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 10%</text>
+
+  <rect x="210" y="136" width="270" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="345" y="158" text-anchor="middle" fill="#24292f" font-weight="bold">warmOut</text>
+  <text x="345" y="176" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 21 degC</text>
+
+  <rect x="540" y="86" width="150" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="615" y="108" text-anchor="middle" fill="#24292f" font-weight="bold">both</text>
+  <text x="615" y="126" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <!-- the reference's AlarmDelay, which is also its lockout_check_duration -->
+  <rect x="750" y="86" width="200" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="850" y="108" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="850" y="126" text-anchor="middle" fill="#57606a" font-size="11">Logical.TrueDelay · 1800 s</text>
+
+  <!-- boundary output -->
+  <rect x="1000" y="100" width="68" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1034" y="119" text-anchor="middle" fill="#7f1d1d">yFault</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 152 65 H 206"/>
+    <path d="M 152 165 H 206"/>
+    <path d="M 480 65 H 510 V 101 H 536"/>
+    <path d="M 480 165 H 510 V 129 H 536"/>
+    <path d="M 690 115 H 746"/>
+    <path d="M 950 115 H 996"/>
+  </g>
+
+  <!-- signal type hints -->
+  <text x="158" y="46" fill="#7d8590" font-size="10">Real %</text>
+  <text x="158" y="146" fill="#7d8590" font-size="10">Real degC</text>
+  <text x="486" y="58" fill="#7d8590" font-size="10">Bool</text>
+  <text x="486" y="158" fill="#7d8590" font-size="10">Bool</text>
+  <text x="514" y="97" fill="#7d8590" font-size="9">u1</text>
+  <text x="514" y="141" fill="#7d8590" font-size="9">u2</text>
+  <text x="696" y="108" fill="#7d8590" font-size="10">Bool</text>
+
+  <text x="210" y="228" fill="#7d8590" font-size="11">both thresholds are strict: 10% of valve travel and 21.0 degC read healthy</text>
+  <text x="210" y="248" fill="#7d8590" font-size="11">instantiated per zone — rht_vlv_cmd is one VAV box or FCU, oat is the site's</text>
+</svg>

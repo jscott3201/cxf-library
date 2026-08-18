@@ -1,0 +1,115 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 7200 },
+  "scenarios": [
+    {
+      "name": "lights_on_during_occupied_hours",
+      "description": "The normal case the rule must never touch: lights on, people detected, inside the occupied schedule.",
+      "inputs": { "lighting_status": true, "occ_sensor": true, "occ_scheduled": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "lights_on_in_an_empty_room_during_scheduled_hours",
+      "description": "The schedule conjunct blocking on its own. Lights on and the sensor sees nobody, but the building is inside its occupied schedule — an empty conference room mid-morning is not this fault.",
+      "inputs": { "lighting_status": true, "occ_sensor": false, "occ_scheduled": true },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "lights_on_after_hours_with_someone_present",
+      "description": "The sensor conjunct blocking on its own. Out of schedule, but the occupancy sensor sees someone — a cleaner or someone working late gets light, not a work order.",
+      "inputs": { "lighting_status": true, "occ_sensor": true, "occ_scheduled": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "lights_off_after_hours",
+      "description": "The lighting conjunct blocking on its own: nobody there, nothing scheduled, and the circuit is off. Correct operation.",
+      "inputs": { "lighting_status": false, "occ_sensor": false, "occ_scheduled": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "lights_on_with_no_occupancy",
+      "description": "The reference condition. Circuit energized, sensor unoccupied, outside the schedule; TrueDelay asserts at exactly alarm_delay (1800 s) and holds.",
+      "inputs": { "lighting_status": true, "occ_sensor": false, "occ_scheduled": false },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1800, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "lights_switch_off_on_the_alarm_tick",
+      "description": "The delay edge from below: the circuit de-energizes at exactly 1800 s, so the condition is false on the tick the delay would have matured and nothing is ever reported.",
+      "inputs": {
+        "lighting_status": [
+          { "t": 0, "value": true },
+          { "t": 1800, "value": false }
+        ],
+        "occ_sensor": false,
+        "occ_scheduled": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "lights_switch_off_one_tick_later",
+      "description": "The same edge from above: one tick of alarm at 1800 s, then clear. The realized test is 'on and unoccupied for strictly more than alarm_delay' at tick resolution.",
+      "inputs": {
+        "lighting_status": [
+          { "t": 0, "value": true },
+          { "t": 1860, "value": false }
+        ],
+        "occ_sensor": false,
+        "occ_scheduled": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1800, "to_s": 1800, "equals": true },
+        { "output": "yFault", "from_s": 1860, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "occupancy_detected_restarts_the_clock",
+      "description": "Continuous means continuous. Someone walks through at 900 s and leaves at 1200 s; the elapsed 900 s is discarded rather than paused, so the alarm lands a full 1800 s after the room goes quiet again.",
+      "inputs": {
+        "lighting_status": true,
+        "occ_sensor": [
+          { "t": 0, "value": false },
+          { "t": 900, "value": true },
+          { "t": 1200, "value": false }
+        ],
+        "occ_scheduled": false
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2940, "equals": false },
+        { "output": "yFault", "from_s": 3000, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "schedule_resumes_then_ends_again",
+      "description": "Recovery and re-arm on one timeline: the alarm asserts at 1800 s, the occupied schedule opens at 3000 s and drops it on that tick (TrueDelay delays the rising edge only), and the schedule closing again at 3600 s starts a fresh 1800 s to the second alarm at 5400 s.",
+      "inputs": {
+        "lighting_status": true,
+        "occ_sensor": false,
+        "occ_scheduled": [
+          { "t": 0, "value": false },
+          { "t": 3000, "value": true },
+          { "t": 3600, "value": false }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1800, "to_s": 2940, "equals": true },
+        { "output": "yFault", "from_s": 3000, "to_s": 5340, "equals": false },
+        { "output": "yFault", "from_s": 5400, "to_s": 7200, "equals": true }
+      ]
+    }
+  ]
+}

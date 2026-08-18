@@ -14,7 +14,7 @@ source:
   - "PNNL-27338 §4.4.2 (pp. 4.12-4.13), high HW supply temperature: pump VFD speed below 35% together with supply water above 130 °F over the averaging window"
   - "PNNL-27338 §4.5.2 (pp. 4.16-4.17) — the missing HWS reset this fault is usually the water-side symptom of; HW-FC-057 is its detector"
   - "PNNL-27338 §1.2, §2.1 — the data_window / no_required_data / max_dx_time gating this library expresses as preconditions and evaluability outputs"
-  - "Deep-read memo: _research/local/deep-reads/pnnl-27338-rcx-measures.md (HW candidate #6)"
+  - "PNNL-27338 (Katipamula et al. 2018) — adapted via an internal paraphrased deep-read digest, not distributed (HW candidate #6)"
   - "Library-authored extension: faults/hw/README.md index (name, severity, method); the HVAC FDD Reference v1.0 ch.14 specifies only HW-FC-050..052 and does not contain this rule"
   - "Sibling-rule precedent: CHW-FC-053 (evaluability floor + hour of persistence), HW-FC-052 (threshold + TrueDelay on a hot water plant), VFD-FC-050 (min_cmd_for_eval / yCmdOk)"
 g36: null

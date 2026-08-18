@@ -79,7 +79,7 @@
         ]
       },
       "provisional": false,
-      "notes": "brick:Leaving_Condenser_Water_Temperature_Sensor grep-verified. Reference Haystack markers: condenser, water, leaving, temp, sensor. Baseline regressor input for CHW-FC-050 (condenser lift proxy)."
+      "notes": "brick:Leaving_Condenser_Water_Temperature_Sensor grep-verified. Reference Haystack markers: condenser, water, leaving, temp, sensor. Baseline regressor input for CHW-FC-050 (condenser lift proxy). LOOP-SIDE WARNING: this is the WARM side (chiller-leaving, chiller-to-tower). A future cooling-tower approach rule needs the COLD side (tower-leaving, tower-to-chiller = entering condenser water) — a different point; do not wire a tower rule here by name alone (internal deep-read finding, 2026-08-18)."
     },
     {
       "name": "chwst",
@@ -199,7 +199,7 @@
         ]
       },
       "provisional": true,
-      "notes": "HOST-DERIVED (zone_reheat_fraction / satisfied_zone_fraction precedent): the reference's chw_valve_positions is a vector across AHU/FCU cooling coils; the rule needs only its max, so the host binds max() over the coil valve commands it serves. CHW-FC-052's 'no coil starving' conjunct. Engine vector blocks could compute this in-graph once the points contract grows vector bindings — see _research/local/engine-block-inventory-fdd-candidates.md.",
+      "notes": "HOST-DERIVED (zone_reheat_fraction / satisfied_zone_fraction precedent): the reference's chw_valve_positions is a vector across AHU/FCU cooling coils; the rule needs only its max, so the host binds max() over the coil valve commands it serves. CHW-FC-052's 'no coil starving' conjunct. Engine vector blocks could compute this in-graph once the points contract grows vector bindings (tracked in internal engine-block-inventory research notes).",
       "derived": true
     }
   ]

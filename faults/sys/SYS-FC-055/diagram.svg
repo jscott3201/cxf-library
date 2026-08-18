@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2040 500" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs: the accused sensor and the host's model prediction of it -->
+  <rect x="12" y="195" width="160" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="92" y="214" text-anchor="middle" fill="#1e3a8a">physical_sensor</text>
+  <rect x="12" y="265" width="160" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="92" y="284" text-anchor="middle" fill="#1e3a8a">virtual_value</text>
+
+  <!-- the one quantity the graph works on -->
+  <rect x="210" y="216" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="295" y="238" text-anchor="middle" fill="#24292f" font-weight="bold">resid</text>
+  <text x="295" y="256" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+
+  <!-- bias branch: |mean(residual)| over the window -->
+  <g>
+    <rect x="440" y="41" width="230" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="555" y="63" text-anchor="middle" fill="#24292f" font-weight="bold">muResid</text>
+    <text x="555" y="81" text-anchor="middle" fill="#57606a" font-size="11">Reals.MovingAverage · 3600 s</text>
+
+    <rect x="720" y="41" width="150" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="795" y="63" text-anchor="middle" fill="#24292f" font-weight="bold">absMu</text>
+    <text x="795" y="81" text-anchor="middle" fill="#57606a" font-size="11">Reals.Abs</text>
+
+    <rect x="920" y="41" width="250" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="1045" y="63" text-anchor="middle" fill="#24292f" font-weight="bold">biasHigh</text>
+    <text x="1045" y="81" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 1.5</text>
+  </g>
+
+  <!-- noise branch: E[r²] − (E[r])² against the squared threshold -->
+  <g>
+    <rect x="440" y="171" width="230" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="555" y="193" text-anchor="middle" fill="#24292f" font-weight="bold">sqResid</text>
+    <text x="555" y="211" text-anchor="middle" fill="#57606a" font-size="11">Reals.Multiply</text>
+
+    <rect x="720" y="171" width="230" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="835" y="193" text-anchor="middle" fill="#24292f" font-weight="bold">muSq</text>
+    <text x="835" y="211" text-anchor="middle" fill="#57606a" font-size="11">Reals.MovingAverage · 3600 s</text>
+
+    <rect x="720" y="261" width="230" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="835" y="283" text-anchor="middle" fill="#24292f" font-weight="bold">meanSq</text>
+    <text x="835" y="301" text-anchor="middle" fill="#57606a" font-size="11">Reals.Multiply</text>
+
+    <rect x="1000" y="216" width="190" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="1095" y="238" text-anchor="middle" fill="#24292f" font-weight="bold">variance</text>
+    <text x="1095" y="256" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+
+    <rect x="440" y="361" width="230" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="555" y="383" text-anchor="middle" fill="#24292f" font-weight="bold">noiseThr</text>
+    <text x="555" y="401" text-anchor="middle" fill="#57606a" font-size="11">Reals.Sources.Constant · k = 3.0</text>
+
+    <rect x="720" y="361" width="230" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="835" y="383" text-anchor="middle" fill="#24292f" font-weight="bold">thrSq</text>
+    <text x="835" y="401" text-anchor="middle" fill="#57606a" font-size="11">Reals.Multiply</text>
+
+    <rect x="1240" y="286" width="200" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+    <text x="1340" y="308" text-anchor="middle" fill="#24292f" font-weight="bold">noiseHigh</text>
+    <text x="1340" y="326" text-anchor="middle" fill="#57606a" font-size="11">Reals.Greater</text>
+  </g>
+
+  <!-- either branch, then the alarm hold -->
+  <rect x="1500" y="141" width="150" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1575" y="163" text-anchor="middle" fill="#24292f" font-weight="bold">anyDrift</text>
+  <text x="1575" y="181" text-anchor="middle" fill="#57606a" font-size="11">Logical.Or</text>
+
+  <rect x="1700" y="141" width="190" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1795" y="163" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1795" y="181" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 1800 s</text>
+
+  <!-- boundary outputs: the alarm, and the two branch flags that name the diagnosis -->
+  <rect x="1930" y="155" width="68" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1964" y="174" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1240" y="10" width="64" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1272" y="29" text-anchor="middle" fill="#7f1d1d">yBias</text>
+  <rect x="1520" y="300" width="72" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1556" y="319" text-anchor="middle" fill="#7f1d1d">yNoise</text>
+
+  <!-- fan-out trunks -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none">
+    <path d="M 380 245 H 405"/>
+    <path d="M 670 70 H 695"/>
+    <path d="M 670 390 H 695"/>
+    <path d="M 1170 70 H 1195"/>
+    <path d="M 1440 315 H 1470"/>
+  </g>
+  <circle cx="405" cy="245" r="3" fill="#7d8590"/>
+  <circle cx="695" cy="70" r="3" fill="#7d8590"/>
+  <circle cx="695" cy="390" r="3" fill="#7d8590"/>
+  <circle cx="1195" cy="70" r="3" fill="#7d8590"/>
+  <circle cx="1470" cy="315" r="3" fill="#7d8590"/>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 172 210 H 190 V 231 H 206"/>
+    <path d="M 172 280 H 190 V 259 H 206"/>
+
+    <path d="M 405 245 V 70 H 436"/>
+    <path d="M 405 245 V 186 H 436"/>
+    <path d="M 405 245 V 214 H 436"/>
+
+    <path d="M 695 70 H 716"/>
+    <path d="M 695 70 V 276 H 716"/>
+    <path d="M 695 70 V 304 H 716"/>
+
+    <path d="M 870 70 H 916"/>
+
+    <path d="M 670 200 H 716"/>
+    <path d="M 950 200 H 972 V 231 H 996"/>
+    <path d="M 950 290 H 972 V 259 H 996"/>
+
+    <path d="M 695 390 V 376 H 716"/>
+    <path d="M 695 390 V 404 H 716"/>
+
+    <path d="M 1190 245 H 1215 V 301 H 1236"/>
+    <path d="M 950 390 H 1215 V 329 H 1236"/>
+
+    <path d="M 1195 70 V 25 H 1236"/>
+    <path d="M 1195 70 V 156 H 1496"/>
+    <path d="M 1470 315 V 184 H 1496"/>
+    <path d="M 1470 315 H 1516"/>
+
+    <path d="M 1650 170 H 1696"/>
+    <path d="M 1890 170 H 1926"/>
+  </g>
+
+  <!-- port hints where operand order matters -->
+  <g fill="#7d8590" font-size="9">
+    <text x="214" y="228">u1</text>
+    <text x="214" y="263">u2</text>
+    <text x="1004" y="228">u1</text>
+    <text x="1004" y="263">u2</text>
+    <text x="1244" y="298">u1</text>
+    <text x="1244" y="333">u2</text>
+  </g>
+
+  <!-- signal type hints -->
+  <text x="178" y="190" fill="#7d8590" font-size="10">Real</text>
+  <text x="386" y="238" fill="#7d8590" font-size="10">Real</text>
+  <text x="1176" y="62" fill="#7d8590" font-size="10">Bool</text>
+  <text x="1446" y="307" fill="#7d8590" font-size="10">Bool</text>
+
+  <text x="440" y="455" fill="#7d8590" font-size="11">sqResid and meanSq square by multiplying one signal into both ports; thrSq squares the published</text>
+  <text x="440" y="475" fill="#7d8590" font-size="11">noise_threshold so the tunable stays in the bound point's own units — variance vs threshold²</text>
+</svg>
