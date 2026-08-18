@@ -13,7 +13,7 @@ estimation_method: QUALITATIVE_ONLY
 source:
   - "HVAC FDD Reference v1.0 §16, SYS-FC-055 (pdf pp. 144-145) — the residual equation, both published thresholds, the four diagnoses, the whole impact profile, and the Koo & Yoon note"
   - "The reference's own provenance line for that card: Koo & Yoon 2022; Sun et al. 2024 (virtual sensor RMSE 0.30 °C, bias > 1 °C detected reliably)"
-  - "Accepted design: _research/fc100-sensor-health-design.md (§2 stance, §2.3 the adjudicates contract, §4.3 the MovingAverage ring floor, §4.4 vector strategy)"
+  - "Accepted design: internal sensor-health design note (local-only, not distributed) (§2 stance, §2.3 the adjudicates contract, §4.3 the MovingAverage ring floor, §4.4 vector strategy)"
   - "Library precedent: SYS-FC-054 (the pair form of the same question), SYS-FC-100/101 (the role-point sensor family), AHU-FC-056 (Reals.MovingAverage at a 64-checkpoint ring), HP-FC-050 and VAV-FC-050 (host-fitted baselines consumed as ordinary points)"
 g36: null
 clusters: [CLU-09]

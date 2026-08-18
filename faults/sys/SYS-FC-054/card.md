@@ -14,7 +14,7 @@ source:
   - "HVAC FDD Reference v1.0 §16, SYS-FC-054 (pdf pp. 142-144) — equation, both delays, drift_threshold `2°C / 5%`, the four diagnoses, and the whole impact profile"
   - "The reference's own provenance line for that card: PNNL-27338 §3; G36 sensor calibration checks"
   - "Yang, H., Cho, S., Tae, C.-S., Zaheeruddin, M. (2008). Sequential rule based algorithms for temperature sensor fault detection in air handling units. Energy Conversion and Management 49(8), 2291-2306. doi:10.1016/j.enconman.2008.01.029 — the published grounding for pairwise sensor comparison, and the source of this card's honesty about isolation"
-  - "Accepted design: _research/fc100-sensor-health-design.md (§2 stance, §3 ID scheme, §4.4 pair-bias vector strategy, §5 usable pairs)"
+  - "Accepted design: internal sensor-health design note (local-only, not distributed) (§2 stance, §3 ID scheme, §4.4 pair-bias vector strategy, §5 usable pairs)"
   - "Library precedent: AHU-FC-062 and RTU-FC-052 (physical-plausibility rules that already ship), VFD-FC-050 (two published delays chained), VAV-FC-050 (per-binding placeholder parameter)"
 g36: null
 clusters: [CLU-09]

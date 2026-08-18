@@ -94,7 +94,6 @@ python3 tools/book/generate.py && mdbook serve book --open
 - **`playbooks/`**, **`clusters/`** — remediation workflows and fault syndromes.
 - **`tools/verify`** — engine-backed conformance runner.
 - **`tools/book`**, **`book/`** — documentation generator and mdBook config.
-- **`_research/`** — source digests (CDL/CXF specs, FDD reference, repo landscape).
 
 ## License
 

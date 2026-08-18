@@ -9,7 +9,7 @@ this chapter:
   reference's entire fully-specified fault set.
 - **Sensor-health rules** (SYS-FC-054 + SYS-FC-100/101): the library's
   cross-equipment sensor-integrity family per the accepted design
-  (`_research/fc100-sensor-health-design.md`). SYS-FC-054 is BOTH — the
+  (internal sensor-health design note, local-only). SYS-FC-054 is BOTH — the
   reference's own paired-sensor cross-validation card is exactly the
   redundancy-pair bias rule, so it keeps its reference number (decided
   2026-08-17; numbering is adjustable as the library grows).
