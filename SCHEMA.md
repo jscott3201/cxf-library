@@ -23,9 +23,21 @@ cxf-library/
 ```
 
 Equipment family keys: `ahu`, `vav`, `rtu`, `hp`, `fcu`, `chw`, `hw`, `erv`,
-`pmp`, `vfd`, `sys`, `tower`. Fault IDs follow `{EQUIP}-FC-{NNN}` (001–049 G36-derived,
-050–099 research-backed, 100–149 advanced statistical, 150–199 ML) per the HVAC
-FDD Reference; folder name is the fault ID, uppercase.
+`pmp`, `vfd`, `sys`, `tower`. Fault IDs follow `{EQUIP}-FC-{NNN}`; the folder
+name is the fault ID, uppercase. The number encodes the rule's provenance
+band (numbering within a band is arbitrary and IDs are never reused):
+
+| Band | Meaning |
+|---|---|
+| 001–049 | Transcribed from the HVAC FDD Reference / G36-derived; IDs preserve the source's numbering. |
+| 050–099 | Library expansion — research-, standards-, or simulation-backed rules of **any** method (threshold `rule` or `statistical`). |
+| 100–149 | Advanced statistical — sequential/accumulating (e.g. CUSUM) or fleet-relative (e.g. neighbor-median) methods. `method: statistical` required (lint-enforced). |
+| 150–199 | ML-based methods (reserved). |
+
+Band placement is set at authoring time and IDs are stable identifiers —
+renames are exceptional (the CXF does not embed the fault ID, so a rename
+never churns `content_id`, but it does break external links and every
+cross-reference).
 
 ## Design stance (why the pieces split this way)
 

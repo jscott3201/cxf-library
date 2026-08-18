@@ -23,7 +23,7 @@ suppressed_by: []
 adjudicates:
   points: [sensor_value_a, sensor_value_b]
   verdict: ambiguous
-related: [SYS-FC-055, SYS-FC-100, SYS-FC-101, AHU-FC-062, RTU-FC-052]
+related: [SYS-FC-055, SYS-FC-058, SYS-FC-059, AHU-FC-062, RTU-FC-052]
 playbooks: [sensor-drift]
 operating_states: "all, within the binding's own validity window — the two sensors must be measuring the same physical quantity at the moment of comparison, which for a stream-mixing pair is true only in particular damper or mode states (host-enforced; see preconditions)"
 preconditions: "sensor_value_a and sensor_value_b are ROLE points, not canonical names: the host's instance configuration records which real point each is bound to, and that record is also what resolves this card's adjudicates target. Both must be bound to the same quantity kind in the same units — the rule subtracts two numbers and converts nothing, so a pair trended in °C against °F reads as a permanent 30-unit divergence and alarms forever. drift_threshold ships as a temperature placeholder and MUST be retuned to the binding (see Deviations); a percent-quantity pair left at the shipped 2.0 gets a band the reference never intended. The pair must genuinely see the same quantity during evaluation, which is a per-binding claim the graph cannot check: erv_oa_entering_temp against oat holds whenever both are in the outdoor air stream, but mat against rat holds only with the outdoor air damper shut and mat against oat only at full economizer, so the host must gate those bindings on damper position and exclude the minutes after a changeover exactly as AHU-FC-062 does. Delivery quality is resolved before this rule runs, not by it: a value the host held over from twenty minutes ago reads as a divergence, and the rule is right about the number it was given and wrong about the sensor. Per the design doc's normative constraint, no other card may list SYS-FC-054 in its suppresses — an equipment fault silencing the sensor rule that invalidates it is a cycle with a wrong answer at both ends."
@@ -136,7 +136,7 @@ The reference's four, in its order:
    outdoor sensor on a sunlit wall, a probe downstream of a leak, a pair split
    across a mixing plane), which is a binding correction, not a work order
 4. Sensor failure — a transmitter drifting toward a rail, on its way to the
-   flatline SYS-FC-100 will catch when it arrives
+   flatline SYS-FC-058 will catch when it arrives
 
 Every one of the four names a single sensor and this rule cannot say which of
 the two it is; the playbook's Step 3.4 settles it by taking a reference
@@ -200,7 +200,7 @@ emits nothing. The quantity is entirely cascade, which is why
   both are kept and chained, the VFD-FC-050 shape. A single 5400 s delay behaves
   identically as shipped; the chain is what lets a site keep a 30-minute drift
   window and a two-hour alarm hold, or the reverse, without re-authoring.
-- **No activity gate, deliberately.** SYS-FC-100 needs `equip_active` because a
+- **No activity gate, deliberately.** SYS-FC-058 needs `equip_active` because a
   signal that is not moving on idle equipment is not evidence of anything; a
   bias test needs no such permission, since two thermometers in the same air
   disagree when one is wrong whether or not a fan runs. What this rule does need
@@ -211,7 +211,7 @@ emits nothing. The quantity is entirely cascade, which is why
   are combinational, and so is `GreaterThreshold` at the shipped `h = 0` — it
   takes a state word only when hysteresis is enabled — so tick one compares two
   live readings and means it. `Discrete.UnitDelay`'s tick-one artifact and the
-  ban on `Reals.Derivative` belong to SYS-FC-101; this card's only state is the
+  ban on `Reals.Derivative` belong to SYS-FC-059; this card's only state is the
   two timers.
 - **`TrueDelay` asserts at exactly `T + delayTime`,** verified against the engine
   at the pin rather than assumed: with `delayOnInit` the timer is zero on the
@@ -260,7 +260,7 @@ common false positive. Real drift opens slowly and does not close; a placement
 mismatch opens and closes with the weather, the schedule, or the damper, and the
 repair is a bracket rather than a calibration.
 
-The family's three members answer different questions: SYS-FC-100 catches the
-transmitter that has stopped moving, SYS-FC-101 the one that jumps further than
+The family's three members answer different questions: SYS-FC-058 catches the
+transmitter that has stopped moving, SYS-FC-059 the one that jumps further than
 the process can, and this one the one that is quietly wrong. A sensor that trips
-this rule and later trips SYS-FC-100 has finished failing.
+this rule and later trips SYS-FC-058 has finished failing.

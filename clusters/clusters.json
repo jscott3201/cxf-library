@@ -116,8 +116,8 @@
         "AHU-FC-002",
         "AHU-FC-003",
         "SYS-FC-055",
-        "SYS-FC-100",
-        "SYS-FC-101"
+        "SYS-FC-058",
+        "SYS-FC-059"
       ],
       "playbook": "sensor-drift",
       "prevalence": "~15%",

@@ -32,6 +32,30 @@ def read_card(card_path: Path):
     return fm, body
 
 
+# Fault-ID numbering bands (SCHEMA.md "Layout"). The sidebar groups a
+# family's rules under these labels when it spans more than one band.
+ID_BANDS = [
+    (1, 49, "Reference rules (001–049)"),
+    (50, 99, "Expansion rules (050–099)"),
+    (100, 149, "Advanced statistical (100–149)"),
+    (150, 199, "ML (150–199)"),
+]
+
+BAND_LEGEND = (
+    "\n---\n\n*Fault ID bands: 001–049 reference-derived · 050–099 library "
+    "expansion (any method) · 100–149 advanced statistical · 150–199 ML "
+    "(reserved) — see [Schema](../../schema.md).*\n"
+)
+
+
+def band_label(fid: str) -> str:
+    num = int(fid.rsplit("-", 1)[1])
+    for lo, hi, label in ID_BANDS:
+        if lo <= num <= hi:
+            return label
+    return "Unbanded"
+
+
 SVG_ROOT_RE = re.compile(r"<svg\b[^>]*>")
 SVG_VIEWBOX_RE = re.compile(
     r'viewBox="\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)[\s,]+([\d.]+)\s*"'
@@ -190,7 +214,7 @@ def build_family(family_dir: Path, known: set):
         text = text.replace("](../../points/", "](../../points/").replace(
             f"](../../points/{family}.points.json)", f"](../../points/{family}.md)"
         )
-        (dest / "index.md").write_text(text, encoding="utf-8")
+        (dest / "index.md").write_text(text + BAND_LEGEND, encoding="utf-8")
     return entries
 
 
@@ -326,8 +350,19 @@ def main():
     summary = ["# Summary\n", "[Introduction](index.md)", "[Schema](schema.md)\n", "# Fault Rules\n"]
     for fam, entries in families.items():
         summary.append(f"- [{fam.upper()}](faults/{fam}/index.md)")
+        # Group under band separators only when the family spans bands —
+        # a single-band family keeps the flat list.
+        bands = {}
         for fid, name in entries:
-            summary.append(f"  - [{fid} — {name}](faults/{fam}/{fid}.md)")
+            bands.setdefault(band_label(fid), []).append((fid, name))
+        if len(bands) > 1:
+            for label in [b[2] for b in ID_BANDS if b[2] in bands]:
+                summary.append(f"  - [{label}]()")
+                for fid, name in bands[label]:
+                    summary.append(f"    - [{fid} — {name}](faults/{fam}/{fid}.md)")
+        else:
+            for fid, name in entries:
+                summary.append(f"  - [{fid} — {name}](faults/{fam}/{fid}.md)")
     summary.append("\n# Reference\n")
     summary.append("- [Fault Clusters](clusters.md)")
     summary.append("- [Playbooks](playbooks/index.md)")

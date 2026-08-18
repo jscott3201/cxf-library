@@ -613,7 +613,7 @@
     },
     {
       "name": "slow_drift_reads_as_flatline",
-      "description": "A documented limit, pinned rather than left for a site to find: a reading climbing 0.05 units every 1800 s never travels more than 0.15 from its baseline inside one window, so the rule calls it flatline and alarms at 8100 s. SYS-FC-100 cannot separate a frozen transmitter from one moving slower than flatline_band per flatline_window; both are sensor findings, and naming which is the redundancy-pair rule's job.",
+      "description": "A documented limit, pinned rather than left for a site to find: a reading climbing 0.05 units every 1800 s never travels more than 0.15 from its baseline inside one window, so the rule calls it flatline and alarms at 8100 s. SYS-FC-058 cannot separate a frozen transmitter from one moving slower than flatline_band per flatline_window; both are sensor findings, and naming which is the redundancy-pair rule's job.",
       "inputs": {
         "sensor_value": [
           {

@@ -179,7 +179,7 @@ should follow the actual heating source (the same caveat VAV-FC-055 carries).
 - **`oat` drift is the standing false positive and this card does not solve
   it.** A sun-baked or drifted outdoor sensor reading 3 K high manufactures the
   fault across every zone at once, which is also the tell. SYS-FC-054,
-  SYS-FC-100 and SYS-FC-101 adjudicate `oat` directly; where a host runs them,
+  SYS-FC-058 and SYS-FC-059 adjudicate `oat` directly; where a host runs them,
   an active sensor finding on the bound `oat` makes this rule NO_EVAL through
   the `adjudicates` fan-out.
 - **`clusters: [CLU-05]` is a declaration, not an edit.** CLU-05 already lists

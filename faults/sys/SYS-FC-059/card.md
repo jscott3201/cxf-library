@@ -1,6 +1,6 @@
 ---
 schema: cxf-library/fault-card/v1
-id: SYS-FC-101
+id: SYS-FC-059
 name: Sensor spike / rate-of-change violation
 equipment: sys
 status: verified
@@ -24,7 +24,7 @@ suppressed_by: []
 adjudicates:
   points: [sensor_value]
   verdict: invalid_while_active
-related: [SYS-FC-100, SYS-FC-054, AHU-FC-062, RTU-FC-052]
+related: [SYS-FC-058, SYS-FC-054, AHU-FC-062, RTU-FC-052]
 playbooks: [sensor-drift]
 operating_states: "all — a step larger than the measured process can produce is implausible whether the equipment is running, idling, or off, and the rule takes no run-state conjunct (see Deviations)"
 preconditions: "Delivery quality is resolved host-side before this rule runs, and this rule is unusually exposed to it: a value re-served from cache after a comms outage, a gap the host interpolated badly, and a poll interval that slipped all present as a sample-to-sample step that no graph reading one point can tell from a failing transmitter. The reference's ch.4 gap handling runs first and this rule sits on top of it — it is right about the number it was given and says nothing about how the number arrived. sample_period MUST equal the host's tick interval: the rule is written for, pinned at, and only means what it looks like it means at one sample of lookback (see Deviations). history_warmup MUST be set to exactly twice sample_period and re-set with it; it is not an independent tunable. max_step_per_sample is a per-binding number in the bound point's units, and the shipped default is a worked example for sensor_value := sat at a 60 s tick, not a site value — deployed unretuned on a pressure, flow, humidity or CO2 point it is comparing against an arbitrary number. Read yHistoryOk before yFault: while it is false the delay line still holds its y_start seed, and the verdict is NO_EVAL rather than a healthy sensor."
@@ -102,7 +102,7 @@ yFault      = step > max_step_per_sample  AND  yHistoryOk
 
 Block graph (`rule.cxf.jsonld`):
 
-![SYS-FC-101 block graph](diagram.svg)
+![SYS-FC-059 block graph](diagram.svg)
 
 Seven blocks in two strands. The upper strand is the measurement, ending in a
 strict `Reals.GreaterThreshold`: a step landing exactly on `max_step_per_sample`
@@ -248,7 +248,7 @@ Avoided-emissions basis: N/A.
   finding here; splitting them would double the graph to distinguish two cases
   that lead to the same work order.
 - **No `equip_active` conjunct, which is where this rule parts company with
-  SYS-FC-100.** Flatline needs the gate, because a still reading on idle
+  SYS-FC-058.** Flatline needs the gate, because a still reading on idle
   equipment is the correct answer. A spike needs none for the mirror reason: the
   ceiling is set by the mass of the process, not by whether anything drives it,
   and an idle system moves *slower*, so the running case is the permissive one. A
@@ -264,7 +264,7 @@ Avoided-emissions basis: N/A.
   Five consecutive 5 K steps carry a reading from 22 to 47 °C — physically absurd
   in a duct, and silent, because each individual step is legal. A step bound sees
   steps. Slow monotone drift is structurally invisible to this rule and to
-  SYS-FC-100 alike, which is the argument for SYS-FC-054 being a third shape
+  SYS-FC-058 alike, which is the argument for SYS-FC-054 being a third shape
   rather than a variation on these two.
 - **`adjudicates` cards must not be suppressible, so `suppressed_by` is empty
   and must stay empty:** if an equipment fault could silence the sensor rule that
@@ -280,7 +280,7 @@ Avoided-emissions basis: N/A.
   is not this card's to change. PROTECTIVE is declined on evidence: in this
   library it means avoided physical damage (PMP-FC-050's dry-running seal,
   RTU-FC-050's short-cycled compressor), and stretching it to cover avoided false
-  alarms would make one category mean two unrelated things. Note SYS-FC-100 takes
+  alarms would make one category mean two unrelated things. Note SYS-FC-058 takes
   the opposite call, so the family is split and reconciling it is library-wide.
 - **`clusters: []`, and CLU-09 is the open question.** `clusters/clusters.json`
   gives CLU-09 the trigger `AHU-FC-062` and lists SYS-FC-054 and SYS-FC-055 as
@@ -288,7 +288,7 @@ Avoided-emissions basis: N/A.
   rules and 062 becomes a member. That is a single-writer file, so this card
   declares nothing and this bullet is the flag.
 - **[`sensor-drift`](../../../playbooks/sensor-drift.md) is the right playbook
-  and does not yet name this rule;** adding SYS-FC-100 and SYS-FC-101 to its
+  and does not yet name this rule;** adding SYS-FC-058 and SYS-FC-059 to its
   Applies-To row is the playbook owner's edit. Step 1's portable-reference
   comparison and step 3's recalibrate-or-replace both transfer. Step 2's BAS
   offset does not: an offset corrects a bias and does nothing for a sensor that
@@ -330,6 +330,6 @@ equipment types, not between tick rates.
 
 Know what this rule cannot do. It sees steps, so it is blind to the drift most
 sensor work is actually about: a transmitter losing a degree a month never
-violates a step bound. SYS-FC-100 covers the opposite extreme, a reading that
+violates a step bound. SYS-FC-058 covers the opposite extreme, a reading that
 stopped moving at all. The middle needs a second sensor to compare against,
 which is SYS-FC-054's job and the reason this family has three shapes.
