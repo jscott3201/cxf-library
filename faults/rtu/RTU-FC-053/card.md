@@ -69,23 +69,15 @@ verified:
 ## Description
 
 A packaged unit's economizer has two jobs and this rule watches both of them
-fail. When outdoor air is cool, the damper should be open and the compressor
-should be doing less; when outdoor air is hot, the damper should be back at its
-ventilation minimum and the compressor should not be paying to cool air that
-was brought in on purpose. Branch 1 catches the damper parked at minimum on a
-mild day with mechanical cooling running — free cooling standing right there,
-unused. Branch 2 catches the opposite: 30 °C outdoor air pouring through a
-damper that should have closed an hour ago, with the compressor absorbing the
-difference.
-
-The two failures come from different places. Stuck-at-minimum is usually
-mechanical — a popped rod end, a dead actuator, a controller with economizing
-switched off — and it is the single most common RTU economizer fault in
-Cowan's 2004 survey, which found 54% of units carrying at least one. Stuck-open
-is more often a spring-return actuator that has lost its return, or a high
-limit set so high it never locks out. Both waste compressor energy and both
-are invisible from a monthly bill, which is why the reference gives this fault
-a 5–20% cooling-energy range and PNNL wrote two AFDD routines for it.
+fail. Branch 1 catches the damper parked at ventilation minimum on a mild day
+with mechanical cooling running — free cooling standing right there, unused;
+branch 2 catches 30 °C outdoor air pouring through a damper that should have
+closed, with the compressor absorbing the difference. The two failures come from
+different places: stuck-at-minimum is usually mechanical (a popped rod end, a
+dead actuator, economizing switched off), stuck-open is more often a
+spring-return actuator that lost its return or a high limit that never locks
+out. Cowan's 2004 survey found 54% of RTU economizers carrying at least one
+fault, and both failures are invisible from a monthly bill.
 
 ## Detection Logic
 
@@ -100,26 +92,19 @@ Block graph (`rule.cxf.jsonld`):
 
 ![RTU-FC-053 block graph](diagram.svg)
 
-The two branches are mirror images: `oatLow`/`dmprLow` for the economizer that
-will not open, `oatHigh`/`dmprHigh` for the one that will not close, each
-conjoined with `comp_status` before `either` combines them. `comp_status` is in
-the graph rather than in the frontmatter because it is not a gate on data
-quality — it is part of the fault definition. Neither branch describes waste
-without a compressor running: a damper at minimum on a cool morning with the
-unit coasting is a unit that does not need cooling, not a broken economizer.
-
-Between `econ_lockout_temp` and `econ_relock_temp` the rule is deliberately
-silent. Neither temperature test is true in that band, so a unit changing over
-at 21.4 °C — damper opening, closing, hunting a little while the mixed-air loop
-settles — produces no verdict at all. That silence is what the reference's
-`lockout_deadband` buys, and it is why the deadband is folded into a second
-absolute threshold rather than a symmetric window around one (see Deviations).
-
-All four comparisons are strict, so a damper resting exactly on `min_oa_margin`
-trips neither branch, and outdoor air resting exactly on either temperature
-setpoint arms neither. `persist` then requires 30 minutes of continuous
-violation, which rides out a damper stroke, a changeover, and the minimum-
-position dwell an economizer holds while its own control loop settles.
+`comp_status` is in the graph rather than in the frontmatter because it is not a
+gate on data quality — it is part of the fault definition. Neither branch
+describes waste without a compressor running: a damper at minimum on a cool
+morning with the unit coasting is a unit that does not need cooling, not a
+broken economizer. Between `econ_lockout_temp` and `econ_relock_temp` the rule
+is deliberately silent — neither temperature test is true in that band, so a
+unit changing over at 21.4 °C produces no verdict while its mixed-air loop
+settles. That silence is what the reference's `lockout_deadband` buys. All four
+comparisons are strict, so a damper resting exactly on `min_oa_margin` trips
+neither branch and outdoor air resting exactly on either setpoint arms neither.
+`persist` requires 30 minutes of continuous violation, which rides out a damper
+stroke, a changeover, and the minimum-position dwell an economizer holds while
+its own loop settles; `delayOnInit = true` holds that window across a restart.
 
 ## Possible Diagnoses
 
@@ -129,120 +114,93 @@ position dwell an economizer holds while its own control loop settles.
    (branch 2)
 3. Economizer controller disabled or misconfigured in the unit controller
 4. OAT sensor reading erroneously high, which locks out changeover while the
-   control sequence works correctly (branch 1's most common false positive,
-   and the reason RTU-FC-052 suppresses this rule)
-5. Economizer high-limit setpoint set too low for the climate zone, so the
-   unit locks out during weather it should be economizing in
+   control sequence works correctly (branch 1's most common false positive, and
+   the reason RTU-FC-052 suppresses this rule)
+5. Economizer high-limit setpoint set too low for the climate zone, so the unit
+   locks out during weather it should be economizing in
 
 ## Energy Impact
 
 CRITICAL_WASTE, HIGH confidence, DIRECT_MEASUREMENT. The waste is compressor
-work the economizer position made unnecessary, and the compressor status is one
-of this rule's own inputs: `waste_kw = comp_status × rtu_cooling_kw`. Under
-branch 1 that is the mechanical cooling free cooling would have displaced;
-under branch 2 it is the load the open damper added. The reference's 5–20% of
-cooling energy is consistent with PNNL EEM-06 (OA damper and controls) and
-EEM-23 (RTU advanced controls, 3–11% of unit electricity). Confidence is HIGH:
-the condition is read directly from a temperature and two commands with no
-baseline or model in between, and both the prevalence and the savings range
-come from field data rather than simulation. Strongly cooling-dominant, and
-worth the most in shoulder seasons — which is exactly when a stuck economizer
-is least likely to be noticed from inside the building.
+work the economizer position made unnecessary, and compressor status is one of
+this rule's own inputs: `waste_kw = comp_status × rtu_cooling_kw` — under branch
+1 the mechanical cooling free cooling would have displaced, under branch 2 the
+load the open damper added. The reference's 5–20% of cooling energy is
+consistent with PNNL EEM-06 (OA damper and controls) and EEM-23 (RTU advanced
+controls, 3–11% of unit electricity). HIGH confidence: the condition is read
+directly from a temperature and two commands with no model in between. Strongly
+cooling-dominant, and worth the most in shoulder seasons.
 
 ## Emissions Impact
 
-Scope 2, DIRECT_EMISSIONS, HIGH confidence; typical 800–5,000 kg CO₂e/yr for a
+Scope 2, DIRECT_EMISSIONS, HIGH confidence; typically 800–5,000 kg CO₂e/yr for a
 single packaged unit. The wasted energy is compressor electricity, so the whole
 impact lands in purchased power. Free-cooling hours cluster in mild daytime and
-overnight weather, when the marginal generator differs sharply from the annual
-average — use the marginal operating emissions rate (MOER), not an average grid
-factor, or the estimate will miss by the width of the grid's daily swing.
+overnight weather, so use the marginal operating emissions rate (MOER), not an
+average grid factor, or the estimate misses by the width of the grid's daily
+swing.
 
 ## Deviations
 
 - **`min_oa_margin`'s default is adopted, not transcribed.** The reference
-  states both branches in terms of `min_oa_margin` but omits it from the
-  tunables table. This card adopts 25.0%, the value chapter 9 uses everywhere
-  a damper counts as parked at minimum (AHU-FC-051's `econ_damper_threshold`),
-  so "at minimum" means the same thing across both economizer rules. The
-  reference's own vectors (10% versus 75–80%) are decidable at any margin
-  between those, so the choice does not change a published result. AHU-FC-064
-  precedent for adopted defaults.
+  states both branches in terms of it but omits it from the tunables table. This
+  card adopts 25.0%, chapter 9's value for a damper parked at minimum
+  (AHU-FC-051's `econ_damper_threshold`), so the phrase means the same thing
+  across both economizer rules; the reference's own vectors (10% versus 75–80%)
+  are decidable at any margin between those. AHU-FC-064 precedent.
 - **The reference's `lockout_deadband` is folded into a second absolute
-  threshold.** The reference writes branch 2 as `oat > econ_lockout_temp +
-  lockout_deadband`. A card parameter binds a single value per CXF path and
-  the block set cannot add two parameters in-graph, so branch 2 compares
-  against `econ_relock_temp`, defaulted to 22.0 °C = 21.0 + 1.0. The
-  consequence for hosts: moving the lockout means retuning **both**
-  parameters, and setting `econ_relock_temp` below `econ_lockout_temp` overlaps
-  the two temperature tests into a rule that fires at every damper position but
-  the margin itself. Combined-parameter precedent AHU-FC-005; AHU-FC-064 makes
-  the same trade in the other direction by feeding one term in as a constant.
+  threshold.** Branch 2 is written `oat > econ_lockout_temp + lockout_deadband`,
+  but a card parameter binds a single CXF path and the block set cannot add two
+  parameters in-graph, so branch 2 compares against `econ_relock_temp` = 22.0 °C
+  = 21.0 + 1.0. Moving the lockout means retuning **both**; setting
+  `econ_relock_temp` below `econ_lockout_temp` overlaps the temperature tests
+  into a rule that fires at every damper position but the margin itself.
+  Combined-parameter precedent AHU-FC-005.
 - **`min_oa_margin` is one card parameter bound to two CXF paths**
   (`dmprLow.t`, `dmprHigh.t`), matching the reference's single margin. Hosts
-  must set both together. Split them and a band of damper positions is either
-  tested by neither branch (`dmprLow.t` below `dmprHigh.t`) or read as parked
-  at minimum in cool weather and as open in warm weather at once
-  (`dmprLow.t` above `dmprHigh.t`). AHU-FC-059 precedent.
+  must set both together: split them and a band of damper positions is either
+  tested by neither branch or read as parked at minimum and as open at once.
+  AHU-FC-059 precedent.
 - **All four comparisons are strict** (`<`, `>`, `<`, `>`). The reference does
-  not specify boundary behavior, and CDL's Reals family has no `GreaterEqual`,
-  so the inclusive reading is not directly expressible anyway. The deviation
-  is measure-zero — a damper command sitting on exactly 25.00% or an outdoor
-  temperature on exactly 21.00 °C — and it errs toward silence.
-  `damper_at_margin_is_silent` and `lockout_setpoints_are_silent` pin all four.
-- **The changeover band is a blind spot, by construction.** Between 21 and
-  22 °C neither branch can fire, whatever the damper is doing, so a unit whose
-  economizer fails while the weather sits in that 1 °C band reports nothing
-  until the weather moves. `changeover_band_is_silent` pins the behavior. The
-  alternative — reporting inside the band — would alarm on every normal
-  changeover, which is what the reference's deadband exists to prevent.
+  not specify boundary behavior and CDL's Reals family has no `GreaterEqual`, so
+  the inclusive reading is not expressible. The deviation is measure-zero and it
+  errs toward silence.
+- **The changeover band is a blind spot, by construction.** Between 21 and 22 °C
+  neither branch can fire whatever the damper is doing, so an economizer that
+  fails while the weather sits in that 1 °C band reports nothing until the
+  weather moves. Reporting inside the band would alarm on every normal
+  changeover, which is what the deadband exists to prevent.
 - **`comp_status` is in-graph; everything else about mode is not.** The
   reference lists "cooling call active" as the operating state and
-  `comp_status` as a term of both equations. The term is implemented; the
-  broader gating (unit mode, occupancy, manual override, RTU-FC-052's sensor
-  check) stays host-side per this library's design stance, as in AHU-FC-051.
-- **Damper command, not damper feedback.** The reference names
-  `oa_dmpr_cmd` and the RTU dictionary carries no damper position feedback
-  point, so an actuator that reports 80% while the blades sit closed is
-  invisible to this rule. That failure belongs to the mixed-air checks
-  (RTU-FC-052) and to step 3 of the playbook, which is why the two are linked
-  by suppression rather than by a shared input.
-- **Test vectors: the reference's four, plus six of our own.** The published
-  vectors (15 °C/80%/ON clear, 15 °C/10%/ON fault, 30 °C/10%/ON clear,
-  30 °C/75%/ON fault) are transcribed as the first four scenarios. The
-  deadband pin, both boundary pins, the compressor-off case, the transient,
-  and the recovery case are authored here.
-- Severity 3 (warning), phase 2, method `rule`, and the tunable defaults are
-  the reference's chapter 11 card; its §5.8.3 index corroborates and carries no
-  severity column. `g36: null` — this is a PNNL/Title 24-derived rule, not a
-  G36 §5.16.14 clause.
+  `comp_status` as a term of both equations. The term is implemented; broader
+  gating (unit mode, occupancy, manual override, RTU-FC-052's sensor check)
+  stays host-side, as in AHU-FC-051.
+- **Damper command, not damper feedback.** The RTU dictionary carries no damper
+  position feedback point, so an actuator reporting 80% while the blades sit
+  closed is invisible here. That failure belongs to the mixed-air checks
+  (RTU-FC-052) and to step 3 of the playbook — which is why the two rules are
+  linked by suppression rather than by a shared input.
+- Severity 3 (warning), phase 2, method `rule`, and the tunable defaults are the
+  reference's chapter 11 card; its §5.8.3 index corroborates and carries no
+  severity column. `g36: null` — PNNL/Title 24-derived, not a G36 §5.16.14
+  clause.
 - `persist.delayOnInit = true` (Modelica/CDL default is `false`), the library's
   standing choice: a violation already present at load waits out the full 30
-  minutes instead of alarming on the first tick after a controller restart.
+  minutes instead of alarming on the first tick after a restart.
 
 ## Notes
 
-This is AHU-FC-051's fault seen through packaged-unit points. AHU-FC-051 reads
-a modulating cooling valve and can compare outdoor air to return air for a
-differential changeover; an RTU has a compressor contactor and, in most
-installations, a fixed dry-bulb high limit, so this card tests against absolute
-setpoints and a boolean. The reference keeps them as separate cards, and so do
-we: a site running both an AHU and a fleet of RTUs wants the same fault named
-the same way per equipment family. Both sit in CLU-03, with AHU-FC-051 as the
-cluster trigger and this card as a member.
+This is AHU-FC-051's fault seen through packaged-unit points — an RTU has a
+compressor contactor and a fixed dry-bulb high limit where the AHU has a
+modulating valve and a differential changeover — so both sit in CLU-03 with
+AHU-FC-051 as trigger and this card as member.
 
-Retune `econ_lockout_temp` for the climate zone before trusting the default.
-21 °C is near ASHRAE 90.1's 70 °F fixed high limit for zones 4A–5A; zones
-1A–3A allow 75 °F (23.9 °C) and zones 5B–8 use 65 °F (18.3 °C). Step 2.2 of the
-[economizer-failure](../../../playbooks/economizer-failure.md) playbook carries
-the table. A high limit set for the wrong zone produces this fault's branch 1
-signature with nothing mechanically wrong, which is diagnosis 5 and a remote
-fix.
-
-Verify order within CLU-03: RTU-FC-052 first (it suppresses this rule for a
-reason — a supply/mixed-air sensor pair that disagrees makes every economizer
-verdict on the unit suspect), then this rule, then RTU-FC-054, whose excess
-outdoor air is often just branch 2 seen from the airflow side. On a multi-unit
-roof, survey the rest of the fleet after the first confirmed fault; the
-playbook's step 4.4 puts the odds of a sibling unit having the same problem at
-30–50%.
+Retune `econ_lockout_temp` for the climate zone before trusting the default:
+21 °C is near ASHRAE 90.1's 70 °F fixed high limit for zones 4A–5A, while zones
+1A–3A allow 75 °F (23.9 °C) and zones 5B–8 use 65 °F (18.3 °C). A limit set for
+the wrong zone produces branch 1's signature with nothing mechanically wrong
+(diagnosis 5, a remote fix). Verify order within CLU-03 is RTU-FC-052 first,
+then this rule, then RTU-FC-054, whose excess outdoor air is often branch 2 seen
+from the airflow side; the [economizer-failure](../../../playbooks/economizer-failure.md)
+playbook carries the climate-zone table and puts the odds of a sibling unit on
+the same roof having the same problem at 30–50%.
