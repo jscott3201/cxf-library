@@ -1,0 +1,204 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 7200
+  },
+  "scenarios": [
+    {
+      "name": "healthy_range",
+      "description": "Entering 32.0 °C, leaving 29.0 °C — a 3.0 K range, inside the 2.2-3.2 K healthy p50 band the 4-climate simulation study found, with the fan modulating at 60%. Evaluated and silent.",
+      "inputs": {
+        "tower_entering_temp": 32.0,
+        "tower_leaving_temp": 29.0,
+        "tower_fan_speed": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yFanOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "range_collapsed",
+      "description": "Entering 30.0 °C, leaving 29.2 °C — a 0.8 K range against the 1.0 K band, with the fan at 60%. The alarm lands at exactly alarm_delay because delayOnInit holds the condition from the first tick.",
+      "inputs": {
+        "tower_entering_temp": 30.0,
+        "tower_leaving_temp": 29.2,
+        "tower_fan_speed": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yFanOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "fan_below_eval_floor",
+      "description": "The same collapsed 0.8 K range with the fan idling at 20%. A tower whose fan is barely turning rejects little heat and its range says nothing about the condenser loop, which is what yFanOk = false tells the host: NO_EVAL, not a healthy tower.",
+      "inputs": {
+        "tower_entering_temp": 30.0,
+        "tower_leaving_temp": 29.2,
+        "tower_fan_speed": 20.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yFanOk", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "range_exactly_at_the_band",
+      "description": "Boundary, bit-exact: 30.0 − 29.0 is exactly 1.0 in IEEE-754 and range_low_band is exactly 1.0. Reals.LessThreshold is strict, so exactly-on-the-band reads healthy.",
+      "inputs": {
+        "tower_entering_temp": 30.0,
+        "tower_leaving_temp": 29.0,
+        "tower_fan_speed": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yFanOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "range_just_below_the_band",
+      "description": "Boundary from below: 30.0 − 29.01 = 0.99 K clears the strict comparison by 10 mK and alarms on the normal schedule.",
+      "inputs": {
+        "tower_entering_temp": 30.0,
+        "tower_leaving_temp": 29.01,
+        "tower_fan_speed": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yFanOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "range_just_above_the_band",
+      "description": "Boundary from above: 30.0 − 28.99 = 1.01 K never alarms, however marginal the loop is. Ten milli-kelvin is an order of magnitude inside any condenser-water sensor's error, which is the point of the placeholder warning on the band.",
+      "inputs": {
+        "tower_entering_temp": 30.0,
+        "tower_leaving_temp": 28.99,
+        "tower_fan_speed": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yFanOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "fan_speed_exactly_at_the_floor",
+      "description": "Boundary on the other conjunct: the fan sits at exactly min_fan_speed_for_eval (30%) with the range collapsed. Reals.GreaterThreshold is strict, so exactly-at-the-floor is NO_EVAL and the rule stays silent.",
+      "inputs": {
+        "tower_entering_temp": 30.0,
+        "tower_leaving_temp": 29.2,
+        "tower_fan_speed": 30.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yFanOk", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "fan_speed_just_above_the_floor",
+      "description": "30.1% with the same collapsed range: evaluable, and the alarm lands at exactly alarm_delay. One tenth of a percent of fan speed is the whole difference between this scenario and the previous one.",
+      "inputs": {
+        "tower_entering_temp": 30.0,
+        "tower_leaving_temp": 29.2,
+        "tower_fan_speed": 30.1
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yFanOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "range_collapses_mid_run",
+      "description": "A tower holding a healthy 3.0 K range loses it at t = 1800 s — a second condenser pump starting, or a bypass valve opening. The alarm lands at exactly 5400 s: the mid-run rising edge carries the same T + delayTime arithmetic as the init case.",
+      "inputs": {
+        "tower_entering_temp": 32.0,
+        "tower_leaving_temp": [
+          { "t": 0, "value": 29.0 },
+          { "t": 1800, "value": 31.2 }
+        ],
+        "tower_fan_speed": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5340, "equals": false },
+        { "output": "yFault", "from_s": 5400, "to_s": 7200, "equals": true },
+        { "output": "yFanOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "range_recovers_after_alarm",
+      "description": "Recovery: the alarm asserts at 3600 s and the range comes back at t = 5400 s when the extra pump stops. TrueDelay passes the falling edge with no delay, so yFault drops on that tick.",
+      "inputs": {
+        "tower_entering_temp": 32.0,
+        "tower_leaving_temp": [
+          { "t": 0, "value": 31.2 },
+          { "t": 5400, "value": 29.0 }
+        ],
+        "tower_fan_speed": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 5340, "equals": true },
+        { "output": "yFault", "from_s": 5400, "to_s": 7200, "equals": false },
+        { "output": "yFanOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "fan_slows_after_alarm",
+      "description": "The evaluability release: an alarming tower drops to 15% fan at t = 5400 s with the collapsed range unchanged. yFault and yFanOk fall on the same tick, and only the pair tells the host that the tower unloaded rather than that the range recovered.",
+      "inputs": {
+        "tower_entering_temp": 30.0,
+        "tower_leaving_temp": 29.2,
+        "tower_fan_speed": [
+          { "t": 0, "value": 60.0 },
+          { "t": 5400, "value": 15.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 5340, "equals": true },
+        { "output": "yFault", "from_s": 5400, "to_s": 7200, "equals": false },
+        { "output": "yFanOk", "from_s": 0, "to_s": 5340, "equals": true },
+        { "output": "yFanOk", "from_s": 5400, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "intermittent_collapse_never_alarms",
+      "description": "Range alternating between 0.8 K and 3.0 K every 1200 s — a condenser pump staging on and off, or a chiller cycling. No single episode reaches alarm_delay, so nothing fires. Persistence is not averaging: a loop spending half its day at 0.8 K range is a real finding this rule cannot make.",
+      "inputs": {
+        "tower_entering_temp": 32.0,
+        "tower_leaving_temp": [
+          { "t": 0, "value": 31.2 },
+          { "t": 1200, "value": 29.0 },
+          { "t": 2400, "value": 31.2 },
+          { "t": 3600, "value": 29.0 },
+          { "t": 4800, "value": 31.2 },
+          { "t": 6000, "value": 29.0 }
+        ],
+        "tower_fan_speed": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yFanOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "loop_side_semantics_inverted",
+      "description": "Blind spot, pinned: the two water sensors are bound the wrong way round (entering 29.0 °C, leaving 32.0 °C), so range reads −3.0 K. Nothing in the graph knows a negative range is impossible, and the rule reports the strongest possible collapse on a tower that may be running perfectly. The tower dictionary's loop-side note is the check: leaving is the COLD side.",
+      "inputs": {
+        "tower_entering_temp": 29.0,
+        "tower_leaving_temp": 32.0,
+        "tower_fan_speed": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yFanOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    }
+  ]
+}

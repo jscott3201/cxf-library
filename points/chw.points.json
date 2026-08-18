@@ -201,6 +201,28 @@
       "provisional": true,
       "notes": "HOST-DERIVED (zone_reheat_fraction / satisfied_zone_fraction precedent): the reference's chw_valve_positions is a vector across AHU/FCU cooling coils; the rule needs only its max, so the host binds max() over the coil valve commands it serves. CHW-FC-052's 'no coil starving' conjunct. Engine vector blocks could compute this in-graph once the points contract grows vector bindings (tracked in internal engine-block-inventory research notes).",
       "derived": true
+    },
+    {
+      "name": "cond_sat_temp",
+      "description": "Condensing saturation temperature (HOST-DERIVED: discharge/liquid pressure via refrigerant P-T lookup)",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Refrigerant",
+        "aspects": [
+          "condensing",
+          "derived"
+        ]
+      },
+      "provisional": true,
+      "notes": "Host-derived P-T saturation lookup from measured discharge/liquid pressure (hp dict precedent, duplicated per the lint's own-family resolution rule). Consumed by CHW-FC-054 condenser-approach-high: approach = cond_sat_temp − cwst. Refrigerant-specific lookup is the host's, documented per binding.",
+      "derived": true
     }
   ]
 }

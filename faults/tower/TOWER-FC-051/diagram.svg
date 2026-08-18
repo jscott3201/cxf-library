@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1260 400" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+  <rect x="12" y="40" width="170" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="97" y="59" text-anchor="middle" fill="#1e3a8a">tower_entering_temp</text>
+  <rect x="12" y="100" width="170" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="97" y="119" text-anchor="middle" fill="#1e3a8a">tower_leaving_temp</text>
+  <rect x="12" y="290" width="170" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="97" y="309" text-anchor="middle" fill="#1e3a8a">tower_fan_speed</text>
+  <rect x="230" y="40" width="140" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="300" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">range</text>
+  <text x="300" y="80" text-anchor="middle" fill="#57606a" font-size="11">Reals.Subtract</text>
+  <rect x="430" y="40" width="250" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="555" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">rangeLow</text>
+  <text x="555" y="80" text-anchor="middle" fill="#57606a" font-size="11">Reals.LessThreshold · t = 1.0 °C</text>
+  <rect x="230" y="280" width="250" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="355" y="302" text-anchor="middle" fill="#24292f" font-weight="bold">fanOk</text>
+  <text x="355" y="320" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 30 %</text>
+  <rect x="740" y="40" width="110" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="795" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">gate</text>
+  <text x="795" y="80" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="910" y="40" width="160" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="990" y="62" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="990" y="80" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 3600 s</text>
+  <rect x="1130" y="54" width="81" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1170.5" y="73" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1130" y="294" width="85" height="30" rx="15" fill="#fef3c7" stroke="#d97706"/>
+  <text x="1172.5" y="313" text-anchor="middle" fill="#78350f">yFanOk</text>
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 182 55 H 226"/>
+    <path d="M 182 115 H 200 V 83 H 226"/>
+    <path d="M 182 305 H 200 V 309 H 226"/>
+    <path d="M 370 69 H 426"/>
+    <path d="M 680 69 H 710 V 55 H 736"/>
+    <path d="M 480 309 H 710 V 83 H 736"/>
+    <path d="M 480 309 H 1126"/>
+    <path d="M 850 69 H 906"/>
+    <path d="M 1070 69 H 1126"/>
+  </g>
+  <text x="188" y="48" fill="#7d8590" font-size="10">Real</text>
+  <text x="188" y="108" fill="#7d8590" font-size="10">Real</text>
+  <text x="188" y="298" fill="#7d8590" font-size="10">Real</text>
+  <text x="376" y="62" fill="#7d8590" font-size="10">Real</text>
+  <text x="686" y="62" fill="#7d8590" font-size="10">Bool</text>
+  <text x="486" y="302" fill="#7d8590" font-size="10">Bool</text>
+  <text x="1130" y="362" fill="#7d8590" font-size="11">false ⇒ NO_EVAL</text>
+</svg>

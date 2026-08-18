@@ -1,0 +1,230 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 7200
+  },
+  "scenarios": [
+    {
+      "name": "clean_condenser_at_load",
+      "description": "NO_FAULT: 36 °C saturated condensing against 30 °C leaving condenser water is a 6 K approach, inside the shipped 10 K band, at 60% load. The approach conjunct blocks alone — the machine is evaluable and silent.",
+      "inputs": {
+        "cond_sat_temp": 36.0,
+        "cwst": 30.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "fouled_condenser_at_load",
+      "description": "FAULT: 42 °C condensing against 30 °C leaving water is a 12 K approach at 60% load. The alarm lands at exactly alarm_delay because delayOnInit holds the condition from the first tick.",
+      "inputs": {
+        "cond_sat_temp": 42.0,
+        "cwst": 30.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "high_approach_at_low_load",
+      "description": "NO_EVAL: the same 12 K approach at 20% load. The load conjunct blocks alone, and yLoadOk = false is what tells the host that the silence is not a healthy verdict — at part load a clean machine and a fouled one both make small approaches.",
+      "inputs": {
+        "cond_sat_temp": 42.0,
+        "cwst": 30.0,
+        "chiller_load": 20.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "approach_exactly_at_the_band",
+      "description": "Boundary, bit-exact: 40.0 − 30.0 is exactly 10.0 and 5.0 × 2.0 is the same double, so the approach sits exactly on the band. Reals.Greater is strict, so exactly-at-the-band reads healthy.",
+      "inputs": {
+        "cond_sat_temp": 40.0,
+        "cwst": 30.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "approach_just_above_the_band",
+      "description": "Boundary from above: 40.01 − 30.0 clears the strict comparison by 10 mK and alarms on the normal schedule.",
+      "inputs": {
+        "cond_sat_temp": 40.01,
+        "cwst": 30.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "approach_just_below_the_band",
+      "description": "Boundary from below: 39.99 − 30.0 is 10 mK inside the band and never alarms, however marginal the machine's condenser is.",
+      "inputs": {
+        "cond_sat_temp": 39.99,
+        "cwst": 30.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "load_exactly_at_the_evaluability_floor",
+      "description": "Boundary on the other conjunct: load is exactly min_load_for_eval (40%) with a 12 K approach. Reals.GreaterThreshold is strict, so exactly-at-the-floor is NO_EVAL.",
+      "inputs": {
+        "cond_sat_temp": 42.0,
+        "cwst": 30.0,
+        "chiller_load": 40.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "load_just_below_the_evaluability_floor",
+      "description": "39.9% load with the same widened approach: still NO_EVAL.",
+      "inputs": {
+        "cond_sat_temp": 42.0,
+        "cwst": 30.0,
+        "chiller_load": 39.9
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "load_just_above_the_evaluability_floor",
+      "description": "40.1% load with the same widened approach: evaluable, and the alarm lands at exactly alarm_delay. One tenth of a percent of chiller load is the whole difference between this scenario and the previous one.",
+      "inputs": {
+        "cond_sat_temp": 42.0,
+        "cwst": 30.0,
+        "chiller_load": 40.1
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "approach_widens_mid_run",
+      "description": "A machine holding a 6 K approach loses it at t = 1800 s — condenser water flow falling away, or non-condensables released into the shell. The alarm lands at exactly 5400 s: the mid-run rising edge carries the same T + delayTime arithmetic as the init case.",
+      "inputs": {
+        "cond_sat_temp": [
+          { "t": 0, "value": 36.0 },
+          { "t": 1800, "value": 42.0 }
+        ],
+        "cwst": 30.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5340, "equals": false },
+        { "output": "yFault", "from_s": 5400, "to_s": 7200, "equals": true },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "approach_recovers_after_alarm",
+      "description": "Recovery: the alarm asserts at 3600 s and the condenser is cleaned — or the purge unit runs — at t = 5400 s. TrueDelay passes the falling edge with no delay, so yFault drops on that tick.",
+      "inputs": {
+        "cond_sat_temp": [
+          { "t": 0, "value": 42.0 },
+          { "t": 5400, "value": 36.0 }
+        ],
+        "cwst": 30.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 5340, "equals": true },
+        { "output": "yFault", "from_s": 5400, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "load_drops_after_alarm",
+      "description": "The evaluability release: an alarming machine unloads to 20% at t = 5400 s with the widened approach unchanged. yFault and yLoadOk fall on the same tick, and only the pair tells the host that the chiller unloaded rather than that the condenser recovered.",
+      "inputs": {
+        "cond_sat_temp": 42.0,
+        "cwst": 30.0,
+        "chiller_load": [
+          { "t": 0, "value": 60.0 },
+          { "t": 5400, "value": 20.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 5340, "equals": true },
+        { "output": "yFault", "from_s": 5400, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 5340, "equals": true },
+        { "output": "yLoadOk", "from_s": 5400, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "intermittent_high_approach_never_alarms",
+      "description": "Approach alternating between 12 K and 6 K every 1200 s — a condenser water valve hunting, or a machine cycling between capacity steps. No single episode reaches alarm_delay, so nothing fires. Persistence is not averaging: a machine spending half its day at 12 K is a real finding this rule cannot make.",
+      "inputs": {
+        "cond_sat_temp": [
+          { "t": 0, "value": 42.0 },
+          { "t": 1200, "value": 36.0 },
+          { "t": 2400, "value": 42.0 },
+          { "t": 3600, "value": 36.0 },
+          { "t": 4800, "value": 42.0 },
+          { "t": 6000, "value": 36.0 }
+        ],
+        "cwst": 30.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "entering_condenser_water_bound_by_mistake",
+      "description": "Blind spot, pinned: cwst is bound to the cold tower-leaving water entering the condenser instead of the warm water leaving it. The measured difference then carries the condenser range as well as the approach — 38.0 − 26.5 = 11.5 K on a machine whose real approach is 8 K — and the rule alarms permanently on a healthy condenser. This is the loop-side error the point dictionary's cwst note warns about.",
+      "inputs": {
+        "cond_sat_temp": 38.0,
+        "cwst": 26.5,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "saturation_lookup_biased_low_hides_the_fault",
+      "description": "The opposite blind spot, pinned: a P-T lookup run against the wrong refrigerant biases cond_sat_temp several kelvin low, so a machine at a true 13 K approach reports 9 K and reads healthy for as long as the mis-binding lasts. Nothing in the graph can see the derivation, so the failure is silent in the false-negative direction.",
+      "inputs": {
+        "cond_sat_temp": 39.0,
+        "cwst": 30.0,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yLoadOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    }
+  ]
+}

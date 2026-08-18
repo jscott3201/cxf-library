@@ -1,0 +1,144 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 5400 },
+  "scenarios": [
+    {
+      "name": "healthy_tower_at_full_fan",
+      "description": "Design-like conditions: 24 °C wet-bulb, 26 °C leaving water, fans wide open. Approach 2.0 °C sits inside the loaded healthy envelope the simulation study observed (Miami July p95 ~2.3 °C), so the fan conjunct is true and the approach conjunct is what holds the alarm down.",
+      "inputs": { "tower_leaving_temp": 26.0, "oa_wetbulb": 24.0, "tower_fan_speed": 100.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false },
+        { "output": "yWetBulbOk", "from_s": 0, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "fouled_fill_at_full_fan",
+      "description": "The fault: same 24 °C wet-bulb, but the tower can only make 30 °C leaving water with the fans at 100%. Approach 6.0 °C is past the band and the fan has nothing left to give, so the alarm matures one alarm_delay in.",
+      "inputs": { "tower_leaving_temp": 30.0, "oa_wetbulb": 24.0, "tower_fan_speed": 100.0 },
+      "expect": [
+        { "output": "yWetBulbOk", "from_s": 0, "to_s": 5400, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "part_load_high_approach_stays_silent",
+      "description": "The design result the fan gate exists for: approach 8.0 °C at 60% fan speed. That is a bigger approach than the fault scenario carries and it is healthy — the study found un-gated healthy approach spanning 1.6-13.3 °C, driven by nothing but VFD modulation at part load. The approach conjunct is true here and the fan conjunct alone blocks the alarm.",
+      "inputs": { "tower_leaving_temp": 32.0, "oa_wetbulb": 24.0, "tower_fan_speed": 60.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false },
+        { "output": "yWetBulbOk", "from_s": 0, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "approach_exactly_at_the_band",
+      "description": "Threshold edge: 29.0 − 24.0 is exactly 5.0, the shipped band, and the comparison is a strict `>`, so a tower sitting precisely on the band reads healthy. Both operands and the difference are binary-exact, so this is a true boundary pin.",
+      "inputs": { "tower_leaving_temp": 29.0, "oa_wetbulb": 24.0, "tower_fan_speed": 100.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "approach_just_past_the_band",
+      "description": "Threshold edge from the other side: a tenth of a degree more leaving-water temperature puts approach at 5.1 °C and the alarm matures.",
+      "inputs": { "tower_leaving_temp": 29.1, "oa_wetbulb": 24.0, "tower_fan_speed": 100.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "fan_exactly_at_the_capacity_threshold",
+      "description": "Fan-gate edge: approach is 6.0 °C and clearly faulted, but the drive reads exactly fan_capacity_threshold (95.0%). The gate is a strict `>`, so the rule stays silent — a tower with a drive still holding a hair of headroom is not at capacity.",
+      "inputs": { "tower_leaving_temp": 30.0, "oa_wetbulb": 24.0, "tower_fan_speed": 95.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "fan_just_past_the_capacity_threshold",
+      "description": "Fan-gate edge from the other side: 95.1% clears the gate and the identical approach now alarms. The two scenarios differ by a tenth of a percent of fan speed and disagree completely.",
+      "inputs": { "tower_leaving_temp": 30.0, "oa_wetbulb": 24.0, "tower_fan_speed": 95.1 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "brief_peak_never_alarms",
+      "description": "A load step, not a fault: approach jumps to 6.0 °C at t = 600 s with the fans already at 100% and recovers at t = 1800 s, 20 minutes short of alarm_delay. The timer resets on the recovery and nothing is reported.",
+      "inputs": {
+        "oa_wetbulb": 24.0,
+        "tower_fan_speed": 100.0,
+        "tower_leaving_temp": [
+          { "t": 0, "value": 26.0 },
+          { "t": 600, "value": 30.0 },
+          { "t": 1800, "value": 26.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "capacity_reached_late_starts_the_clock",
+      "description": "Delay edge: approach is 6.0 °C from t = 0 but the fan only reaches capacity at t = 1200 s, so the alarm lands at 3000 s — alarm_delay is measured from the conjunction's rising edge, not from when the approach went high.",
+      "inputs": {
+        "tower_leaving_temp": 30.0,
+        "oa_wetbulb": 24.0,
+        "tower_fan_speed": [
+          { "t": 0, "value": 80.0 },
+          { "t": 1200, "value": 100.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2940, "equals": false },
+        { "output": "yFault", "from_s": 3060, "to_s": 5400, "equals": true }
+      ]
+    },
+    {
+      "name": "alarm_clears_when_the_fans_back_off",
+      "description": "Recovery has two readings and this is the one that is not a repair: the tower is still making 30 °C water, but the load falls away at t = 3600 s and the fans throttle to 70%. yFault drops on that same tick — TrueDelay only delays the rising edge — and the tower is no more clean than it was a minute earlier.",
+      "inputs": {
+        "tower_leaving_temp": 30.0,
+        "oa_wetbulb": 24.0,
+        "tower_fan_speed": [
+          { "t": 0, "value": 100.0 },
+          { "t": 3600, "value": 70.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3540, "equals": true },
+        { "output": "yFault", "from_s": 3660, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "negative_approach_is_no_eval",
+      "description": "The wet-bulb input fails its own sanity check: 24 °C wet-bulb against 22 °C leaving water is an approach of −2 °C, which evaporative cooling cannot produce. yWetBulbOk goes false and the host must read NO_EVAL rather than a well-performing tower.",
+      "inputs": { "tower_leaving_temp": 22.0, "oa_wetbulb": 24.0, "tower_fan_speed": 100.0 },
+      "expect": [
+        { "output": "yWetBulbOk", "from_s": 0, "to_s": 5400, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "approach_exactly_zero_is_no_eval",
+      "description": "Validity-floor edge: leaving water exactly at the wet-bulb. The floor is a strict `>`, so a 0.0 °C approach reads NO_EVAL — it is the thermodynamic limit, not an achievable steady state, and a tower reporting it is reporting a derivation or a sensor.",
+      "inputs": { "tower_leaving_temp": 24.0, "oa_wetbulb": 24.0, "tower_fan_speed": 100.0 },
+      "expect": [
+        { "output": "yWetBulbOk", "from_s": 0, "to_s": 5400, "equals": false },
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    },
+    {
+      "name": "approach_just_above_zero_is_evaluable",
+      "description": "Validity-floor edge from the other side: a tenth of a degree of approach is physically extraordinary but not impossible, so the rule is willing to issue a verdict — and the verdict is healthy, since 0.1 °C is far below the band.",
+      "inputs": { "tower_leaving_temp": 24.1, "oa_wetbulb": 24.0, "tower_fan_speed": 100.0 },
+      "expect": [
+        { "output": "yWetBulbOk", "from_s": 0, "to_s": 5400, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false }
+      ]
+    }
+  ]
+}

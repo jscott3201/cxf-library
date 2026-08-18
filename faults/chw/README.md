@@ -20,6 +20,7 @@ and the chiller-plant entries in the project’s internal research triage (licen
 | CHW-FC-051 | CHWST reset not functioning | 3 | statistical | **verified** |
 | CHW-FC-052 | CHW loop DP reset not functioning | 3 | statistical | **verified** |
 | CHW-FC-053 | Chilled water low delta-T syndrome | 3 | rule | **verified** |
+| CHW-FC-054 | Chiller condenser approach high | 3 | rule | **verified** |
 
 Severity and method per the reference's ch.13 cards.
 
