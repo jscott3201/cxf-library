@@ -446,6 +446,11 @@ def main():
     runp.add_argument("--begin", default="7-6", help="run period start M-D")
     runp.add_argument("--end", default="7-12", help="run period end M-D")
     runp.add_argument("--mode", default="airloop", choices=["airloop", "plant"])
+    runp.add_argument("--reuse", action="store_true",
+                      help="reuse an existing eplusout.csv instead of re-running EnergyPlus")
+    runp.add_argument("--bias", default=None, metavar="POINT=DELTA",
+                      help="TPR mode: add DELTA to POINT in the replayed inputs "
+                           "(faulted-sensor-as-seen-by-FDD); FAILs are DETECTIONS")
     args = ap.parse_args()
 
     bdir = Path(args.building)
@@ -464,8 +469,10 @@ def main():
         patched = patch_plant(b, pn, begin, end)
         pj = out / "patched.epjson"
         pj.write_text(json.dumps(patched))
-        print(f"plant loops: {list(pn)}; running EnergyPlus…")
-        csv_path = run_energyplus(pj, epw, out / "ep")
+        csv_path = out / "ep" / "eplusout.csv"
+        if not (args.reuse and csv_path.is_file()):
+            print(f"plant loops: {list(pn)}; running EnergyPlus…")
+            csv_path = run_energyplus(pj, epw, out / "ep")
         fams = extract_plant(csv_path, pn, b)
         rules = {}
         for fam in fams:
@@ -519,9 +526,18 @@ def main():
     patched = patch(b, loops, begin, end)
     pj = out / "patched.epjson"
     pj.write_text(json.dumps(patched))
-    print(f"loops: {list(loops)}; running EnergyPlus…")
-    csv_path = run_energyplus(pj, epw, out / "ep")
+    csv_path = out / "ep" / "eplusout.csv"
+    if not (args.reuse and csv_path.is_file()):
+        print(f"loops: {list(loops)}; running EnergyPlus…")
+        csv_path = run_energyplus(pj, epw, out / "ep")
     loops_pts = extract(csv_path, loops)
+    if args.bias:
+        pt, delta = args.bias.split("=")
+        delta = float(delta)
+        for pts in loops_pts.values():
+            if pt in pts:
+                pts[pt] = [round(v + delta, ROUND) for v in pts[pt]]
+        print(f"TPR bias applied: {pt} += {delta} — FAILs below are DETECTIONS")
     rules = eligible_rules()
     print(f"eligible rules (points ⊆ mapped): {sorted(rules)}")
     log = emit_and_replay(bdir.name, loops_pts, rules, out)

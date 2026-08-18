@@ -51,6 +51,13 @@ emissions:
   scope: "1|2"
   method: QUALITATIVE_EMISSIONS
 validation:
+  - kind: simulation_tpr
+    harness: simharness/v1
+    date: 2026-08-18
+    fleet: "TPR: +/-3 degC OAT bias injected into replay inputs (faulted-sensor-as-seen-by-FDD), B2B OfficeMedium-4004 July week, 3 VAV loops; failures = missed detections; baseline-confounded rules excluded from attribution"
+    scenarios: 6
+    failures: 1
+    notes: "both directions: 3/3 at +3 degC (~4.5-28 h), 2/3 at -3 degC — empirical confirmation of the CLU-09 biased-OAT cascade"
   - kind: simulation_fpr
     harness: simharness/v1
     date: 2026-08-18
