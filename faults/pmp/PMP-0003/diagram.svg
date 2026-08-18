@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1350 400" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <rect x="230" y="10" width="150" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="305" y="32" text-anchor="middle" fill="#24292f" font-weight="bold">notCmd</text>
+  <text x="305" y="50" text-anchor="middle" fill="#57606a" font-size="11">Logical.Not</text>
+  <rect x="470" y="45" width="150" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="545" y="67" text-anchor="middle" fill="#24292f" font-weight="bold">runCond</text>
+  <text x="545" y="85" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="680" y="45" width="210" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="785" y="67" text-anchor="middle" fill="#24292f" font-weight="bold">stopProof</text>
+  <text x="785" y="85" text-anchor="middle" fill="#57606a" font-size="11">Logical.TrueDelay · 60 s</text>
+
+  <rect x="470" y="235" width="150" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="545" y="257" text-anchor="middle" fill="#24292f" font-weight="bold">failCond</text>
+  <text x="545" y="275" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="680" y="235" width="210" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="785" y="257" text-anchor="middle" fill="#24292f" font-weight="bold">startProof</text>
+  <text x="785" y="275" text-anchor="middle" fill="#57606a" font-size="11">Logical.TrueDelay · 15 s</text>
+  <rect x="230" y="272" width="150" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="305" y="294" text-anchor="middle" fill="#24292f" font-weight="bold">notSts</text>
+  <text x="305" y="312" text-anchor="middle" fill="#57606a" font-size="11">Logical.Not</text>
+
+  <rect x="960" y="140" width="150" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1035" y="162" text-anchor="middle" fill="#24292f" font-weight="bold">anyDir</text>
+  <text x="1035" y="180" text-anchor="middle" fill="#57606a" font-size="11">Logical.Or</text>
+
+  <rect x="12" y="115" width="130" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="77" y="134" text-anchor="middle" fill="#1e3a8a">pump_cmd</text>
+  <rect x="12" y="175" width="130" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="77" y="194" text-anchor="middle" fill="#1e3a8a">pump_status</text>
+
+  <rect x="1180" y="59" width="128" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1244" y="78" text-anchor="middle" fill="#7f1d1d">yUnexpectedRun</text>
+  <rect x="1180" y="154" width="76" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1218" y="173" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1180" y="249" width="112" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1236" y="268" text-anchor="middle" fill="#7f1d1d">yFailToStart</text>
+
+  <g fill="none" stroke="#7d8590" stroke-width="1.5" marker-end="url(#arrow)">
+    <path d="M 142 130 H 150 V 39 H 230"/>
+    <path d="M 142 130 H 210 V 252 H 470"/>
+    <path d="M 142 190 H 180 V 88 H 470"/>
+    <path d="M 180 190 V 301 H 230"/>
+    <path d="M 380 39 H 440 V 62 H 470"/>
+    <path d="M 380 301 H 440 V 278 H 470"/>
+    <path d="M 620 74 H 680"/>
+    <path d="M 620 264 H 680"/>
+    <path d="M 890 74 H 1180"/>
+    <path d="M 930 74 V 157 H 960"/>
+    <path d="M 890 264 H 1180"/>
+    <path d="M 930 264 V 181 H 960"/>
+    <path d="M 1110 169 H 1180"/>
+  </g>
+
+  <g fill="#7d8590" font-size="9">
+    <text x="474" y="62">u1</text>
+    <text x="474" y="88">u2</text>
+    <text x="474" y="252">u1</text>
+    <text x="474" y="278">u2</text>
+    <text x="964" y="157">u1</text>
+    <text x="964" y="181">u2</text>
+  </g>
+
+  <g fill="#7d8590" font-size="10">
+    <text x="386" y="34">Bool</text>
+    <text x="386" y="296">Bool</text>
+    <text x="626" y="69">Bool</text>
+    <text x="626" y="259">Bool</text>
+    <text x="896" y="69">Bool</text>
+    <text x="896" y="259">Bool</text>
+  </g>
+
+  <text x="230" y="364" fill="#7d8590" font-size="11">Two lanes, one per failure direction: runCond = status AND NOT command (unexpected run), failCond = command AND NOT status (fail to start).</text>
+  <text x="230" y="382" fill="#7d8590" font-size="11">The lanes are mutually exclusive at every instant, and the Or sits AFTER both delays — a mismatch that changes direction re-serves the new lane's window.</text>
+</svg>

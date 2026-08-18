@@ -254,6 +254,25 @@
       },
       "provisional": false,
       "notes": "brick:Motor_Speed_Sensor grep-verified (same mapping as vfd_speed in points/vfd.points.json). HW-0005/HW-0007's load proxy per PNNL-27338's pump-speed heuristics."
+    },
+    {
+      "name": "boiler_cmd",
+      "description": "Boiler enable command (true = commanded to fire)",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Start_Stop_Command",
+      "s223": {
+        "pattern": "EnumeratedActuatableProperty on the Boiler via hasProperty",
+        "property_class": "EnumeratedActuatableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": false,
+      "notes": "brick:Start_Stop_Command attached via isPointOf to brick:Boiler (pump_cmd precedent). The command HALF of the boiler_status pair; HW-0009 proof-of-operation compares the two. Bind the plant-level enable the BAS actually writes — a lead/lag sequencer's internal stage command is upstream of what this point means."
     }
   ]
 }

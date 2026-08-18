@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1560 360" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <rect x="270" y="30" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="355" y="52" text-anchor="middle" fill="#24292f" font-weight="bold">notStatus</text>
+  <text x="355" y="70" text-anchor="middle" fill="#57606a" font-size="11">Logical.Not</text>
+  <rect x="520" y="30" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="605" y="52" text-anchor="middle" fill="#24292f" font-weight="bold">startMiss</text>
+  <text x="605" y="70" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="770" y="30" width="200" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="870" y="52" text-anchor="middle" fill="#24292f" font-weight="bold">startProof</text>
+  <text x="870" y="70" text-anchor="middle" fill="#57606a" font-size="11">Logical.TrueDelay · 300 s</text>
+
+  <rect x="270" y="210" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="355" y="232" text-anchor="middle" fill="#24292f" font-weight="bold">notCmd</text>
+  <text x="355" y="250" text-anchor="middle" fill="#57606a" font-size="11">Logical.Not</text>
+  <rect x="520" y="210" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="605" y="232" text-anchor="middle" fill="#24292f" font-weight="bold">stopMiss</text>
+  <text x="605" y="250" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="770" y="210" width="200" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="870" y="232" text-anchor="middle" fill="#24292f" font-weight="bold">stopProof</text>
+  <text x="870" y="250" text-anchor="middle" fill="#57606a" font-size="11">Logical.TrueDelay · 120 s</text>
+
+  <rect x="1080" y="120" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1165" y="142" text-anchor="middle" fill="#24292f" font-weight="bold">anyDir</text>
+  <text x="1165" y="160" text-anchor="middle" fill="#57606a" font-size="11">Logical.Or</text>
+
+  <rect x="12" y="95" width="120" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="72" y="114" text-anchor="middle" fill="#1e3a8a">boiler_cmd</text>
+  <rect x="12" y="175" width="145" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="84.5" y="194" text-anchor="middle" fill="#1e3a8a">boiler_status</text>
+
+  <rect x="1330" y="44" width="140" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1400" y="63" text-anchor="middle" fill="#7f1d1d">yFailToStart</text>
+  <rect x="1330" y="134" width="90" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1375" y="153" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1330" y="224" width="155" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1407.5" y="243" text-anchor="middle" fill="#7f1d1d">yUnexpectedRun</text>
+
+  <g fill="none" stroke="#7d8590" stroke-width="1.5" marker-end="url(#arrow)">
+    <path d="M 157 190 H 230 V 59 H 270"/>
+    <path d="M 132 110 H 248 V 239 H 270"/>
+    <path d="M 132 110 H 200 V 14 H 500 V 47 H 520"/>
+    <path d="M 157 190 H 200 V 284 H 500 V 227 H 520"/>
+    <path d="M 440 59 H 480 V 71 H 520"/>
+    <path d="M 440 239 H 480 V 227 H 520"/>
+    <path d="M 690 59 H 770"/>
+    <path d="M 690 239 H 770"/>
+    <path d="M 970 59 H 1330"/>
+    <path d="M 1040 59 V 137 H 1080"/>
+    <path d="M 970 239 H 1330"/>
+    <path d="M 1040 239 V 161 H 1080"/>
+    <path d="M 1250 149 H 1330"/>
+  </g>
+
+  <g fill="#7d8590" font-size="9">
+    <text x="526" y="52">u1</text>
+    <text x="526" y="76">u2</text>
+    <text x="526" y="232">u1</text>
+    <text x="526" y="256">u2</text>
+    <text x="1086" y="142">u1</text>
+    <text x="1086" y="166">u2</text>
+  </g>
+
+  <text x="270" y="322" fill="#7d8590" font-size="11">Every signal is Boolean. The two And gates are mutually exclusive by construction, so yFailToStart and yUnexpectedRun can never be true on the same tick.</text>
+  <text x="270" y="340" fill="#7d8590" font-size="11">delayOnInit = true on both delays: a restart serves the full window before either direction asserts. Composed from elementary blocks, not CDL Logical.Proof — see Deviations.</text>
+</svg>

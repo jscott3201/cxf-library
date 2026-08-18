@@ -306,6 +306,14 @@
       "legacy_id": null
     },
     {
+      "id": "AHU-0039",
+      "family": "ahu",
+      "name": "Supply fan proof-of-operation failure",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
       "id": "CHW-0001",
       "family": "chw",
       "name": "Chiller efficiency (kW/ton) degradation",
@@ -522,6 +530,14 @@
       "legacy_id": "HW-FC-057"
     },
     {
+      "id": "HW-0009",
+      "family": "hw",
+      "name": "Boiler proof-of-operation failure",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
       "id": "PMP-0001",
       "family": "pmp",
       "name": "Pump commanded on, no flow detected",
@@ -536,6 +552,14 @@
       "method": "rule",
       "status": "verified",
       "legacy_id": "PMP-FC-051"
+    },
+    {
+      "id": "PMP-0003",
+      "family": "pmp",
+      "name": "Pump proof-of-operation failure",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
     },
     {
       "id": "RTU-0001",

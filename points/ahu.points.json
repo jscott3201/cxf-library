@@ -449,6 +449,25 @@
       },
       "derived": true,
       "notes": "HOST-DERIVED virtual point (cond_split_baseline precedent): the commissioning-period valve command fitted against the load condition (OAT band and supply setpoint), published for the CURRENT condition each tick. The fit window must be known-clean — a baseline fitted on a fouled coil learns the fouling as normal (the SYS-0006 training caveat). Consumed by AHU-0038: under temperature control a fouling coil holds its heat duty by opening the valve, so the hydraulic excess — not the temperatures — is the observable."
+    },
+    {
+      "name": "sf_cmd",
+      "description": "Supply fan run command (true = commanded on)",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Start_Stop_Command",
+      "s223": {
+        "pattern": "EnumeratedActuatableProperty on the supply Fan via hasProperty",
+        "property_class": "EnumeratedActuatableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": false,
+      "notes": "brick:Start_Stop_Command attached via isPointOf to brick:Supply_Fan (pump_cmd precedent — the class is equipment-agnostic and grep-verified in Brick 1.4.4). The command HALF of the sf_status pair; AHU-0039 proof-of-operation compares the two. On VFD-driven fans bind the run enable, not the speed reference (sf_speed carries that)."
     }
   ]
 }
