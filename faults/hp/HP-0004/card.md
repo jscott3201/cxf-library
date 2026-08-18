@@ -21,7 +21,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [HP-0001, HP-0005, RTU-0002]
+related: [HP-0001, HP-0005, RTU-0002, RTU-0008]
 playbooks: [heat-pump-faults]
 operating_states: "mechanical cooling, compressor running, unit not in defrost — all three host-gated"
 preconditions: "The compressor must be running and the unit must not be in defrost. Both are host gates on comp_status and defrost_status: with the compressor off all four temperatures equalise and both differences collapse to zero, and a defrost cycle deliberately reverses the circuit, which scrambles every refrigerant-side temperature this rule reads (HP-0002/HP-0003 precedent). The compressor must also have held its current capacity for min_runtime_for_eval (15 min); superheat overshoots for minutes after a start or a capacity step while the expansion valve catches up. evap_sat_temp and cond_sat_temp are host-derived P-T lookups and the lookup MUST be configured for the refrigerant actually in the machine — a wrong refrigerant biases both differences at once and in opposite directions, which is this rule's exact fault pattern. The suction and liquid probes must be in good contact with the line and insulated from ambient air; an uninsulated liquid-line probe reads high in a hot plant room and fabricates collapsed subcooling. Read yTxvSaturated as diagnostic context, NOT as an evaluability gate: this rule has no in-graph NO_EVAL test and false never means healthy (see Deviations)."

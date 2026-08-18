@@ -1,0 +1,210 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 7200
+  },
+  "scenarios": [
+    {
+      "name": "clean_coil_holding_setpoint",
+      "description": "NO_FAULT: the loop sits at 45% against a fitted 42% and holds supply air 0.2 K off a 13.0 °C setpoint. Three points of hydraulic excess is fit residual, not fouling, and yInControlOk is true the whole run so the silence means healthy rather than unevaluated.",
+      "inputs": {
+        "clg_vlv_cmd": 45.0,
+        "clg_vlv_baseline": 42.0,
+        "sat": 13.2,
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yInControlOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "fouled_coil_alarms_at_the_persistence_edge",
+      "description": "FAULT, and the whole point of the card: supply air is still 0.2 K off setpoint — thermally the unit looks perfect — while the valve holds 65% where the fit expects 42%. The alarm lands at exactly 3600 s, which also pins delayOnInit: the condition is present from the first tick and still serves the full hour.",
+      "inputs": {
+        "clg_vlv_cmd": 65.0,
+        "clg_vlv_baseline": 42.0,
+        "sat": 13.2,
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yInControlOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "excess_exactly_at_the_threshold",
+      "description": "Boundary, bit-exact: 52.0 − 42.0 is exactly 10.0 and the parameter is exactly 10.0, so the verdict is decided by the strictness of Reals.GreaterThreshold and not by rounding. A valve sitting exactly on the creep line reads healthy.",
+      "inputs": {
+        "clg_vlv_cmd": 52.0,
+        "clg_vlv_baseline": 42.0,
+        "sat": 13.2,
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yInControlOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "excess_just_above_the_threshold",
+      "description": "Boundary from above: one hundredth of a percent more valve opening puts the excess at 10.01 points and the rule alarms on the normal schedule.",
+      "inputs": {
+        "clg_vlv_cmd": 52.01,
+        "clg_vlv_baseline": 42.0,
+        "sat": 13.2,
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yInControlOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "in_control_band_exactly_at_the_edge_is_no_eval",
+      "description": "NO_EVAL boundary: 14.0 − 13.0 is exactly 1.0 and Reals.LessThreshold is strict, so a loop sitting exactly on the band edge is NOT in control. The hydraulic excess is 23 points and the rule still says nothing — yInControlOk false is the only thing that distinguishes this from a clean coil.",
+      "inputs": {
+        "clg_vlv_cmd": 65.0,
+        "clg_vlv_baseline": 42.0,
+        "sat": 14.0,
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yInControlOk", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "in_control_band_just_inside_alarms",
+      "description": "The other side of the same boundary: 13.99 against 13.0 is 0.99 K of tracking error, inside the band, and the same 23 points of excess now count. Together with the previous scenario this pins both sides of the evaluability gate.",
+      "inputs": {
+        "clg_vlv_cmd": 65.0,
+        "clg_vlv_baseline": 42.0,
+        "sat": 13.99,
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yInControlOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "loop_lost_control_is_no_eval",
+      "description": "NO_EVAL: the valve is pinned at 100% and supply air runs 4 K warm. This is a coil that has stopped meeting its setpoint, which is AHU-0033's finding and a louder one; the excess-over-baseline arithmetic means nothing once the loop is saturated, so this card stands down.",
+      "inputs": {
+        "clg_vlv_cmd": 100.0,
+        "clg_vlv_baseline": 42.0,
+        "sat": 17.0,
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yInControlOk", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "overcooling_side_of_the_band_is_no_eval",
+      "description": "NO_EVAL on the cold side, and the vector that pins the Abs: sat − sat_sp is −1.5 K, which is less than the 1.0 K band as a signed number and outside it as a magnitude. Without absErr the rule would read an overcooling loop as in control and count its open valve as fouling.",
+      "inputs": {
+        "clg_vlv_cmd": 65.0,
+        "clg_vlv_baseline": 42.0,
+        "sat": 11.5,
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yInControlOk", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "fan_off_signature_is_absent",
+      "description": "Why the fan gate is a host precondition rather than a conjunct in the graph: with the fan stopped the cooling valve is driven shut, so the excess is −45 points and the fault term is false on arithmetic alone. Nothing charges the persistence timer overnight, which is the failure mode that put the fan status inside AHU-0036's graph.",
+      "inputs": {
+        "clg_vlv_cmd": 0.0,
+        "clg_vlv_baseline": 45.0,
+        "sat": 24.0,
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yInControlOk", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "loop_excursion_restarts_persistence",
+      "description": "A single tick outside the control band at 1800 s — a load step the loop has to chase — drops the evaluability gate and restarts the hour. The alarm moves from 3600 s to 5460 s, one delay after the loop settles back inside the band.",
+      "inputs": {
+        "clg_vlv_cmd": 65.0,
+        "clg_vlv_baseline": 42.0,
+        "sat": [
+          { "t": 0, "value": 13.2 },
+          { "t": 1800, "value": 15.0 },
+          { "t": 1860, "value": 13.2 }
+        ],
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yInControlOk", "from_s": 0, "to_s": 1740, "equals": true },
+        { "output": "yInControlOk", "from_s": 1800, "to_s": 1800, "equals": false },
+        { "output": "yInControlOk", "from_s": 1860, "to_s": 7200, "equals": true },
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false },
+        { "output": "yFault", "from_s": 5460, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "excess_dip_restarts_persistence",
+      "description": "The same restart driven from the other conjunct: the valve backs off to 50% for one tick, putting the excess at 8 points, then returns to 65%. The creep gate cycles off and on and the alarm lands at 5460 s.",
+      "inputs": {
+        "clg_vlv_cmd": [
+          { "t": 0, "value": 65.0 },
+          { "t": 1800, "value": 50.0 },
+          { "t": 1860, "value": 65.0 }
+        ],
+        "clg_vlv_baseline": 42.0,
+        "sat": 13.2,
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5400, "equals": false },
+        { "output": "yFault", "from_s": 5460, "to_s": 7200, "equals": true },
+        { "output": "yInControlOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "coil_cleaned_mid_run_clears_the_alarm",
+      "description": "Recovery: the alarm asserts at 3600 s, then the coil is washed at 4800 s and the same duty is met at 44% — two points of excess. TrueDelay drops on the falling edge with no release delay, so the fault clears on the tick the valve backs off.",
+      "inputs": {
+        "clg_vlv_cmd": [
+          { "t": 0, "value": 65.0 },
+          { "t": 4800, "value": 44.0 }
+        ],
+        "clg_vlv_baseline": 42.0,
+        "sat": 13.2,
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 4740, "equals": true },
+        { "output": "yFault", "from_s": 4800, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "baseline_fitted_on_a_fouled_coil_stays_silent",
+      "description": "The point dictionary's known-clean caveat made executable. The valve is at 65% and the coil is fouled, but the host fitted the baseline from that same period and publishes 64%, so the excess is one point and the rule is quiet forever. Nothing in the graph can see this; the fit window is a commissioning obligation.",
+      "inputs": {
+        "clg_vlv_cmd": 65.0,
+        "clg_vlv_baseline": 64.0,
+        "sat": 13.2,
+        "sat_sp": 13.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yInControlOk", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    }
+  ]
+}
