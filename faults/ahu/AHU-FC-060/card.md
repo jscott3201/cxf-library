@@ -63,11 +63,9 @@ for, so every cubic metre of outdoor air drawn in is heated or cooled to no
 purpose. A damper left at its occupied minimum (typically 15–30%) through a
 winter night puts the full outdoor-to-return enthalpy difference on the coils
 for the entire run. Prevalence is about 10%, and the fix is usually a single
-line in the unoccupied sequence.
-
-This rule is the ventilation half of the after-hours pair. AHU-FC-052 asks
-whether the fan should be running at all; this one asks whether the fan is
-dragging in outdoor air while it runs.
+line in the unoccupied sequence. This is the ventilation half of the after-hours
+pair: AHU-FC-052 asks whether the fan should be running at all, this one asks
+whether it is dragging in outdoor air while it runs.
 
 ## Detection Logic
 
@@ -88,8 +86,9 @@ with a strict comparison, so a damper parked at exactly 5% (leakage band, or a
 minimum-position parameter never zeroed but within tolerance) does not alarm.
 `persist` requires the combination to hold for `alarm_delay`, which rides out
 the damper stroke at a scheduled occupied→unoccupied transition. Any fan stop,
-return to occupancy, or damper close resets the timer; a damper that reopens
-restarts the full 15 min.
+return to occupancy, or damper close resets the timer, and a damper that reopens
+restarts the full 15 min; `delayOnInit = true` holds the window across a
+controller restart.
 
 ## Possible Diagnoses
 
@@ -108,10 +107,8 @@ conditioning load on unnecessary outdoor air: `waste_kw = (oa_dmpr_cmd/100) ×
 design_oa_flow × cp × |OAT − RAT|`. With the damper open, 100% of ventilation
 energy during the unoccupied run is waste; measured against total off-hours
 energy the correction typically returns 3–10% (PNNL-25985 EEM-06, OA damper
-faults; PNNL RetuningOpps A11). Heating-dominant sensitivity: the winter
-night is when |OAT − RAT| is largest and the outdoor air must be heated from
-design conditions, while a mild or humid summer night is cheaper per unit of
-flow. Prevalence ~10%.
+faults; PNNL RetuningOpps A11). Heating-dominant: the winter night is when
+|OAT − RAT| is largest.
 
 ## Emissions Impact
 
@@ -124,25 +121,19 @@ Avoided-emissions basis: MOER.
 
 ## Deviations
 
-- **No grace period.** AHU-FC-052 grants `grace_period` (30 min) after the
-  occupied period ends before after-hours fan operation counts; this rule
-  grants none, matching the reference, and that difference is deliberate.
-  Legitimate unoccupied fan operation — setback, warmup, an authorized tenant
-  override, or FC-052's own grace window — should still run with the OA damper
-  closed. There is no state in which the fan is properly running unoccupied
-  and the damper is properly open, so the check alarms after `alarm_delay`
-  alone.
+- No grace period, matching the reference, where AHU-FC-052 grants 30 minutes.
+  The difference is deliberate: legitimate unoccupied fan operation — setback,
+  warmup, an authorized override — should still run with the OA damper closed,
+  so there is no state this rule needs to forgive.
 - The reference's logic uses a schedule-evaluation predicate over an occupancy
   schedule object; as in AHU-FC-052 we consume the host-evaluated boolean
   `occ_schedule` point, leaving time zone, calendar, and holiday
   interpretation to the host (see `points/ahu.points.json` notes on
   `occ_schedule`).
-- Severity 3 (warning), per the reference's chapter 9 card — the reference's
-  only severity statement for this fault (its §5.8.1 index carries no severity
-  column). This chapter's README previously mistranscribed the severity as 2;
-  corrected alongside this card. The ventilation-only waste is a fraction of
-  what FC-052 (whole-AHU) costs, and warning severity is the consistent rank
-  for it.
+- Severity 3 (warning), per the reference's chapter 9 card — its only severity
+  statement for this fault, since the §5.8.1 index carries no severity column.
+  This chapter's README previously mistranscribed it as 2, corrected alongside
+  this card.
 - The reference tags this fault for both AHU and RTU. This is the AHU-family
   instance; an RTU sibling would reuse the same block graph against the RTU
   point dictionary.
@@ -152,10 +143,9 @@ Avoided-emissions basis: MOER.
 
 ## Notes
 
-The remote fix is a sequence edit — zero the minimum OA position in the
-unoccupied mode and gate the economizer on occupancy — so it lands in Step 2
-of the after-hours-operation playbook. When this rule fires alongside
-AHU-FC-052 (the CLU-04 trigger), fix the schedule first: restoring the
-unoccupied period often closes the damper as a side effect and clears both.
-When it fires *without* FC-052, the schedule is right and the damper sequence
-or the actuator is wrong.
+The remote fix is a sequence edit — zero the minimum OA position in unoccupied
+mode and gate the economizer on occupancy — Step 2 of the after-hours-operation
+playbook. Firing alongside AHU-FC-052 (the CLU-04 trigger), fix the schedule
+first: restoring the unoccupied period often closes the damper as a side effect.
+Firing *without* FC-052, the schedule is right and the damper sequence or the
+actuator is wrong.

@@ -65,25 +65,17 @@ verified:
 
 ## Description
 
-The chilled water loop differential-pressure setpoint never moves, and every
-coil valve on the loop is throttling. The pumps are holding a design-day
-pressure against a building that is not asking for one, and the valves burn
-the difference across their seats. Pump power goes with the cube of pressure,
-so this is the cheapest large number in the plant: a 20% setpoint reduction is
-about half the pump energy, and the reset that achieves it is a sequence, not
-a purchase.
-
-The valve conjunct is what makes the finding safe to act on. A flat DP
-setpoint on its own is ambiguous — it is also what a correctly working reset
-looks like when it has been driven to its upper limit and pinned there by a
-coil that cannot get enough water. Requiring the most-open valve to sit below
-`high_valve_threshold` for the whole window says no coil is starving, so the
-setpoint is flat because nothing is moving it, not because everything is
-asking for more.
-
-Found in more than 30% of buildings (PNNL 151-building study), usually
-alongside its supply-temperature twin CHW-FC-051 and for the same reason:
-nobody commissioned the reset.
+The chilled water loop differential-pressure setpoint never moves while every
+coil valve on the loop is throttling. The pumps hold a design-day pressure
+against a building that is not asking for one, and the valves burn the
+difference across their seats. Pump power goes with the cube of pressure, so
+this is the cheapest large number in the plant: a 20% setpoint reduction is
+about half the pump energy, and the reset that achieves it is a sequence, not a
+purchase. The valve conjunct is what makes the finding safe to act on — a flat
+setpoint alone is also what a working reset looks like when a starving coil has
+pinned it at its upper limit. Found in more than 30% of buildings (PNNL
+151-building study), usually alongside its supply-temperature twin CHW-FC-051
+and for the same reason.
 
 ## Detection Logic
 
@@ -108,13 +100,13 @@ has stayed within `sp_flat_tolerance` of it continuously for a full window.
 
 The demand condition needs no baseline. The reference's
 `max(chw_valve_positions) < high_valve_threshold` over the window is exactly
-equivalent to "the most-open valve stays below the threshold continuously,"
-which is one `LessThreshold` plus a dwell `TrueDelay` on the host-aggregated
-maximum — an exact transformation of the reference test, not an approximation
-of it. Worst-case time to alarm from cold start:
-`evaluation_window + alarm_delay` — 4 days. A loop that goes quiet mid-run
-alarms `evaluation_window + alarm_delay` after the valves settle, which
-`valve_drops_mid_run` pins at exactly 388800 s for a 12 h startup transient.
+equivalent to "the most-open valve stays below the threshold continuously" —
+one `LessThreshold` plus a dwell, an exact transformation rather than an
+approximation. Both comparisons are strict, so a valve at exactly 90% is not low
+demand and a setpoint deviating exactly 7.5 kPa is not flat; both boundaries
+fall on the no-fault side. Every `TrueDelay` carries `delayOnInit = true`, and
+worst-case time to alarm from cold start is `evaluation_window + alarm_delay` —
+4 days.
 
 ## Possible Diagnoses
 
@@ -126,108 +118,82 @@ alarms `evaluation_window + alarm_delay` after the valves settle, which
 ## Energy Impact
 
 EXCESS_CONSUMPTION, HIGH confidence, PROXY_ESTIMATION (EEM-10, PNNL-25985).
-Savings 0.5–2% of site energy, climate-neutral, through the cubic pump law.
-Prevalence: >30% of buildings. Diagnosis 4 — a DP sensor at the wrong location
-— is the one that changes the economics: moving the sensor to the hydraulically
-most remote coil is a pipe-fitting job, not a desk job, and the reference lists
-it because a sensor at the pump discharge makes a correct reset impossible
-rather than merely absent.
+Savings 0.5–2% of site energy, climate-neutral, through the cubic pump law:
+`pump_waste_kw = chw_pump_kw × [1 − (1 − DP_reduction/100)³]`. Prevalence above
+30% of buildings. Diagnosis 4 changes the economics — moving a DP sensor to the
+hydraulically most remote coil is a pipe-fitting job rather than a desk job, and
+the reference lists it because a sensor at the pump discharge makes a correct
+reset impossible rather than merely absent.
 
 ## Emissions Impact
 
-Scope 2, PROXY_EMISSIONS, HIGH confidence; typical 300–3,000 kg CO₂e/yr
-(excess pump energy, cubic law). Avoided-emissions basis: MOER (marginal).
+Scope 2, PROXY_EMISSIONS, HIGH confidence; typical 300–3,000 kg CO₂e/yr of
+excess pump energy. Avoided-emissions basis: MOER (marginal).
 
 ## Deviations
 
 - **`chw_valve_positions` (vector) → host-derived `chw_valve_max` (scalar).**
-  The reference consumes every CHW coil valve position and takes the maximum;
-  library v1 has no vector boundary points, so the host aggregates and feeds
-  one scalar (`derived: true` in the point dictionary, which also records that
-  the underlying coil-valve points carry their semantic tags in the AHU and FCU
-  dictionaries). AHU-FC-058's `zone_dmpr_pos_max` is the precedent. The cost is
-  in `preconditions`: the graph cannot tell a maximum over ten coils from a
-  maximum over three.
-- **Windowed range → deviation from a sampled baseline** on the setpoint
-  chain, with `sp_flat_tolerance = min_expected_sp_range/2`, exactly as
-  AHU-FC-057/058. CDL has no windowed min/max block. Detection is equivalent
-  for a setpoint that moves and returns and slightly conservative for
-  monotonic drift inside one window. The valve chain is not an approximation:
-  `max over window < t` ⇔ `continuously below t`.
-- **`Reals.MovingAverage` rejected, and the tick band that follows.** The
-  engine implements it with a fixed 64-checkpoint ring, so it needs
-  `dt ≥ evaluation_window/63` — 4,114 s (1 h 9 min) at 3 days — before the
-  window stops silently dropping its oldest samples, and no BAS ticks that
-  slowly. AHU-FC-057 found this; this card inherits both the finding and the
-  sampler-and-dwell replacement, which has no lower bound on tick period. The
-  upper bound is what you need to see: a setpoint excursion or a valve
-  excursion shorter than one tick is invisible to the dwells, so trend at
-  5–15 min. These vectors run at 5 min.
+  Library v1 has no vector boundary points, so the host aggregates and feeds one
+  scalar (`derived: true` in the point dictionary). AHU-FC-058's
+  `zone_dmpr_pos_max` is the precedent, and the cost is in `preconditions`: the
+  graph cannot tell a maximum over ten coils from a maximum over three.
+- **Windowed range → deviation from a sampled baseline** on the setpoint chain,
+  with `sp_flat_tolerance = min_expected_sp_range/2`, exactly as AHU-FC-057/058;
+  CDL has no windowed min/max block. Detection is equivalent for a setpoint that
+  moves and returns and slightly conservative for monotonic drift inside one
+  window. The valve chain is not an approximation.
+- **`Reals.MovingAverage` rejected, and the tick band that follows.** Its fixed
+  64-checkpoint ring needs `dt ≥ evaluation_window/63` — 4,114 s at three days —
+  before the window stops silently dropping its oldest samples, and no BAS ticks
+  that slowly. The sampler-and-dwell replacement has no lower bound on tick
+  period; its upper bound is what you need to see, since an excursion shorter
+  than one tick is invisible to the dwells. Trend at 5–15 min.
 - **`high_valve_threshold` is adopted, not transcribed.** The chapter names it
-  in the equation but its Tunable Parameters line lists only
-  `evaluation_window = 3 days`, `min_expected_sp_range = 15 kPa`,
-  `AlarmDelay = 24 hrs`. The shipped 90% is deliberately permissive on the
-  fault side: the conjunct's only job is to exclude a loop genuinely pinned at
-  maximum demand, and a modulating two-way valve at 90% is within a hair of
-  having no authority left. It is a looser bar than AHU-FC-058's
-  chapter-supplied 70% damper analog, which means more findings on loops with
-  one moderately loaded coil; a site that wants the AHU-side margin should set
-  70–80 via `set_param`. Note the direction — raising this number makes the
-  rule fire more often, not less.
-- **Strict comparisons, and both measure-zero boundaries pinned.**
-  `Reals.LessThreshold` is `u < t`, so a valve sitting exactly at 90 % is not
-  low demand and a setpoint deviating exactly 7.5 kPa from its baseline is not
-  flat — both boundaries fall on the no-fault side. Equality is measure-zero
-  in continuous data but perfectly reachable in a BAS that scales valve
-  commands to whole percent, so the vectors pin both sides:
-  `valve_at_threshold` / `valve_just_below_threshold` and
-  `sp_at_flat_tolerance` / `sp_within_flat_tolerance`. The delay edges are
-  pinned to the tick: the alarm asserts at exactly 345,600 s from a cold start
-  and at exactly 388,800 s when the valves settle 12 h into the run.
+  in the equation but its tunables line lists only `evaluation_window`,
+  `min_expected_sp_range` and `AlarmDelay`. The shipped 90% is deliberately
+  permissive on the fault side — the conjunct's only job is to exclude a loop
+  genuinely pinned at maximum demand, and a modulating two-way valve at 90% is
+  within a hair of having no authority left. It is looser than AHU-FC-058's
+  chapter-supplied 70% damper analog, so a site wanting that margin should set
+  70–80. Note the direction: raising this number makes the rule fire more often.
 - **No evaluability output.** The valve test is a conjunct of the reference's
   fault condition, not an evaluability gate (contrast CHW-FC-051's
-  `yLoadVaried`, which mirrors the reference's own NO_EVAL semantics). An
-  output carrying `chw_valve_max < high_valve_threshold` would only echo one
-  boundary input through a threshold, so the rule ships `yFault` alone and the
-  staleness question stays where it belongs, in `preconditions`.
-- **`AlarmDelay` = 24 h implemented as `TrueDelay` on the fault
-  conjunction**; the evaluation window itself is enforced by the two dwells.
-  `delayOnInit = true` on every `TrueDelay` (startup conservatism per
-  AHU-FC-050).
+  `yLoadVaried`, which mirrors the reference's own NO_EVAL semantics). An output
+  carrying `chw_valve_max < high_valve_threshold` would only echo one boundary
+  input through a threshold, so the rule ships `yFault` alone and the staleness
+  question stays in `preconditions`.
+- **`AlarmDelay` = 24 h implemented as `TrueDelay` on the fault conjunction**;
+  the evaluation window itself is enforced by the two dwells. `delayOnInit =
+  true` on every `TrueDelay` (startup conservatism per AHU-FC-050).
 - **Transcription gaps in the source.** The chapter gives CHW-FC-052 no
-  Description paragraph, no Operating States line, and no test vectors; all
-  vectors here are constructed. Its Required Points line reads "DP_SP,
-  chw_valve_positions" — the canonical names come from
-  `points/chw.points.json`, which is where the binding contract lives. The
-  chapter's heading for the fault is "CHW loop differential pressure reset not
-  functioning"; `name` carries the shorter index spelling from
-  `faults/chw/README.md`, which owns names.
+  description paragraph, no operating-states line and no test vectors, so all
+  vectors here are constructed. Its Required Points line reads
+  "DP_SP, chw_valve_positions"; canonical names come from
+  `points/chw.points.json`. The chapter's heading is "CHW loop differential
+  pressure reset not functioning"; `name` carries the shorter index spelling
+  from `faults/chw/README.md`, which owns names.
 - **Blind spots.** The rule sees the setpoint, not the pressure: a loop whose
   setpoint resets correctly while the pumps fail to track it is a different
-  fault. Diagnosis 4 (DP sensor at the wrong location) is invisible here — a
-  badly placed sensor produces a plausible flat setpoint and this rule reports
-  it as a missing reset, which is why the playbook's first step is to check
-  where the sensor is before programming anything. Diagnosis 3 (valve feedback
-  not connected) is worse than invisible: it corrupts the input the rule leans
-  on, and a host that binds a defaulted-to-zero feedback will see a permanent
-  low maximum. And a loop whose pumps are off for the window holds both
-  signals flat, which the host's operating-state gate must suppress; the graph
-  has no way to know.
+  fault. Diagnosis 4 is invisible here — a badly placed sensor produces a
+  plausible flat setpoint this rule reports as a missing reset, which is why the
+  playbook's first step is to check where the sensor is. Diagnosis 3 is worse
+  than invisible: it corrupts the input the rule leans on, and a defaulted-to-zero
+  feedback reads as a permanent low maximum. And a loop whose pumps are off for
+  the window holds both signals flat, which only the host's operating-state gate
+  can suppress.
 
 ## Notes
 
 Fix path is the [missing-reset](../../../playbooks/missing-reset.md) playbook.
-Its worked examples are the AHU-side pair (SAT and DSP setpoint plots against
-zone demand); the plant-side procedure is the same shape one system upstream —
-plot `dp_sp` against the most-open coil valve over the window, confirm the DP
-sensor is at the hydraulically most remote coil, then program the reset. The
-index owner is extending the playbook's Applies-To to cover this rule and
-CHW-FC-051.
+Its worked examples are the AHU-side pair; the plant-side procedure is the same
+shape one system upstream — plot `dp_sp` against the most-open coil valve over
+the window, confirm the DP sensor is at the hydraulically most remote coil, then
+program the reset.
 
-`clusters` is deliberately empty: CLU-02 ("Missing Reset Strategy") is
-currently AHU-scoped and triggered by AHU-FC-057, and membership is
+`clusters` is deliberately empty: CLU-02 ("Missing Reset Strategy") is currently
+AHU-scoped and triggered by AHU-FC-057, and membership is
 `clusters/clusters.json`'s to declare. A plant failing both CHW-FC-051 and
 CHW-FC-052 has one root cause and should be dispatched as one visit. Expect
-CHW-FC-053 (low delta-T) nearby for the opposite reason: low delta-T drives
-flow up and can hold coil valves open, which is the condition that legitimately
+CHW-FC-053 (low delta-T) nearby for the opposite reason: low delta-T drives flow
+up and can hold coil valves open, which is the condition that legitimately
 suppresses this fault.

@@ -106,6 +106,19 @@ on the left, fault outputs as red pills on the right, elementary blocks as
 rounded rectangles labeled `instance` over `Class · key params`, signal flow
 left to right.
 
+**Card style (conciseness contract, adopted 2026-08-18; exemplar:
+`faults/ahu/AHU-FC-050/card.md`).** Cards are clear, concise, and outlay the
+conditions — they are specifications, not design journals. Targets:
+Description ≤ ~10 lines; Detection Logic prose ≤ ~15 lines beyond the
+equation and diagram (timing semantics, strictness, deployer must-knows
+only — no block-by-block narration of the diagram); Energy/Emissions ≤ ~8
+lines each; Notes ≤ ~8 lines or omitted. Deviations keeps EVERY engineering
+decision but each as one bullet of 2–5 lines (decision + one-sentence why +
+citation) — no alternatives-considered essays. Never narrate vector
+scenarios in the card (vectors.json is that record), except a sentence
+naming a deliberately-pinned engine behavior. Typical full card:
+~140–220 lines (statistical cards may run ~250).
+
 ## `rule.cxf.jsonld` contract
 
 Target dialect: the open-control engine's composite subset
