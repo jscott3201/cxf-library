@@ -239,6 +239,26 @@
       "provisional": true,
       "notes": "HOST-DERIVED virtual point, same convention and refrigerant caveat as evap_sat_temp.",
       "derived": true
+    },
+    {
+      "name": "comp_discharge_temp",
+      "description": "Compressor discharge line refrigerant temperature (surface-mount acceptable)",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Refrigerant",
+        "aspects": [
+          "discharge"
+        ]
+      },
+      "provisional": true,
+      "notes": "No Brick 1.4.4 class models refrigerant-line temperatures (suction_temp precedent; discharge-AIR classes are the wrong medium). Refrigerant side, hot-gas line between compressor and reversing valve. Consumed by the reversing-valve internal-leakage rule (HP-FC-055): NIST SP 1087 (2012) found leakage raises discharge and evaporating temperature while condensing temperature and subcooling fall, with superheat unaffected."
     }
   ]
 }

@@ -52,7 +52,39 @@ wall-to-wall "false positives" from OS#2-scoped rules correctly detecting
 mechanical cooling at night — the gating is part of the deployment
 contract, not a fudge.
 
-## First results (B2B OfficeMedium-4004, Albuquerque, July week, 3 loops)
+## Fleet results (sweep v3, 2026-08-18)
+
+**B2B OfficeMedium × 8 ASHRAE climate zones (1–8), one July + one January
+week, 3 VAV loops each — 787 host-gated scenario-replays. 17 of 20
+auto-eligible AHU rules fully clean.** Recorded on each swept card as a
+`validation:` frontmatter block (SCHEMA.md contract). Remaining failures
+are two explained findings, not noise:
+
+1. **AHU-FC-006/055 (31 events each, winter-dominant, all buildings)** —
+   DCV-driven excess outdoor air: `Controller:MechanicalVentilation` holds
+   ventilation flow while VAV turndown shrinks total flow, so OA fraction
+   legitimately exceeds any fixed minimum (~86% observed at −7.8 °C OAT —
+   freeze-stat territory in a real building). Conclusion: OA-fraction
+   rules need a DCV-aware host precondition.
+2. **AHU-FC-067 (8 events, winter only)** — the fleet publishes one
+   constant cooling-oriented SAT setpoint, so heating-season tracking
+   error is real per the rule's letter while the setpoint no longer means
+   the active mode's target. Per-mode setpoint binding is a deployment
+   requirement.
+
+Sweep-methodology lessons baked into the harness: OS smoothing is
+majority-of-window (an any-window smoother stretched compressor blips into
+OS misclassification); heating takes outright precedence in OS derivation;
+and an incomplete hand-maintained OS_MAP produced two spurious FP clusters
+before being caught — the map should eventually be parsed from each card's
+`operating_states` frontmatter (`OS#x` tokens) instead of hand-kept (TODO).
+
+The B2B baseline also runs its fans 24/7 (no setback) — an after-hours
+fault by construction; excluded from FPR claims, useful as a
+known-positive. Reset-family rules are likewise excluded (constant-setpoint
+baselines read "reset absent" by construction).
+
+## First results (single building, superseded by the fleet sweep above) (B2B OfficeMedium-4004, Albuquerque, July week, 3 loops)
 
 **16 of 18 auto-eligible AHU rules replayed clean across all three loops
 for the full week** — the envelope pair (002/003), SAT families

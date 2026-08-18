@@ -60,6 +60,14 @@ energy_impact:
 emissions:
   scope: "1+2"
   method: DIRECT_EMISSIONS
+validation:
+  - kind: simulation_fpr
+    harness: simharness/v1
+    date: 2026-08-18
+    fleet: "B2B OfficeMedium x8 ASHRAE climate zones (1-8), one July + one January week, 3 VAV loops each, host-gated (fan + OS)"
+    scenarios: 47
+    failures: 31
+    notes: "same DCV excess-OA events as AHU-FC-006 (see its note); winter-dominant"
 verified:
   engine_rev: e2ff2f8
   content_id: "cxf:fnv1a128:a9c58cb4c0e46fe131faed48a0c8efc0"

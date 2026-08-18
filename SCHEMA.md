@@ -105,6 +105,16 @@ on the left, fault outputs as red pills on the right, elementary blocks as
 rounded rectangles labeled `instance` over `Class · key params`, signal flow
 left to right.
 
+**`validation:` (optional frontmatter block, adopted 2026-08-18).** Records
+empirical validation runs against the card's rule. A list; each entry:
+`kind` (`simulation_fpr` | `simulation_tpr`), `harness` (e.g.
+`simharness/v1`), `date`, `fleet` (one-line description of buildings ×
+climates × period), `scenarios` (count), `failures` (count), optional
+`notes` (one line, e.g. the finding a failure represents). Results are
+facts about a specific fleet and gating configuration, not guarantees;
+the harness README documents mapping proxies and gating. Cards without
+the block simply have not been swept yet.
+
 **Card style (conciseness contract, adopted 2026-08-18; exemplar:
 `faults/ahu/AHU-FC-050/card.md`).** Cards are clear, concise, and outlay the
 conditions — they are specifications, not design journals. Targets:
