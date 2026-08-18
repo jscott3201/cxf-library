@@ -369,6 +369,66 @@
       "s223": null,
       "provisional": true,
       "notes": "Distinct from expected_mode: that point is what the mode SHOULD be given conditions (AHU-0029 compares actuators against it); this one is what the sequence says the state IS (AHU-0004 counts how often it changes). Hosts typically read it from the BAS mode/state enum or derive it per G36 Section 5.16.14. Value-level semantics are deliberately unspecified here since only transitions are consumed; a host must simply keep the encoding stable, as any re-mapping mid-stream registers as a spurious transition."
+    },
+    {
+      "name": "zone_dmpr_fraction_open",
+      "description": "Fraction of served zones whose damper command exceeds a high-open threshold",
+      "kind": "real",
+      "unit": "1",
+      "qudt_unit": "UNITLESS",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty, host-computed aggregate",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": null,
+        "medium": null,
+        "aspects": [
+          "derived"
+        ]
+      },
+      "derived": true,
+      "notes": "Aggregate point (zone_reheat_fraction precedent): the host computes the fraction of zones whose damper command exceeds the high-open counting threshold (PNNL-27338 §2.3 uses 90%; host configuration, not dictionary). Value range 0-1. Consumed by AHU-0035 as the cooling-starvation population signal."
+    },
+    {
+      "name": "zone_dmpr_high_avg",
+      "description": "Average damper command over the top half of served zones (dampers sorted descending)",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty, host-computed aggregate",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
+        "medium": null,
+        "aspects": [
+          "derived"
+        ]
+      },
+      "derived": true,
+      "notes": "Aggregate point: sort every served zone's damper command, average the top half. PNNL-27338 §2.6's population-percentile signal — TOGETHER with zone_dmpr_low_avg it distinguishes a starved trunk (both halves elevated) from a few busy zones (top only). Consumed by AHU-0036; the host documents the zone population like zone_reheat_fraction."
+    },
+    {
+      "name": "zone_dmpr_low_avg",
+      "description": "Average damper command over the bottom half of served zones (dampers sorted descending)",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty, host-computed aggregate",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
+        "medium": null,
+        "aspects": [
+          "derived"
+        ]
+      },
+      "derived": true,
+      "notes": "Aggregate point, the bottom-half mate of zone_dmpr_high_avg (one sorted pass yields both). Consumed by AHU-0036."
     }
   ]
 }

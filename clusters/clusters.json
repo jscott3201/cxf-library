@@ -26,7 +26,8 @@
       "members": [
         "AHU-0024",
         "AHU-0019",
-        "AHU-0031"
+        "AHU-0031",
+        "AHU-0035"
       ],
       "playbook": "missing-reset",
       "prevalence": "74% of buildings (PNNL 151-building study)",

@@ -1,0 +1,122 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": { "step_s": 60, "horizon_s": 3600 },
+  "scenarios": [
+    {
+      "name": "damper_at_minimum_unfavorable",
+      "description": "Healthy: OAT 28 °C against RAT 22 °C leaves nothing to economize with, and the damper sits at its 20% minimum — the correct response",
+      "inputs": { "oat": 28.0, "rat": 22.0, "oa_dmpr_cmd": 20.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_above_minimum_unfavorable",
+      "description": "The fault: same unfavorable outdoor condition, damper commanded to 60% — twice the 30% excess threshold; alarms after alarm_delay (1800 s)",
+      "inputs": { "oat": 28.0, "rat": 22.0, "oa_dmpr_cmd": 60.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "favorable_for_economizing",
+      "description": "Econ gate off on its own: OAT 12 °C is 10 °C below return air, so a wide-open damper is free cooling doing its job and no damper position is excessive",
+      "inputs": { "oat": 12.0, "rat": 22.0, "oa_dmpr_cmd": 95.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_exactly_at_threshold",
+      "description": "Edge case: damper parked exactly on min_damper_sp × excess_damper_multiplier (20 × 1.5 = 30%) — the strict `>` keeps it out of the alarm",
+      "inputs": { "oat": 28.0, "rat": 22.0, "oa_dmpr_cmd": 30.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_just_above_threshold",
+      "description": "Edge case, other side: 30.1% clears the threshold by a tenth of a point and the alarm follows at 1800 s",
+      "inputs": { "oat": 28.0, "rat": 22.0, "oa_dmpr_cmd": 30.1 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "deadband_exactly_at_threshold",
+      "description": "Edge case: rat − oat sits exactly on temp_deadband (22.0 − 21.0 = 1.0 °C) with the damper wide open — the strict `<` leaves the outdoor condition counted as still favorable, so no alarm",
+      "inputs": { "oat": 21.0, "rat": 22.0, "oa_dmpr_cmd": 95.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "deadband_just_inside_threshold",
+      "description": "Edge case, other side: rat − oat = 0.9 °C closes the deadband, the outdoor condition counts as unfavorable, and the wide-open damper alarms at 1800 s",
+      "inputs": { "oat": 21.1, "rat": 22.0, "oa_dmpr_cmd": 95.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "close_temperatures_where_the_ratio_is_blind",
+      "description": "The complementarity case: OAT 23.0 °C against RAT 22.5 °C is a 0.5 °C spread, far inside the 6 °C evaluability gate that puts AHU-0021 and AHU-0030 into NO_EVAL — this rule still reads a 70% damper as excess and alarms at 1800 s",
+      "inputs": { "oat": 23.0, "rat": 22.5, "oa_dmpr_cmd": 70.0 },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yFault", "from_s": 1860, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "changeover_arrives_midrun",
+      "description": "Gate edge: the damper is open at 95% throughout, but outdoor air only rises from 12 °C to 28 °C at t=600 — persistence starts from the changeover, not from t=0, so the alarm lands at 2400 s",
+      "inputs": {
+        "oat": [
+          { "t": 0, "value": 12.0 },
+          { "t": 600, "value": 28.0 }
+        ],
+        "rat": 22.0,
+        "oa_dmpr_cmd": 95.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2340, "equals": false },
+        { "output": "yFault", "from_s": 2460, "to_s": 3600, "equals": true }
+      ]
+    },
+    {
+      "name": "damper_closes_before_delay",
+      "description": "Transient: the damper drives from 60% back to its 20% minimum at t=1200, clearing the condition short of alarm_delay, so no alarm",
+      "inputs": {
+        "oat": 28.0,
+        "rat": 22.0,
+        "oa_dmpr_cmd": [
+          { "t": 0, "value": 60.0 },
+          { "t": 1200, "value": 20.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3600, "equals": false }
+      ]
+    },
+    {
+      "name": "damper_cycle_resets_persistence",
+      "description": "Transient: the damper closes at t=900 and reopens at t=1200 under an unbroken unfavorable outdoor condition — persistence restarts from the reopen, so the alarm lands at 3000 s, not 1800 s",
+      "inputs": {
+        "oat": 28.0,
+        "rat": 22.0,
+        "oa_dmpr_cmd": [
+          { "t": 0, "value": 60.0 },
+          { "t": 900, "value": 20.0 },
+          { "t": 1200, "value": 60.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2940, "equals": false },
+        { "output": "yFault", "from_s": 3060, "to_s": 3600, "equals": true }
+      ]
+    }
+  ]
+}

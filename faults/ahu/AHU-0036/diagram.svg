@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 395" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <g>
+    <rect x="12" y="60" width="200" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="112" y="79" text-anchor="middle" fill="#1e3a8a">zone_dmpr_high_avg</text>
+    <rect x="12" y="180" width="200" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="112" y="199" text-anchor="middle" fill="#1e3a8a">zone_dmpr_low_avg</text>
+    <rect x="12" y="300" width="200" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="112" y="319" text-anchor="middle" fill="#1e3a8a">sf_status</text>
+  </g>
+
+  <!-- population thresholds -->
+  <rect x="270" y="46" width="250" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="395" y="68" text-anchor="middle" fill="#24292f" font-weight="bold">highOpen</text>
+  <text x="395" y="86" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 90 %</text>
+
+  <rect x="270" y="166" width="250" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="395" y="188" text-anchor="middle" fill="#24292f" font-weight="bold">lowOpen</text>
+  <text x="395" y="206" text-anchor="middle" fill="#57606a" font-size="11">Reals.GreaterThreshold · t = 25 %</text>
+
+  <!-- conjunctions -->
+  <rect x="590" y="106" width="130" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="655" y="128" text-anchor="middle" fill="#24292f" font-weight="bold">starved</text>
+  <text x="655" y="146" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <rect x="790" y="166" width="130" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="855" y="188" text-anchor="middle" fill="#24292f" font-weight="bold">gated</text>
+  <text x="855" y="206" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+
+  <!-- persistence -->
+  <rect x="990" y="166" width="190" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1085" y="188" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1085" y="206" text-anchor="middle" fill="#57606a" font-size="11">Logical.TrueDelay · 900 s</text>
+
+  <!-- boundary output -->
+  <rect x="1250" y="180" width="80" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1290" y="199" text-anchor="middle" fill="#7f1d1d">yFault</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 212 75 H 266"/>
+    <path d="M 212 195 H 266"/>
+    <path d="M 520 75 H 560 V 120 H 586"/>
+    <path d="M 520 195 H 560 V 150 H 586"/>
+    <path d="M 720 135 H 760 V 180 H 786"/>
+    <path d="M 212 315 H 760 V 210 H 786"/>
+    <path d="M 920 195 H 986"/>
+    <path d="M 1180 195 H 1246"/>
+  </g>
+
+  <!-- port labels -->
+  <g fill="#7d8590" font-size="9">
+    <text x="594" y="120">u1</text>
+    <text x="594" y="150">u2</text>
+    <text x="794" y="180">u1</text>
+    <text x="794" y="210">u2</text>
+  </g>
+
+  <!-- signal type hints -->
+  <g fill="#7d8590" font-size="10">
+    <text x="218" y="54">Real</text>
+    <text x="218" y="294">Bool</text>
+    <text x="526" y="68">Bool</text>
+    <text x="926" y="188">Bool</text>
+  </g>
+
+  <text x="270" y="356" fill="#7d8590" font-size="11">Both halves come from one host-side sort (points contract): a stuck-open damper lands in the top half and cannot lift the bottom-half average.</text>
+  <text x="270" y="374" fill="#7d8590" font-size="11">Both comparisons are strict — a half exactly on its threshold reads healthy. The fan gate sits ahead of the delay, so a fan stop resets persistence.</text>
+</svg>
