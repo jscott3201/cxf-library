@@ -19,8 +19,19 @@ paraphrase-and-cite only.
 | HW-FC-050 | Boiler short-cycling | 2 | rule | **verified** |
 | HW-FC-051 | Boiler efficiency degradation | 3 | statistical | **verified** |
 | HW-FC-052 | Boiler/HW pump on above OAT lockout | 3 | rule | **verified** |
+| HW-FC-053 | HW loop low delta-T | 3 | rule | **verified** |
+| HW-FC-054 | HW loop DP too high (pump speed vs mild OAT) | 3 | rule | **verified** |
+| HW-FC-055 | HW loop DP reset not functioning | 3 | statistical | **verified** |
+| HW-FC-056 | HW supply temperature too high at low load | 3 | rule | **verified** |
+| HW-FC-057 | HWS temperature reset not functioning | 3 | statistical | **verified** |
 
-Severity and method per the reference's ch.14 cards.
+Severity and method for FC-050–052 per the reference's ch.14 cards.
+FC-053–057 are **library-authored** rules grounded in PNNL-27338's hot-water
+distribution measure-identification algorithms (§4; deep-read memo in
+`_research/local/deep-reads/pnnl-27338-rcx-measures.md`) — the reference's
+ch.14 specifies only three rules, so these five extend the family under the
+same numbering with explicit non-reference sourcing; severities are
+library-assigned by analogy to the AHU/CHW siblings.
 
 ## Relationships
 

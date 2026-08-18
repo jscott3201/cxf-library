@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | HW-FC-050 (short-cycling), HW-FC-051 (efficiency), HW-FC-052 (OAT lockout) |
+| **Applies to** | HW-FC-050 (short-cycling), HW-FC-051 (efficiency), HW-FC-052 (OAT lockout); HW-FC-053, HW-FC-054, HW-FC-055, HW-FC-056, HW-FC-057 — library-authored loop-side additions, the reference's row names only its own three rules |
 | **Fix complexity** | Remote fix (lockout) · Remote + on-site (cycling) · On-site (efficiency) |
 | **Typical time** | 15 min (lockout) / 2–4 h (cycling) / 4–8 h (efficiency) |
 | **Typical cost** | $0 lockout / $0–$500 cycling / $500–$3,000 efficiency |

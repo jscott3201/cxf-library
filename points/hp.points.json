@@ -23,7 +23,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "Heat pump point dictionary. Air-side and compressor points carry from the AHU/RTU dictionaries; HP-specific points grep-verified against Brick 1.4.4 where a class exists (Thermal_Power_Sensor, Active_Power_Sensor, Mode_Command) and provisional where none does (defrost_status). Owning equipment: the packaged heat pump unit.",
+  "notes": "Heat pump point dictionary. Air-side and compressor points carry from the AHU/RTU dictionaries; HP-specific points grep-verified against Brick 1.4.4 where a class exists (Thermal_Power_Sensor, Active_Power_Sensor, Mode_Command) and provisional where none does (defrost_status). Owning equipment: the packaged heat pump unit. EXPANSION 2026-08-17: refrigerant-side points added for the future charge-fault family (NIST SP 1087 grounding); the two saturation temperatures are HOST-DERIVED virtual points per SCHEMA.md's virtual-point convention.",
   "points": [
     {
       "name": "thermal_power",
@@ -155,6 +155,90 @@
       },
       "provisional": true,
       "notes": "brick:Mode_Command grep-verified in Brick 1.4.4. The 1/2 encoding is this library's convention (expected_mode precedent); HP-FC-052 exposes both codes as rule params so hosts with their own enum rebind without editing the graph."
+    },
+    {
+      "name": "suction_temp",
+      "description": "Compressor suction line refrigerant temperature (surface-mount acceptable)",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Refrigerant",
+        "aspects": [
+          "suction"
+        ]
+      },
+      "provisional": true,
+      "notes": "No Brick 1.4.4 suction-temperature class (only Refrigerant_Level_Sensor exists refrigerant-side); null mapping per defrost_status precedent. Superheat = suction_temp - evap_sat_temp."
+    },
+    {
+      "name": "liquid_temp",
+      "description": "Liquid line refrigerant temperature (surface-mount acceptable)",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Refrigerant",
+        "aspects": [
+          "liquid-line"
+        ]
+      },
+      "provisional": true,
+      "notes": "No Brick 1.4.4 class; null mapping. Subcooling = cond_sat_temp - liquid_temp."
+    },
+    {
+      "name": "evap_sat_temp",
+      "description": "Evaporating saturation temperature (HOST-DERIVED: suction pressure via refrigerant P-T lookup, or coil-surface proxy)",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Refrigerant",
+        "aspects": [
+          "evaporating",
+          "derived"
+        ]
+      },
+      "provisional": true,
+      "notes": "HOST-DERIVED virtual point (zone_reheat_fraction/chw_valve_max precedent): the P-T relationship is refrigerant-specific and lives at the host, never in a rule graph. Derivation MUST match the site's refrigerant.",
+      "derived": true
+    },
+    {
+      "name": "cond_sat_temp",
+      "description": "Condensing saturation temperature (HOST-DERIVED: discharge/liquid pressure via refrigerant P-T lookup)",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": null,
+      "s223": {
+        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Refrigerant",
+        "aspects": [
+          "condensing",
+          "derived"
+        ]
+      },
+      "provisional": true,
+      "notes": "HOST-DERIVED virtual point, same convention and refrigerant caveat as evap_sat_temp.",
+      "derived": true
     }
   ]
 }

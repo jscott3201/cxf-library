@@ -1,0 +1,1236 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 300,
+    "horizon_s": 432000
+  },
+  "scenarios": [
+    {
+      "name": "reset_working",
+      "description": "DP setpoint swings 50 kPa every 6 h while the pumps modulate 35-75%; the flatness dwell never completes and nothing alarms",
+      "inputs": {
+        "hw_dp_sp": [
+          {
+            "t": 0,
+            "value": 150.0
+          },
+          {
+            "t": 21600,
+            "value": 100.0
+          },
+          {
+            "t": 43200,
+            "value": 150.0
+          },
+          {
+            "t": 64800,
+            "value": 100.0
+          },
+          {
+            "t": 86400,
+            "value": 150.0
+          },
+          {
+            "t": 108000,
+            "value": 100.0
+          },
+          {
+            "t": 129600,
+            "value": 150.0
+          },
+          {
+            "t": 151200,
+            "value": 100.0
+          },
+          {
+            "t": 172800,
+            "value": 150.0
+          },
+          {
+            "t": 194400,
+            "value": 100.0
+          },
+          {
+            "t": 216000,
+            "value": 150.0
+          },
+          {
+            "t": 237600,
+            "value": 100.0
+          },
+          {
+            "t": 259200,
+            "value": 150.0
+          },
+          {
+            "t": 280800,
+            "value": 100.0
+          },
+          {
+            "t": 302400,
+            "value": 150.0
+          },
+          {
+            "t": 324000,
+            "value": 100.0
+          },
+          {
+            "t": 345600,
+            "value": 150.0
+          },
+          {
+            "t": 367200,
+            "value": 100.0
+          },
+          {
+            "t": 388800,
+            "value": 150.0
+          },
+          {
+            "t": 410400,
+            "value": 100.0
+          },
+          {
+            "t": 432000,
+            "value": 150.0
+          }
+        ],
+        "hw_pump_vfd_speed": [
+          {
+            "t": 0,
+            "value": 35.0
+          },
+          {
+            "t": 21600,
+            "value": 75.0
+          },
+          {
+            "t": 43200,
+            "value": 35.0
+          },
+          {
+            "t": 64800,
+            "value": 75.0
+          },
+          {
+            "t": 86400,
+            "value": 35.0
+          },
+          {
+            "t": 108000,
+            "value": 75.0
+          },
+          {
+            "t": 129600,
+            "value": 35.0
+          },
+          {
+            "t": 151200,
+            "value": 75.0
+          },
+          {
+            "t": 172800,
+            "value": 35.0
+          },
+          {
+            "t": 194400,
+            "value": 75.0
+          },
+          {
+            "t": 216000,
+            "value": 35.0
+          },
+          {
+            "t": 237600,
+            "value": 75.0
+          },
+          {
+            "t": 259200,
+            "value": 35.0
+          },
+          {
+            "t": 280800,
+            "value": 75.0
+          },
+          {
+            "t": 302400,
+            "value": 35.0
+          },
+          {
+            "t": 324000,
+            "value": 75.0
+          },
+          {
+            "t": 345600,
+            "value": 35.0
+          },
+          {
+            "t": 367200,
+            "value": 75.0
+          },
+          {
+            "t": 388800,
+            "value": 35.0
+          },
+          {
+            "t": 410400,
+            "value": 75.0
+          },
+          {
+            "t": 432000,
+            "value": 35.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": false
+        },
+        {
+          "output": "yPumpSpeedVaried",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "fixed_setpoint",
+      "description": "DP setpoint pinned at 150 kPa while pump speed swings 35-75%; fault asserts at exactly evaluation_window (3 d) + alarm_delay (24 h) = 345600 s, pinned from both sides",
+      "inputs": {
+        "hw_dp_sp": 150.0,
+        "hw_pump_vfd_speed": [
+          {
+            "t": 0,
+            "value": 35.0
+          },
+          {
+            "t": 21600,
+            "value": 75.0
+          },
+          {
+            "t": 43200,
+            "value": 35.0
+          },
+          {
+            "t": 64800,
+            "value": 75.0
+          },
+          {
+            "t": 86400,
+            "value": 35.0
+          },
+          {
+            "t": 108000,
+            "value": 75.0
+          },
+          {
+            "t": 129600,
+            "value": 35.0
+          },
+          {
+            "t": 151200,
+            "value": 75.0
+          },
+          {
+            "t": 172800,
+            "value": 35.0
+          },
+          {
+            "t": 194400,
+            "value": 75.0
+          },
+          {
+            "t": 216000,
+            "value": 35.0
+          },
+          {
+            "t": 237600,
+            "value": 75.0
+          },
+          {
+            "t": 259200,
+            "value": 35.0
+          },
+          {
+            "t": 280800,
+            "value": 75.0
+          },
+          {
+            "t": 302400,
+            "value": 35.0
+          },
+          {
+            "t": 324000,
+            "value": 75.0
+          },
+          {
+            "t": 345600,
+            "value": 35.0
+          },
+          {
+            "t": 367200,
+            "value": 75.0
+          },
+          {
+            "t": 388800,
+            "value": 35.0
+          },
+          {
+            "t": 410400,
+            "value": 75.0
+          },
+          {
+            "t": 432000,
+            "value": 35.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 345300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 345600,
+          "to_s": 432000,
+          "equals": true
+        },
+        {
+          "output": "yPumpSpeedVaried",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "flat_pump_speed_no_eval",
+      "description": "NO_EVAL: setpoint flat but the pumps hold one speed all week; yPumpSpeedVaried drops at exactly evaluation_window and yFault never fires",
+      "inputs": {
+        "hw_dp_sp": 150.0,
+        "hw_pump_vfd_speed": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": false
+        },
+        {
+          "output": "yPumpSpeedVaried",
+          "from_s": 0,
+          "to_s": 258900,
+          "equals": true
+        },
+        {
+          "output": "yPumpSpeedVaried",
+          "from_s": 259200,
+          "to_s": 432000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "sp_at_flat_tolerance",
+      "description": "Setpoint deviates from its baseline by exactly sp_flat_tolerance (8.625 kPa): strict < puts that on the not-flat side, so no fault",
+      "inputs": {
+        "hw_dp_sp": [
+          {
+            "t": 0,
+            "value": 150.0
+          },
+          {
+            "t": 21600,
+            "value": 158.625
+          },
+          {
+            "t": 43200,
+            "value": 150.0
+          },
+          {
+            "t": 64800,
+            "value": 158.625
+          },
+          {
+            "t": 86400,
+            "value": 150.0
+          },
+          {
+            "t": 108000,
+            "value": 158.625
+          },
+          {
+            "t": 129600,
+            "value": 150.0
+          },
+          {
+            "t": 151200,
+            "value": 158.625
+          },
+          {
+            "t": 172800,
+            "value": 150.0
+          },
+          {
+            "t": 194400,
+            "value": 158.625
+          },
+          {
+            "t": 216000,
+            "value": 150.0
+          },
+          {
+            "t": 237600,
+            "value": 158.625
+          },
+          {
+            "t": 259200,
+            "value": 150.0
+          },
+          {
+            "t": 280800,
+            "value": 158.625
+          },
+          {
+            "t": 302400,
+            "value": 150.0
+          },
+          {
+            "t": 324000,
+            "value": 158.625
+          },
+          {
+            "t": 345600,
+            "value": 150.0
+          },
+          {
+            "t": 367200,
+            "value": 158.625
+          },
+          {
+            "t": 388800,
+            "value": 150.0
+          },
+          {
+            "t": 410400,
+            "value": 158.625
+          },
+          {
+            "t": 432000,
+            "value": 150.0
+          }
+        ],
+        "hw_pump_vfd_speed": [
+          {
+            "t": 0,
+            "value": 35.0
+          },
+          {
+            "t": 21600,
+            "value": 75.0
+          },
+          {
+            "t": 43200,
+            "value": 35.0
+          },
+          {
+            "t": 64800,
+            "value": 75.0
+          },
+          {
+            "t": 86400,
+            "value": 35.0
+          },
+          {
+            "t": 108000,
+            "value": 75.0
+          },
+          {
+            "t": 129600,
+            "value": 35.0
+          },
+          {
+            "t": 151200,
+            "value": 75.0
+          },
+          {
+            "t": 172800,
+            "value": 35.0
+          },
+          {
+            "t": 194400,
+            "value": 75.0
+          },
+          {
+            "t": 216000,
+            "value": 35.0
+          },
+          {
+            "t": 237600,
+            "value": 75.0
+          },
+          {
+            "t": 259200,
+            "value": 35.0
+          },
+          {
+            "t": 280800,
+            "value": 75.0
+          },
+          {
+            "t": 302400,
+            "value": 35.0
+          },
+          {
+            "t": 324000,
+            "value": 75.0
+          },
+          {
+            "t": 345600,
+            "value": 35.0
+          },
+          {
+            "t": 367200,
+            "value": 75.0
+          },
+          {
+            "t": 388800,
+            "value": 35.0
+          },
+          {
+            "t": 410400,
+            "value": 75.0
+          },
+          {
+            "t": 432000,
+            "value": 35.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": false
+        },
+        {
+          "output": "yPumpSpeedVaried",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "sp_within_flat_tolerance",
+      "description": "Setpoint jitter of 8.5 kPa stays inside sp_flat_tolerance, so it still counts as flat; fault at 345600 s",
+      "inputs": {
+        "hw_dp_sp": [
+          {
+            "t": 0,
+            "value": 150.0
+          },
+          {
+            "t": 21600,
+            "value": 158.5
+          },
+          {
+            "t": 43200,
+            "value": 150.0
+          },
+          {
+            "t": 64800,
+            "value": 158.5
+          },
+          {
+            "t": 86400,
+            "value": 150.0
+          },
+          {
+            "t": 108000,
+            "value": 158.5
+          },
+          {
+            "t": 129600,
+            "value": 150.0
+          },
+          {
+            "t": 151200,
+            "value": 158.5
+          },
+          {
+            "t": 172800,
+            "value": 150.0
+          },
+          {
+            "t": 194400,
+            "value": 158.5
+          },
+          {
+            "t": 216000,
+            "value": 150.0
+          },
+          {
+            "t": 237600,
+            "value": 158.5
+          },
+          {
+            "t": 259200,
+            "value": 150.0
+          },
+          {
+            "t": 280800,
+            "value": 158.5
+          },
+          {
+            "t": 302400,
+            "value": 150.0
+          },
+          {
+            "t": 324000,
+            "value": 158.5
+          },
+          {
+            "t": 345600,
+            "value": 150.0
+          },
+          {
+            "t": 367200,
+            "value": 158.5
+          },
+          {
+            "t": 388800,
+            "value": 150.0
+          },
+          {
+            "t": 410400,
+            "value": 158.5
+          },
+          {
+            "t": 432000,
+            "value": 150.0
+          }
+        ],
+        "hw_pump_vfd_speed": [
+          {
+            "t": 0,
+            "value": 35.0
+          },
+          {
+            "t": 21600,
+            "value": 75.0
+          },
+          {
+            "t": 43200,
+            "value": 35.0
+          },
+          {
+            "t": 64800,
+            "value": 75.0
+          },
+          {
+            "t": 86400,
+            "value": 35.0
+          },
+          {
+            "t": 108000,
+            "value": 75.0
+          },
+          {
+            "t": 129600,
+            "value": 35.0
+          },
+          {
+            "t": 151200,
+            "value": 75.0
+          },
+          {
+            "t": 172800,
+            "value": 35.0
+          },
+          {
+            "t": 194400,
+            "value": 75.0
+          },
+          {
+            "t": 216000,
+            "value": 35.0
+          },
+          {
+            "t": 237600,
+            "value": 75.0
+          },
+          {
+            "t": 259200,
+            "value": 35.0
+          },
+          {
+            "t": 280800,
+            "value": 75.0
+          },
+          {
+            "t": 302400,
+            "value": 35.0
+          },
+          {
+            "t": 324000,
+            "value": 75.0
+          },
+          {
+            "t": 345600,
+            "value": 35.0
+          },
+          {
+            "t": 367200,
+            "value": 75.0
+          },
+          {
+            "t": 388800,
+            "value": 35.0
+          },
+          {
+            "t": 410400,
+            "value": 75.0
+          },
+          {
+            "t": 432000,
+            "value": 35.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 345300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 345600,
+          "to_s": 432000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "pump_speed_at_variation_tolerance",
+      "description": "Pump speed deviates from its baseline by exactly pump_variation_tolerance (10%): strict < makes that varied, so the rule stays evaluable and the flat setpoint alarms",
+      "inputs": {
+        "hw_dp_sp": 150.0,
+        "hw_pump_vfd_speed": [
+          {
+            "t": 0,
+            "value": 50.0
+          },
+          {
+            "t": 21600,
+            "value": 60.0
+          },
+          {
+            "t": 43200,
+            "value": 50.0
+          },
+          {
+            "t": 64800,
+            "value": 60.0
+          },
+          {
+            "t": 86400,
+            "value": 50.0
+          },
+          {
+            "t": 108000,
+            "value": 60.0
+          },
+          {
+            "t": 129600,
+            "value": 50.0
+          },
+          {
+            "t": 151200,
+            "value": 60.0
+          },
+          {
+            "t": 172800,
+            "value": 50.0
+          },
+          {
+            "t": 194400,
+            "value": 60.0
+          },
+          {
+            "t": 216000,
+            "value": 50.0
+          },
+          {
+            "t": 237600,
+            "value": 60.0
+          },
+          {
+            "t": 259200,
+            "value": 50.0
+          },
+          {
+            "t": 280800,
+            "value": 60.0
+          },
+          {
+            "t": 302400,
+            "value": 50.0
+          },
+          {
+            "t": 324000,
+            "value": 60.0
+          },
+          {
+            "t": 345600,
+            "value": 50.0
+          },
+          {
+            "t": 367200,
+            "value": 60.0
+          },
+          {
+            "t": 388800,
+            "value": 50.0
+          },
+          {
+            "t": 410400,
+            "value": 60.0
+          },
+          {
+            "t": 432000,
+            "value": 50.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yPumpSpeedVaried",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 345300,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 345600,
+          "to_s": 432000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "pump_speed_within_variation_tolerance",
+      "description": "Pump speed moves only 9.5 points about its baseline, inside pump_variation_tolerance: NO_EVAL at exactly evaluation_window, and the simultaneous setpoint-flat edge cannot race it into a fault",
+      "inputs": {
+        "hw_dp_sp": 150.0,
+        "hw_pump_vfd_speed": [
+          {
+            "t": 0,
+            "value": 50.0
+          },
+          {
+            "t": 21600,
+            "value": 59.5
+          },
+          {
+            "t": 43200,
+            "value": 50.0
+          },
+          {
+            "t": 64800,
+            "value": 59.5
+          },
+          {
+            "t": 86400,
+            "value": 50.0
+          },
+          {
+            "t": 108000,
+            "value": 59.5
+          },
+          {
+            "t": 129600,
+            "value": 50.0
+          },
+          {
+            "t": 151200,
+            "value": 59.5
+          },
+          {
+            "t": 172800,
+            "value": 50.0
+          },
+          {
+            "t": 194400,
+            "value": 59.5
+          },
+          {
+            "t": 216000,
+            "value": 50.0
+          },
+          {
+            "t": 237600,
+            "value": 59.5
+          },
+          {
+            "t": 259200,
+            "value": 50.0
+          },
+          {
+            "t": 280800,
+            "value": 59.5
+          },
+          {
+            "t": 302400,
+            "value": 50.0
+          },
+          {
+            "t": 324000,
+            "value": 59.5
+          },
+          {
+            "t": 345600,
+            "value": 50.0
+          },
+          {
+            "t": 367200,
+            "value": 59.5
+          },
+          {
+            "t": 388800,
+            "value": 50.0
+          },
+          {
+            "t": 410400,
+            "value": 59.5
+          },
+          {
+            "t": 432000,
+            "value": 50.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yPumpSpeedVaried",
+          "from_s": 0,
+          "to_s": 258900,
+          "equals": true
+        },
+        {
+          "output": "yPumpSpeedVaried",
+          "from_s": 259200,
+          "to_s": 432000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "sp_goes_flat_mid_run",
+      "description": "Reset stops working 12 h into the run: the flatness dwell starts at 43200 s, so the alarm lands at exactly 43200 + 259200 + 86400 = 388800 s",
+      "inputs": {
+        "hw_dp_sp": [
+          {
+            "t": 0,
+            "value": 150.0
+          },
+          {
+            "t": 21600,
+            "value": 100.0
+          },
+          {
+            "t": 43200,
+            "value": 150.0
+          }
+        ],
+        "hw_pump_vfd_speed": [
+          {
+            "t": 0,
+            "value": 35.0
+          },
+          {
+            "t": 21600,
+            "value": 75.0
+          },
+          {
+            "t": 43200,
+            "value": 35.0
+          },
+          {
+            "t": 64800,
+            "value": 75.0
+          },
+          {
+            "t": 86400,
+            "value": 35.0
+          },
+          {
+            "t": 108000,
+            "value": 75.0
+          },
+          {
+            "t": 129600,
+            "value": 35.0
+          },
+          {
+            "t": 151200,
+            "value": 75.0
+          },
+          {
+            "t": 172800,
+            "value": 35.0
+          },
+          {
+            "t": 194400,
+            "value": 75.0
+          },
+          {
+            "t": 216000,
+            "value": 35.0
+          },
+          {
+            "t": 237600,
+            "value": 75.0
+          },
+          {
+            "t": 259200,
+            "value": 35.0
+          },
+          {
+            "t": 280800,
+            "value": 75.0
+          },
+          {
+            "t": 302400,
+            "value": 35.0
+          },
+          {
+            "t": 324000,
+            "value": 75.0
+          },
+          {
+            "t": 345600,
+            "value": 35.0
+          },
+          {
+            "t": 367200,
+            "value": 75.0
+          },
+          {
+            "t": 388800,
+            "value": 35.0
+          },
+          {
+            "t": 410400,
+            "value": 75.0
+          },
+          {
+            "t": 432000,
+            "value": 35.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 388500,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 388800,
+          "to_s": 432000,
+          "equals": true
+        },
+        {
+          "output": "yPumpSpeedVaried",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "reset_resumes",
+      "description": "Setpoint flat for 2 days, then reset activity resumes before the window completes; the dwell restarts and nothing alarms",
+      "inputs": {
+        "hw_dp_sp": [
+          {
+            "t": 0,
+            "value": 150.0
+          },
+          {
+            "t": 172800,
+            "value": 100.0
+          },
+          {
+            "t": 194400,
+            "value": 150.0
+          },
+          {
+            "t": 216000,
+            "value": 100.0
+          },
+          {
+            "t": 237600,
+            "value": 150.0
+          },
+          {
+            "t": 259200,
+            "value": 100.0
+          },
+          {
+            "t": 280800,
+            "value": 150.0
+          },
+          {
+            "t": 302400,
+            "value": 100.0
+          },
+          {
+            "t": 324000,
+            "value": 150.0
+          },
+          {
+            "t": 345600,
+            "value": 100.0
+          },
+          {
+            "t": 367200,
+            "value": 150.0
+          },
+          {
+            "t": 388800,
+            "value": 100.0
+          },
+          {
+            "t": 410400,
+            "value": 150.0
+          },
+          {
+            "t": 432000,
+            "value": 100.0
+          }
+        ],
+        "hw_pump_vfd_speed": [
+          {
+            "t": 0,
+            "value": 35.0
+          },
+          {
+            "t": 21600,
+            "value": 75.0
+          },
+          {
+            "t": 43200,
+            "value": 35.0
+          },
+          {
+            "t": 64800,
+            "value": 75.0
+          },
+          {
+            "t": 86400,
+            "value": 35.0
+          },
+          {
+            "t": 108000,
+            "value": 75.0
+          },
+          {
+            "t": 129600,
+            "value": 35.0
+          },
+          {
+            "t": 151200,
+            "value": 75.0
+          },
+          {
+            "t": 172800,
+            "value": 35.0
+          },
+          {
+            "t": 194400,
+            "value": 75.0
+          },
+          {
+            "t": 216000,
+            "value": 35.0
+          },
+          {
+            "t": 237600,
+            "value": 75.0
+          },
+          {
+            "t": 259200,
+            "value": 35.0
+          },
+          {
+            "t": 280800,
+            "value": 75.0
+          },
+          {
+            "t": 302400,
+            "value": 35.0
+          },
+          {
+            "t": 324000,
+            "value": 75.0
+          },
+          {
+            "t": 345600,
+            "value": 35.0
+          },
+          {
+            "t": 367200,
+            "value": 75.0
+          },
+          {
+            "t": 388800,
+            "value": 35.0
+          },
+          {
+            "t": 410400,
+            "value": 75.0
+          },
+          {
+            "t": 432000,
+            "value": 35.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 432000,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

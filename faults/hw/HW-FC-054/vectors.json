@@ -1,0 +1,233 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 7200
+  },
+  "scenarios": [
+    {
+      "name": "mild_day_pumps_loafing",
+      "description": "The healthy mild-weather case: 20 degC outdoors and the distribution pumps at 30%. The loop is asking for little and the drives have backed off, which is what a working DP reset looks like.",
+      "inputs": {
+        "hw_pump_vfd_speed": 30.0,
+        "oat": 20.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yMildWeather", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "cold_day_pumps_working_hard",
+      "description": "NO_EVAL: 0 degC outdoors with the pumps at 80%. The plant is meant to work hard on a design day, so pump speed carries no information about the DP setpoint and yMildWeather = false tells the host not to read yFault as a clean bill of health.",
+      "inputs": {
+        "hw_pump_vfd_speed": 80.0,
+        "oat": 0.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yMildWeather", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "mild_day_pumps_working_hard",
+      "description": "The fault as PNNL-27338 sec.4.2 writes it: 20 degC outdoors, pumps at 80%. Light load, hard-working pumps, and the alarm lands at exactly alarm_delay because delayOnInit holds the condition from the first tick.",
+      "inputs": {
+        "hw_pump_vfd_speed": 80.0,
+        "oat": 20.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yMildWeather", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "pump_speed_exactly_at_the_threshold",
+      "description": "Threshold edge from below: the drives sit exactly on high_pump_speed (45%) in mild weather. Reals.GreaterThreshold is strict, so 45.0% is not above 45.0% and nothing is reported.",
+      "inputs": {
+        "hw_pump_vfd_speed": 45.0,
+        "oat": 20.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yMildWeather", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "pump_speed_just_below_the_threshold",
+      "description": "44.9% in the same mild weather: still clear, by a tenth of a percent of drive speed.",
+      "inputs": {
+        "hw_pump_vfd_speed": 44.9,
+        "oat": 20.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yMildWeather", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "pump_speed_just_above_the_threshold",
+      "description": "45.1% in the same mild weather: the alarm arrives at 3600 s. Both sides of the pump-speed boundary are pinned so the strictness cannot change silently.",
+      "inputs": {
+        "hw_pump_vfd_speed": 45.1,
+        "oat": 20.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yMildWeather", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "oat_exactly_at_the_mild_weather_floor",
+      "description": "Threshold edge on the evaluability conjunct: outdoor air exactly at mild_weather_oat (15.6 degC) with the pumps at 80%. Strict comparison, so exactly-at-the-floor is NO_EVAL rather than a fault.",
+      "inputs": {
+        "hw_pump_vfd_speed": 80.0,
+        "oat": 15.6
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yMildWeather", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "oat_just_below_the_mild_weather_floor",
+      "description": "15.5 degC with the same hard-working pumps: still NO_EVAL.",
+      "inputs": {
+        "hw_pump_vfd_speed": 80.0,
+        "oat": 15.5
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yMildWeather", "from_s": 0, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "oat_just_above_the_mild_weather_floor",
+      "description": "15.7 degC with the same hard-working pumps: evaluable, and the alarm lands at exactly alarm_delay. A tenth of a degree of outdoor air is the whole difference between this scenario and the one before last.",
+      "inputs": {
+        "hw_pump_vfd_speed": 80.0,
+        "oat": 15.7
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 7200, "equals": true },
+        { "output": "yMildWeather", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "plant_off_in_mild_weather",
+      "description": "The other healthy mild-weather case: the distribution is off and the drive reports 0%. The rule needs no run-status conjunct as long as the speed feedback falls to zero with the pump - a drive that latches its last commanded speed while stopped fabricates this fault, which is why preconditions asks for feedback rather than command.",
+      "inputs": {
+        "hw_pump_vfd_speed": 0.0,
+        "oat": 25.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yMildWeather", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "morning_warms_through_the_floor",
+      "description": "A spring morning: the pumps run at 80% from midnight and outdoor air crosses 15.6 degC at t = 1800 s. The clock starts at the crossing, not at the start of the run, and the alarm lands at 5400 s.",
+      "inputs": {
+        "hw_pump_vfd_speed": 80.0,
+        "oat": [
+          { "t": 0, "value": 12.0 },
+          { "t": 1800, "value": 20.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5340, "equals": false },
+        { "output": "yFault", "from_s": 5400, "to_s": 7200, "equals": true },
+        { "output": "yMildWeather", "from_s": 0, "to_s": 1740, "equals": false },
+        { "output": "yMildWeather", "from_s": 1800, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "pumps_slow_after_alarm",
+      "description": "The repair, seen from the trend: the DP setpoint is reset down at t = 5400 s and the drives fall to 30%. yFault clears on that tick - TrueDelay passes the falling edge with no delay - while yMildWeather stays true, so the host can tell a fix from a weather change.",
+      "inputs": {
+        "hw_pump_vfd_speed": [
+          { "t": 0, "value": 80.0 },
+          { "t": 5400, "value": 30.0 }
+        ],
+        "oat": 20.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 5340, "equals": true },
+        { "output": "yFault", "from_s": 5400, "to_s": 7200, "equals": false },
+        { "output": "yMildWeather", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "evening_cooldown_releases_evaluability",
+      "description": "The weather change, for contrast: an alarming plant sees outdoor air fall to 10 degC at t = 5400 s with the pumps still at 80%. yFault and yMildWeather drop on the same tick and nothing was repaired.",
+      "inputs": {
+        "hw_pump_vfd_speed": 80.0,
+        "oat": [
+          { "t": 0, "value": 20.0 },
+          { "t": 5400, "value": 10.0 }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 5340, "equals": true },
+        { "output": "yFault", "from_s": 5400, "to_s": 7200, "equals": false },
+        { "output": "yMildWeather", "from_s": 0, "to_s": 5340, "equals": true },
+        { "output": "yMildWeather", "from_s": 5400, "to_s": 7200, "equals": false }
+      ]
+    },
+    {
+      "name": "pump_speed_dips_and_restarts_the_clock",
+      "description": "Persistence is continuous, not accumulated: a 600 s dip to 40% at t = 1800 s discards the elapsed time rather than pausing it, so the alarm lands at 6000 s - one full alarm_delay after the second crossing. PNNL-27338's window average would have carried the dip through instead (see Deviations).",
+      "inputs": {
+        "hw_pump_vfd_speed": [
+          { "t": 0, "value": 80.0 },
+          { "t": 1800, "value": 40.0 },
+          { "t": 2400, "value": 80.0 }
+        ],
+        "oat": 20.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 5940, "equals": false },
+        { "output": "yFault", "from_s": 6000, "to_s": 7200, "equals": true },
+        { "output": "yMildWeather", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "pumps_slow_on_the_maturity_tick",
+      "description": "Delay edge from below: the condition holds from t = 0 and the drives fall to 30% at exactly 3600 s, the tick the timer matures on. The input is false when the timer comes due, so a full hour of hard pumping in mild weather is never reported.",
+      "inputs": {
+        "hw_pump_vfd_speed": [
+          { "t": 0, "value": 80.0 },
+          { "t": 3600, "value": 30.0 }
+        ],
+        "oat": 20.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 7200, "equals": false },
+        { "output": "yMildWeather", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    },
+    {
+      "name": "pumps_slow_one_tick_later",
+      "description": "Delay edge from above: the same run held 60 s longer asserts at exactly 3600 s and clears at 3660 s. The pair makes the T + delayTime boundary observable rather than assumed.",
+      "inputs": {
+        "hw_pump_vfd_speed": [
+          { "t": 0, "value": 80.0 },
+          { "t": 3660, "value": 30.0 }
+        ],
+        "oat": 20.0
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 3540, "equals": false },
+        { "output": "yFault", "from_s": 3600, "to_s": 3600, "equals": true },
+        { "output": "yFault", "from_s": 3660, "to_s": 7200, "equals": false },
+        { "output": "yMildWeather", "from_s": 0, "to_s": 7200, "equals": true }
+      ]
+    }
+  ]
+}

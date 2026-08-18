@@ -1,0 +1,1140 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 300,
+    "horizon_s": 777600
+  },
+  "scenarios": [
+    {
+      "name": "reset_working",
+      "description": "HWS setpoint swings 10 degC with the weather; the flatness dwell restarts every 12 h and nothing alarms",
+      "inputs": {
+        "hws_temp_sp": [
+          {
+            "t": 0,
+            "value": 70.0
+          },
+          {
+            "t": 43200,
+            "value": 60.0
+          },
+          {
+            "t": 86400,
+            "value": 70.0
+          },
+          {
+            "t": 129600,
+            "value": 60.0
+          },
+          {
+            "t": 172800,
+            "value": 70.0
+          },
+          {
+            "t": 216000,
+            "value": 60.0
+          },
+          {
+            "t": 259200,
+            "value": 70.0
+          },
+          {
+            "t": 302400,
+            "value": 60.0
+          },
+          {
+            "t": 345600,
+            "value": 70.0
+          },
+          {
+            "t": 388800,
+            "value": 60.0
+          },
+          {
+            "t": 432000,
+            "value": 70.0
+          },
+          {
+            "t": 475200,
+            "value": 60.0
+          },
+          {
+            "t": 518400,
+            "value": 70.0
+          },
+          {
+            "t": 561600,
+            "value": 60.0
+          },
+          {
+            "t": 604800,
+            "value": 70.0
+          },
+          {
+            "t": 648000,
+            "value": 60.0
+          },
+          {
+            "t": 691200,
+            "value": 70.0
+          },
+          {
+            "t": 734400,
+            "value": 60.0
+          },
+          {
+            "t": 777600,
+            "value": 70.0
+          }
+        ],
+        "oat": [
+          {
+            "t": 0,
+            "value": 2.0
+          },
+          {
+            "t": 43200,
+            "value": 14.0
+          },
+          {
+            "t": 86400,
+            "value": 2.0
+          },
+          {
+            "t": 129600,
+            "value": 14.0
+          },
+          {
+            "t": 172800,
+            "value": 2.0
+          },
+          {
+            "t": 216000,
+            "value": 14.0
+          },
+          {
+            "t": 259200,
+            "value": 2.0
+          },
+          {
+            "t": 302400,
+            "value": 14.0
+          },
+          {
+            "t": 345600,
+            "value": 2.0
+          },
+          {
+            "t": 388800,
+            "value": 14.0
+          },
+          {
+            "t": 432000,
+            "value": 2.0
+          },
+          {
+            "t": 475200,
+            "value": 14.0
+          },
+          {
+            "t": 518400,
+            "value": 2.0
+          },
+          {
+            "t": 561600,
+            "value": 14.0
+          },
+          {
+            "t": 604800,
+            "value": 2.0
+          },
+          {
+            "t": 648000,
+            "value": 14.0
+          },
+          {
+            "t": 691200,
+            "value": 2.0
+          },
+          {
+            "t": 734400,
+            "value": 14.0
+          },
+          {
+            "t": 777600,
+            "value": 2.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": false
+        },
+        {
+          "output": "yOatVaried",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "fixed_setpoint",
+      "description": "HWS setpoint pinned at 70 degC while OAT swings 2-14 degC; fault asserts at exactly evaluation_window (7 d) + alarm_delay (24 h) = 691200 s, pinned from both sides",
+      "inputs": {
+        "hws_temp_sp": 70.0,
+        "oat": [
+          {
+            "t": 0,
+            "value": 2.0
+          },
+          {
+            "t": 43200,
+            "value": 14.0
+          },
+          {
+            "t": 86400,
+            "value": 2.0
+          },
+          {
+            "t": 129600,
+            "value": 14.0
+          },
+          {
+            "t": 172800,
+            "value": 2.0
+          },
+          {
+            "t": 216000,
+            "value": 14.0
+          },
+          {
+            "t": 259200,
+            "value": 2.0
+          },
+          {
+            "t": 302400,
+            "value": 14.0
+          },
+          {
+            "t": 345600,
+            "value": 2.0
+          },
+          {
+            "t": 388800,
+            "value": 14.0
+          },
+          {
+            "t": 432000,
+            "value": 2.0
+          },
+          {
+            "t": 475200,
+            "value": 14.0
+          },
+          {
+            "t": 518400,
+            "value": 2.0
+          },
+          {
+            "t": 561600,
+            "value": 14.0
+          },
+          {
+            "t": 604800,
+            "value": 2.0
+          },
+          {
+            "t": 648000,
+            "value": 14.0
+          },
+          {
+            "t": 691200,
+            "value": 2.0
+          },
+          {
+            "t": 734400,
+            "value": 14.0
+          },
+          {
+            "t": 777600,
+            "value": 2.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 690900,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 691200,
+          "to_s": 777600,
+          "equals": true
+        },
+        {
+          "output": "yOatVaried",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "flat_oat_no_eval",
+      "description": "NO_EVAL: setpoint flat but the weather never moves; yOatVaried drops at exactly evaluation_window and yFault never fires",
+      "inputs": {
+        "hws_temp_sp": 70.0,
+        "oat": 5.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": false
+        },
+        {
+          "output": "yOatVaried",
+          "from_s": 0,
+          "to_s": 604500,
+          "equals": true
+        },
+        {
+          "output": "yOatVaried",
+          "from_s": 604800,
+          "to_s": 777600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "sp_at_flat_tolerance",
+      "description": "Setpoint deviates from its baseline by exactly sp_flat_tolerance (2.75 degC): strict < puts that on the not-flat side, so no fault",
+      "inputs": {
+        "hws_temp_sp": [
+          {
+            "t": 0,
+            "value": 70.0
+          },
+          {
+            "t": 43200,
+            "value": 72.75
+          },
+          {
+            "t": 86400,
+            "value": 70.0
+          },
+          {
+            "t": 129600,
+            "value": 72.75
+          },
+          {
+            "t": 172800,
+            "value": 70.0
+          },
+          {
+            "t": 216000,
+            "value": 72.75
+          },
+          {
+            "t": 259200,
+            "value": 70.0
+          },
+          {
+            "t": 302400,
+            "value": 72.75
+          },
+          {
+            "t": 345600,
+            "value": 70.0
+          },
+          {
+            "t": 388800,
+            "value": 72.75
+          },
+          {
+            "t": 432000,
+            "value": 70.0
+          },
+          {
+            "t": 475200,
+            "value": 72.75
+          },
+          {
+            "t": 518400,
+            "value": 70.0
+          },
+          {
+            "t": 561600,
+            "value": 72.75
+          },
+          {
+            "t": 604800,
+            "value": 70.0
+          },
+          {
+            "t": 648000,
+            "value": 72.75
+          },
+          {
+            "t": 691200,
+            "value": 70.0
+          },
+          {
+            "t": 734400,
+            "value": 72.75
+          },
+          {
+            "t": 777600,
+            "value": 70.0
+          }
+        ],
+        "oat": [
+          {
+            "t": 0,
+            "value": 2.0
+          },
+          {
+            "t": 43200,
+            "value": 14.0
+          },
+          {
+            "t": 86400,
+            "value": 2.0
+          },
+          {
+            "t": 129600,
+            "value": 14.0
+          },
+          {
+            "t": 172800,
+            "value": 2.0
+          },
+          {
+            "t": 216000,
+            "value": 14.0
+          },
+          {
+            "t": 259200,
+            "value": 2.0
+          },
+          {
+            "t": 302400,
+            "value": 14.0
+          },
+          {
+            "t": 345600,
+            "value": 2.0
+          },
+          {
+            "t": 388800,
+            "value": 14.0
+          },
+          {
+            "t": 432000,
+            "value": 2.0
+          },
+          {
+            "t": 475200,
+            "value": 14.0
+          },
+          {
+            "t": 518400,
+            "value": 2.0
+          },
+          {
+            "t": 561600,
+            "value": 14.0
+          },
+          {
+            "t": 604800,
+            "value": 2.0
+          },
+          {
+            "t": 648000,
+            "value": 14.0
+          },
+          {
+            "t": 691200,
+            "value": 2.0
+          },
+          {
+            "t": 734400,
+            "value": 14.0
+          },
+          {
+            "t": 777600,
+            "value": 2.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": false
+        },
+        {
+          "output": "yOatVaried",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "sp_within_flat_tolerance",
+      "description": "Setpoint jitter of 2.5 degC stays inside sp_flat_tolerance, so it still counts as flat; fault at 691200 s",
+      "inputs": {
+        "hws_temp_sp": [
+          {
+            "t": 0,
+            "value": 70.0
+          },
+          {
+            "t": 43200,
+            "value": 72.5
+          },
+          {
+            "t": 86400,
+            "value": 70.0
+          },
+          {
+            "t": 129600,
+            "value": 72.5
+          },
+          {
+            "t": 172800,
+            "value": 70.0
+          },
+          {
+            "t": 216000,
+            "value": 72.5
+          },
+          {
+            "t": 259200,
+            "value": 70.0
+          },
+          {
+            "t": 302400,
+            "value": 72.5
+          },
+          {
+            "t": 345600,
+            "value": 70.0
+          },
+          {
+            "t": 388800,
+            "value": 72.5
+          },
+          {
+            "t": 432000,
+            "value": 70.0
+          },
+          {
+            "t": 475200,
+            "value": 72.5
+          },
+          {
+            "t": 518400,
+            "value": 70.0
+          },
+          {
+            "t": 561600,
+            "value": 72.5
+          },
+          {
+            "t": 604800,
+            "value": 70.0
+          },
+          {
+            "t": 648000,
+            "value": 72.5
+          },
+          {
+            "t": 691200,
+            "value": 70.0
+          },
+          {
+            "t": 734400,
+            "value": 72.5
+          },
+          {
+            "t": 777600,
+            "value": 70.0
+          }
+        ],
+        "oat": [
+          {
+            "t": 0,
+            "value": 2.0
+          },
+          {
+            "t": 43200,
+            "value": 14.0
+          },
+          {
+            "t": 86400,
+            "value": 2.0
+          },
+          {
+            "t": 129600,
+            "value": 14.0
+          },
+          {
+            "t": 172800,
+            "value": 2.0
+          },
+          {
+            "t": 216000,
+            "value": 14.0
+          },
+          {
+            "t": 259200,
+            "value": 2.0
+          },
+          {
+            "t": 302400,
+            "value": 14.0
+          },
+          {
+            "t": 345600,
+            "value": 2.0
+          },
+          {
+            "t": 388800,
+            "value": 14.0
+          },
+          {
+            "t": 432000,
+            "value": 2.0
+          },
+          {
+            "t": 475200,
+            "value": 14.0
+          },
+          {
+            "t": 518400,
+            "value": 2.0
+          },
+          {
+            "t": 561600,
+            "value": 14.0
+          },
+          {
+            "t": 604800,
+            "value": 2.0
+          },
+          {
+            "t": 648000,
+            "value": 14.0
+          },
+          {
+            "t": 691200,
+            "value": 2.0
+          },
+          {
+            "t": 734400,
+            "value": 14.0
+          },
+          {
+            "t": 777600,
+            "value": 2.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 690900,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 691200,
+          "to_s": 777600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "oat_at_variation_tolerance",
+      "description": "OAT deviates from its baseline by exactly oat_variation_tolerance (4 degC): strict < makes that varied, so the rule stays evaluable and the flat setpoint alarms",
+      "inputs": {
+        "hws_temp_sp": 70.0,
+        "oat": [
+          {
+            "t": 0,
+            "value": 5.0
+          },
+          {
+            "t": 43200,
+            "value": 9.0
+          },
+          {
+            "t": 86400,
+            "value": 5.0
+          },
+          {
+            "t": 129600,
+            "value": 9.0
+          },
+          {
+            "t": 172800,
+            "value": 5.0
+          },
+          {
+            "t": 216000,
+            "value": 9.0
+          },
+          {
+            "t": 259200,
+            "value": 5.0
+          },
+          {
+            "t": 302400,
+            "value": 9.0
+          },
+          {
+            "t": 345600,
+            "value": 5.0
+          },
+          {
+            "t": 388800,
+            "value": 9.0
+          },
+          {
+            "t": 432000,
+            "value": 5.0
+          },
+          {
+            "t": 475200,
+            "value": 9.0
+          },
+          {
+            "t": 518400,
+            "value": 5.0
+          },
+          {
+            "t": 561600,
+            "value": 9.0
+          },
+          {
+            "t": 604800,
+            "value": 5.0
+          },
+          {
+            "t": 648000,
+            "value": 9.0
+          },
+          {
+            "t": 691200,
+            "value": 5.0
+          },
+          {
+            "t": 734400,
+            "value": 9.0
+          },
+          {
+            "t": 777600,
+            "value": 5.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yOatVaried",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 690900,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 691200,
+          "to_s": 777600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "oat_within_variation_tolerance",
+      "description": "OAT moves only 3.9 degC about its baseline, inside oat_variation_tolerance: NO_EVAL at exactly evaluation_window, and the simultaneous setpoint-flat edge cannot race it into a fault",
+      "inputs": {
+        "hws_temp_sp": 70.0,
+        "oat": [
+          {
+            "t": 0,
+            "value": 5.0
+          },
+          {
+            "t": 43200,
+            "value": 8.9
+          },
+          {
+            "t": 86400,
+            "value": 5.0
+          },
+          {
+            "t": 129600,
+            "value": 8.9
+          },
+          {
+            "t": 172800,
+            "value": 5.0
+          },
+          {
+            "t": 216000,
+            "value": 8.9
+          },
+          {
+            "t": 259200,
+            "value": 5.0
+          },
+          {
+            "t": 302400,
+            "value": 8.9
+          },
+          {
+            "t": 345600,
+            "value": 5.0
+          },
+          {
+            "t": 388800,
+            "value": 8.9
+          },
+          {
+            "t": 432000,
+            "value": 5.0
+          },
+          {
+            "t": 475200,
+            "value": 8.9
+          },
+          {
+            "t": 518400,
+            "value": 5.0
+          },
+          {
+            "t": 561600,
+            "value": 8.9
+          },
+          {
+            "t": 604800,
+            "value": 5.0
+          },
+          {
+            "t": 648000,
+            "value": 8.9
+          },
+          {
+            "t": 691200,
+            "value": 5.0
+          },
+          {
+            "t": 734400,
+            "value": 8.9
+          },
+          {
+            "t": 777600,
+            "value": 5.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yOatVaried",
+          "from_s": 0,
+          "to_s": 604500,
+          "equals": true
+        },
+        {
+          "output": "yOatVaried",
+          "from_s": 604800,
+          "to_s": 777600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "sp_goes_flat_mid_run",
+      "description": "Reset stops working 12 h into the run: the dwell starts at 43200 s, so the alarm lands at exactly 43200 + 604800 + 86400 = 734400 s",
+      "inputs": {
+        "hws_temp_sp": [
+          {
+            "t": 0,
+            "value": 70.0
+          },
+          {
+            "t": 21600,
+            "value": 60.0
+          },
+          {
+            "t": 43200,
+            "value": 70.0
+          }
+        ],
+        "oat": [
+          {
+            "t": 0,
+            "value": 2.0
+          },
+          {
+            "t": 43200,
+            "value": 14.0
+          },
+          {
+            "t": 86400,
+            "value": 2.0
+          },
+          {
+            "t": 129600,
+            "value": 14.0
+          },
+          {
+            "t": 172800,
+            "value": 2.0
+          },
+          {
+            "t": 216000,
+            "value": 14.0
+          },
+          {
+            "t": 259200,
+            "value": 2.0
+          },
+          {
+            "t": 302400,
+            "value": 14.0
+          },
+          {
+            "t": 345600,
+            "value": 2.0
+          },
+          {
+            "t": 388800,
+            "value": 14.0
+          },
+          {
+            "t": 432000,
+            "value": 2.0
+          },
+          {
+            "t": 475200,
+            "value": 14.0
+          },
+          {
+            "t": 518400,
+            "value": 2.0
+          },
+          {
+            "t": 561600,
+            "value": 14.0
+          },
+          {
+            "t": 604800,
+            "value": 2.0
+          },
+          {
+            "t": 648000,
+            "value": 14.0
+          },
+          {
+            "t": 691200,
+            "value": 2.0
+          },
+          {
+            "t": 734400,
+            "value": 14.0
+          },
+          {
+            "t": 777600,
+            "value": 2.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 734100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 734400,
+          "to_s": 777600,
+          "equals": true
+        },
+        {
+          "output": "yOatVaried",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "reset_resumes",
+      "description": "Setpoint flat for 4 days, then reset activity resumes before the window completes; the dwell restarts and nothing alarms",
+      "inputs": {
+        "hws_temp_sp": [
+          {
+            "t": 0,
+            "value": 70.0
+          },
+          {
+            "t": 345600,
+            "value": 60.0
+          },
+          {
+            "t": 388800,
+            "value": 70.0
+          },
+          {
+            "t": 432000,
+            "value": 60.0
+          },
+          {
+            "t": 475200,
+            "value": 70.0
+          },
+          {
+            "t": 518400,
+            "value": 60.0
+          },
+          {
+            "t": 561600,
+            "value": 70.0
+          },
+          {
+            "t": 604800,
+            "value": 60.0
+          },
+          {
+            "t": 648000,
+            "value": 70.0
+          },
+          {
+            "t": 691200,
+            "value": 60.0
+          },
+          {
+            "t": 734400,
+            "value": 70.0
+          },
+          {
+            "t": 777600,
+            "value": 60.0
+          }
+        ],
+        "oat": [
+          {
+            "t": 0,
+            "value": 2.0
+          },
+          {
+            "t": 43200,
+            "value": 14.0
+          },
+          {
+            "t": 86400,
+            "value": 2.0
+          },
+          {
+            "t": 129600,
+            "value": 14.0
+          },
+          {
+            "t": 172800,
+            "value": 2.0
+          },
+          {
+            "t": 216000,
+            "value": 14.0
+          },
+          {
+            "t": 259200,
+            "value": 2.0
+          },
+          {
+            "t": 302400,
+            "value": 14.0
+          },
+          {
+            "t": 345600,
+            "value": 2.0
+          },
+          {
+            "t": 388800,
+            "value": 14.0
+          },
+          {
+            "t": 432000,
+            "value": 2.0
+          },
+          {
+            "t": 475200,
+            "value": 14.0
+          },
+          {
+            "t": 518400,
+            "value": 2.0
+          },
+          {
+            "t": 561600,
+            "value": 14.0
+          },
+          {
+            "t": 604800,
+            "value": 2.0
+          },
+          {
+            "t": 648000,
+            "value": 14.0
+          },
+          {
+            "t": 691200,
+            "value": 2.0
+          },
+          {
+            "t": 734400,
+            "value": 14.0
+          },
+          {
+            "t": 777600,
+            "value": 2.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 777600,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

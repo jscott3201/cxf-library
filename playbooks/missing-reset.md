@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | AHU-FC-057 (SAT reset), AHU-FC-058 (DSP reset), AHU-FC-053 (SAT SP too low), AHU-FC-065 (excess static pressure), CLU-02; CHW-FC-051 (CHWST reset), CHW-FC-052 (CHW DP reset) — plant-side additions by this library, the reference's row names only the AHU rules |
+| **Applies to** | AHU-FC-057 (SAT reset), AHU-FC-058 (DSP reset), AHU-FC-053 (SAT SP too low), AHU-FC-065 (excess static pressure), CLU-02; CHW-FC-051 (CHWST reset), CHW-FC-052 (CHW DP reset), HW-FC-055 (HW DP reset), HW-FC-057 (HWS temp reset) — plant-side additions by this library, the reference's row names only the AHU rules |
 | **Fix complexity** | Remote fix (90%) · Controller upgrade (10%) |
 | **Typical time** | 1–4 h remote (sequence programming) |
 | **Typical cost** | $0 remote / $2,000–$5,000 if controller upgrade needed |

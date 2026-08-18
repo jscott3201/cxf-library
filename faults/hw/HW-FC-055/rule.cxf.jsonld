@@ -1,0 +1,625 @@
+{
+  "@context": {
+    "S231": "http://data.ashrae.org/S231P#",
+    "base": "urn:cxf-library:hw-fc-055#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055",
+      "@type": "S231:Block",
+      "S231:label": "hw_fc_055",
+      "S231:containsBlock": [
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spRef"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spDev"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spAbs"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlat"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlatHeld"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpRef"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpDev"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpAbs"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlat"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlatHeld"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpVaried"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.flatAndEval"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.persist"
+        }
+      ],
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.hw_dp_sp"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.hw_pump_vfd_speed"
+        }
+      ],
+      "S231:hasOutput": [
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.yFault"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.yPumpSpeedVaried"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spRef",
+      "@type": "urn:cxf-library:hw-fc-055#Buildings.Controls.OBC.CDL.Discrete.Sampler",
+      "S231:label": "spRef",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spRef.samplePeriod"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spRef.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spRef.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spRef.samplePeriod",
+      "S231:value": {
+        "@value": "259200.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spRef.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spRef.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spDev.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spDev",
+      "@type": "urn:cxf-library:hw-fc-055#Buildings.Controls.OBC.CDL.Reals.Subtract",
+      "S231:label": "spDev",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spDev.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spDev.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spDev.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spDev.u1",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spDev.u2",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spDev.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spAbs.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spAbs",
+      "@type": "urn:cxf-library:hw-fc-055#Buildings.Controls.OBC.CDL.Reals.Abs",
+      "S231:label": "spAbs",
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spAbs.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spAbs.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spAbs.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spAbs.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlat.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlat",
+      "@type": "urn:cxf-library:hw-fc-055#Buildings.Controls.OBC.CDL.Reals.LessThreshold",
+      "S231:label": "spFlat",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlat.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlat.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlat.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlat.t",
+      "S231:value": {
+        "@value": "8.625",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlat.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlat.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlatHeld.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlatHeld",
+      "@type": "urn:cxf-library:hw-fc-055#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "spFlatHeld",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlatHeld.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlatHeld.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlatHeld.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlatHeld.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlatHeld.delayTime",
+      "S231:value": {
+        "@value": "259200.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlatHeld.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlatHeld.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpRef",
+      "@type": "urn:cxf-library:hw-fc-055#Buildings.Controls.OBC.CDL.Discrete.Sampler",
+      "S231:label": "pumpRef",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpRef.samplePeriod"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpRef.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpRef.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpRef.samplePeriod",
+      "S231:value": {
+        "@value": "259200.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpRef.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpRef.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpDev.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpDev",
+      "@type": "urn:cxf-library:hw-fc-055#Buildings.Controls.OBC.CDL.Reals.Subtract",
+      "S231:label": "pumpDev",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpDev.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpDev.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpDev.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpDev.u1",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpDev.u2",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpDev.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpAbs.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpAbs",
+      "@type": "urn:cxf-library:hw-fc-055#Buildings.Controls.OBC.CDL.Reals.Abs",
+      "S231:label": "pumpAbs",
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpAbs.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpAbs.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpAbs.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpAbs.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlat.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlat",
+      "@type": "urn:cxf-library:hw-fc-055#Buildings.Controls.OBC.CDL.Reals.LessThreshold",
+      "S231:label": "pumpFlat",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlat.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlat.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlat.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlat.t",
+      "S231:value": {
+        "@value": "10.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlat.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlat.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlatHeld.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlatHeld",
+      "@type": "urn:cxf-library:hw-fc-055#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "pumpFlatHeld",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlatHeld.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlatHeld.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlatHeld.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlatHeld.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlatHeld.delayTime",
+      "S231:value": {
+        "@value": "259200.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlatHeld.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlatHeld.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spFlatHeld.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.flatAndEval.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpFlatHeld.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpVaried.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpVaried",
+      "@type": "urn:cxf-library:hw-fc-055#Buildings.Controls.OBC.CDL.Logical.Not",
+      "S231:label": "pumpVaried",
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpVaried.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpVaried.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpVaried.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpVaried.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.flatAndEval.u2"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.yPumpSpeedVaried"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.flatAndEval",
+      "@type": "urn:cxf-library:hw-fc-055#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "flatAndEval",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.flatAndEval.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.flatAndEval.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.flatAndEval.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.flatAndEval.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.flatAndEval.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.flatAndEval.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.persist.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.persist",
+      "@type": "urn:cxf-library:hw-fc-055#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "persist",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.persist.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.persist.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.persist.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.persist.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.persist.delayTime",
+      "S231:value": {
+        "@value": "86400.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.persist.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.persist.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.persist.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.yFault"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.hw_dp_sp",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spRef.u"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.spDev.u1"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.hw_pump_vfd_speed",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpRef.u"
+        },
+        {
+          "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.pumpDev.u1"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.yFault",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hw-fc-055#hw_fc_055.yPumpSpeedVaried",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    }
+  ]
+}

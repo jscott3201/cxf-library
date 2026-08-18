@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1830 430" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+
+  <!-- boundary inputs -->
+  <rect x="12" y="80" width="130" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="77" y="99" text-anchor="middle" fill="#1e3a8a">hw_dp_sp</text>
+  <rect x="12" y="300" width="170" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+  <text x="97" y="319" text-anchor="middle" fill="#1e3a8a">hw_pump_vfd_speed</text>
+
+  <!-- setpoint chain -->
+  <rect x="230" y="40" width="160" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="310" y="60" text-anchor="middle" fill="#24292f" font-weight="bold">spRef</text>
+  <text x="310" y="78" text-anchor="middle" fill="#57606a" font-size="11">Sampler · 3 d</text>
+
+  <rect x="450" y="80" width="130" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="515" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">spDev</text>
+  <text x="515" y="118" text-anchor="middle" fill="#57606a" font-size="11">Subtract</text>
+
+  <rect x="610" y="80" width="90" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="655" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">spAbs</text>
+  <text x="655" y="118" text-anchor="middle" fill="#57606a" font-size="11">Abs</text>
+
+  <rect x="730" y="80" width="200" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="830" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">spFlat</text>
+  <text x="830" y="118" text-anchor="middle" fill="#57606a" font-size="11">LessThreshold · 8.625 kPa</text>
+
+  <rect x="970" y="80" width="180" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1060" y="100" text-anchor="middle" fill="#24292f" font-weight="bold">spFlatHeld</text>
+  <text x="1060" y="118" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 3 d</text>
+
+  <!-- pump-speed chain -->
+  <rect x="230" y="260" width="160" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="310" y="280" text-anchor="middle" fill="#24292f" font-weight="bold">pumpRef</text>
+  <text x="310" y="298" text-anchor="middle" fill="#57606a" font-size="11">Sampler · 3 d</text>
+
+  <rect x="450" y="300" width="130" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="515" y="320" text-anchor="middle" fill="#24292f" font-weight="bold">pumpDev</text>
+  <text x="515" y="338" text-anchor="middle" fill="#57606a" font-size="11">Subtract</text>
+
+  <rect x="610" y="300" width="90" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="655" y="320" text-anchor="middle" fill="#24292f" font-weight="bold">pumpAbs</text>
+  <text x="655" y="338" text-anchor="middle" fill="#57606a" font-size="11">Abs</text>
+
+  <rect x="730" y="300" width="200" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="830" y="320" text-anchor="middle" fill="#24292f" font-weight="bold">pumpFlat</text>
+  <text x="830" y="338" text-anchor="middle" fill="#57606a" font-size="11">LessThreshold · 10 %</text>
+
+  <rect x="970" y="300" width="180" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1060" y="320" text-anchor="middle" fill="#24292f" font-weight="bold">pumpFlatHeld</text>
+  <text x="1060" y="338" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 3 d</text>
+
+  <rect x="1190" y="300" width="110" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1245" y="320" text-anchor="middle" fill="#24292f" font-weight="bold">pumpVaried</text>
+  <text x="1245" y="338" text-anchor="middle" fill="#57606a" font-size="11">Not</text>
+
+  <!-- conjunction + persistence -->
+  <rect x="1340" y="150" width="140" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1410" y="170" text-anchor="middle" fill="#24292f" font-weight="bold">flatAndEval</text>
+  <text x="1410" y="188" text-anchor="middle" fill="#57606a" font-size="11">And</text>
+
+  <rect x="1530" y="150" width="160" height="50" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1610" y="170" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1610" y="188" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 24 h</text>
+
+  <!-- boundary outputs -->
+  <rect x="1720" y="160" width="90" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1765" y="179" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <rect x="1340" y="380" width="160" height="30" rx="15" fill="#fef3c7" stroke="#d97706"/>
+  <text x="1420" y="399" text-anchor="middle" fill="#78350f">yPumpSpeedVaried</text>
+
+  <!-- wires -->
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 142 95 H 175 V 65 H 228"/>
+    <path d="M 142 95 H 430 V 93 H 448"/>
+    <path d="M 390 65 H 430 V 117 H 448"/>
+    <path d="M 580 105 H 608"/>
+    <path d="M 700 105 H 728"/>
+    <path d="M 930 105 H 968"/>
+    <path d="M 1150 105 H 1300 V 168 H 1338"/>
+
+    <path d="M 182 315 H 200 V 285 H 228"/>
+    <path d="M 182 315 H 430 V 313 H 448"/>
+    <path d="M 390 285 H 430 V 337 H 448"/>
+    <path d="M 580 325 H 608"/>
+    <path d="M 700 325 H 728"/>
+    <path d="M 930 325 H 968"/>
+    <path d="M 1150 325 H 1188"/>
+    <path d="M 1300 325 H 1318 V 182 H 1338"/>
+    <path d="M 1300 325 H 1318 V 395 H 1338"/>
+
+    <path d="M 1480 175 H 1528"/>
+    <path d="M 1690 175 H 1718"/>
+  </g>
+
+  <!-- annotation -->
+  <text x="1180" y="378" fill="#7d8590" font-size="11">false ⇒ NO_EVAL</text>
+</svg>
