@@ -8,7 +8,11 @@
     },
     "s223": {
       "iri": "http://data.ashrae.org/standard223#",
-      "verified_version": "v1.0.0-2026"
+      "verified_version": "1.0.0-ppr.2.1"
+    },
+    "s223_g36": {
+      "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#",
+      "verified_version": "1.0.0-ppr.2.1"
     },
     "quantitykind": {
       "iri": "http://qudt.org/vocab/quantitykind/",
@@ -19,86 +23,90 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "Cooling tower point dictionary (library-authored family, opened 2026-08-18; no reference chapter exists). LOOP-SIDE SEMANTICS: water LEAVING the tower is the COLD side and ENTERS the chiller condenser — so tower_leaving_temp grounds as Entering_Condenser_Water_Temperature_Sensor and tower_entering_temp (warm, chiller-to-tower) as Leaving_Condenser_Water_Temperature_Sensor, the same physical stream as points/chw.points.json cwst (see its loop-side warning). Bind per tower cell where cells are sensed individually; plant-level binding uses the common headers.",
+  "notes": "Cooling-tower point dictionary. LOOP-SIDE SEMANTICS: water leaving the tower is the COLD stream that enters the chiller condenser, so tower_leaving_temp and its active target ground as Entering_Condenser_Water points; tower_entering_temp is the WARM chiller-leaving return. Bind per tower/cell when outlets and fans are individually sensed; common-header points are valid only where a card explicitly permits them. ASHRAE 223 local names were checked against public-review artifact 223p-1.0.0-ppr2.1.ttl (owl:versionInfo 1.0.0-ppr.2.1; SHA-256 1f156f9938c0be430d2216e01e31bb183c438ba318d8d4a23d2f074ebcd6f573), not an inferred final 2026 release, replacing the former unverified v1.0.0-2026 label. That artifact imports QUDT 3.1.8; quantity-kind and unit local names here were independently checked against the repository-declared QUDT 3.1.4 artifacts. Connection direction and tower/basin location belong in topology/patterns, not invented aspects. Brick 1.4.4 was checked against Brick.ttl SHA-256 b65720b7b9b64c646745c689777e6138c0d59ce0088df0aeb78fbd444d04d8e7.",
   "points": [
     {
       "name": "tower_leaving_temp",
-      "description": "Tower leaving (cold, basin/sump outlet) condenser water temperature",
+      "description": "Tower leaving (cold, tower-to-chiller) condenser water temperature",
       "kind": "real",
       "unit": "degC",
       "qudt_unit": "DEG_C",
       "brick": "Entering_Condenser_Water_Temperature_Sensor",
       "s223": {
-        "pattern": "Sensor observes QuantifiableObservableProperty on the condenser water entering connection point (tower outlet)",
+        "pattern": "TemperatureSensor observes a QuantifiableObservableProperty at the CoolingTower Fluid-Water outlet ConnectionPoint that supplies the chiller condenser inlet",
         "property_class": "QuantifiableObservableProperty",
         "quantitykind": "Temperature",
         "unit": "DEG_C",
-        "medium": "Water",
-        "aspects": ["entering"]
+        "medium": "Fluid-Water",
+        "aspects": []
       },
-      "notes": "brick:Entering_Condenser_Water_Temperature_Sensor grep-verified. Approach = tower_leaving_temp − oa_wetbulb."
+      "provisional": false,
+      "notes": "brick:Entering_Condenser_Water_Temperature_Sensor is exact in Brick 1.4.4: tower-leaving/cold water next enters the condenser. ASHRAE 223 uses s223:CoolingTower, TemperatureSensor, ConnectionPoint and Fluid-Water; leaving direction is topology, not an aspect. TOWER-0001 approach and TOWER-0002 range use this point; TOWER-0005 requires the individual-cell outlet when evaluating an individual fan."
     },
     {
       "name": "tower_entering_temp",
-      "description": "Tower entering (warm, chiller-leaving) condenser water temperature",
+      "description": "Tower entering (warm, chiller-to-tower) condenser water temperature",
       "kind": "real",
       "unit": "degC",
       "qudt_unit": "DEG_C",
       "brick": "Leaving_Condenser_Water_Temperature_Sensor",
       "s223": {
-        "pattern": "Sensor observes QuantifiableObservableProperty on the condenser water leaving connection point (chiller outlet)",
+        "pattern": "TemperatureSensor observes a QuantifiableObservableProperty at the CoolingTower Fluid-Water inlet ConnectionPoint returning from the chiller condenser outlet",
         "property_class": "QuantifiableObservableProperty",
         "quantitykind": "Temperature",
         "unit": "DEG_C",
-        "medium": "Water",
-        "aspects": ["leaving"]
+        "medium": "Fluid-Water",
+        "aspects": []
       },
-      "notes": "Same physical stream as chw dict cwst (duplicated per the lint's own-family resolution rule). Range = tower_entering_temp − tower_leaving_temp."
+      "provisional": false,
+      "notes": "brick:Leaving_Condenser_Water_Temperature_Sensor is exact in Brick 1.4.4 because this warm stream has just left the condenser. Same physical stream as points/chw.points.json cwst. ASHRAE 223 expresses entering direction through the tower inlet ConnectionPoint, not a nonexistent aspect. TOWER-0002 range = tower_entering_temp - tower_leaving_temp."
     },
     {
       "name": "oa_wetbulb",
-      "description": "Outdoor air wet-bulb temperature (host-derived psychrometric)",
+      "description": "Outdoor air wet-bulb temperature (normally host-derived psychrometric)",
       "kind": "real",
       "unit": "degC",
       "qudt_unit": "DEG_C",
-      "brick": "Air_Wet_Bulb_Temperature_Sensor",
+      "brick": null,
       "s223": {
-        "pattern": "QuantifiableObservableProperty at the outdoor air reference; typically host-computed",
-        "property_class": "QuantifiableObservableProperty",
+        "pattern": "Host Function hasOutput a QuantifiableProperty representing outdoor Fluid-Air wet-bulb temperature; a physical Air_Wet_Bulb_Temperature_Sensor is an alternative binding",
+        "property_class": "QuantifiableProperty",
         "quantitykind": "Temperature",
         "unit": "DEG_C",
-        "medium": "Air",
+        "medium": "Fluid-Air",
         "aspects": []
       },
+      "provisional": true,
       "derived": true,
-      "notes": "Host-derived when no physical wet-bulb sensor exists (the common case): psychrometric calculation from drybulb + RH + station pressure. A MULTIVARIABLE derivation — harder class than the P-T saturation lookups (hp dict evap_sat_temp precedent) and more error-prone near saturation; the host must document its psychrometric routine and accuracy. Simulation supplies it natively (EnergyPlus Site Outdoor Air Wetbulb)."
+      "notes": "Usually a multivariable psychrometric result from dry-bulb, RH, and station pressure. PPR2.1 provides Function/hasOutput/QuantifiableProperty but no exact derived-wet-bulb aspect; the derivation record carries that meaning. Brick is null because this canonical point is explicitly host-derived; a separate physical binding may use exact brick:Air_Wet_Bulb_Temperature_Sensor and a TemperatureSensor/QOP pattern. The host must document routine, inputs, freshness, and accuracy near saturation. EnergyPlus supplies a native outdoor wet-bulb output."
     },
     {
       "name": "tower_fan_speed",
-      "description": "Tower fan VFD speed command/feedback",
+      "description": "Individual tower-fan speed feedback (verified command or effective-airflow proxy only when explicitly documented)",
       "kind": "real",
       "unit": "%",
       "qudt_unit": "PERCENT",
       "brick": "Motor_Speed_Sensor",
       "s223": {
-        "pattern": "QuantifiableObservableProperty on the tower fan motor via hasProperty",
+        "pattern": "QuantifiableObservableProperty on the CoolingTower Fan or contained motor via hasProperty",
         "property_class": "QuantifiableObservableProperty",
         "quantitykind": "DimensionlessRatio",
         "unit": "PERCENT",
         "medium": null,
         "aspects": []
       },
-      "notes": "Same grounding convention as hw dict hw_pump_vfd_speed. The at-capacity gate for the approach rule: approach is only diagnostic when the fan can no longer compensate (4-climate simulation study: healthy approach spans 1.6-13.3 degC un-gated purely from fan modulation)."
+      "provisional": true,
+      "notes": "ASHRAE 223 PPR2.1 supports an observable DimensionlessRatio/PERCENT property on s223:Fan. Brick 1.4.4 has Motor_Speed_Sensor, but its inherited Speed applicable-unit set does not include PERCENT; this same percent-speed conflict is documented for AHU/VFD points, so the mapping is provisional. Feedback is required for TOWER-0001 and preferred for TOWER-0005. A verified command proxy is weaker; EnergyPlus Cooling Tower Air Flow Rate Ratio x 100 is an explicitly simulation-only effective-airflow proxy rather than mechanical VFD feedback."
     },
     {
       "name": "tower_fan_status",
-      "description": "Tower fan run status",
+      "description": "Independent individual cooling-tower fan run proof",
       "kind": "bool",
       "unit": "bool",
       "qudt_unit": null,
       "brick": "Fan_On_Off_Status",
       "s223": {
-        "pattern": "EnumeratedObservableProperty on the tower Fan via hasProperty",
+        "pattern": "EnumeratedObservableProperty on the CoolingTower Fan via hasProperty",
         "property_class": "EnumeratedObservableProperty",
         "quantitykind": null,
         "unit": null,
@@ -106,7 +114,121 @@
         "aspects": [],
         "enumerationkind": "Binary-OnOff"
       },
-      "notes": "Consumed by the fan short-cycling rule (starts-per-hour edge counting; Logical.Edge Nyquist ceiling window/(2·dt) applies — RTU-0001 precedent)."
+      "provisional": false,
+      "notes": "brick:Fan_On_Off_Status and PPR2.1 s223:Fan with Binary-OnOff EnumeratedObservableProperty are exact. Bind independent electrical, rotation, airflow, or auxiliary-contact proof for one fan/cell, not command echo or fleet OR. TOWER-0003 counts this point's rising edges; TOWER-0004 compares it with the final same-fan command."
+    },
+    {
+      "name": "tower_fan_cmd",
+      "description": "Final individual cooling-tower fan run command",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Start_Stop_Command",
+      "s223": {
+        "pattern": "EnumeratedActuatableProperty on the CoolingTower Fan via hasProperty",
+        "property_class": "EnumeratedActuatableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": false,
+      "notes": "brick:Start_Stop_Command is exact and equipment-agnostic; attach it to brick:Cooling_Tower_Fan. PPR2.1 s223:Fan plus Binary-OnOff EnumeratedActuatableProperty is exact. TOWER-0004 requires the final per-fan request after staging, free-convection, anti-cycle, and normal interlock logic; plant enable is invalid."
+    },
+    {
+      "name": "tower_leaving_temp_sp",
+      "description": "Active tower-leaving cold condenser-water temperature setpoint",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": "Entering_Condenser_Water_Temperature_Setpoint",
+      "s223": {
+        "pattern": "QuantifiableActuatableProperty with Aspect-Setpoint controlling the CoolingTower Fluid-Water outlet ConnectionPoint that supplies the chiller condenser inlet",
+        "property_class": "QuantifiableActuatableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Water",
+        "aspects": [
+          "Aspect-Setpoint"
+        ]
+      },
+      "provisional": true,
+      "notes": "brick:Entering_Condenser_Water_Temperature_Setpoint is exact: tower-leaving cold water is entering-condenser water. PPR2.1 uses exact Aspect-Setpoint; outlet direction remains topology. Bind the active delivered target after reset/limit logic, not an upstream request. A common condenser-loop supply setpoint is valid for individual parallel cells only when the sequence actually gives each cell that target."
+    },
+    {
+      "name": "oat",
+      "description": "Outdoor dry-bulb temperature representative of cooling-tower exposure",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": "Outside_Air_Temperature_Sensor",
+      "s223": {
+        "pattern": "TemperatureSensor observes a QuantifiableObservableProperty located in an OutdoorPhysicalSpace representative of the CoolingTower exposure",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Air",
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "brick:Outside_Air_Temperature_Sensor and s223:OutdoorPhysicalSpace are exact. Unlike an AHU intake point, tower ambient exposure is a physical-space observation; Role-OutdoorAirIntake is therefore not used or mis-serialized as an aspect. TOWER-0006 requires representative tower exposure rather than a remote weather point with materially different wind/sun conditions."
+    },
+    {
+      "name": "tower_basin_temp",
+      "description": "Representative cooling-tower collection-basin/sump water temperature",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": "Collection_Basin_Water_Temperature_Sensor",
+      "s223": {
+        "pattern": "TemperatureSensor observes a QuantifiableObservableProperty of Fluid-Water in a site-defined basin/storage component contained in the CoolingTower",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Water",
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "brick:Collection_Basin_Water_Temperature_Sensor is exact in Brick 1.4.4. PPR2.1 has CoolingTower, TemperatureSensor and Fluid-Water but no collection-basin equipment class, so basin topology is site-defined and the cross-ontology mapping is provisional. Bind a submerged bulk-water sensor away from the heater plume and stagnant pockets; the host separately proves water level and applicability."
+    },
+    {
+      "name": "tower_basin_heater_cmd",
+      "description": "Final request for cooling-tower basin heater operation",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Start_Stop_Command",
+      "s223": {
+        "pattern": "Binary-OnOff EnumeratedActuatableProperty on an ElectricResistanceElement contained in the CoolingTower and identified by site topology as the basin heater",
+        "property_class": "EnumeratedActuatableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": true,
+      "notes": "Brick 1.4.4 has exact Collection_Basin_Water_Heater and Start_Stop_Command classes; attach the command to that equipment. PPR2.1 has ElectricResistanceElement and the enumerated property pattern but no basin-heater class, so basin identity/topology remains provisional. Bind the final local post-thermostat/post-safety request, not a remote enable upstream of low-water or OEM interlocks. A non-electric equivalent needs a site-defined s223 equipment class rather than the ElectricResistanceElement pattern."
+    },
+    {
+      "name": "tower_basin_heater_status",
+      "description": "Independent proof of cooling-tower basin heater operation",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "On_Off_Status",
+      "s223": {
+        "pattern": "Binary-OnOff EnumeratedObservableProperty on an ElectricResistanceElement contained in the CoolingTower and identified by site topology as the basin heater",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": true,
+      "notes": "Brick 1.4.4 has exact Collection_Basin_Water_Heater and On_Off_Status classes. PPR2.1 has the electrical element/property terms but no basin-heater class, so the mapping remains provisional. Prefer current, power, contactor, or defensible thermal proof; a command echo is invalid. A proven heater does not prove safe basin level or adequate bulk-water temperature."
     }
   ]
 }

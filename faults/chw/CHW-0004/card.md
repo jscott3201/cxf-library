@@ -63,18 +63,11 @@ emissions:
 validation:
   - kind: simulation_fpr
     harness: simharness/v1
-    date: 2026-08-18
-    fleet: "DOE prototype OfficeLarge STD2019 x 4 climates (Miami 1A, Tucson 2B, Atlanta 3A, Buffalo 5A), one July + one January week each, plant mode"
-    scenarios: 6
-    failures: 0
-    notes: "windowed wherever chiller load crossed the 40% floor (incl. Miami January); cold-climate January weeks never cross it"
-  - kind: simulation_fpr
-    harness: simharness/v1
-    date: 2026-08-18
-    fleet: "DOE prototype OfficeLarge STD2019 Atlanta (IDF 22.1 auto-transitioned to E+ 25.1), one July + one January week, plant mode"
+    date: 2026-08-20
+    fleet: "EnergyPlus 25.1 OfficeLarge STD2019 Denver, one July week, plant mode at 60 s"
     scenarios: 1
     failures: 0
-    notes: "gated windows only in the July week (chiller load > 40% floor); Atlanta January never crosses the floor"
+    notes: "single RunPeriod with timeline/cadence validation; gated only where chiller load exceeded 40%. The January rerun had no evaluable loaded window and is not counted; supersedes earlier outputs whose 900 s source cadence had been mislabeled as 300 s"
 verified:
   engine_rev: e2ff2f8
   content_id: "cxf:fnv1a128:f12c5169f0aa1755a37402fe2dbfe04a"

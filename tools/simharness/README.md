@@ -12,7 +12,7 @@ artifact, or a fault genuinely present in the model.
 
 ```
 export ENERGYPLUS_PATH=/path/to/EnergyPlus-25.1.0   # native install
-python3 tools/simharness/harness.py run --building <dir>
+python3 tools/simharness/harness.py run --building <dir> [--step-s 300]
 ```
 
 `<dir>` holds `building.epjson` + a `*.epw` (the Building2Building dataset's
@@ -21,6 +21,13 @@ The harness patches the run period (default one July week) and
 `Output:Variable` requests, runs EnergyPlus, extracts per-air-loop point
 series, emits one replay dir per (rule × loop), and prints a per-rule
 clean/FP table.
+
+The harness selects exactly one `RunPeriod`, writes the requested EnergyPlus
+`Timestep`, and validates every CSV timestamp against `--step-s` before replay.
+It fails on environment/date resets or cadence mismatch, including `--reuse`
+against an older CSV. This is load-bearing for timer rules: the source model's
+four timesteps/hour (900 s) cannot be labeled as a 300 s replay. Use 60 s for
+TOWER-0005's 600 s persistence; 300 s remains the default for legacy sweeps.
 
 ## Point mapping (packaged VAV)
 
@@ -148,12 +155,12 @@ boiler active; unnecessary-operation rules replay ungated — gating on the
 equipment they accuse would mask them). `PLANT_EXCLUDE` names the
 baseline-fitted, reset-class, and by-construction rules with reasons.
 
-First plant results (OfficeLarge STD2019 Atlanta, Jul + Jan weeks):
-CHW-0004, HW-0003/HW-0004/HW-0005 all clean in their gated windows (recorded
-as `validation:` blocks); HW-0007 verified firing correctly on the
-prototype's constant-HWST-at-low-load operation (excluded by-construction);
-Atlanta January never crosses CHW-0004's 40% chiller-load floor — season
-selection matters per family.
+Historical multi-climate plant outputs made before the cadence/timeline guard
+remain useful exploratory statistics but are no longer card validation claims.
+The current validation blocks use a fresh Denver OfficeLarge rerun at a real
+60 s cadence and one RunPeriod: CHW-0004, HW-0003/HW-0004/HW-0005 are clean in
+their actual gated windows; January has no CHW-0004 loaded window and July has
+no HW-0004 boiler-active window.
 
 PR 04 adds a separate **per-chiller adapter** for CHW-0007/CHW-0009 instead
 of reusing the plant `max(PLR)` and mixed-header temperature. Each chiller
@@ -163,33 +170,43 @@ electricity; PLR × 100 is the per-machine load proxy. CHW-0007 compares the
 individual outlet with the prototype's common supply setpoint only because its
 parallel constant-flow chillers share that EnergyPlus plant target, and its FPR
 windows begin 1800 s after the same machine is both running and above 20% load.
-CHW-0009 copies are retuned to `count_scale=3600/300=12`; 300 s is inside the
-rule's legal ring/count band but misses cycles completed inside ten minutes.
+CHW-0009 copies are cadence-coupled to `count_scale=3600/step_s`; the current
+60 s rerun uses 60 and can still miss cycles completed inside 120 seconds.
 CHW-0008 is not replayed: EnergyPlus exposes operating outputs but no
 independent final BAS per-chiller stage command, and deriving command from
 status would make proof-of-operation tautological. In the Denver OfficeLarge
 campaign, CHW-0007 is clean for both chillers in July's evaluable loaded
 windows; January has no evaluable loaded windows. CHW-0009 is clear for both
-machines in January but alarms on both in July. The underlying per-machine PLR
-and power series confirm repeated OFF/ON operation—four sampled starts inside
-45 minutes for each machine during low/moderate-load periods—so these two
-failed healthy-baseline expectations are classified as real prototype cycling,
-not hidden as unexplained FPR or tuned away.
+machines in January and one in July; the other July status series contains
+repeated sampled starts and raises the raw finding. It is classified as real
+prototype cycling, not hidden as unexplained FPR or tuned away.
 
 PR 03 adds a separate **per-pump adapter** for PMP-0004/PMP-0005 instead of
 reusing those aggregate HW proxies. Each `Pump:VariableSpeed` instance keeps its
 own series: `pump_status` is disclosed as strictly positive pump active power
 (the prototype's variable-speed pump legitimately draws single-digit watts),
 `pump_flow` is native branch mass-flow magnitude converted to L/s at 997 kg/m³,
-and `pump_kw` is W/1000. At the native 300 s replay tick PMP-0004's copied graph
-is retuned to `count_scale=3600/300=12`; its run can check healthy FPR for starts
-that survive sampling, but cycles completed inside one tick remain invisible
-and the observable ceiling is only six starts/hour. EnergyPlus pump flow is
+and `pump_kw` is W/1000. At the current 60 s replay tick PMP-0004's copied graph
+uses `count_scale=3600/60=60`; its run checks healthy FPR for starts that survive
+sampling, but cycles completed inside 120 seconds remain invisible. EnergyPlus pump flow is
 nonnegative, so PMP-0005 replay checks `yFault` healthy behavior only—it cannot
 validate signed direction or reverse leakage. PMP-0006 remains excluded until a
 frozen expected-power model can be trained on known-good per-pump data and
 scored on a disjoint period; aggregate power or fitting the evaluation week
 would not be a valid baseline comparison.
+
+PR 05 adds a **per-tower-object TOWER-0005 adapter** for legacy
+`CoolingTower:VariableSpeed`: native `Cooling Tower Outlet Temperature`, the
+condenser-loop outlet `System Node Setpoint Temperature`, strictly positive fan
+electricity as run proof, and native `Cooling Tower Air Flow Rate Ratio × 100`
+as an explicitly effective-airflow proxy—not mechanical VFD feedback. Host-valid
+expectations require positive mass flow and heat rejection, continuous fan PLR,
+stable cell count/setpoint, speed above the graph's 30% placeholder, and an
+1800 s lead after state changes. The Denver July 60 s campaign is clean for two
+tower objects over 7,610 evaluated loaded/settled ticks across 16 windows;
+January has no evaluable tower window and is excluded. Each EnergyPlus object
+contains two internal cells, so this is aggregate object-level FPR only, not
+per-cell proof and not an induced-fault TPR.
 
 ## First results (single building, superseded by the fleet sweep above) (B2B OfficeMedium-4004, Albuquerque, July week, 3 loops)
 

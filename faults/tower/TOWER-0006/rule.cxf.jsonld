@@ -1,0 +1,474 @@
+{
+  "@context": {
+    "S231": "http://data.ashrae.org/S231P#",
+    "base": "urn:cxf-library:tower-0006#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006",
+      "@type": "S231:Block",
+      "S231:label": "tower_0006",
+      "S231:containsBlock": [
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.freezeExposure"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.basinLow"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.lowCondition"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.thermalProof"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.notHeaterStatus"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.heaterMismatch"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.heaterProof"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.anyFault"
+        }
+      ],
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.oat"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.tower_basin_temp"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.tower_basin_heater_cmd"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.tower_basin_heater_status"
+        }
+      ],
+      "S231:hasOutput": [
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.yFault"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.yHeaterFailToRun"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.yLowBasinTemp"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.yFreezeExposure"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.freezeExposure",
+      "@type": "urn:cxf-library:tower-0006#Buildings.Controls.OBC.CDL.Reals.LessThreshold",
+      "S231:label": "freezeExposure",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.freezeExposure.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.freezeExposure.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.freezeExposure.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.freezeExposure.t",
+      "S231:value": {
+        "@value": "2.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.freezeExposure.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.freezeExposure.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.lowCondition.u1"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.yFreezeExposure"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.basinLow",
+      "@type": "urn:cxf-library:tower-0006#Buildings.Controls.OBC.CDL.Reals.LessThreshold",
+      "S231:label": "basinLow",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.basinLow.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.basinLow.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.basinLow.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.basinLow.t",
+      "S231:value": {
+        "@value": "4.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.basinLow.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.basinLow.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.lowCondition.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.lowCondition",
+      "@type": "urn:cxf-library:tower-0006#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "lowCondition",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.lowCondition.u1"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.lowCondition.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.lowCondition.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.lowCondition.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.lowCondition.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.lowCondition.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.thermalProof.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.thermalProof",
+      "@type": "urn:cxf-library:tower-0006#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "thermalProof",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.thermalProof.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.thermalProof.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.thermalProof.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.thermalProof.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.thermalProof.delayTime",
+      "S231:value": {
+        "@value": "1800.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.thermalProof.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.thermalProof.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.thermalProof.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.anyFault.u2"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.yLowBasinTemp"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.notHeaterStatus",
+      "@type": "urn:cxf-library:tower-0006#Buildings.Controls.OBC.CDL.Logical.Not",
+      "S231:label": "notHeaterStatus",
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.notHeaterStatus.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.notHeaterStatus.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.notHeaterStatus.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.notHeaterStatus.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.heaterMismatch.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.heaterMismatch",
+      "@type": "urn:cxf-library:tower-0006#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "heaterMismatch",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.heaterMismatch.u1"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.heaterMismatch.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.heaterMismatch.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.heaterMismatch.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.heaterMismatch.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.heaterMismatch.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.heaterProof.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.heaterProof",
+      "@type": "urn:cxf-library:tower-0006#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "heaterProof",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.heaterProof.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.heaterProof.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.heaterProof.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.heaterProof.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.heaterProof.delayTime",
+      "S231:value": {
+        "@value": "120.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.heaterProof.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.heaterProof.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.heaterProof.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.anyFault.u1"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.yHeaterFailToRun"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.anyFault",
+      "@type": "urn:cxf-library:tower-0006#Buildings.Controls.OBC.CDL.Logical.Or",
+      "S231:label": "anyFault",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.anyFault.u1"
+        },
+        {
+          "@id": "urn:cxf-library:tower-0006#tower_0006.anyFault.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.anyFault.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.anyFault.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.anyFault.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.anyFault.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.yFault"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.oat",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.freezeExposure.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.tower_basin_temp",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.basinLow.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.tower_basin_heater_cmd",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.heaterMismatch.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.tower_basin_heater_status",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:tower-0006#tower_0006.notHeaterStatus.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.yFault",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.yHeaterFailToRun",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.yLowBasinTemp",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:tower-0006#tower_0006.yFreezeExposure",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    }
+  ]
+}

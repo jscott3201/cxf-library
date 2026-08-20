@@ -64,10 +64,10 @@ validation:
   - kind: simulation_fpr
     harness: simharness/v1
     date: 2026-08-20
-    fleet: "EnergyPlus 25.1 OfficeLarge STD2019 Denver, July week, two individual parallel chillers, plant mode"
+    fleet: "EnergyPlus 25.1 OfficeLarge STD2019 Denver, July week, two individual parallel chillers, plant mode at 60 s"
     scenarios: 2
     failures: 0
-    notes: "strictly positive per-machine electricity is the run-status proxy; PLR is per-machine load; direct evaporator outlet temperature is compared with the prototype's shared plant outlet target; expectations only cover windows beginning 1800 s after the same machine is running above 20% load. January had no evaluable loaded windows and is not counted"
+    notes: "single RunPeriod with timeline/cadence validation; strictly positive per-machine electricity is the run-status proxy, PLR is per-machine load, and direct evaporator outlet temperature is compared with the shared target. Expectations begin 1800 s after the same machine runs above 20%; January had no evaluable window and is not counted"
 verified:
   engine_rev: e2ff2f8
   content_id: "cxf:fnv1a128:c2159704c8d4e994bfed070006ff5d4e"

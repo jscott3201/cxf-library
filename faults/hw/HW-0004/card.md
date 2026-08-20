@@ -65,18 +65,11 @@ emissions:
 validation:
   - kind: simulation_fpr
     harness: simharness/v1
-    date: 2026-08-18
-    fleet: "DOE prototype OfficeLarge STD2019 x 4 climates (Miami 1A, Tucson 2B, Atlanta 3A, Buffalo 5A), one July + one January week each, plant mode"
-    scenarios: 3
-    failures: 0
-    notes: "boiler-active windows only in heating-season runs (Atlanta/Tucson/Buffalo Jan; Miami's boilers never ran)"
-  - kind: simulation_fpr
-    harness: simharness/v1
-    date: 2026-08-18
-    fleet: "DOE prototype OfficeLarge STD2019 Atlanta (IDF 22.1 auto-transitioned to E+ 25.1), one July + one January week, plant mode"
+    date: 2026-08-20
+    fleet: "EnergyPlus 25.1 OfficeLarge STD2019 Denver, one January week, plant mode at 60 s"
     scenarios: 1
     failures: 0
-    notes: "gated windows only in the January week (boiler active); hw_pump_vfd_speed is a flow-fraction proxy"
+    notes: "single RunPeriod with timeline/cadence validation; gated only where the boiler is active and hw_pump_vfd_speed remains a flow-fraction proxy. July had no evaluable boiler-active window and is not counted"
 verified:
   engine_rev: e2ff2f8
   content_id: "cxf:fnv1a128:022b2acd6415b5ce7aaba663fa8c3c49"

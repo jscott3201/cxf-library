@@ -55,10 +55,10 @@ validation:
   - kind: simulation_fpr
     harness: simharness/v1
     date: 2026-08-20
-    fleet: "EnergyPlus 25.1 OfficeLarge STD2019 Denver, one July + one January week, one individual HW pump, plant mode"
+    fleet: "EnergyPlus 25.1 OfficeLarge STD2019 Denver, one July + one January week, one individual HW pump, plant mode at 60 s"
     scenarios: 2
     failures: 0
-    notes: "strictly positive pump active power is the disclosed status proxy; native per-pump mass-flow magnitude converted at 997 kg/m3; validates healthy yFault only, not signed direction or realistic reverse leakage"
+    notes: "single RunPeriod with timeline/cadence validation; strictly positive pump active power is the disclosed status proxy and native mass-flow magnitude is converted at 997 kg/m3. Validates healthy yFault only, not signed direction or realistic reverse leakage"
 verified:
   engine_rev: e2ff2f8
   content_id: "cxf:fnv1a128:d567fd02bea2ecc336bdf44f7680de4a"

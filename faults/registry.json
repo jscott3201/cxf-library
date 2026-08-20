@@ -810,6 +810,30 @@
       "legacy_id": "TOWER-FC-052"
     },
     {
+      "id": "TOWER-0004",
+      "family": "tower",
+      "name": "Tower fan proof-of-operation failure",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "TOWER-0005",
+      "family": "tower",
+      "name": "Condenser water overcooling with fan energy",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "TOWER-0006",
+      "family": "tower",
+      "name": "Cooling-tower basin freeze-protection failure",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
       "id": "VAV-0001",
       "family": "vav",
       "name": "VAV minimum airflow setpoint too high",
