@@ -23,11 +23,20 @@ series, emits one replay dir per (rule × loop), and prints a per-rule
 clean/FP table.
 
 The harness selects exactly one `RunPeriod`, writes the requested EnergyPlus
-`Timestep`, and validates every CSV timestamp against `--step-s` before replay.
-It fails on environment/date resets or cadence mismatch, including `--reuse`
-against an older CSV. This is load-bearing for timer rules: the source model's
-four timesteps/hour (900 s) cannot be labeled as a 300 s replay. Use 60 s for
-TOWER-0005's 600 s persistence; 300 s remains the default for legacy sweeps.
+`Timestep`, and validates the CSV's first timestamp, last timestamp, sample
+count, and every interval against `--begin`, `--end`, and `--step-s` before
+replay. A source without a `RunPeriod` receives one. The harness fails on
+environment/date resets, cadence mismatch, a different requested period, or a
+failed verifier—including `--reuse` against an older CSV. This is load-bearing
+for timer rules: neither a July CSV relabeled as January nor the source model's
+four timesteps/hour (900 s) relabeled as a 300 s replay is valid evidence. Use
+60 s for TOWER-0005's 600 s persistence; 300 s remains the default for legacy
+sweeps.
+
+Generated replay directories are deliberately not publishable fault packages,
+so the harness invokes `tools/verify --replay-only`: source packages still pass
+the normal schema/content lint, while the harness process status reflects the
+generated scenarios' replay result instead of expected missing-package lint.
 
 ## Point mapping (packaged VAV)
 

@@ -52,9 +52,11 @@ def configure_period_and_timestep(b: dict, begin, end) -> None:
     periods = b.get("RunPeriod", {})
     if periods:
         name, rp = next(iter(periods.items()))
-        rp["begin_month"], rp["begin_day_of_month"] = begin
-        rp["end_month"], rp["end_day_of_month"] = end
-        b["RunPeriod"] = {name: rp}
+    else:
+        name, rp = "simharness run period", {}
+    rp["begin_month"], rp["begin_day_of_month"] = begin
+    rp["end_month"], rp["end_day_of_month"] = end
+    b["RunPeriod"] = {name: rp}
     tph = 3600 // STEP_S
     timesteps = b.get("Timestep", {})
     if timesteps:
@@ -65,19 +67,25 @@ def configure_period_and_timestep(b: dict, begin, end) -> None:
         b["Timestep"] = {"simharness timestep": {"number_of_timesteps_per_hour": tph}}
 
 
-def validate_csv_timeline(csv_path: Path) -> None:
-    """Fail on cadence mismatch or an EnergyPlus environment/date reset."""
+def validate_csv_timeline(csv_path: Path, begin, end) -> dict:
+    """Validate cadence and prove that CSV dates match the requested period."""
     with open(csv_path) as f:
         rows = list(csv.reader(f))
     if len(rows) < 3:
         raise ValueError(f"{csv_path}: not enough rows to establish cadence")
+    period_start = datetime(2001, *begin)
+    period_end = datetime(2001, *end) + timedelta(days=1)
+    if period_end <= period_start:
+        period_end = period_end.replace(year=2002)
+    crosses_year = period_end.year > period_start.year
     stamps = []
     for row in rows[1:]:
         m = re.match(r"\s*(\d{1,2})/(\d{1,2})\s+(\d{1,2}):(\d{2}):(\d{2})", row[0])
         if not m:
             raise ValueError(f"{csv_path}: cannot parse EnergyPlus Date/Time {row[0]!r}")
         month, day, hour, minute, second = map(int, m.groups())
-        stamp = datetime(2001, month, day, hour % 24, minute, second)
+        year = 2002 if crosses_year and (month, day) < tuple(begin) else 2001
+        stamp = datetime(year, month, day, hour % 24, minute, second)
         if hour == 24:
             stamp += timedelta(days=1)
         stamps.append(stamp)
@@ -90,6 +98,41 @@ def validate_csv_timeline(csv_path: Path) -> None:
             f"{csv_path}: {reason} at data row {i + 1}: delta={delta}s, expected {STEP_S}s; "
             "do not reuse this CSV for timer-based replay"
         )
+    expected_first = period_start + timedelta(seconds=STEP_S)
+    expected_last = period_end
+    expected_samples = int((period_end - period_start).total_seconds()) // STEP_S
+    if stamps[0] != expected_first or stamps[-1] != expected_last or len(stamps) != expected_samples:
+        raise ValueError(
+            f"{csv_path}: observed period does not match requested "
+            f"{begin[0]}-{begin[1]}..{end[0]}-{end[1]} at {STEP_S}s: "
+            f"first={rows[1][0].strip()!r}, last={rows[-1][0].strip()!r}, "
+            f"samples={len(stamps)}; expected first={expected_first.isoformat()}, "
+            f"last={expected_last.isoformat()}, samples={expected_samples}; "
+            "do not relabel or reuse this CSV"
+        )
+    return {
+        "begin": f"{begin[0]}-{begin[1]}",
+        "end": f"{end[0]}-{end[1]}",
+        "observed_first": rows[1][0].strip(),
+        "observed_last": rows[-1][0].strip(),
+        "samples": len(stamps),
+    }
+
+
+def replay_results(log: str) -> dict[str, str]:
+    """Extract one PASS/FAIL outcome per replay directory from verifier output."""
+    results, current = {}, None
+    for line in log.splitlines():
+        path = re.search(r"(?:^|[\\/])replay[\\/]([^\s\\/]+)\s*$", line.strip())
+        if path:
+            current = path.group(1)
+            continue
+        if current and re.search(r"\bFAIL\b", line):
+            results[current] = "fail"
+        elif current and re.search(r"\bPASS\b", line) and current not in results:
+            results[current] = "pass"
+    return results
+
 
 def loop_nodes(b: dict) -> dict:
     """Per-air-loop node map derived from the epJSON topology."""
@@ -372,9 +415,9 @@ def emit_and_replay(building: str, loops_pts: dict, rules: dict, out: Path):
             dirs.append(d)
     r = subprocess.run(
         ["cargo", "run", "--quiet", "--manifest-path",
-         str(REPO / "tools/verify/Cargo.toml"), "--", *map(str, dirs)],
+         str(REPO / "tools/verify/Cargo.toml"), "--", "--replay-only", *map(str, dirs)],
         capture_output=True, text=True, cwd=REPO)
-    return r.stdout + r.stderr
+    return r
 
 
 
@@ -704,7 +747,7 @@ def vavcal(b, bdir, out, epw, begin, end, args):
     if not (args.reuse and csv_path.is_file()):
         print(f"vavcal: {len(zones)} terminals; running EnergyPlus…")
         csv_path = run_energyplus(pj, epw, out / "ep")
-    validate_csv_timeline(csv_path)
+    validate_csv_timeline(csv_path, begin, end)
     with open(csv_path) as f:
         rows = list(csv.reader(f))
     header, data = rows[0], rows[1:]
@@ -809,7 +852,7 @@ def main():
         if not (args.reuse and csv_path.is_file()):
             print(f"plant loops: {list(pn)}; running EnergyPlus…")
             csv_path = run_energyplus(pj, epw, out / "ep")
-        validate_csv_timeline(csv_path)
+        timeline = validate_csv_timeline(csv_path, begin, end)
         fams = extract_plant(csv_path, pn, b)
         chillers = fams.pop("_chillers", {})
         pumps = fams.pop("_pumps", {})
@@ -965,7 +1008,7 @@ def main():
         tower_validation = {
             "schema": "cxf-library/simharness/tower-0005/v1",
             "building": bdir.name,
-            "period": {"begin": args.begin, "end": args.end},
+            "period": timeline,
             "step_s": STEP_S,
             "mapping": {
                 "tower_leaving_temp": "per-object Cooling Tower Outlet Temperature",
@@ -1017,23 +1060,24 @@ def main():
                 }, indent=1))
                 dirs.append(d)
         rr = subprocess.run(["cargo", "run", "--quiet", "--manifest-path",
-                             str(REPO / "tools/verify/Cargo.toml"), "--", *map(str, dirs)],
+                             str(REPO / "tools/verify/Cargo.toml"), "--", "--replay-only",
+                             *map(str, dirs)],
                             capture_output=True, text=True, cwd=REPO)
         log = rr.stdout + rr.stderr
         (out / "verify.log").write_text(log)
+        outcomes = replay_results(log)
         for tower_name, result in tower_validation["tower_objects"].items():
             safe_name = re.sub(r"[^a-z0-9]+", "_", tower_name.lower()).strip("_")
-            marker = f"replay/TOWER-0005__{safe_name}"
-            if marker not in log:
-                result["replay_result"] = "not_evaluated"
-                continue
-            segment = log.split(marker, 1)[1].split("\n/", 1)[0]
-            result["replay_result"] = "fail" if re.search(r"\bFAIL\b", segment) else \
-                "pass" if re.search(r"\bPASS\b", segment) else "unknown"
+            result["replay_result"] = outcomes.get(
+                f"TOWER-0005__{safe_name}", "not_evaluated")
         (out / "tower_0005_validation.json").write_text(json.dumps(tower_validation, indent=1))
         for line in log.splitlines():
             if re.search(r"replay/|PASS|FAIL", line):
                 print(line if "replay/" not in line else "  " + line.split("replay/")[-1])
+        if rr.returncode:
+            print(f"verifier failed with exit status {rr.returncode}; see {out / 'verify.log'}",
+                  file=sys.stderr)
+            raise SystemExit(rr.returncode)
         return
 
     if args.mode == "vavcal":
@@ -1060,7 +1104,7 @@ def main():
     if not (args.reuse and csv_path.is_file()):
         print(f"loops: {list(loops)}; running EnergyPlus…")
         csv_path = run_energyplus(pj, epw, out / "ep")
-    validate_csv_timeline(csv_path)
+    validate_csv_timeline(csv_path, begin, end)
     loops_pts = extract(csv_path, loops)
     if args.bias:
         pt, delta = args.bias.split("=")
@@ -1071,7 +1115,8 @@ def main():
         print(f"TPR bias applied: {pt} += {delta} — FAILs below are DETECTIONS")
     rules = eligible_rules()
     print(f"eligible rules (points ⊆ mapped): {sorted(rules)}")
-    log = emit_and_replay(bdir.name, loops_pts, rules, out)
+    rr = emit_and_replay(bdir.name, loops_pts, rules, out)
+    log = rr.stdout + rr.stderr
     (out / "verify.log").write_text(log)
     # tally per rule (dir name carries RULE__LOOP)
     per_rule: dict = {}
@@ -1093,6 +1138,8 @@ def main():
     for rid, lp, line in findings:
         print(f"  FP {rid} @ {lp}: {line.split('—')[-1].strip()}")
     print(f"full log: {out}/verify.log")
+    if rr.returncode:
+        raise SystemExit(rr.returncode)
 
 
 if __name__ == "__main__":
