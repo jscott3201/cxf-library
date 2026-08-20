@@ -1,0 +1,637 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 2100
+  },
+  "scenarios": [
+    {
+      "name": "exact_agreement",
+      "description": "Measurement and independent reference agree.",
+      "inputs": {
+        "primary_airflow": 100.0,
+        "primary_airflow_reference": 100.0
+      },
+      "expect": [
+        {
+          "output": "yReferenceOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yPositiveBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yNegativeBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "sustained_positive_bias",
+      "description": "A 15.1% high measurement drives only the positive direction and matures outside the delay edge.",
+      "inputs": {
+        "primary_airflow": 115.1,
+        "primary_airflow_reference": 100.0
+      },
+      "expect": [
+        {
+          "output": "yReferenceOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yPositiveBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yNegativeBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 2100,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "sustained_negative_bias",
+      "description": "A 15.1% low measurement drives only the negative direction.",
+      "inputs": {
+        "primary_airflow": 84.9,
+        "primary_airflow_reference": 100.0
+      },
+      "expect": [
+        {
+          "output": "yReferenceOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yPositiveBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yNegativeBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 2100,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "positive_exact_threshold",
+      "description": "Exactly +15% is clear under strict Greater.",
+      "inputs": {
+        "primary_airflow": 115.0,
+        "primary_airflow_reference": 100.0
+      },
+      "expect": [
+        {
+          "output": "yPositiveBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yNegativeBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "negative_exact_threshold",
+      "description": "Exactly -15% is clear under the mirrored strict comparison.",
+      "inputs": {
+        "primary_airflow": 85.0,
+        "primary_airflow_reference": 100.0
+      },
+      "expect": [
+        {
+          "output": "yPositiveBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yNegativeBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "reference_below_minimum",
+      "description": "49.9 L/s is below the reference floor and all bias outputs are gated false.",
+      "inputs": {
+        "primary_airflow": 100.0,
+        "primary_airflow_reference": 49.9
+      },
+      "expect": [
+        {
+          "output": "yReferenceOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yPositiveBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yNegativeBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "reference_exactly_at_minimum",
+      "description": "Exactly 50 L/s is NO_EVAL.",
+      "inputs": {
+        "primary_airflow": 100.0,
+        "primary_airflow_reference": 50.0
+      },
+      "expect": [
+        {
+          "output": "yReferenceOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yPositiveBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yNegativeBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "reference_just_above_minimum",
+      "description": "50.1 L/s is evaluable when measurement agrees.",
+      "inputs": {
+        "primary_airflow": 50.1,
+        "primary_airflow_reference": 50.1
+      },
+      "expect": [
+        {
+          "output": "yReferenceOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yPositiveBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yNegativeBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "zero_reference",
+      "description": "Zero reference cannot trigger Divide because the graph contains none; it is NO_EVAL.",
+      "inputs": {
+        "primary_airflow": 100.0,
+        "primary_airflow_reference": 0.0
+      },
+      "expect": [
+        {
+          "output": "yReferenceOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yPositiveBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yNegativeBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "negative_reference_raw_case",
+      "description": "A negative reference remains numerically safe and non-evaluable.",
+      "inputs": {
+        "primary_airflow": 100.0,
+        "primary_airflow_reference": -10.0
+      },
+      "expect": [
+        {
+          "output": "yReferenceOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yPositiveBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yNegativeBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "violation_ends_one_step_before_persistence",
+      "description": "Disagreement clears at 840 s, one step before persistence, and never matures.",
+      "inputs": {
+        "primary_airflow": [
+          {
+            "t": 0,
+            "value": 120.0
+          },
+          {
+            "t": 840,
+            "value": 100.0
+          }
+        ],
+        "primary_airflow_reference": 100.0
+      },
+      "expect": [
+        {
+          "output": "yPositiveBias",
+          "from_s": 0,
+          "to_s": 780,
+          "equals": true
+        },
+        {
+          "output": "yPositiveBias",
+          "from_s": 840,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_disagreement_recovers",
+      "description": "A mature bias alarm clears immediately when the measurement reconverges.",
+      "inputs": {
+        "primary_airflow": [
+          {
+            "t": 0,
+            "value": 120.0
+          },
+          {
+            "t": 1200,
+            "value": 100.0
+          }
+        ],
+        "primary_airflow_reference": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1200,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yPositiveBias",
+          "from_s": 0,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yPositiveBias",
+          "from_s": 1200,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yNegativeBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_disagreements_reset",
+      "description": "Separated short disagreements do not accumulate timer age.",
+      "inputs": {
+        "primary_airflow": [
+          {
+            "t": 0,
+            "value": 120.0
+          },
+          {
+            "t": 360,
+            "value": 100.0
+          },
+          {
+            "t": 600,
+            "value": 120.0
+          },
+          {
+            "t": 960,
+            "value": 100.0
+          }
+        ],
+        "primary_airflow_reference": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "direction_handoff_preserves_age",
+      "description": "A direct positive-to-negative handoff stays continuously outside the band, so the shared timer preserves age while diagnostics swap.",
+      "inputs": {
+        "primary_airflow": [
+          {
+            "t": 0,
+            "value": 120.0
+          },
+          {
+            "t": 480,
+            "value": 80.0
+          }
+        ],
+        "primary_airflow_reference": 100.0
+      },
+      "expect": [
+        {
+          "output": "yPositiveBias",
+          "from_s": 0,
+          "to_s": 420,
+          "equals": true
+        },
+        {
+          "output": "yPositiveBias",
+          "from_s": 480,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yNegativeBias",
+          "from_s": 0,
+          "to_s": 420,
+          "equals": false
+        },
+        {
+          "output": "yNegativeBias",
+          "from_s": 480,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 2100,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "time_alignment_step_transient",
+      "description": "Reference moves two samples before measurement; the temporary disagreement is rejected by persistence, but alignment remains a host obligation.",
+      "inputs": {
+        "primary_airflow_reference": [
+          {
+            "t": 0,
+            "value": 100.0
+          },
+          {
+            "t": 300,
+            "value": 140.0
+          }
+        ],
+        "primary_airflow": [
+          {
+            "t": 0,
+            "value": 100.0
+          },
+          {
+            "t": 420,
+            "value": 140.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "circular_reference_blind_spot",
+      "description": "A reference calculated directly from the accused point agrees perfectly and hides any bias; the clear result pins why circular evidence is invalid.",
+      "inputs": {
+        "primary_airflow": 130.0,
+        "primary_airflow_reference": 130.0
+      },
+      "expect": [
+        {
+          "output": "yReferenceOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yPositiveBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yNegativeBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "unit_mismatch_raw_false_positive",
+      "description": "Numerically mismatched units look like a permanent positive bias and alarm raw; equal units are host-enforced.",
+      "inputs": {
+        "primary_airflow": 211.9,
+        "primary_airflow_reference": 100.0
+      },
+      "expect": [
+        {
+          "output": "yReferenceOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yPositiveBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yNegativeBias",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 2100,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}

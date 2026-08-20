@@ -18,7 +18,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [HW-0002, HW-0004, HW-0007, HW-0008, HW-0009, HW-0011]
+related: [HW-0002, HW-0004, HW-0007, HW-0008, HW-0009, HW-0011, FPB-0006]
 playbooks: [hot-water-plant-faults]
 operating_states: "normal automatic hot-water operation after startup, with at least one boiler proven firing and distribution circulation established"
 preconditions: "hws_temp and hws_temp_sp must describe the same controlled outlet or common header and final active target. A common header plus an OR of firing statuses is valid only when all points belong to the same configured plant; it is not an individual-boiler outlet comparison. Exclude warm-up and setback recovery, setpoint/reset ramps, stage or pump changes, minimum-flow transitions, tuning tests, and intentional demand, high-limit, fuel, flame-safeguard, freeze, emissions, or other capacity limits until the plant has settled. boiler_status must represent firing rather than enable, and hw_pump_status must establish distribution circulation. Temperature, status, and setpoint signals must be fresh, aligned, calibrated, and in the declared units. When any obligation is unmet the verdict is NO_EVAL, not healthy."

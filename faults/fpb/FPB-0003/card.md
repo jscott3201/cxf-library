@@ -18,7 +18,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [FPB-0001, FPB-0002, FCU-0005, VAV-0009]
+related: [FPB-0001, FPB-0002, FPB-0006, FCU-0005, VAV-0009]
 playbooks: [fan-powered-terminal-faults]
 operating_states: "hydronic-reheat FPB states with proven airflow through the reheat coil and no legitimate reheat request"
 preconditions: "Apply only to hydronic reheat with available hot water at meaningful temperature and pressure. fan_status must prove airflow through the evaluated coil path. Bind physical coil-local temperatures: SFPU downstream of the series fan/immediately upstream of the coil and immediately at coil outlet; PFPU immediately around the fan/reheat branch before primary/branch mixing. A mixed zone-discharge proxy is invalid unless the host supplies a validated derived coil-leaving estimate. Exclude freeze/exercise/commissioning, intentional minimum valve position, sensor faults, and warm-soak after a prior heating call. Inputs must be fresh and aligned; unmet obligations are NO_EVAL, not healthy."

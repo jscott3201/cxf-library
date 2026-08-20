@@ -156,6 +156,81 @@
       },
       "provisional": true,
       "notes": "Brick provides only the generic class and PPR2.1 location is topology. For PFPU bind inside the fan/reheat branch before primary/branch mixing; mixed zone discharge is not equivalent unless a validated host Function derives the coil-leaving estimate. For SFPU bind immediately at coil outlet."
+    },
+    {
+      "name": "fan_airflow",
+      "description": "Measured airflow through the terminal-fan path",
+      "kind": "real",
+      "unit": "L/s",
+      "qudt_unit": "L-PER-SEC",
+      "brick": "Air_Flow_Sensor",
+      "s223": {
+        "pattern": "FlowSensor observes a QuantifiableObservableProperty of Fluid-Air at the terminal Fan path: PFPU secondary fan/plenum branch or SFPU series-fan flow path",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "VolumeFlowRate",
+        "unit": "L-PER-SEC",
+        "medium": "Fluid-Air",
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "brick:Air_Flow_Sensor and PPR2.1 FlowSensor/VolumeFlowRate/L-PER-SEC/Fluid-Air are exact generic terms. Deployment topology identifies PFPU branch flow (ConnectionPoint Role-Secondary where applicable) or SFPU series-fan path. Do not bind total mixed discharge for PFPU. For SFPU, do not duplicate primary_airflow unless topology proves the same flow and the expected model remains independent."
+    },
+    {
+      "name": "fan_airflow_expected",
+      "description": "Expected terminal-fan-path airflow at the current operating condition (host-fitted baseline)",
+      "kind": "real",
+      "unit": "L/s",
+      "qudt_unit": "L-PER-SEC",
+      "brick": null,
+      "s223": {
+        "pattern": "Host model represented as a Function whose hasOutput is a QuantifiableProperty for Fluid-Air VolumeFlowRate",
+        "property_class": "QuantifiableProperty",
+        "quantitykind": "VolumeFlowRate",
+        "unit": "L-PER-SEC",
+        "medium": "Fluid-Air",
+        "aspects": []
+      },
+      "derived": true,
+      "provisional": true,
+      "notes": "HOST-DERIVED SITE_FITTED baseline. Train on a known-good period, record model version/fit interval/error/update policy and inputs, and publish only while ready, fresh, and in-domain for fan command/speed, pressure, subtype, damper/topology, and operating state. Actual and expected must cover the same fan path. Brick has no exact expected-airflow point; PPR2.1 Function/hasOutput/QuantifiableProperty are exact but there is no exact predicted/expected aspect."
+    },
+    {
+      "name": "primary_airflow_reference",
+      "description": "Independent or redundant host estimate of the terminal's primary inlet airflow",
+      "kind": "real",
+      "unit": "L/s",
+      "qudt_unit": "L-PER-SEC",
+      "brick": null,
+      "s223": {
+        "pattern": "Independent host Function hasOutput a QuantifiableProperty for Fluid-Air VolumeFlowRate at the FanPoweredTerminal primary inlet",
+        "property_class": "QuantifiableProperty",
+        "quantitykind": "VolumeFlowRate",
+        "unit": "L-PER-SEC",
+        "medium": "Fluid-Air",
+        "aspects": []
+      },
+      "derived": true,
+      "provisional": true,
+      "notes": "HOST-DERIVED or redundant reference used only for sensor disagreement. Valid examples include a certified redundant sensor, independent calibrated damper/pressure model, or validated upstream branch balance. It must not consume primary_airflow or any direct transform of it; circular evidence guarantees agreement. Record derivation, inputs, same-stream/location proof, accuracy, readiness, domain, freshness, and time alignment. A physical redundant sensor may use brick:Supply_Air_Flow_Sensor instead of this derived form."
+    },
+    {
+      "name": "rht_delta_t_expected",
+      "description": "Expected air-side temperature rise across the hydronic reheat coil at the current operating condition",
+      "kind": "real",
+      "unit": "K",
+      "qudt_unit": "K",
+      "brick": null,
+      "s223": {
+        "pattern": "Host model represented as a Function whose hasOutput is a QuantifiableProperty for Fluid-Air TemperatureDifference",
+        "property_class": "QuantifiableProperty",
+        "quantitykind": "TemperatureDifference",
+        "unit": "K",
+        "medium": "Fluid-Air",
+        "aspects": []
+      },
+      "derived": true,
+      "provisional": true,
+      "notes": "HOST-DERIVED SITE_FITTED baseline. Train on known-good coil operation and publish a positive value only while ready/fresh/in-domain for coil airflow, entering temperature, valve/full-heat state, and hot-water temperature/flow/pressure. Record model version, fit period, error, inputs, and freeze/update policy. Brick has no exact expected delta-T point; PPR2.1 Function/hasOutput/QuantifiableProperty and QUDT TemperatureDifference/K are exact, but no expected/derived aspect exists."
     }
   ]
 }

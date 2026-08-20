@@ -28,6 +28,24 @@ and electric-reheat-only units for the hydronic valve rule.
 | FPB-0001 | Terminal fan proof-of-operation failure | 2 | rule | **verified** |
 | FPB-0002 | Primary airflow tracking failure | 3 | rule | **verified** |
 | FPB-0003 | Reheat valve closed with unintended temperature rise | 3 | rule | **verified** |
+| FPB-0004 | Terminal fan airflow degradation | 3 | statistical | **verified** |
+| FPB-0005 | Primary airflow sensor disagreement | 3 | meta | **verified** |
+| FPB-0006 | Reheat-coil heat-transfer degradation | 3 | statistical | **verified** |
+
+
+## Minimum telemetry tiers
+
+| Tier | Points | Supported rules |
+|---|---|---|
+| Basic | fan command/status, primary flow/setpoint | FPB-0001..0002 |
+| Reheat | + valve and coil inlet/outlet temperatures | + FPB-0003 |
+| Performance | + fan airflow/expected airflow and expected coil delta-T | + FPB-0004, FPB-0006 |
+| Sensor redundancy | + independent primary airflow reference | + FPB-0005 |
+
+Expected/reference points are host-derived contracts, not guesses. Each deployment
+records known-good fit data, model/version, inputs, accuracy, same-path scope,
+freshness, domain checks, and update/freeze policy. A model using the point it
+is supposed to check is circular and invalid.
 
 ## Source and validation posture
 
@@ -43,6 +61,6 @@ the library-authored thresholds in this slice; the adapter is deferred to PR11.
   suppression is safe for FPB-0002/0003.
 - FPB-0002 is the primary-stream sibling of VAV-0004 and relates upstream AHU
   static/reset signatures without claiming their causes.
-- FPB-0003 is the coil-local sibling of FCU-0005/VAV-0009. It is not added to
-  CLU-01 because a single AHU simultaneous-command repair cannot reliably clear
-  a physically passing terminal valve.
+- FPB-0003 is the coil-local leakage sibling of FCU-0005/VAV-0009; FPB-0006 asks the opposite full-command performance question. Neither joins CLU-01.
+- FPB-0004 separates proven operation from delivered fan-path airflow. FPB-0001 remains direction-sensitive context, not a whole-rule suppressor.
+- FPB-0005's ambiguous adjudication reports disagreement without automatically choosing the physical sensor or host reference as the failed member.

@@ -18,7 +18,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [FPB-0001, FPB-0003, VAV-0004, AHU-0001, AHU-0024, AHU-0031]
+related: [FPB-0001, FPB-0003, FPB-0004, FPB-0005, VAV-0004, AHU-0001, AHU-0024, AHU-0031]
 playbooks: [fan-powered-terminal-faults]
 operating_states: "enabled series or parallel FPB in a settled occupied/ventilation/control state where active primary airflow tracking is expected"
 preconditions: "primary_airflow must be the AHU-fed primary inlet stream, excluding induced/plenum fan flow; primary_airflow_sp must be the settled final active target, not a design minimum/maximum. The upstream AHU fan and sufficient static pressure must be available. Validate airflow units, calibration and K-factor, controller pressure-independence, and data freshness. Exclude AHU shutdown, startup, setpoint ramps, balancing, overrides, and maintenance. minimum_airflow_sp is adoption-blocking and must be commissioned. ySetpointOk covers only the numerical setpoint floor; any other unmet host obligation is NO_EVAL, not healthy."

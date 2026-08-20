@@ -506,6 +506,30 @@
       "legacy_id": null
     },
     {
+      "id": "FPB-0004",
+      "family": "fpb",
+      "name": "Terminal fan airflow degradation",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "FPB-0005",
+      "family": "fpb",
+      "name": "Primary airflow sensor disagreement",
+      "method": "meta",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "FPB-0006",
+      "family": "fpb",
+      "name": "Reheat-coil heat-transfer degradation",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
       "id": "HP-0001",
       "family": "hp",
       "name": "COP degradation vs baseline",

@@ -18,7 +18,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [FPB-0002, FPB-0003]
+related: [FPB-0002, FPB-0003, FPB-0004]
 playbooks: [proof-of-operation, fan-powered-terminal-faults]
 operating_states: "series or parallel fan-powered terminal states in which the final terminal-fan command and same-fan independent proof are authoritative"
 preconditions: "Bind fan_cmd after subtype sequence ownership, fan delay, occupancy, low-flow/heating logic, and normal interlocks. Bind independent fan_status for the same fan; command echo is invalid. A series fan may run continuously while occupied, whereas a parallel fan may legitimately remain off in many modes. Exclude smoke/emergency, freeze/condensate protection, exercise, maintenance, local hand operation, and any intentional fan delay not represented in the final command. Inputs must be fresh and aligned; unmet obligations are NO_EVAL, not healthy."
