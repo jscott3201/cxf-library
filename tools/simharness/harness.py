@@ -442,10 +442,23 @@ TOWER_MAPPED = {"tower_leaving_temp", "tower_leaving_temp_sp",
                 "tower_fan_status", "tower_fan_speed"}
 # rule -> gate key; rules absent here replay ungated (lead margin only):
 # unnecessary-operation rules must NOT be gated on the equipment they accuse.
-PLANT_GATE = {"CHW-0004": "chw_load40", "HW-0004": "hw_on", "HW-0007": "hw_on"}
-PUMP_ON_W = 100.0
+PLANT_GATE = {"CHW-0004": "chw_load40", "HW-0004": "hw_on", "HW-0007": "hw_on",
+              "HW-0010": "hw_tracking"}
 PMP_ON_W = 0.0
 WATER_DENSITY_KG_M3 = 997.0
+
+
+def plant_side_component_names(b: dict, pl: dict, object_types: set[str]) -> list[str]:
+    """Return exact supply-side equipment membership from PlantLoop topology."""
+    list_name = pl.get("plant_side_branch_list_name")
+    branch_list = b.get("BranchList", {}).get(list_name, {})
+    names = []
+    for branch_ref in branch_list.get("branches", []):
+        branch = b.get("Branch", {}).get(branch_ref.get("branch_name"), {})
+        for component in branch.get("components", []):
+            if component.get("component_object_type") in object_types:
+                names.append(component["component_name"])
+    return list(dict.fromkeys(names))
 
 
 def plant_nodes(b: dict) -> dict:
@@ -461,8 +474,14 @@ def plant_nodes(b: dict) -> dict:
                                  ] + [c for c in b.get("Chiller:Electric:EIR", {})]
             out["chw"] = entry
         elif any(name.startswith(p) for p in ("HeatSys", "HW")) and "SWH" not in name:
-            entry["boilers"] = [x for x in b.get("Boiler:HotWater", {}) if name.split("_")[0].lower() in x.lower() or "Central" not in x]
-            entry["pumps"] = [p for p in list(b.get("Pump:VariableSpeed", {})) if name.split("_")[0].lower() in p.lower()]
+            entry["boilers"] = plant_side_component_names(
+                b, pl, {"Boiler:HotWater"})
+            entry["pumps"] = plant_side_component_names(
+                b, pl, {"Pump:VariableSpeed", "Pump:ConstantSpeed",
+                        "HeaderedPumps:VariableSpeed", "HeaderedPumps:ConstantSpeed"})
+            if not entry["boilers"] or not entry["pumps"]:
+                raise ValueError(
+                    f"{name}: HW loop topology must identify at least one boiler and pump")
             out["hw"] = entry
     for name, cl in b.get("CondenserLoop", {}).items():
         out["tower"] = {"out_node": cl["condenser_side_outlet_node_name"],
@@ -614,8 +633,14 @@ def extract_plant(csv_path: Path, pn: dict, b: dict) -> dict:
             "hws_temp": series(data, col(header, h["out_node"], "System Node Temperature")),
             "hwr_temp": series(data, col(header, h["in_node"], "System Node Temperature")),
             "hws_temp_sp": series(data, col(header, h["sp_node"], "System Node Setpoint Temperature")),
-            "boiler_status": [max(v) > 0.02 for v in zip(*plrs)],
-            "hw_pump_status": [max(v) > PUMP_ON_W for v in zip(*pump_w)],
+            # Any positive target-loop PLR is the simulation's disclosed
+            # firing-status proxy. Do not discard low-fire operation with an
+            # arbitrary PLR cutoff.
+            "boiler_status": [max(v) > 0.0 for v in zip(*plrs)],
+            # Same-loop native mass flow is a stronger circulation proxy than
+            # pump power here: the variable-speed prototype legitimately draws
+            # only single-digit watts at low flow.
+            "hw_pump_status": [max(v) > 0.0 for v in zip(*flows)],
             # VFD speed proxy: pump mass-flow fraction of observed max x100
             # (affinity-law approximation; documented proxy)
             "hw_pump_vfd_speed": [round(max(v) / fmax * 100.0, ROUND) for v in zip(*flows)],
@@ -661,18 +686,28 @@ def plant_gate_windows(key: str | None, pts: dict, n: int) -> list:
         ok = [s and load > 20.0 for s, load in
               zip(pts["chiller_status"], pts["chiller_load"])]
     elif key == "hw_on":
-        ok = pts["boiler_status"]
+        ok = [boiler and pump for boiler, pump in
+              zip(pts["boiler_status"], pts["hw_pump_status"])]
+    elif key == "hw_tracking":
+        ok = [boiler and pump for boiler, pump in
+              zip(pts["boiler_status"], pts["hw_pump_status"])]
     else:
         raise KeyError(key)
-    wins, start = [], None
+    wins, start, state = [], None, None
     for i, v in enumerate(list(ok) + [False]):
-        if v and start is None:
-            start = i
+        current = round(pts["hws_temp_sp"][i], 3) \
+            if key == "hw_tracking" and i < n else None
+        if v and (start is None or current != state):
+            if start is not None:
+                a, b_ = start * STEP_S + OS_LEAD_S, (i - 1) * STEP_S
+                if b_ - a >= 1800:
+                    wins.append((a, b_))
+            start, state = i, current
         elif not v and start is not None:
             a, b_ = start * STEP_S + OS_LEAD_S, (i - 1) * STEP_S
             if b_ - a >= 1800:
                 wins.append((a, b_))
-            start = None
+            start, state = None, None
     return wins
 
 
@@ -921,13 +956,29 @@ def main():
             wins = plant_gate_windows(PLANT_GATE.get(rid), pts, n)
             if not wins:
                 print(f"  {rid}: no gated windows this period"); continue
+            if rid == "HW-0010":
+                evaluated_ticks = sum((b_ - a) // STEP_S + 1 for a, b_ in wins)
+                print(f"  HW-0010: {len(wins)} settled tracking window(s), "
+                      f"{evaluated_ticks} evaluated tick(s)")
             d = replay / rid
             d.mkdir(parents=True)
             shutil.copy(r["dir"] / "rule.cxf.jsonld", d / "rule.cxf.jsonld")
+            if rid == "HW-0010":
+                description = (
+                    f"Healthy-baseline EnergyPlus week ({bdir.name}); target-loop boiler "
+                    "membership is traversed from the PlantLoop supply branches, any positive "
+                    "boiler PLR is a disclosed firing proxy, and positive same-loop pump mass "
+                    "flow is the circulation proxy. Common loop outlet temperature is compared "
+                    "with its own final node setpoint only in windows beginning 1800 s after "
+                    "both proxies are active and restarting on setpoint change. Any FAIL is a "
+                    "false positive."
+                )
+            else:
+                description = (f"Healthy-baseline EnergyPlus week ({bdir.name}); "
+                               "plant-mode replay, gated; any FAIL is a false positive.")
             scen = {
                 "name": f"{bdir.name}_{fam}".replace("-", "_").replace(".", "_").lower(),
-                "description": f"Healthy-baseline EnergyPlus week ({bdir.name}); "
-                               "plant-mode replay, gated; any FAIL is a false positive.",
+                "description": description,
                 "inputs": {p: to_steps(pts[p]) for p in r["points"]},
                 "expect": [{"output": "yFault", "from_s": a, "to_s": b_,
                             "equals": False} for a, b_ in wins],

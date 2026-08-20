@@ -1,0 +1,644 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 3600
+  },
+  "scenarios": [
+    {
+      "name": "inactive_plant_with_error",
+      "description": "A stopped plant is outside the rule's operating premise even with a large temperature error.",
+      "inputs": {
+        "hws_temp": 50.0,
+        "hws_temp_sp": 60.0,
+        "boiler_status": false,
+        "hw_pump_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooHot",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "active_on_setpoint",
+      "description": "A firing boiler and running pump holding the active target are healthy.",
+      "inputs": {
+        "hws_temp": 60.0,
+        "hws_temp_sp": 60.0,
+        "boiler_status": true,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooHot",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "too_cold_at_initialization",
+      "description": "A standing cold-side violation exposes direction immediately and waits the full initialization-safe delay.",
+      "inputs": {
+        "hws_temp": 57.0,
+        "hws_temp_sp": 60.0,
+        "boiler_status": true,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yTooHot",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "too_hot_at_initialization",
+      "description": "The mirror hot-side violation uses the same continuous persistence.",
+      "inputs": {
+        "hws_temp": 63.0,
+        "hws_temp_sp": 60.0,
+        "boiler_status": true,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yTooHot",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "hot_error_exact_boundary_clear",
+      "description": "Exactly +2 K is clear under the strict comparator.",
+      "inputs": {
+        "hws_temp": 62.0,
+        "hws_temp_sp": 60.0,
+        "boiler_status": true,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooHot",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "hot_error_just_beyond_boundary",
+      "description": "One hundredth kelvin above the hot boundary follows the full delay.",
+      "inputs": {
+        "hws_temp": 62.01,
+        "hws_temp_sp": 60.0,
+        "boiler_status": true,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yTooHot",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "cold_error_exact_boundary_clear",
+      "description": "Exactly -2 K is clear under the mirrored strict comparator.",
+      "inputs": {
+        "hws_temp": 58.0,
+        "hws_temp_sp": 60.0,
+        "boiler_status": true,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooHot",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "cold_error_just_beyond_boundary",
+      "description": "One hundredth kelvin past the cold boundary follows the full delay.",
+      "inputs": {
+        "hws_temp": 57.99,
+        "hws_temp_sp": 60.0,
+        "boiler_status": true,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "boiler_only_is_inactive",
+      "description": "Boiler firing without established distribution-pump proof gates off both directions.",
+      "inputs": {
+        "hws_temp": 50.0,
+        "hws_temp_sp": 60.0,
+        "boiler_status": true,
+        "hw_pump_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooHot",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "pump_only_is_inactive",
+      "description": "Pump circulation without a firing heat source is not tracking evidence for this rule.",
+      "inputs": {
+        "hws_temp": 50.0,
+        "hws_temp_sp": 60.0,
+        "boiler_status": false,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooHot",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "violation_ends_one_tick_before_persistence",
+      "description": "The cold error returns to the band one evaluator step before 900 s and never matures.",
+      "inputs": {
+        "hws_temp": [
+          {
+            "t": 0,
+            "value": 57.0
+          },
+          {
+            "t": 840,
+            "value": 60.0
+          }
+        ],
+        "hws_temp_sp": 60.0,
+        "boiler_status": true,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_alarm_recovers",
+      "description": "A mature hot-side alarm and its diagnostic clear immediately after temperature recovers.",
+      "inputs": {
+        "hws_temp": [
+          {
+            "t": 0,
+            "value": 63.0
+          },
+          {
+            "t": 1800,
+            "value": 60.0
+          }
+        ],
+        "hws_temp_sp": 60.0,
+        "boiler_status": true,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1740,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooHot",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_episodes_do_not_accumulate",
+      "description": "Two cold episodes separated by an in-band interval each start a fresh timer.",
+      "inputs": {
+        "hws_temp": [
+          {
+            "t": 0,
+            "value": 57.0
+          },
+          {
+            "t": 600,
+            "value": 60.0
+          },
+          {
+            "t": 900,
+            "value": 57.0
+          },
+          {
+            "t": 1500,
+            "value": 60.0
+          }
+        ],
+        "hws_temp_sp": 60.0,
+        "boiler_status": true,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "pump_proof_drop_resets_timer",
+      "description": "Loss and restoration of pump proof gives the continuing temperature error a fresh 900-second clock.",
+      "inputs": {
+        "hws_temp": 57.0,
+        "hws_temp_sp": 60.0,
+        "boiler_status": true,
+        "hw_pump_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          },
+          {
+            "t": 900,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "boiler_proof_drop_resets_timer",
+      "description": "A firing-status interruption independently resets persistence.",
+      "inputs": {
+        "hws_temp": 63.0,
+        "hws_temp_sp": 60.0,
+        "boiler_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          },
+          {
+            "t": 900,
+            "value": true
+          }
+        ],
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "direct_direction_handoff_preserves_timer",
+      "description": "A sampled hot-to-cold handoff never re-enters the band, so the shared out-of-band timer continues while diagnostics swap.",
+      "inputs": {
+        "hws_temp": [
+          {
+            "t": 0,
+            "value": 63.0
+          },
+          {
+            "t": 600,
+            "value": 57.0
+          }
+        ],
+        "hws_temp_sp": 60.0,
+        "boiler_status": true,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yTooHot",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 660,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "setpoint_step_settles_before_delay",
+      "description": "A reset step creates raw cold error, but temperature catches the new target before persistence.",
+      "inputs": {
+        "hws_temp": [
+          {
+            "t": 0,
+            "value": 60.0
+          },
+          {
+            "t": 600,
+            "value": 64.0
+          }
+        ],
+        "hws_temp_sp": [
+          {
+            "t": 0,
+            "value": 60.0
+          },
+          {
+            "t": 300,
+            "value": 64.0
+          }
+        ],
+        "boiler_status": true,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "temperature_threshold_chatter_resets_delay",
+      "description": "Alternating just inside and outside the hot boundary never accumulates continuous persistence.",
+      "inputs": {
+        "hws_temp": [
+          {
+            "t": 0,
+            "value": 62.01
+          },
+          {
+            "t": 180,
+            "value": 61.99
+          },
+          {
+            "t": 360,
+            "value": 62.01
+          },
+          {
+            "t": 540,
+            "value": 61.99
+          },
+          {
+            "t": 720,
+            "value": 62.01
+          },
+          {
+            "t": 900,
+            "value": 61.99
+          }
+        ],
+        "hws_temp_sp": 60.0,
+        "boiler_status": true,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "common_header_binding_is_host_excluded",
+      "description": "The graph alarms on a coherent raw tuple even if this header is not the firing boiler's controlled target; topology proof is a mandatory host gate.",
+      "inputs": {
+        "hws_temp": 55.0,
+        "hws_temp_sp": 60.0,
+        "boiler_status": true,
+        "hw_pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}
