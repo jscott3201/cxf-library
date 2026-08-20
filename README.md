@@ -40,7 +40,7 @@ Here's a real one — AHU-0016, simultaneous heating and cooling:
 
 ## What's inside
 
-- **131 verified fault rules** across thirteen equipment families — air handlers,
+- **134 verified fault rules** across thirteen equipment families — air handlers,
   VAV boxes, fan-powered terminals, rooftop units, heat pumps, chillers, cooling
   towers, hot-water plants, fan coils, energy recovery ventilators, pumps, VFDs, and
   cross-equipment sensor-health rules. The

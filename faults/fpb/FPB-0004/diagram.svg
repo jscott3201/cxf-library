@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="520" viewBox="0 0 1900 520">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#718096"/></marker></defs>
+<style>.title{font:700 20px monospace;fill:#172033}.port{font:600 12px monospace;fill:#172033}.inst{font:700 11px monospace;fill:#172033}.cls{font:9px monospace;fill:#4b5563}.wire{stroke:#718096;stroke-width:2;fill:none;marker-end:url(#arrow)}.in{fill:#dbeafe;stroke:#2563eb;stroke-width:1.5}.out{fill:#fee2e2;stroke:#dc2626;stroke-width:1.5}.blk{fill:#f8fafc;stroke:#64748b;stroke-width:1.5}</style>
+<text x="24" y="30" class="title">FPB-0004 block graph</text>
+<path d="M200 99 H250" class="wire"/>
+<path d="M200 99 H225 V202 H250" class="wire"/>
+<path d="M200 99 H225 V312 H250" class="wire"/>
+<path d="M200 219 H250" class="wire"/>
+<path d="M430 202 H550" class="wire"/>
+<path d="M470 312 H510 V202 H550" class="wire"/>
+<path d="M470 82 H760 V172 H800" class="wire"/>
+<path d="M710 202 H760 V172 H800" class="wire"/>
+<path d="M970 172 H1020 V272 H1060" class="wire"/>
+<path d="M200 399 H1020 V272 H1060" class="wire"/>
+<path d="M1230 272 H1320" class="wire"/>
+<path d="M1530 272 H1720" class="wire"/>
+<path d="M470 82 H1640 V82 H1720" class="wire"/>
+<path d="M970 172 H1640 V162 H1720" class="wire"/>
+<rect x="20" y="82" width="180" height="34" rx="17" class="in"/>
+<text x="110" y="104" text-anchor="middle" class="port">fan_airflow_expected</text>
+<rect x="20" y="202" width="180" height="34" rx="17" class="in"/>
+<text x="110" y="224" text-anchor="middle" class="port">fan_airflow</text>
+<rect x="20" y="382" width="180" height="34" rx="17" class="in"/>
+<text x="110" y="404" text-anchor="middle" class="port">fan_status</text>
+<rect x="250" y="55" width="220" height="54" rx="8" class="blk"/>
+<text x="262" y="74" class="inst">baselineOk</text>
+<text x="262" y="93" class="cls">GreaterThreshold · 50 L/s</text>
+<rect x="250" y="175" width="180" height="54" rx="8" class="blk"/>
+<text x="262" y="194" class="inst">residual</text>
+<text x="262" y="213" class="cls">Reals.Subtract</text>
+<rect x="250" y="285" width="220" height="54" rx="8" class="blk"/>
+<text x="262" y="304" class="inst">allowance</text>
+<text x="262" y="323" class="cls">MultiplyByParameter · 0.20</text>
+<rect x="550" y="175" width="160" height="54" rx="8" class="blk"/>
+<text x="562" y="194" class="inst">dropHigh</text>
+<text x="562" y="213" class="cls">Reals.Greater</text>
+<rect x="800" y="145" width="170" height="54" rx="8" class="blk"/>
+<text x="812" y="164" class="inst">airflowLow</text>
+<text x="812" y="183" class="cls">Logical.And</text>
+<rect x="1060" y="245" width="170" height="54" rx="8" class="blk"/>
+<text x="1072" y="264" class="inst">runningLow</text>
+<text x="1072" y="283" class="cls">Logical.And</text>
+<rect x="1320" y="245" width="210" height="54" rx="8" class="blk"/>
+<text x="1332" y="264" class="inst">persist</text>
+<text x="1332" y="283" class="cls">TrueDelay · 900 s</text>
+<rect x="1720" y="65" width="150" height="34" rx="17" class="out"/>
+<text x="1795" y="87" text-anchor="middle" class="port">yBaselineOk</text>
+<rect x="1720" y="145" width="150" height="34" rx="17" class="out"/>
+<text x="1795" y="167" text-anchor="middle" class="port">yAirflowLow</text>
+<rect x="1720" y="245" width="150" height="34" rx="17" class="out"/>
+<text x="1795" y="267" text-anchor="middle" class="port">yFault</text>
+</svg>

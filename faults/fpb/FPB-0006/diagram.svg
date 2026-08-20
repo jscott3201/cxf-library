@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2280" height="720" viewBox="0 0 2280 720">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#718096"/></marker></defs>
+<style>.title{font:700 20px monospace;fill:#172033}.port{font:600 12px monospace;fill:#172033}.inst{font:700 11px monospace;fill:#172033}.cls{font:9px monospace;fill:#4b5563}.wire{stroke:#718096;stroke-width:2;fill:none;marker-end:url(#arrow)}.in{fill:#dbeafe;stroke:#2563eb;stroke-width:1.5}.out{fill:#fee2e2;stroke:#dc2626;stroke-width:1.5}.blk{fill:#f8fafc;stroke:#64748b;stroke-width:1.5}</style>
+<text x="24" y="30" class="title">FPB-0006 block graph</text>
+<path d="M200 99 H225 V122 H250" class="wire"/>
+<path d="M200 179 H225 V122 H250" class="wire"/>
+<path d="M430 122 H500 V202 H540" class="wire"/>
+<path d="M200 319 H225 V202 H540" class="wire"/>
+<path d="M200 319 H250" class="wire"/>
+<path d="M200 319 H500 V332 H540" class="wire"/>
+<path d="M720 202 H850" class="wire"/>
+<path d="M760 332 H805 V252 H850" class="wire"/>
+<path d="M440 302 H1060 V252 H1100" class="wire"/>
+<path d="M1010 252 H1100" class="wire"/>
+<path d="M200 499 H250" class="wire"/>
+<path d="M450 482 H805 V512 H850" class="wire"/>
+<path d="M200 619 H805 V512 H850" class="wire"/>
+<path d="M1310 252 H1355 V382 H1400" class="wire"/>
+<path d="M1010 512 H1355 V382 H1400" class="wire"/>
+<path d="M1560 382 H1650" class="wire"/>
+<path d="M1860 382 H2100" class="wire"/>
+<path d="M440 302 H2020 V292 H2100" class="wire"/>
+<path d="M450 482 H2020 V472 H2100" class="wire"/>
+<path d="M1310 252 H2020 V242 H2085" class="wire"/>
+<rect x="20" y="82" width="180" height="34" rx="17" class="in"/>
+<text x="110" y="104" text-anchor="middle" class="port">rht_coil_entering_temp</text>
+<rect x="20" y="162" width="180" height="34" rx="17" class="in"/>
+<text x="110" y="184" text-anchor="middle" class="port">rht_coil_leaving_temp</text>
+<rect x="20" y="302" width="180" height="34" rx="17" class="in"/>
+<text x="110" y="324" text-anchor="middle" class="port">rht_delta_t_expected</text>
+<rect x="20" y="482" width="180" height="34" rx="17" class="in"/>
+<text x="110" y="504" text-anchor="middle" class="port">rht_vlv_cmd</text>
+<rect x="20" y="602" width="180" height="34" rx="17" class="in"/>
+<text x="110" y="624" text-anchor="middle" class="port">fan_status</text>
+<rect x="250" y="95" width="180" height="54" rx="8" class="blk"/>
+<text x="262" y="114" class="inst">actualRise</text>
+<text x="262" y="133" class="cls">Reals.Subtract</text>
+<rect x="250" y="275" width="190" height="54" rx="8" class="blk"/>
+<text x="262" y="294" class="inst">baselineOk</text>
+<text x="262" y="313" class="cls">GreaterThreshold · 3 K</text>
+<rect x="250" y="455" width="200" height="54" rx="8" class="blk"/>
+<text x="262" y="474" class="inst">fullHeat</text>
+<text x="262" y="493" class="cls">GreaterThreshold · 90%</text>
+<rect x="540" y="175" width="180" height="54" rx="8" class="blk"/>
+<text x="552" y="194" class="inst">residual</text>
+<text x="552" y="213" class="cls">Reals.Subtract</text>
+<rect x="540" y="305" width="220" height="54" rx="8" class="blk"/>
+<text x="552" y="324" class="inst">allowance</text>
+<text x="552" y="343" class="cls">MultiplyByParameter · 0.30</text>
+<rect x="850" y="225" width="160" height="54" rx="8" class="blk"/>
+<text x="862" y="244" class="inst">dropHigh</text>
+<text x="862" y="263" class="cls">Reals.Greater</text>
+<rect x="1100" y="225" width="210" height="54" rx="8" class="blk"/>
+<text x="1112" y="244" class="inst">temperatureRiseLow</text>
+<text x="1112" y="263" class="cls">Logical.And</text>
+<rect x="850" y="485" width="160" height="54" rx="8" class="blk"/>
+<text x="862" y="504" class="inst">fanHeat</text>
+<text x="862" y="523" class="cls">Logical.And</text>
+<rect x="1400" y="355" width="160" height="54" rx="8" class="blk"/>
+<text x="1412" y="374" class="inst">candidate</text>
+<text x="1412" y="393" class="cls">Logical.And</text>
+<rect x="1650" y="355" width="210" height="54" rx="8" class="blk"/>
+<text x="1662" y="374" class="inst">persist</text>
+<text x="1662" y="393" class="cls">TrueDelay · 900 s</text>
+<rect x="2100" y="275" width="150" height="34" rx="17" class="out"/>
+<text x="2175" y="297" text-anchor="middle" class="port">yBaselineOk</text>
+<rect x="2100" y="455" width="150" height="34" rx="17" class="out"/>
+<text x="2175" y="477" text-anchor="middle" class="port">yFullHeatCommand</text>
+<rect x="2085" y="225" width="180" height="34" rx="17" class="out"/>
+<text x="2175" y="247" text-anchor="middle" class="port">yTemperatureRiseLow</text>
+<rect x="2100" y="355" width="150" height="34" rx="17" class="out"/>
+<text x="2175" y="377" text-anchor="middle" class="port">yFault</text>
+</svg>

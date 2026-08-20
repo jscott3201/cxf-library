@@ -1,0 +1,607 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 2100
+  },
+  "scenarios": [
+    {
+      "name": "full_heat_meets_expected_rise",
+      "description": "Full heat with actual coil rise equal to its valid expected baseline is healthy.",
+      "inputs": {
+        "rht_vlv_cmd": 100.0,
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": 30.0,
+        "rht_delta_t_expected": 10.0,
+        "fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yFullHeatCommand",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "baseline_zero_is_no_eval",
+      "description": "A zero expected delta-T is numerically invalid and safe without Divide.",
+      "inputs": {
+        "rht_vlv_cmd": 100.0,
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": 20.0,
+        "rht_delta_t_expected": 0.0,
+        "fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "baseline_exactly_at_minimum",
+      "description": "Exactly 3 K is NO_EVAL under strict Greater.",
+      "inputs": {
+        "rht_vlv_cmd": 100.0,
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": 20.0,
+        "rht_delta_t_expected": 3.0,
+        "fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "baseline_just_above_minimum",
+      "description": "3.1 K is evaluable when actual rise matches it.",
+      "inputs": {
+        "rht_vlv_cmd": 100.0,
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": 23.1,
+        "rht_delta_t_expected": 3.1,
+        "fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "partial_command_low_rise",
+      "description": "Low rise at partial valve command remains diagnostically visible but cannot mature a full-heat degradation fault.",
+      "inputs": {
+        "rht_vlv_cmd": 60.0,
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": 25.0,
+        "rht_delta_t_expected": 10.0,
+        "fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yFullHeatCommand",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "command_exactly_at_full_threshold",
+      "description": "Exactly 90% is not full heat under the strict comparison.",
+      "inputs": {
+        "rht_vlv_cmd": 90.0,
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": 25.0,
+        "rht_delta_t_expected": 10.0,
+        "fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yFullHeatCommand",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "drop_exactly_at_threshold",
+      "description": "Actual 7 K against expected 10 K makes residual equal the 3 K allowance and remains clear.",
+      "inputs": {
+        "rht_vlv_cmd": 100.0,
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": 27.0,
+        "rht_delta_t_expected": 10.0,
+        "fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yFullHeatCommand",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "both_just_beyond_thresholds",
+      "description": "Command 90.1% and actual rise 6.9 K put both strict comparisons just beyond their boundaries.",
+      "inputs": {
+        "rht_vlv_cmd": 90.1,
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": 26.9,
+        "rht_delta_t_expected": 10.0,
+        "fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yFullHeatCommand",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 2100,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "zero_actual_rise",
+      "description": "Zero actual rise is a strong low-transfer signature under an otherwise valid full-heat baseline.",
+      "inputs": {
+        "rht_vlv_cmd": 100.0,
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": 20.0,
+        "rht_delta_t_expected": 10.0,
+        "fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 2100,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "negative_actual_rise",
+      "description": "A negative measured rise also trips the one-sided low-transfer residual; sensor binding is among the diagnoses.",
+      "inputs": {
+        "rht_vlv_cmd": 100.0,
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": 18.0,
+        "rht_delta_t_expected": 10.0,
+        "fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 2100,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "fan_off_low_rise",
+      "description": "The diagnostic remains visible, but no fan proof means the final verdict stays clear/NO_EVAL.",
+      "inputs": {
+        "rht_vlv_cmd": 100.0,
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": 20.0,
+        "rht_delta_t_expected": 10.0,
+        "fan_status": false
+      },
+      "expect": [
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "hot_water_unavailable_raw_signature",
+      "description": "Full command with no hot-water availability produces the raw fault; the host must report NO_EVAL rather than diagnose coil degradation.",
+      "inputs": {
+        "rht_vlv_cmd": 100.0,
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": 20.0,
+        "rht_delta_t_expected": 10.0,
+        "fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 2100,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "violation_ends_one_step_before_persistence",
+      "description": "Low transfer clears at 840 s, one step before persistence, and never alarms.",
+      "inputs": {
+        "rht_vlv_cmd": 100.0,
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": [
+          {
+            "t": 0,
+            "value": 24.0
+          },
+          {
+            "t": 840,
+            "value": 30.0
+          }
+        ],
+        "rht_delta_t_expected": 10.0,
+        "fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 0,
+          "to_s": 780,
+          "equals": true
+        },
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 840,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_fault_recovers",
+      "description": "A mature degradation alarm clears when coil rise recovers to expected.",
+      "inputs": {
+        "rht_vlv_cmd": 100.0,
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": [
+          {
+            "t": 0,
+            "value": 24.0
+          },
+          {
+            "t": 1200,
+            "value": 30.0
+          }
+        ],
+        "rht_delta_t_expected": 10.0,
+        "fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1200,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 0,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 1200,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "command_release_resets_timer",
+      "description": "Valve command backs below full heat before persistence and resets the candidate.",
+      "inputs": {
+        "rht_vlv_cmd": [
+          {
+            "t": 0,
+            "value": 100.0
+          },
+          {
+            "t": 600,
+            "value": 80.0
+          }
+        ],
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": 24.0,
+        "rht_delta_t_expected": 10.0,
+        "fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFullHeatCommand",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yFullHeatCommand",
+          "from_s": 600,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_low_transfer_episodes",
+      "description": "Separated short degradation episodes cannot accumulate timer age.",
+      "inputs": {
+        "rht_vlv_cmd": 100.0,
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": [
+          {
+            "t": 0,
+            "value": 24.0
+          },
+          {
+            "t": 360,
+            "value": 30.0
+          },
+          {
+            "t": 600,
+            "value": 24.0
+          },
+          {
+            "t": 960,
+            "value": 30.0
+          }
+        ],
+        "rht_delta_t_expected": 10.0,
+        "fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "expected_baseline_change_resets_candidate",
+      "description": "A valid expected-model change removes the residual and resets persistence.",
+      "inputs": {
+        "rht_vlv_cmd": 100.0,
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": 26.9,
+        "rht_delta_t_expected": [
+          {
+            "t": 0,
+            "value": 10.0
+          },
+          {
+            "t": 600,
+            "value": 6.0
+          }
+        ],
+        "fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 600,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

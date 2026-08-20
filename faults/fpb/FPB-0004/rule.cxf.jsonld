@@ -1,0 +1,413 @@
+{
+  "@context": {
+    "S231": "http://data.ashrae.org/S231P#",
+    "base": "urn:cxf-library:fpb-0004#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004",
+      "@type": "S231:Block",
+      "S231:label": "fpb_0004",
+      "S231:containsBlock": [
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.baselineOk"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.residual"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.allowance"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.dropHigh"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.airflowLow"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.runningLow"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.persist"
+        }
+      ],
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.fan_status"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.fan_airflow"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.fan_airflow_expected"
+        }
+      ],
+      "S231:hasOutput": [
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.yFault"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.yBaselineOk"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.yAirflowLow"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.baselineOk",
+      "@type": "urn:cxf-library:fpb-0004#Buildings.Controls.OBC.CDL.Reals.GreaterThreshold",
+      "S231:label": "baselineOk",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.baselineOk.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.baselineOk.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.baselineOk.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.baselineOk.t",
+      "S231:value": {
+        "@value": "50.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.baselineOk.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.baselineOk.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.airflowLow.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.yBaselineOk"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.residual",
+      "@type": "urn:cxf-library:fpb-0004#Buildings.Controls.OBC.CDL.Reals.Subtract",
+      "S231:label": "residual",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.residual.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.residual.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.residual.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.residual.u1",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.residual.u2",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.residual.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.dropHigh.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.allowance",
+      "@type": "urn:cxf-library:fpb-0004#Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter",
+      "S231:label": "allowance",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.allowance.k"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.allowance.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.allowance.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.allowance.k",
+      "S231:value": {
+        "@value": "0.2",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.allowance.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.allowance.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.dropHigh.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.dropHigh",
+      "@type": "urn:cxf-library:fpb-0004#Buildings.Controls.OBC.CDL.Reals.Greater",
+      "S231:label": "dropHigh",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.dropHigh.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.dropHigh.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.dropHigh.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.dropHigh.u1",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.dropHigh.u2",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.dropHigh.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.airflowLow.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.airflowLow",
+      "@type": "urn:cxf-library:fpb-0004#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "airflowLow",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.airflowLow.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.airflowLow.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.airflowLow.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.airflowLow.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.airflowLow.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.airflowLow.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.runningLow.u2"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.yAirflowLow"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.runningLow",
+      "@type": "urn:cxf-library:fpb-0004#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "runningLow",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.runningLow.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.runningLow.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.runningLow.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.runningLow.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.runningLow.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.runningLow.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.persist.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.persist",
+      "@type": "urn:cxf-library:fpb-0004#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "persist",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.persist.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.persist.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.persist.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.persist.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.persist.delayTime",
+      "S231:value": {
+        "@value": "900.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.persist.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.persist.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.persist.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.yFault"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.fan_status",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.runningLow.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.fan_airflow",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0004#fpb_0004.residual.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.fan_airflow_expected",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.baselineOk.u"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.residual.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0004#fpb_0004.allowance.u"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.yFault",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.yBaselineOk",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0004#fpb_0004.yAirflowLow",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    }
+  ]
+}

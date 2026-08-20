@@ -1,0 +1,606 @@
+{
+  "@context": {
+    "S231": "http://data.ashrae.org/S231P#",
+    "base": "urn:cxf-library:fpb-0005#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005",
+      "@type": "S231:Block",
+      "S231:label": "fpb_0005",
+      "S231:containsBlock": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.referenceOk"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveResidual"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeResidual"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.allowance"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveRaw"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeRaw"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.biasAny"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveBias"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeBias"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.candidate"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.persist"
+        }
+      ],
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.primary_airflow"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.primary_airflow_reference"
+        }
+      ],
+      "S231:hasOutput": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.yFault"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.yReferenceOk"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.yPositiveBias"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.yNegativeBias"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.referenceOk",
+      "@type": "urn:cxf-library:fpb-0005#Buildings.Controls.OBC.CDL.Reals.GreaterThreshold",
+      "S231:label": "referenceOk",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.referenceOk.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.referenceOk.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.referenceOk.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.referenceOk.t",
+      "S231:value": {
+        "@value": "50.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.referenceOk.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.referenceOk.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveBias.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeBias.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.candidate.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.yReferenceOk"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveResidual",
+      "@type": "urn:cxf-library:fpb-0005#Buildings.Controls.OBC.CDL.Reals.Subtract",
+      "S231:label": "positiveResidual",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveResidual.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveResidual.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveResidual.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveResidual.u1",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveResidual.u2",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveResidual.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveRaw.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeResidual",
+      "@type": "urn:cxf-library:fpb-0005#Buildings.Controls.OBC.CDL.Reals.Subtract",
+      "S231:label": "negativeResidual",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeResidual.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeResidual.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeResidual.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeResidual.u1",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeResidual.u2",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeResidual.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeRaw.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.allowance",
+      "@type": "urn:cxf-library:fpb-0005#Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter",
+      "S231:label": "allowance",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.allowance.k"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.allowance.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.allowance.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.allowance.k",
+      "S231:value": {
+        "@value": "0.15",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.allowance.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.allowance.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveRaw.u2"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeRaw.u2"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveRaw",
+      "@type": "urn:cxf-library:fpb-0005#Buildings.Controls.OBC.CDL.Reals.Greater",
+      "S231:label": "positiveRaw",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveRaw.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveRaw.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveRaw.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveRaw.u1",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveRaw.u2",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveRaw.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveBias.u2"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.biasAny.u1"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeRaw",
+      "@type": "urn:cxf-library:fpb-0005#Buildings.Controls.OBC.CDL.Reals.Greater",
+      "S231:label": "negativeRaw",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeRaw.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeRaw.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeRaw.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeRaw.u1",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeRaw.u2",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeRaw.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeBias.u2"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.biasAny.u2"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.biasAny",
+      "@type": "urn:cxf-library:fpb-0005#Buildings.Controls.OBC.CDL.Logical.Or",
+      "S231:label": "biasAny",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.biasAny.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.biasAny.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.biasAny.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.biasAny.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.biasAny.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.biasAny.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.candidate.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveBias",
+      "@type": "urn:cxf-library:fpb-0005#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "positiveBias",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveBias.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveBias.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveBias.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveBias.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveBias.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveBias.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.yPositiveBias"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeBias",
+      "@type": "urn:cxf-library:fpb-0005#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "negativeBias",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeBias.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeBias.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeBias.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeBias.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeBias.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeBias.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.yNegativeBias"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.candidate",
+      "@type": "urn:cxf-library:fpb-0005#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "candidate",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.candidate.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.candidate.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.candidate.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.candidate.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.candidate.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.candidate.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.persist.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.persist",
+      "@type": "urn:cxf-library:fpb-0005#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "persist",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.persist.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.persist.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.persist.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.persist.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.persist.delayTime",
+      "S231:value": {
+        "@value": "900.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.persist.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.persist.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.persist.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0005#fpb_0005.yFault"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.primary_airflow",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveResidual.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeResidual.u2"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.primary_airflow_reference",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.referenceOk.u"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.positiveResidual.u2"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.negativeResidual.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0005#fpb_0005.allowance.u"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.yFault",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.yReferenceOk",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.yPositiveBias",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0005#fpb_0005.yNegativeBias",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    }
+  ]
+}

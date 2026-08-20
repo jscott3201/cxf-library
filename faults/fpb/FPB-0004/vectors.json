@@ -1,0 +1,470 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 2100
+  },
+  "scenarios": [
+    {
+      "name": "expected_airflow_delivered",
+      "description": "Fan-path airflow equals the valid expected baseline.",
+      "inputs": {
+        "fan_status": true,
+        "fan_airflow": 100.0,
+        "fan_airflow_expected": 100.0
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yAirflowLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "baseline_zero_is_no_eval",
+      "description": "A zero expected baseline is numerically invalid without any Divide evaluation.",
+      "inputs": {
+        "fan_status": true,
+        "fan_airflow": 0.0,
+        "fan_airflow_expected": 0.0
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yAirflowLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "baseline_below_minimum",
+      "description": "49.9 L/s lies below the strict baseline floor.",
+      "inputs": {
+        "fan_status": true,
+        "fan_airflow": 0.0,
+        "fan_airflow_expected": 49.9
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yAirflowLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "baseline_exactly_at_minimum",
+      "description": "Exactly 50 L/s is NO_EVAL under the strict comparison.",
+      "inputs": {
+        "fan_status": true,
+        "fan_airflow": 0.0,
+        "fan_airflow_expected": 50.0
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yAirflowLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "baseline_just_above_minimum",
+      "description": "50.1 L/s is evaluable when actual airflow matches it.",
+      "inputs": {
+        "fan_status": true,
+        "fan_airflow": 50.1,
+        "fan_airflow_expected": 50.1
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yAirflowLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "drop_exactly_at_threshold",
+      "description": "An actual 80 against expected 100 makes residual equal the 20 allowance; strict Greater remains clear.",
+      "inputs": {
+        "fan_status": true,
+        "fan_airflow": 80.0,
+        "fan_airflow_expected": 100.0
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yAirflowLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "drop_just_beyond_threshold",
+      "description": "79.9 against 100 drives the low-flow diagnostic and matures outside the 900 s edge margin.",
+      "inputs": {
+        "fan_status": true,
+        "fan_airflow": 79.9,
+        "fan_airflow_expected": 100.0
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yAirflowLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 2100,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "actual_above_expected",
+      "description": "More airflow than expected is outside this one-sided degradation rule.",
+      "inputs": {
+        "fan_status": true,
+        "fan_airflow": 120.0,
+        "fan_airflow_expected": 100.0
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yAirflowLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "fan_off_low_actual",
+      "description": "The baseline-conditioned diagnostic remains visible, but a stopped fan cannot produce the degradation verdict.",
+      "inputs": {
+        "fan_status": false,
+        "fan_airflow": 0.0,
+        "fan_airflow_expected": 100.0
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yAirflowLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "violation_ends_one_step_before_persistence",
+      "description": "Low airflow clears at 840 s, one evaluator step before the 900 s delay, and never alarms.",
+      "inputs": {
+        "fan_status": true,
+        "fan_airflow": [
+          {
+            "t": 0,
+            "value": 70.0
+          },
+          {
+            "t": 840,
+            "value": 100.0
+          }
+        ],
+        "fan_airflow_expected": 100.0
+      },
+      "expect": [
+        {
+          "output": "yAirflowLow",
+          "from_s": 0,
+          "to_s": 780,
+          "equals": true
+        },
+        {
+          "output": "yAirflowLow",
+          "from_s": 840,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_fault_recovers",
+      "description": "A mature airflow degradation alarm clears immediately when actual delivery recovers.",
+      "inputs": {
+        "fan_status": true,
+        "fan_airflow": [
+          {
+            "t": 0,
+            "value": 70.0
+          },
+          {
+            "t": 1200,
+            "value": 100.0
+          }
+        ],
+        "fan_airflow_expected": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1200,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yAirflowLow",
+          "from_s": 0,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yAirflowLow",
+          "from_s": 1200,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_drops_reset",
+      "description": "Two six-minute deficits separated by recovery do not accumulate age.",
+      "inputs": {
+        "fan_status": true,
+        "fan_airflow": [
+          {
+            "t": 0,
+            "value": 70.0
+          },
+          {
+            "t": 360,
+            "value": 100.0
+          },
+          {
+            "t": 600,
+            "value": 70.0
+          },
+          {
+            "t": 960,
+            "value": 100.0
+          }
+        ],
+        "fan_airflow_expected": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "expected_baseline_change_resets_candidate",
+      "description": "An in-domain expected-baseline change removes the residual and resets persistence.",
+      "inputs": {
+        "fan_status": true,
+        "fan_airflow": 79.9,
+        "fan_airflow_expected": [
+          {
+            "t": 0,
+            "value": 100.0
+          },
+          {
+            "t": 600,
+            "value": 75.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yAirflowLow",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yAirflowLow",
+          "from_s": 600,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "pfpu_total_discharge_bad_binding",
+      "description": "A mixed total-discharge point can match the expected branch flow while the fan branch is restricted; the clear raw result pins the path-scope blind spot.",
+      "inputs": {
+        "fan_status": true,
+        "fan_airflow": 100.0,
+        "fan_airflow_expected": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "sfpu_duplicate_primary_sensor_bad_binding",
+      "description": "Using the same primary sensor for actual and expected makes a tautological clear result; topology/model independence is host-enforced.",
+      "inputs": {
+        "fan_status": true,
+        "fan_airflow": 90.0,
+        "fan_airflow_expected": 90.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

@@ -2,11 +2,28 @@
 
 | | |
 |---|---|
-| **Applies to** | FPB-0001, FPB-0002, FPB-0003 |
+| **Applies to** | FPB-0001 through FPB-0006 |
 | **Fix complexity** | Remote (45%) · On-site (55%) |
 | **Typical time** | 10–30 min remote; 30 min–3 h on-site |
 | **Typical cost** | $0 remote to site-specific fan, controller, damper, sensor, actuator, or valve repair |
 | **Energy impact** | Terminal-fan waste, excess primary airflow, and hydronic reheat leakage; low airflow/fan failure may instead be delivery risk |
+
+
+## Baseline readiness and diagnosis matrix
+
+Before trusting FPB-0004/0005/0006, record each expected/reference model's
+known-good fit period, version, inputs, validation error, same-path/location
+scope, freshness, in-domain signal, and update/freeze policy. Never fit on the
+current fault episode or let a sensor reference consume the sensor it judges.
+
+| Finding | First distinction |
+|---|---|
+| FPB-0001 fan proof | final command versus same-fan independent proof |
+| FPB-0002 primary tracking | AHU-fed primary flow versus active primary setpoint |
+| FPB-0004 fan-path degradation | proven fan but actual same-path flow below known-good expectation |
+| FPB-0005 sensor disagreement | measurement versus independent same-stream reference; neither member is automatically guilty |
+| FPB-0003 valve leakage | valve commanded shut but coil-local temperature rises |
+| FPB-0006 poor heat transfer | near-full valve but coil-local rise is below valid expectation |
 
 ## Step 1 — Verify the fault
 
@@ -18,9 +35,8 @@
    series fan may run continuously occupied; a parallel fan may be off normally.
 4. For FPB-0002 confirm the flow point is AHU-fed primary inlet flow, not total
    discharge or induced branch flow; verify units and K-factor.
-5. For FPB-0003 confirm hydronic heat is available, airflow crosses the coil,
-   and both temperatures are immediately around it. PFPU measurements must stay
-   inside the fan/reheat branch before mixing.
+5. For FPB-0003/0006 confirm hydronic heat is available, airflow crosses the coil, and both temperatures are immediately around it. PFPU measurements must stay inside the fan/reheat branch before mixing.
+6. For FPB-0004/0005/0006 verify expected/reference readiness and same-path scope before interpreting residual direction.
 
 ## Step 2 — Remote triage
 
@@ -31,8 +47,8 @@
 3. Trend one representative operating transition. Do not force a parallel fan
    on in a mode that intentionally leaves it off, and do not treat setpoint-ramp
    error as settled tracking.
-4. If the valve reads shut but coil rise persists, inspect any available pipe
-   temperatures and hot-water differential pressure before dispatch.
+4. If the valve reads shut but coil rise persists, inspect any available pipe temperatures and hot-water differential pressure before dispatch.
+5. Compare actual/expected model inputs at the fault interval; an out-of-domain baseline is a configuration finding, not equipment degradation.
 
 ## Step 3 — On-site service
 
