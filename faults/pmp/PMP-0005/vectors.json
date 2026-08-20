@@ -1,0 +1,705 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 2400
+  },
+  "scenarios": [
+    {
+      "name": "stopped_zero_flow",
+      "description": "A stopped branch at zero flow is healthy.",
+      "inputs": {
+        "pump_status": false,
+        "pump_flow": 0.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yForwardFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yReverseFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "stopped_positive_flow",
+      "description": "Forward branch flow present at initialization exposes direction immediately and faults only after persistence.",
+      "inputs": {
+        "pump_status": false,
+        "pump_flow": 2.0
+      },
+      "expect": [
+        {
+          "output": "yForwardFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yReverseFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "stopped_negative_flow",
+      "description": "Signed reverse flow follows the independent reverse diagnostic lane.",
+      "inputs": {
+        "pump_status": false,
+        "pump_flow": -2.0
+      },
+      "expect": [
+        {
+          "output": "yForwardFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yReverseFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "running_with_flow",
+      "description": "Flow is expected while the pump is proven running, so both stopped-flow lanes are gated off.",
+      "inputs": {
+        "pump_status": true,
+        "pump_flow": 2.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yForwardFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yReverseFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "running_with_negative_flow",
+      "description": "Even signed reverse flow is outside this stopped-pump rule while run proof is true; other hydraulic/proof rules own the condition.",
+      "inputs": {
+        "pump_status": true,
+        "pump_flow": -2.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yForwardFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yReverseFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "running_zero_flow_is_other_rule",
+      "description": "A running pump with zero flow is silent here and belongs to PMP-0001/PMP-0002.",
+      "inputs": {
+        "pump_status": true,
+        "pump_flow": 0.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yForwardFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yReverseFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "positive_exact_threshold_clear",
+      "description": "The strict comparator leaves +1.0 L/s clear.",
+      "inputs": {
+        "pump_status": false,
+        "pump_flow": 1.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yForwardFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yReverseFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "negative_exact_threshold_clear",
+      "description": "The strict comparator leaves -1.0 L/s clear.",
+      "inputs": {
+        "pump_status": false,
+        "pump_flow": -1.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yForwardFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yReverseFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "positive_just_over_threshold",
+      "description": "One representable test increment above the forward threshold follows the full delay.",
+      "inputs": {
+        "pump_status": false,
+        "pump_flow": 1.1
+      },
+      "expect": [
+        {
+          "output": "yForwardFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "negative_just_over_threshold",
+      "description": "One test increment beyond the reverse threshold follows the full delay.",
+      "inputs": {
+        "pump_status": false,
+        "pump_flow": -1.1
+      },
+      "expect": [
+        {
+          "output": "yReverseFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "violation_ends_at_delay_boundary",
+      "description": "Flow clears on the 300-second timer boundary before evaluation and never alarms.",
+      "inputs": {
+        "pump_status": false,
+        "pump_flow": [
+          {
+            "t": 0,
+            "value": 2.0
+          },
+          {
+            "t": 300,
+            "value": 0.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yForwardFlow",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": true
+        },
+        {
+          "output": "yForwardFlow",
+          "from_s": 360,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_episodes_reset",
+      "description": "Two sub-delay forward-flow episodes separated by a clear tick do not accumulate.",
+      "inputs": {
+        "pump_status": false,
+        "pump_flow": [
+          {
+            "t": 0,
+            "value": 2.0
+          },
+          {
+            "t": 180,
+            "value": 0.0
+          },
+          {
+            "t": 360,
+            "value": 2.0
+          },
+          {
+            "t": 600,
+            "value": 0.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "short_flow_transient",
+      "description": "A single forward-flow episode shorter than persistence exposes direction but never alarms.",
+      "inputs": {
+        "pump_status": false,
+        "pump_flow": [
+          {
+            "t": 0,
+            "value": 2.0
+          },
+          {
+            "t": 180,
+            "value": 0.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yForwardFlow",
+          "from_s": 0,
+          "to_s": 120,
+          "equals": true
+        },
+        {
+          "output": "yForwardFlow",
+          "from_s": 240,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "flow_recovery_resets_timer",
+      "description": "An in-band interval resets persistence; the second stopped-flow episode serves a new full 300 seconds.",
+      "inputs": {
+        "pump_status": false,
+        "pump_flow": [
+          {
+            "t": 0,
+            "value": 2.0
+          },
+          {
+            "t": 180,
+            "value": 0.0
+          },
+          {
+            "t": 300,
+            "value": 2.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "pump_start_resets_timer",
+      "description": "Run proof temporarily gates off both directions and resets the timer even while branch flow stays high.",
+      "inputs": {
+        "pump_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 180,
+            "value": true
+          },
+          {
+            "t": 360,
+            "value": false
+          }
+        ],
+        "pump_flow": 2.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 720,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "two_opposite_short_episodes",
+      "description": "Positive and negative sub-delay episodes separated by an in-band interval do not accumulate across direction lanes.",
+      "inputs": {
+        "pump_status": false,
+        "pump_flow": [
+          {
+            "t": 0,
+            "value": 2.0
+          },
+          {
+            "t": 180,
+            "value": 0.0
+          },
+          {
+            "t": 300,
+            "value": -2.0
+          },
+          {
+            "t": 540,
+            "value": 0.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "direction_handoff_keeps_candidate_true",
+      "description": "A direct forward-to-reverse handoff changes diagnostic lane but not absolute-flow candidacy, so the timer continues.",
+      "inputs": {
+        "pump_status": false,
+        "pump_flow": [
+          {
+            "t": 0,
+            "value": 2.0
+          },
+          {
+            "t": 180,
+            "value": -2.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yForwardFlow",
+          "from_s": 0,
+          "to_s": 120,
+          "equals": true
+        },
+        {
+          "output": "yReverseFlow",
+          "from_s": 240,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "recovery_after_alarm",
+      "description": "Falling edges pass immediately when stopped-branch flow returns inside the band.",
+      "inputs": {
+        "pump_status": false,
+        "pump_flow": [
+          {
+            "t": 0,
+            "value": 2.0
+          },
+          {
+            "t": 900,
+            "value": 0.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "noise_inside_zero_band",
+      "description": "Signed zero drift that stays inside the allowance never raises a direction flag.",
+      "inputs": {
+        "pump_status": false,
+        "pump_flow": [
+          {
+            "t": 0,
+            "value": 0.9
+          },
+          {
+            "t": 300,
+            "value": -0.9
+          },
+          {
+            "t": 600,
+            "value": 0.5
+          },
+          {
+            "t": 900,
+            "value": -0.5
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yForwardFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yReverseFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "threshold_chatter_resets_delay",
+      "description": "Flow alternating just below and above the forward threshold chatters the diagnostic but never accumulates 300 continuous seconds.",
+      "inputs": {
+        "pump_status": false,
+        "pump_flow": [
+          {
+            "t": 0,
+            "value": 0.9
+          },
+          {
+            "t": 60,
+            "value": 1.1
+          },
+          {
+            "t": 120,
+            "value": 0.9
+          },
+          {
+            "t": 180,
+            "value": 1.1
+          },
+          {
+            "t": 240,
+            "value": 0.9
+          },
+          {
+            "t": 300,
+            "value": 1.1
+          },
+          {
+            "t": 360,
+            "value": 0.9
+          },
+          {
+            "t": 420,
+            "value": 1.1
+          },
+          {
+            "t": 480,
+            "value": 0.9
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "proof_mismatch_raw_fault_host_suppresses",
+      "description": "False status with real flow is indistinguishable from stopped-branch flow in this graph; an active same-pump PMP-0003 suppresses the raw alarm host-side.",
+      "inputs": {
+        "pump_status": false,
+        "pump_flow": 3.0
+      },
+      "expect": [
+        {
+          "output": "yForwardFlow",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}

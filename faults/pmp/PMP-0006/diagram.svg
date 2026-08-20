@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1735" height="520" viewBox="0 0 1735 520">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#718096"/></marker></defs>
+<style>.title{font:700 20px sans-serif;fill:#172033}.port{font:600 13px sans-serif;fill:#172033}.inst{font:700 12px sans-serif;fill:#172033}.cls{font:9px sans-serif;fill:#4b5563}.wire{stroke:#718096;stroke-width:2;fill:none;marker-end:url(#arrow)}.in{fill:#dbeafe;stroke:#2563eb;stroke-width:1.5}.out{fill:#fee2e2;stroke:#dc2626;stroke-width:1.5}.blk{fill:#f8fafc;stroke:#64748b;stroke-width:1.5}</style>
+<text x="24" y="30" class="title">PMP-0006 block graph</text>
+<path d="M200 109 H230 V82 H260" class="wire"/>
+<path d="M200 109 H230 V202 H260" class="wire"/>
+<path d="M200 109 H230 V322 H260" class="wire"/>
+<path d="M200 229 H230 V202 H260" class="wire"/>
+<path d="M490 82 H657.5 V182 H825" class="wire"/>
+<path d="M490 82 H1012.5 V82 H1535" class="wire"/>
+<path d="M465 202 H515 V242 H565" class="wire"/>
+<path d="M490 322 H527.5 V242 H565" class="wire"/>
+<path d="M740 242 H782.5 V182 H825" class="wire"/>
+<path d="M1000 182 H1032.5 V302 H1065" class="wire"/>
+<path d="M1000 182 H1267.5 V182 H1535" class="wire"/>
+<path d="M200 409 H632.5 V302 H1065" class="wire"/>
+<path d="M1240 302 H1267.5 V302 H1295" class="wire"/>
+<path d="M1485 302 H1510 V302 H1535" class="wire"/>
+<rect x="20" y="92" width="180" height="34" rx="17" class="in"/>
+<text x="110" y="114" text-anchor="middle" class="port">pump_kw_expected</text>
+<rect x="20" y="212" width="180" height="34" rx="17" class="in"/>
+<text x="110" y="234" text-anchor="middle" class="port">pump_kw</text>
+<rect x="20" y="392" width="180" height="34" rx="17" class="in"/>
+<text x="110" y="414" text-anchor="middle" class="port">pump_status</text>
+<rect x="260" y="55" width="230" height="54" rx="8" class="blk"/>
+<text x="272" y="73" class="inst">baselineOk</text>
+<text x="272" y="90" class="cls">GreaterThreshold · 0.5 kW</text>
+<rect x="260" y="175" width="205" height="54" rx="8" class="blk"/>
+<text x="272" y="193" class="inst">residual</text>
+<text x="272" y="210" class="cls">Reals.Subtract</text>
+<rect x="260" y="295" width="230" height="54" rx="8" class="blk"/>
+<text x="272" y="313" class="inst">allowance</text>
+<text x="272" y="330" class="cls">MultiplyByParameter · 0.15</text>
+<rect x="565" y="215" width="175" height="54" rx="8" class="blk"/>
+<text x="577" y="233" class="inst">excess</text>
+<text x="577" y="250" class="cls">Reals.Greater</text>
+<rect x="825" y="155" width="175" height="54" rx="8" class="blk"/>
+<text x="837" y="173" class="inst">powerHigh</text>
+<text x="837" y="190" class="cls">Logical.And</text>
+<rect x="1065" y="275" width="175" height="54" rx="8" class="blk"/>
+<text x="1077" y="293" class="inst">runningHigh</text>
+<text x="1077" y="310" class="cls">Logical.And</text>
+<rect x="1295" y="275" width="190" height="54" rx="8" class="blk"/>
+<text x="1307" y="293" class="inst">persist</text>
+<text x="1307" y="310" class="cls">TrueDelay · 1800 s</text>
+<rect x="1535" y="65" width="170" height="34" rx="17" class="out"/>
+<text x="1620" y="87" text-anchor="middle" class="port">yBaselineOk</text>
+<rect x="1535" y="165" width="170" height="34" rx="17" class="out"/>
+<text x="1620" y="187" text-anchor="middle" class="port">yPowerHigh</text>
+<rect x="1535" y="285" width="170" height="34" rx="17" class="out"/>
+<text x="1620" y="307" text-anchor="middle" class="port">yFault</text>
+</svg>

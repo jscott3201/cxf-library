@@ -1,0 +1,593 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 14400
+  },
+  "scenarios": [
+    {
+      "name": "no_starts",
+      "description": "A stopped pump produces no rising edges and stays clear.",
+      "inputs": {
+        "pump_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "first_sample_true_is_inert",
+      "description": "Edge emits at initialization against its false prestate, but the zero-duration first tick contributes no moving-average area.",
+      "inputs": {
+        "pump_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "one_normal_start",
+      "description": "One post-warm-up start is well below the adopted four-start allowance.",
+      "inputs": {
+        "pump_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 4200,
+            "value": true
+          },
+          {
+            "t": 6000,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "exactly_four_starts_clear",
+      "description": "The strict comparison leaves exactly max_starts clear in a completed rolling window.",
+      "inputs": {
+        "pump_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 4200,
+            "value": true
+          },
+          {
+            "t": 4320,
+            "value": false
+          },
+          {
+            "t": 4800,
+            "value": true
+          },
+          {
+            "t": 4920,
+            "value": false
+          },
+          {
+            "t": 5400,
+            "value": true
+          },
+          {
+            "t": 5520,
+            "value": false
+          },
+          {
+            "t": 6000,
+            "value": true
+          },
+          {
+            "t": 6120,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "half_open_window_boundary_clear",
+      "description": "The fifth observed start arrives exactly one window after the first; the oldest pulse has left the trailing window and the count remains four.",
+      "inputs": {
+        "pump_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 3600,
+            "value": true
+          },
+          {
+            "t": 3720,
+            "value": false
+          },
+          {
+            "t": 4500,
+            "value": true
+          },
+          {
+            "t": 4620,
+            "value": false
+          },
+          {
+            "t": 5400,
+            "value": true
+          },
+          {
+            "t": 5520,
+            "value": false
+          },
+          {
+            "t": 6300,
+            "value": true
+          },
+          {
+            "t": 6420,
+            "value": false
+          },
+          {
+            "t": 7200,
+            "value": true
+          },
+          {
+            "t": 7320,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "spread_starts_never_exceed",
+      "description": "Five total starts spread far enough apart never place more than four inside one completed trailing hour.",
+      "inputs": {
+        "pump_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 3600,
+            "value": true
+          },
+          {
+            "t": 3720,
+            "value": false
+          },
+          {
+            "t": 4560,
+            "value": true
+          },
+          {
+            "t": 4680,
+            "value": false
+          },
+          {
+            "t": 5520,
+            "value": true
+          },
+          {
+            "t": 5640,
+            "value": false
+          },
+          {
+            "t": 6480,
+            "value": true
+          },
+          {
+            "t": 6600,
+            "value": false
+          },
+          {
+            "t": 7440,
+            "value": true
+          },
+          {
+            "t": 7560,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "five_starts_fault",
+      "description": "One start over the allowance raises the raw rolling-count verdict after warm-up.",
+      "inputs": {
+        "pump_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 4200,
+            "value": true
+          },
+          {
+            "t": 4320,
+            "value": false
+          },
+          {
+            "t": 4680,
+            "value": true
+          },
+          {
+            "t": 4800,
+            "value": false
+          },
+          {
+            "t": 5160,
+            "value": true
+          },
+          {
+            "t": 5280,
+            "value": false
+          },
+          {
+            "t": 5640,
+            "value": true
+          },
+          {
+            "t": 5760,
+            "value": false
+          },
+          {
+            "t": 6120,
+            "value": true
+          },
+          {
+            "t": 6240,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 6060,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 6240,
+          "to_s": 7740,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 7860,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "oldest_start_ages_out",
+      "description": "Five starts raise the verdict; when the oldest pulse leaves the trailing hour, the count returns to four and clears.",
+      "inputs": {
+        "pump_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 3600,
+            "value": true
+          },
+          {
+            "t": 3720,
+            "value": false
+          },
+          {
+            "t": 4200,
+            "value": true
+          },
+          {
+            "t": 4320,
+            "value": false
+          },
+          {
+            "t": 4800,
+            "value": true
+          },
+          {
+            "t": 4920,
+            "value": false
+          },
+          {
+            "t": 5400,
+            "value": true
+          },
+          {
+            "t": 5520,
+            "value": false
+          },
+          {
+            "t": 6000,
+            "value": true
+          },
+          {
+            "t": 6120,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 6120,
+          "to_s": 7140,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 7320,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "status_chatter_counts_only_rises",
+      "description": "Ten status changes are five starts, not ten; the rising-edge primitive counts only OFF-to-ON transitions.",
+      "inputs": {
+        "pump_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 4200,
+            "value": true
+          },
+          {
+            "t": 4260,
+            "value": false
+          },
+          {
+            "t": 4440,
+            "value": true
+          },
+          {
+            "t": 4500,
+            "value": false
+          },
+          {
+            "t": 4680,
+            "value": true
+          },
+          {
+            "t": 4740,
+            "value": false
+          },
+          {
+            "t": 4920,
+            "value": true
+          },
+          {
+            "t": 4980,
+            "value": false
+          },
+          {
+            "t": 5160,
+            "value": true
+          },
+          {
+            "t": 5220,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 5280,
+          "to_s": 7620,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "warmup_rate_raw_asserts",
+      "description": "Five early starts can make the partial-window extrapolated pace exceed the threshold; the card requires host NO_EVAL for the first full window.",
+      "inputs": {
+        "pump_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 360,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          },
+          {
+            "t": 660,
+            "value": false
+          },
+          {
+            "t": 900,
+            "value": true
+          },
+          {
+            "t": 960,
+            "value": false
+          },
+          {
+            "t": 1200,
+            "value": true
+          },
+          {
+            "t": 1260,
+            "value": false
+          },
+          {
+            "t": 1500,
+            "value": true
+          },
+          {
+            "t": 1560,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 1620,
+          "to_s": 3840,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 3960,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "warmup_single_start_asserts_raw",
+      "description": "Even one early real start is extrapolated above four per hour until enough partial-window time elapses; host warm-up gating is mandatory.",
+      "inputs": {
+        "pump_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 420,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 420,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1020,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "reload_running_then_real_edge",
+      "description": "A pump already true at model load does not create count area; a later real restart is counted once and remains below the limit.",
+      "inputs": {
+        "pump_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          },
+          {
+            "t": 4200,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "subtick_cycle_aliases_clear",
+      "description": "A complete OFF-ON-OFF cycle between 60-second evaluator ticks is invisible; acquisition must resolve the shortest cycle.",
+      "inputs": {
+        "pump_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 10,
+            "value": true
+          },
+          {
+            "t": 20,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

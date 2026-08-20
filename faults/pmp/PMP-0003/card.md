@@ -20,9 +20,9 @@ source:
   - "points/pmp.points.json pump_cmd and pump_status — the status point's provenance note (current switch or VFD run feedback) is what the retune guidance on both windows is argued from"
 g36: null
 clusters: []
-suppresses: []
+suppresses: [PMP-0005]
 suppressed_by: []
-related: [PMP-0001, PMP-0002, VFD-0001, HW-0009]
+related: [PMP-0001, PMP-0002, PMP-0004, PMP-0005, VFD-0001, HW-0009]
 playbooks: [proof-of-operation, vfd-pump-faults]
 operating_states: "all — both directions are meaningful in every state, and the unoccupied hours are where the unexpected-run direction earns its keep"
 preconditions: "Both points must belong to the same pump and both must be fresh, and the freshness obligation is sharper here than on any other pump card because the shipped windows are G36's controller-native 15 s and 60 s. The rule is a pure agreement test between two booleans and has no way to tell a real mismatch from a stale one: a held-over last value, a lapsed COV subscription, or a poll interval longer than the proof time manufactures a fault out of nothing, and a 15 s window against a 60 s poll cycle does so on every start. Both proof times must therefore exceed the host's worst-case delivery latency for these two points — that is the whole of the delivery-quality obligation, and it is why the rule publishes no evaluability flag (see Deviations). pump_status must prove ROTATION or WORK: a current switch set above the motor's no-load current, a differential-pressure switch across the pump, or the drive's own run feedback. A starter auxiliary contact wired from the same relay the command drives makes this rule structurally blind — status echoes command, the two never disagree, and neither direction can ever assert. A current switch set below no-load current is the same failure in one direction only: a sheared coupling or an uncoupled motor reads as proven running. pump_cmd must be the output actually delivered to the starter, not a scheduler's intent upstream of BAS overrides; bound upstream, a legitimate operator override reads as an unexpected run. On a lead/lag set the changeover dwell must fit inside both proof times, and on a headered set the two points must not be crossed between pumps — the binding error that puts the lead pump's status against the lag pump's command produces both faults at once on two healthy machines."
@@ -216,13 +216,15 @@ this rule reads no meter and no flow.
   direction is G36's Level 4 and EXCESS_CONSUMPTION by any reading, and is
   quantified as such above. Hosts routing work by severity or category should
   route on the sub-condition flag, not on the card.
-- **No suppression edges in either direction, which is a finding about the pair
-  rather than an omission.** PMP-0001 requires `pump_cmd AND pump_status` both
+- **No suppression edge is added against PMP-0001/PMP-0002, but this rule now
+  suppresses PMP-0005 on the same pump.** PMP-0001 requires `pump_cmd AND pump_status` both
   true, so either of this rule's directions already puts it in NO_EVAL through
   its own `yRunOk` and an edge would be redundant. PMP-0002 gates on
   `pump_status` alone and therefore stays live during `yUnexpectedRun` — and a
   pump running in HAND against a closed system really is deadheading, so that
-  alarm is true and worth keeping.
+  alarm is true and worth keeping. PMP-0005 instead assumes a false status means
+  a stopped branch; an active proof mismatch invalidates exactly that premise.
+  The host must scope this suppression to the same pump instance.
 - **The rule is silent on a chattering status, deliberately.** A status that will
   not settle never accumulates either window
   (`chattering_status_never_matures`), which is precisely where

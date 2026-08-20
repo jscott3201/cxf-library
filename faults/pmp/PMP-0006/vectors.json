@@ -1,0 +1,778 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 3600
+  },
+  "scenarios": [
+    {
+      "name": "baseline_zero_not_evaluable",
+      "description": "A zero expected-power baseline is not evaluable; no divide exists and both diagnostic/fault outputs stay false.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": 10.0,
+        "pump_kw_expected": 0.0
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yPowerHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "baseline_negative_not_evaluable",
+      "description": "A negative expected value remains numerically safe and not evaluable; cross-multiplication creates no Inf or NaN path.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": 10.0,
+        "pump_kw_expected": -1.0
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yPowerHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "baseline_just_below_floor",
+      "description": "The denominator guard is strict below its configured floor.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": 2.0,
+        "pump_kw_expected": 0.49
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yPowerHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "baseline_exact_floor",
+      "description": "Exactly minimum_expected_kw remains not evaluable under the strict comparator.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": 2.0,
+        "pump_kw_expected": 0.5
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yPowerHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "baseline_just_above_floor",
+      "description": "A small but valid baseline makes evaluability true and can support the full delayed verdict.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": 0.7,
+        "pump_kw_expected": 0.51
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yPowerHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "actual_equals_expected",
+      "description": "Measured power on the baseline has zero positive residual.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": 10.0,
+        "pump_kw_expected": 10.0
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yPowerHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "exact_positive_residual_threshold",
+      "description": "Exactly 15 percent excess is clear because the comparison is strict.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": 11.5,
+        "pump_kw_expected": 10.0
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yPowerHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "just_above_positive_residual",
+      "description": "One test increment above 15 percent asserts yPowerHigh immediately and yFault after 30 minutes.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": 11.51,
+        "pump_kw_expected": 10.0
+      },
+      "expect": [
+        {
+          "output": "yPowerHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "negative_residual_not_this_rule",
+      "description": "Actual power below expected is deliberately silent; delivery/proof faults own that direction.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": 8.0,
+        "pump_kw_expected": 10.0
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yPowerHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "stopped_pump_exposes_diagnostic_only",
+      "description": "Power residual direction is diagnostic detail independent of status, while yFault remains status-gated.",
+      "inputs": {
+        "pump_status": false,
+        "pump_kw": 12.0,
+        "pump_kw_expected": 10.0
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yPowerHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "transient_excess_power",
+      "description": "A 20-minute power excursion clears before the 30-minute persistence window.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": [
+          {
+            "t": 0,
+            "value": 12.0
+          },
+          {
+            "t": 1200,
+            "value": 10.0
+          }
+        ],
+        "pump_kw_expected": 10.0
+      },
+      "expect": [
+        {
+          "output": "yPowerHigh",
+          "from_s": 0,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yPowerHigh",
+          "from_s": 1260,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "violation_ends_at_delay_boundary",
+      "description": "The residual clears exactly at 1800 seconds before timer evaluation and never alarms.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": [
+          {
+            "t": 0,
+            "value": 12.0
+          },
+          {
+            "t": 1800,
+            "value": 10.0
+          }
+        ],
+        "pump_kw_expected": 10.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "sustained_excess_and_recovery",
+      "description": "A mature excess-power alarm clears immediately when actual power returns to baseline.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": [
+          {
+            "t": 0,
+            "value": 12.0
+          },
+          {
+            "t": 2700,
+            "value": 10.0
+          }
+        ],
+        "pump_kw_expected": 10.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 2640,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 2760,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "baseline_change_resets_timer",
+      "description": "A valid baseline change that brings the residual inside allowance resets persistence; a later excess serves a new full window.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": 12.0,
+        "pump_kw_expected": [
+          {
+            "t": 0,
+            "value": 10.0
+          },
+          {
+            "t": 1200,
+            "value": 11.0
+          },
+          {
+            "t": 1500,
+            "value": 10.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3360,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "invalid_baseline_resets_timer",
+      "description": "Expected power falling to zero clears evaluability and diagnostic state; a later valid baseline must serve a new full persistence interval.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": 12.0,
+        "pump_kw_expected": [
+          {
+            "t": 0,
+            "value": 10.0
+          },
+          {
+            "t": 1200,
+            "value": 0.0
+          },
+          {
+            "t": 1500,
+            "value": 10.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 1260,
+          "to_s": 1440,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3360,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "baseline_changes_but_candidate_stays_true",
+      "description": "A model update within the still-faulting region does not reset the timer because the Boolean candidate never falls.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": 13.0,
+        "pump_kw_expected": [
+          {
+            "t": 0,
+            "value": 10.0
+          },
+          {
+            "t": 900,
+            "value": 10.5
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yPowerHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "pump_start_begins_timer",
+      "description": "A standing residual does not accumulate while stopped; persistence starts only after proven run status rises.",
+      "inputs": {
+        "pump_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          }
+        ],
+        "pump_kw": 12.0,
+        "pump_kw_expected": 10.0
+      },
+      "expect": [
+        {
+          "output": "yPowerHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2340,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 2460,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "pump_status_drop_resets_timer",
+      "description": "A stopped interval resets persistence even while the baseline residual remains high; restart requires a new full duration.",
+      "inputs": {
+        "pump_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 1200,
+            "value": false
+          },
+          {
+            "t": 1500,
+            "value": true
+          }
+        ],
+        "pump_kw": 12.0,
+        "pump_kw_expected": 10.0
+      },
+      "expect": [
+        {
+          "output": "yPowerHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 3360,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "two_short_excess_episodes",
+      "description": "Two sub-duration excess-power episodes separated by a compliant interval do not accumulate.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": [
+          {
+            "t": 0,
+            "value": 12.0
+          },
+          {
+            "t": 900,
+            "value": 10.0
+          },
+          {
+            "t": 1200,
+            "value": 12.0
+          },
+          {
+            "t": 2400,
+            "value": 10.0
+          }
+        ],
+        "pump_kw_expected": 10.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "residual_threshold_chatter",
+      "description": "Measured power alternates just below and above the 15 percent boundary, so yPowerHigh chatters but persistence never matures.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": [
+          {
+            "t": 0,
+            "value": 11.49
+          },
+          {
+            "t": 60,
+            "value": 11.51
+          },
+          {
+            "t": 120,
+            "value": 11.49
+          },
+          {
+            "t": 180,
+            "value": 11.51
+          },
+          {
+            "t": 240,
+            "value": 11.49
+          },
+          {
+            "t": 300,
+            "value": 11.51
+          },
+          {
+            "t": 360,
+            "value": 11.49
+          },
+          {
+            "t": 420,
+            "value": 11.51
+          },
+          {
+            "t": 480,
+            "value": 11.49
+          }
+        ],
+        "pump_kw_expected": 10.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "degraded_fit_learns_fault_as_normal",
+      "description": "Actual and expected are both high because the fit learned degraded operation; the residual is zero and the graph stays silent, pinning the known-good training precondition.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": 12.0,
+        "pump_kw_expected": 12.0
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yPowerHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "invalid_stale_baseline_raw_behavior",
+      "description": "A stale but positive expected-power value looks valid to the graph and can alarm; model freshness/in-domain status is a mandatory host NO_EVAL gate.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": 12.0,
+        "pump_kw_expected": 8.0
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yPowerHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "vfd_relationship_is_host_side",
+      "description": "The raw pump baseline alarm remains active with sustained excess; a deployment may suppress only when a same-drive VFD finding actually invalidates this model.",
+      "inputs": {
+        "pump_status": true,
+        "pump_kw": 12.0,
+        "pump_kw_expected": 10.0
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yPowerHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}

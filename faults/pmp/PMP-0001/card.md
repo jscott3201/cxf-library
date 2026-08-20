@@ -18,7 +18,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: [PMP-0002]
-related: [PMP-0002, VFD-0001]
+related: [PMP-0002, PMP-0005, PMP-0006, VFD-0001]
 playbooks: [vfd-pump-faults]
 operating_states: "pump commanded on and proven running, past the start transient — the rule's own yRunOk is that state"
 preconditions: "pump_cmd, pump_status, and pump_flow must belong to the same pump. On a headered set that is the precondition most likely to be violated: sites commonly trend one loop flow meter and bind it to every pump on the header, and a lag pump that is running and delivering nothing then reads the lead pump's flow and is never detected. Bind the pump's own flow element, or accept that the rule only sees a whole-header failure. pump_flow must be in L/s (the rule converts nothing) and no_flow_threshold must have been set from this loop's design flow — the shipped 1.0 L/s is a placeholder, not a site value (see Deviations). The flow measurement itself is uncorroborated: nothing in this rule cross-checks the meter, and the reference's own diagnosis 5 is that the meter is what failed. Run status should be proof of rotation (a current switch or the drive's own run feedback), not a repeat of the command from a relay; a status point wired back from the start contactor makes the two conjuncts one conjunct. Evaluability is signalled in-rule by yRunOk: when it is false the verdict is NO_EVAL, not healthy, and that covers an idle pump, either kind of command/status mismatch, and the first flow_check_delay seconds of every start."
