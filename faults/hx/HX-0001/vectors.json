@@ -100,6 +100,28 @@
       ]
     },
     {
+      "name": "shortfall_just_below_threshold",
+      "description": "A binary-exact 0.1240234375 shortfall is just inside the strict 0.125 allowance and remains clear.",
+      "inputs": {
+        "effectiveness": 0.6259765625,
+        "effectiveness_expected": 0.75
+      },
+      "expect": [
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
       "name": "shortfall_just_above_threshold",
       "description": "A 0.126 shortfall is just beyond the executable threshold.",
       "inputs": {

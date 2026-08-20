@@ -35,6 +35,93 @@
       ]
     },
     {
+      "name": "disabled_with_both_flows",
+      "description": "Command off with both branch flows established completes the Boolean matrix and remains clear; passive circulation is outside this rule's commanded-active premise.",
+      "inputs": {
+        "exchange_cmd": false,
+        "primary_flow": 10.0,
+        "secondary_flow": 10.0
+      },
+      "expect": [
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "disabled_with_primary_flow_only",
+      "description": "Command off with primary flow established and secondary flow missing completes the Boolean matrix and remains clear.",
+      "inputs": {
+        "exchange_cmd": false,
+        "primary_flow": 10.0,
+        "secondary_flow": 0.0
+      },
+      "expect": [
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "disabled_with_secondary_flow_only",
+      "description": "Command off with primary flow missing and secondary flow established completes the Boolean matrix and remains clear.",
+      "inputs": {
+        "exchange_cmd": false,
+        "primary_flow": 0.0,
+        "secondary_flow": 10.0
+      },
+      "expect": [
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
       "name": "active_with_both_flows",
       "description": "Both individual branches deliver flow while exchange is commanded active.",
       "inputs": {
