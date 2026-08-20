@@ -12,6 +12,7 @@
       "file": "pfpu_fault_free.csv",
       "subtype": "parallel",
       "label": "fault_free",
+      "inventory_evidence": "Original synthetic fixture case declaration; not source data.",
       "fault_class": null,
       "severity": null,
       "expected_rules": [],
@@ -20,7 +21,7 @@
       "startup_lead_s": 120,
       "mappings": {
           "fan_cmd": {"column": "fan_cmd", "unit": "bool", "true_values": ["1"], "false_values": ["0"], "inventory_evidence": "Original synthetic fixture field; not source data."},
-          "fan_status": {"column": "fan_proof", "unit": "bool", "true_values": ["1"], "false_values": ["0"], "inventory_evidence": "Original synthetic fixture field; independent of fan_cmd."},
+          "fan_status": {"column": "fan_proof", "unit": "bool", "true_values": ["1"], "false_values": ["0"], "inventory_evidence": "Original synthetic fixture field; independent of fan_cmd.", "independent": true, "independence_evidence": "Separate original fixture proof field with no fan_cmd dependency.", "derived_from": []},
           "primary_airflow": {"column": "primary_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture field; primary inlet stream."},
           "primary_airflow_sp": {"column": "primary_sp_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture field; active primary target."},
           "rht_vlv_cmd": {"column": "valve_fraction", "unit": "fraction", "inventory_evidence": "Original synthetic fixture field; final valve command."},
@@ -32,7 +33,7 @@
             "readiness": {"method": "fixture constant lookup", "version": "fixture-v1", "inputs": ["subtype", "fan_cmd"], "known_good_basis": "invented healthy fixture values", "validation_error": "fixture-only; no empirical claim", "update_policy": "frozen"}
           },
           "primary_airflow_reference": {
-            "column": "primary_ref_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture independent reference.", "independent": true, "derived_from": [],
+            "column": "primary_ref_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture independent reference.", "independent": true, "independence_evidence": "Separate original fixture truth field with no primary_cfm dependency.", "derived_from": [],
             "readiness": {"method": "independent fixture truth channel", "version": "fixture-v1", "inputs": [], "known_good_basis": "original independent fixture channel", "validation_error": "fixture-only; no empirical claim", "update_policy": "frozen"}
           },
           "rht_delta_t_expected": {
@@ -41,12 +42,12 @@
           }
         },
       "gates": {
-          "occupied": {"column": "occupied", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture occupancy gate."},
-          "enabled": {"column": "enabled", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture controller-enabled gate."},
-          "airflow_established": {"column": "airflow_ok", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0002", "FPB-0003", "FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture airflow-established gate."},
-          "stable": {"column": "stable", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0002", "FPB-0003", "FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture mode/setpoint stability gate."},
-          "baseline_ready": {"column": "baseline_ready", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture expected/reference readiness gate."},
-          "point_valid": {"column": "point_valid", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture freshness and point-validity gate."}
+          "occupied": {"column": "occupied", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture occupancy gate.", "inventory_evidence": "Original fixture schedule field.", "derived_from": []},
+          "enabled": {"column": "enabled", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture controller-enabled gate.", "inventory_evidence": "Original fixture controller state field.", "derived_from": []},
+          "airflow_established": {"column": "airflow_ok", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0002", "FPB-0003", "FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture airflow-established gate.", "inventory_evidence": "Original fixture sequence-state field, not computed from target airflow.", "derived_from": []},
+          "stable": {"column": "stable", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0002", "FPB-0003", "FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture mode/setpoint stability gate.", "inventory_evidence": "Original fixture transition-state field.", "derived_from": []},
+          "baseline_ready": {"column": "baseline_ready", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture expected/reference readiness gate.", "inventory_evidence": "Original fixture readiness truth field.", "derived_from": []},
+          "point_valid": {"column": "point_valid", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture freshness and point-validity gate.", "inventory_evidence": "Original fixture quality truth field.", "derived_from": []}
         }
     },
     {
@@ -54,6 +55,7 @@
       "file": "sfpu_restricted_fan.csv",
       "subtype": "series",
       "label": "faulted",
+      "inventory_evidence": "Original synthetic fixture restricted-fan declaration; not source data.",
       "fault_class": "restricted_terminal_fan_flow",
       "severity": "synthetic-high",
       "expected_rules": ["FPB-0004"],
@@ -63,7 +65,7 @@
       "startup_lead_s": 0,
       "mappings": {
           "fan_cmd": {"column": "fan_cmd", "unit": "bool", "true_values": ["1"], "false_values": ["0"], "inventory_evidence": "Original synthetic fixture field; not source data."},
-          "fan_status": {"column": "fan_proof", "unit": "bool", "true_values": ["1"], "false_values": ["0"], "inventory_evidence": "Original synthetic fixture field; independent of fan_cmd."},
+          "fan_status": {"column": "fan_proof", "unit": "bool", "true_values": ["1"], "false_values": ["0"], "inventory_evidence": "Original synthetic fixture field; independent of fan_cmd.", "independent": true, "independence_evidence": "Separate original fixture proof field with no fan_cmd dependency.", "derived_from": []},
           "primary_airflow": {"column": "primary_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture field; primary inlet stream."},
           "primary_airflow_sp": {"column": "primary_sp_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture field; active primary target."},
           "rht_vlv_cmd": {"column": "valve_fraction", "unit": "fraction", "inventory_evidence": "Original synthetic fixture field; final valve command."},
@@ -75,7 +77,7 @@
             "readiness": {"method": "fixture constant lookup", "version": "fixture-v1", "inputs": ["subtype", "fan_cmd"], "known_good_basis": "invented healthy fixture values", "validation_error": "fixture-only; no empirical claim", "update_policy": "frozen"}
           },
           "primary_airflow_reference": {
-            "column": "primary_ref_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture independent reference.", "independent": true, "derived_from": [],
+            "column": "primary_ref_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture independent reference.", "independent": true, "independence_evidence": "Separate original fixture truth field with no primary_cfm dependency.", "derived_from": [],
             "readiness": {"method": "independent fixture truth channel", "version": "fixture-v1", "inputs": [], "known_good_basis": "original independent fixture channel", "validation_error": "fixture-only; no empirical claim", "update_policy": "frozen"}
           },
           "rht_delta_t_expected": {
@@ -84,12 +86,12 @@
           }
         },
       "gates": {
-          "occupied": {"column": "occupied", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture occupancy gate."},
-          "enabled": {"column": "enabled", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture controller-enabled gate."},
-          "airflow_established": {"column": "airflow_ok", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0002", "FPB-0003", "FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture airflow-established gate."},
-          "stable": {"column": "stable", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0002", "FPB-0003", "FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture mode/setpoint stability gate."},
-          "baseline_ready": {"column": "baseline_ready", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture expected/reference readiness gate."},
-          "point_valid": {"column": "point_valid", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture freshness and point-validity gate."}
+          "occupied": {"column": "occupied", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture occupancy gate.", "inventory_evidence": "Original fixture schedule field.", "derived_from": []},
+          "enabled": {"column": "enabled", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture controller-enabled gate.", "inventory_evidence": "Original fixture controller state field.", "derived_from": []},
+          "airflow_established": {"column": "airflow_ok", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0002", "FPB-0003", "FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture airflow-established gate.", "inventory_evidence": "Original fixture sequence-state field, not computed from target airflow.", "derived_from": []},
+          "stable": {"column": "stable", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0002", "FPB-0003", "FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture mode/setpoint stability gate.", "inventory_evidence": "Original fixture transition-state field.", "derived_from": []},
+          "baseline_ready": {"column": "baseline_ready", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture expected/reference readiness gate.", "inventory_evidence": "Original fixture readiness truth field.", "derived_from": []},
+          "point_valid": {"column": "point_valid", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture freshness and point-validity gate.", "inventory_evidence": "Original fixture quality truth field.", "derived_from": []}
         }
     }
   ]

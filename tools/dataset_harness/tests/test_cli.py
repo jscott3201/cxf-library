@@ -4,10 +4,13 @@ import contextlib
 import hashlib
 import io
 import json
+import shutil
 import sys
 import tempfile
+import types
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from tools.dataset_harness import harness
 
@@ -58,6 +61,9 @@ class DatasetHarnessCliTests(unittest.TestCase):
         self.assertEqual(code, 0, stderr)
         self.assertIn("pfpu_fault_free_tiny", stdout)
         self.assertNotIn("sfpu_restricted_fan_tiny", stdout)
+        self.assertIn("mapping primary_airflow: column='primary_cfm'", stdout)
+        self.assertIn("inventory_evidence=", stdout)
+        self.assertIn("gate point_valid:", stdout)
 
     def test_replay_invokes_trace_contract_and_writes_deterministic_schema(self):
         before = tree_fingerprint(FIXTURE)
@@ -142,6 +148,165 @@ class DatasetHarnessCliTests(unittest.TestCase):
         self.assertEqual(code, 2)
         self.assertIn("must stay under the ignored target", stderr)
         self.assertFalse(protected_output.exists())
+
+    def test_case_selectors_reject_unknown_and_duplicate_ids(self):
+        for selector, message in [
+            ("pfpu_fault_free_tiny,typo", "unknown case ids"),
+            ("pfpu_fault_free_tiny,pfpu_fault_free_tiny", "contains duplicates"),
+        ]:
+            with self.subTest(selector=selector):
+                code, _, stderr = self.invoke(
+                    [
+                        "inspect",
+                        "--adapter",
+                        "lbl-fpu",
+                        "--dataset",
+                        str(FIXTURE),
+                        "--case",
+                        selector,
+                    ]
+                )
+                self.assertEqual(code, 2)
+                self.assertIn(message, stderr)
+
+    def test_target_detection_ignores_pre_fault_alarms(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "dataset"
+            shutil.copytree(FIXTURE, root)
+            manifest_path = root / "lbl_fpu_manifest.json"
+            manifest = json.loads(manifest_path.read_text())
+            manifest["cases"][1]["fault_start"] = "2026-01-02T00:05:00Z"
+            manifest_path.write_text(json.dumps(manifest))
+            adapter = harness.ADAPTERS["lbl-fpu"](root)
+            loaded = adapter.load_case(adapter.cases[1])
+
+            def pre_fault_trace(_verifier, _rule, vectors_path):
+                vectors = json.loads(vectors_path.read_text())
+                step = vectors["clock"]["step_s"]
+                count = int(vectors["clock"]["horizon_s"] // step) + 1
+                return {
+                    "schema": harness.TRACE_SCHEMA,
+                    "engine_pin": harness.ENGINE_PIN,
+                    "engine_source_revision": harness.ENGINE_PIN,
+                    "rule_content_id": "cxf:test:pre-fault",
+                    "clock": {"step_s": step},
+                    "scenarios": [
+                        {
+                            "name": scenario["name"],
+                            "samples": [
+                                {"t": index * step, "outputs": {"yFault": index <= 6}}
+                                for index in range(count)
+                            ],
+                        }
+                        for scenario in vectors["scenarios"]
+                    ],
+                }
+
+            with tempfile.TemporaryDirectory() as vectors_root, mock.patch.object(
+                harness, "run_trace", side_effect=pre_fault_trace
+            ):
+                result = harness.replay_case_rule(
+                    loaded, "FPB-0004", Path(vectors_root), FAKE_VERIFIER
+                )
+            metrics = result["metrics"]
+            self.assertGreater(metrics["alarm_samples"], 0)
+            self.assertGreater(metrics["target_post_fault_evaluable_samples"], 0)
+            self.assertGreater(metrics["target_post_fault_alarm_samples"], 0)
+            self.assertEqual(metrics["target_post_fault_alarm_episodes"], 0)
+            self.assertEqual(metrics["target_detected_rule_case_pairs"], 0)
+            self.assertEqual(metrics["target_evaluable_rule_case_pairs"], 1)
+            self.assertIsNone(metrics["median_detection_latency_s"])
+
+    def test_malformed_trace_shapes_fail_as_dataset_errors(self):
+        valid = {
+            "schema": harness.TRACE_SCHEMA,
+            "engine_pin": harness.ENGINE_PIN,
+            "engine_source_revision": harness.ENGINE_PIN,
+            "rule_content_id": harness.recorded_rule_content_id("FPB-0001"),
+            "clock": {"step_s": 60},
+            "scenarios": [],
+        }
+        variants = [
+            ([], "root must be an object"),
+            ({**valid, "clock": True}, "clock must be an object"),
+            ({**valid, "clock": {"step_s": True}}, "step_s must be a finite positive"),
+            ({**valid, "clock": {"step_s": float("nan")}}, "step_s must be a finite positive"),
+        ]
+        for payload, message in variants:
+            with self.subTest(message=message), tempfile.TemporaryDirectory() as temporary:
+                vectors = Path(temporary) / "vectors.json"
+                vectors.write_text("{}")
+
+                def fake_run(*_args, **kwargs):
+                    kwargs["stdout"].write(json.dumps(payload).encode())
+                    return types.SimpleNamespace(returncode=0)
+
+                with mock.patch.object(harness.subprocess, "run", side_effect=fake_run):
+                    with self.assertRaisesRegex(harness.DatasetError, message):
+                        harness.run_trace(FAKE_VERIFIER, "FPB-0001", vectors)
+
+    def test_malformed_sample_shapes_fail_as_dataset_errors(self):
+        adapter = harness.ADAPTERS["lbl-fpu"](FIXTURE)
+        loaded = adapter.load_case(adapter.cases[0])
+
+        def trace_with(sample_mutation):
+            def make_trace(_verifier, rule, vectors_path):
+                vectors = json.loads(vectors_path.read_text())
+                step = vectors["clock"]["step_s"]
+                count = int(vectors["clock"]["horizon_s"] // step) + 1
+                scenarios = []
+                for scenario in vectors["scenarios"]:
+                    samples = [
+                        {"t": index * step, "outputs": {"yFault": False}}
+                        for index in range(count)
+                    ]
+                    replacement = sample_mutation(samples)
+                    if replacement is not None:
+                        samples = replacement
+                    scenarios.append({"name": scenario["name"], "samples": samples})
+                return {
+                    "schema": harness.TRACE_SCHEMA,
+                    "engine_pin": harness.ENGINE_PIN,
+                    "engine_source_revision": harness.ENGINE_PIN,
+                    "rule_content_id": harness.recorded_rule_content_id(rule),
+                    "clock": {"step_s": step},
+                    "scenarios": scenarios,
+                }
+
+            return make_trace
+
+        variants = [
+            (lambda _samples: {}, "samples must be a list"),
+            (lambda samples: samples.__setitem__(0, True), "sample must be an object"),
+            (lambda samples: samples[0].update(t=True), "timestamp does not match"),
+            (lambda samples: samples[0].update(outputs=True), "outputs must be an object"),
+        ]
+        for mutate, message in variants:
+            with self.subTest(message=message), tempfile.TemporaryDirectory() as temporary, mock.patch.object(
+                harness, "run_trace", side_effect=trace_with(mutate)
+            ):
+                with self.assertRaisesRegex(harness.DatasetError, message):
+                    harness.replay_case_rule(loaded, "FPB-0001", Path(temporary), FAKE_VERIFIER)
+
+    def test_invalid_utf8_csv_has_clean_cli_error(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary) / "dataset"
+            shutil.copytree(FIXTURE, root)
+            (root / "pfpu_fault_free.csv").write_bytes(b"\xff\xfe")
+            code, _, stderr = self.invoke(
+                [
+                    "inspect",
+                    "--adapter",
+                    "lbl-fpu",
+                    "--dataset",
+                    str(root),
+                    "--case",
+                    "pfpu_fault_free_tiny",
+                ]
+            )
+            self.assertEqual(code, 2)
+            self.assertIn("codec can't decode", stderr)
+            self.assertNotIn("Traceback", stderr)
 
 
 if __name__ == "__main__":

@@ -4,7 +4,7 @@
 //! `vectors.json` inputs tick by tick, and check every assertion window. Exit code 0 only if every
 //! scenario of every fault passes.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
@@ -56,6 +56,9 @@ struct InputEvent {
 #[derive(Serialize)]
 struct TraceDocument {
     schema: &'static str,
+    engine_pin: &'static str,
+    engine_source_revision: &'static str,
+    rule_content_id: String,
     clock: TraceClock,
     scenarios: Vec<TraceScenario>,
 }
@@ -275,12 +278,15 @@ fn trace_scenario(
     scenario: &Scenario,
 ) -> Result<TraceScenario, String> {
     let (mut engine, _points, events) = prepare_scenario(rule_bytes, scenario)?;
-    let outputs: Vec<(String, String)> = engine
-        .topology()
-        .boundary_outputs
-        .into_iter()
-        .map(|declared| (boundary_name(&declared.path), declared.path))
-        .collect();
+    let mut output_names = BTreeSet::new();
+    let mut outputs = Vec::new();
+    for declared in engine.topology().boundary_outputs {
+        let name = boundary_name(&declared.path);
+        if !output_names.insert(name.clone()) {
+            return Err(format!("duplicate boundary output name `{name}`"));
+        }
+        outputs.push((name, declared.path));
+    }
     let n_ticks = (clock.horizon_s / clock.step_s).floor() as u64;
     let mut next_event = 0usize;
     let mut samples = Vec::with_capacity(n_ticks as usize + 1);
@@ -311,6 +317,20 @@ fn trace_scenario(
     })
 }
 
+fn validate_trace_clock(clock: &Clock) -> Result<(), String> {
+    if !clock.step_s.is_finite() || clock.step_s <= 0.0 {
+        return Err("trace clock step_s must be finite and greater than zero".to_string());
+    }
+    if !clock.horizon_s.is_finite() || clock.horizon_s < 0.0 {
+        return Err("trace clock horizon_s must be finite and non-negative".to_string());
+    }
+    let n_ticks = (clock.horizon_s / clock.step_s).floor();
+    if !n_ticks.is_finite() || n_ticks >= 1_000_000.0 {
+        return Err("trace clock exceeds the 1,000,000-sample safety limit".to_string());
+    }
+    Ok(())
+}
+
 fn trace_vectors(fault_dir: &Path, vectors_path: &Path) -> Result<TraceDocument, String> {
     let rule_path = fault_dir.join("rule.cxf.jsonld");
     let rule_bytes =
@@ -322,12 +342,35 @@ fn trace_vectors(fault_dir: &Path, vectors_path: &Path) -> Result<TraceDocument,
     if vectors.schema != "cxf-library/vectors/v1" {
         return Err(format!("unsupported vectors schema `{}`", vectors.schema));
     }
+    validate_trace_clock(&vectors.clock)?;
+    if vectors.scenarios.len() > 512 {
+        return Err("trace request exceeds the 512-scenario safety limit".to_string());
+    }
+    let samples_per_scenario = (vectors.clock.horizon_s / vectors.clock.step_s).floor() as usize + 1;
+    if !matches!(
+        samples_per_scenario.checked_mul(vectors.scenarios.len()),
+        Some(total) if total <= 1_000_000
+    ) {
+        return Err("trace request exceeds the 1,000,000-total-sample safety limit".to_string());
+    }
+    let mut identity_engine = Engine::in_memory();
+    identity_engine
+        .load_cxf(&rule_bytes)
+        .map_err(|e| format!("load_cxf failed while identifying rule: {e}"))?;
+    let rule_content_id = identity_engine
+        .export_cxf()
+        .map_err(|e| format!("export_cxf failed while identifying rule: {e}"))?
+        .content_id_complete()
+        .map_err(|e| format!("rule content id unavailable: {e}"))?;
     let mut scenarios = Vec::with_capacity(vectors.scenarios.len());
     for scenario in &vectors.scenarios {
         scenarios.push(trace_scenario(&rule_bytes, &vectors.clock, scenario)?);
     }
     Ok(TraceDocument {
         schema: "cxf-library/replay-trace/v1",
+        engine_pin: include_str!("../../../ENGINE_PIN").trim(),
+        engine_source_revision: env!("CXF_ENGINE_SOURCE_REV"),
+        rule_content_id,
         clock: TraceClock {
             step_s: vectors.clock.step_s,
         },
@@ -434,6 +477,46 @@ fn discover_fault_dirs(faults_root: &Path) -> Result<Vec<PathBuf>, String> {
     }
     dirs.sort();
     Ok(dirs)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Clock, validate_trace_clock};
+
+    #[test]
+    fn trace_clock_rejects_unsafe_values() {
+        for clock in [
+            Clock {
+                step_s: 0.0,
+                horizon_s: 60.0,
+            },
+            Clock {
+                step_s: f64::NAN,
+                horizon_s: 60.0,
+            },
+            Clock {
+                step_s: 60.0,
+                horizon_s: -1.0,
+            },
+            Clock {
+                step_s: 1.0,
+                horizon_s: 1_000_000.0,
+            },
+        ] {
+            assert!(validate_trace_clock(&clock).is_err());
+        }
+    }
+
+    #[test]
+    fn trace_clock_accepts_bounded_native_cadence() {
+        assert!(
+            validate_trace_clock(&Clock {
+                step_s: 60.0,
+                horizon_s: 31_536_000.0,
+            })
+            .is_ok()
+        );
+    }
 }
 
 fn main() -> ExitCode {

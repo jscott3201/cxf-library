@@ -4,10 +4,51 @@
   "title": "Open Control Library external-dataset validation result",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema", "adapter", "dataset", "selection", "summary", "results", "notes"],
+  "required": ["schema", "adapter", "execution", "dataset", "selection", "summary", "results", "notes"],
   "properties": {
     "schema": {"const": "cxf-library/dataset-validation/v1"},
     "adapter": {"type": "string", "minLength": 1},
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["library_git_revision", "library_git_dirty", "engine_pin", "engine_source_revisions", "verifier", "tool_sha256", "point_dictionary_sha256", "rules"],
+      "properties": {
+        "library_git_revision": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "library_git_dirty": {"type": "boolean"},
+        "engine_pin": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "engine_source_revisions": {"type": "array", "items": {"type": "string", "pattern": "^[0-9a-f]{40}$"}, "uniqueItems": true, "maxItems": 1},
+        "verifier": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "path", "sha256"],
+          "properties": {
+            "mode": {"enum": ["repository-default", "repository-binary", "explicit-untrusted"]},
+            "path": {"type": "string", "minLength": 1},
+            "sha256": {"type": ["string", "null"], "pattern": "^sha256:[0-9a-f]{64}$"}
+          }
+        },
+        "tool_sha256": {
+          "type": "object",
+          "minProperties": 3,
+          "additionalProperties": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+        },
+        "point_dictionary_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "rules": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["engine_source_revision", "rule_content_id", "graph_sha256", "card_sha256"],
+            "properties": {
+              "engine_source_revision": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"},
+              "rule_content_id": {"type": ["string", "null"]},
+              "graph_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+              "card_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+            }
+          }
+        }
+      }
+    },
     "dataset": {
       "type": "object",
       "additionalProperties": false,
@@ -42,35 +83,57 @@
     "notes": {"type": "array", "items": {"type": "string"}}
   },
   "$defs": {
-    "nullableNumber": {"type": ["number", "null"]},
+    "nullableRate": {
+      "anyOf": [
+        {"type": "number", "minimum": 0, "maximum": 1},
+        {"type": "null"}
+      ]
+    },
+    "nullableDuration": {
+      "anyOf": [
+        {"type": "number", "minimum": 0},
+        {"type": "null"}
+      ]
+    },
     "metricsSummary": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "results",
         "evaluable_samples",
+        "fault_free_evaluable_samples",
         "fault_free_alarm_samples",
         "fault_free_alarm_episodes",
-        "faulted_detected_cases",
-        "faulted_total_cases",
+        "fault_free_alarm_sample_rate",
+        "target_detected_rule_case_pairs",
+        "target_evaluable_rule_case_pairs",
+        "target_declared_rule_case_pairs",
+        "target_detection_rate",
         "median_detection_latency_s"
       ],
       "properties": {
         "results": {"type": "integer", "minimum": 0},
         "evaluable_samples": {"type": "integer", "minimum": 0},
+        "fault_free_evaluable_samples": {"type": "integer", "minimum": 0},
         "fault_free_alarm_samples": {"type": "integer", "minimum": 0},
         "fault_free_alarm_episodes": {"type": "integer", "minimum": 0},
-        "faulted_detected_cases": {"type": "integer", "minimum": 0},
-        "faulted_total_cases": {"type": "integer", "minimum": 0},
-        "median_detection_latency_s": {"$ref": "#/$defs/nullableNumber"}
+        "fault_free_alarm_sample_rate": {"$ref": "#/$defs/nullableRate"},
+        "target_detected_rule_case_pairs": {"type": "integer", "minimum": 0},
+        "target_evaluable_rule_case_pairs": {"type": "integer", "minimum": 0},
+        "target_declared_rule_case_pairs": {"type": "integer", "minimum": 0},
+        "target_detection_rate": {"$ref": "#/$defs/nullableRate"},
+        "median_detection_latency_s": {"$ref": "#/$defs/nullableDuration"}
       }
     },
     "result": {
       "type": "object",
+      "additionalProperties": false,
       "required": [
         "case",
         "rule",
         "subtype",
         "label",
+        "inventory_evidence",
         "fault_class",
         "severity",
         "mapping",
@@ -83,10 +146,12 @@
         "rule": {"type": "string", "pattern": "^FPB-[0-9]{4}$"},
         "subtype": {"enum": ["parallel", "series"]},
         "label": {"enum": ["fault_free", "faulted"]},
+        "inventory_evidence": {"type": "string", "minLength": 1},
         "fault_class": {"type": ["string", "null"]},
         "severity": {"type": ["string", "null"]},
         "mapping": {
           "type": "object",
+          "additionalProperties": false,
           "required": ["canonical_to_source", "binding_details", "proxies", "unit_conversions"],
           "properties": {
             "canonical_to_source": {"type": "object", "additionalProperties": {"type": ["string", "null"]}},
@@ -97,6 +162,7 @@
         },
         "gating": {
           "type": "object",
+          "additionalProperties": false,
           "required": ["description", "definitions", "startup_lead_s", "evaluable_samples", "segments", "source_timeline"],
           "properties": {
             "description": {"type": "string"},
@@ -109,6 +175,7 @@
         },
         "metrics": {
           "type": "object",
+          "additionalProperties": false,
           "required": [
             "evaluable_samples",
             "alarm_samples",
@@ -117,8 +184,12 @@
             "fault_free_alarm_episodes",
             "fault_free_evaluable_samples",
             "fault_free_alarm_sample_rate",
-            "faulted_detected_cases",
-            "faulted_total_cases",
+            "target_post_fault_evaluable_samples",
+            "target_post_fault_alarm_samples",
+            "target_post_fault_alarm_episodes",
+            "target_declared_rule_case_pairs",
+            "target_detected_rule_case_pairs",
+            "target_evaluable_rule_case_pairs",
             "median_detection_latency_s"
           ],
           "properties": {
@@ -128,10 +199,14 @@
             "fault_free_alarm_samples": {"type": "integer", "minimum": 0},
             "fault_free_alarm_episodes": {"type": "integer", "minimum": 0},
             "fault_free_evaluable_samples": {"type": "integer", "minimum": 0},
-            "fault_free_alarm_sample_rate": {"$ref": "#/$defs/nullableNumber"},
-            "faulted_detected_cases": {"type": "integer", "minimum": 0},
-            "faulted_total_cases": {"type": "integer", "minimum": 0},
-            "median_detection_latency_s": {"$ref": "#/$defs/nullableNumber"}
+            "fault_free_alarm_sample_rate": {"$ref": "#/$defs/nullableRate"},
+            "target_post_fault_evaluable_samples": {"type": "integer", "minimum": 0},
+            "target_post_fault_alarm_samples": {"type": "integer", "minimum": 0},
+            "target_post_fault_alarm_episodes": {"type": "integer", "minimum": 0},
+            "target_declared_rule_case_pairs": {"type": "integer", "minimum": 0, "maximum": 1},
+            "target_detected_rule_case_pairs": {"type": "integer", "minimum": 0, "maximum": 1},
+            "target_evaluable_rule_case_pairs": {"type": "integer", "minimum": 0, "maximum": 1},
+            "median_detection_latency_s": {"$ref": "#/$defs/nullableDuration"}
           }
         },
         "notes": {"type": "array", "items": {"type": "string"}}
