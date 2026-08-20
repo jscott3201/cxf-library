@@ -19,7 +19,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: [AHU-0028]
-related: [RTU-0005, AHU-0006, AHU-0026]
+related: [RTU-0005, AHU-0006, AHU-0026, RTU-0010]
 playbooks: [economizer-failure]
 operating_states: "occupied with the supply fan running — both conjuncts are in the graph (occ_schedule, sf_status), because the reference writes them into the fault equation and both are canonical RTU points"
 preconditions: "Occupancy schedule data available and current; the host evaluates the schedule (time zone, calendar, holidays) into the boolean occ_schedule point, and a stale or unknown schedule makes the verdict NO_EVAL rather than healthy. MAT must pass its integrity gate (AHU-0028, see suppressed_by): the fraction is a ratio of temperature differences, so a biased mixed-air reading moves it directly, and this rule's deficit branch is exactly where a low MAT lands. The temperature-difference gate is signalled in-rule by yTempDeltaOk; when it is false the verdict is NO_EVAL, not healthy."

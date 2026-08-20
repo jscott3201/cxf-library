@@ -20,7 +20,7 @@ g36: null
 clusters: [CLU-03]
 suppresses: []
 suppressed_by: [RTU-0003]
-related: [AHU-0017, RTU-0003, RTU-0005]
+related: [AHU-0017, RTU-0003, RTU-0005, RTU-0010]
 playbooks: [economizer-failure]
 operating_states: "cooling call active"
 preconditions: "comp_status gates both branches inside the graph, so the rule is already silent with no mechanical cooling running; a false yFault under a stopped compressor is no verdict, not a healthy economizer. Everything above that stays host-side: mode transitions, morning warm-up, and any period when the damper is under manual override or a commissioning test. The OAT sensor must be trustworthy — a sensor reading high produces branch 1's signature with the economizer control working exactly as designed (diagnosis 4), which is why RTU-0003 (PNNL's AFDD0 sensor-consistency check) suppresses this rule while it is active. Damper position is taken from the command, not a feedback signal: a unit whose actuator ignores the command reports the command's story here and is caught by RTU-0003 or by the playbook's step 3. When any gate is unmet the verdict is NO_EVAL, not healthy."

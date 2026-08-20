@@ -18,7 +18,7 @@ g36: "§5.22.6 FC#2"
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [AHU-0007]
+related: [AHU-0007, FCU-0006]
 playbooks: [fcu-faults]
 operating_states: "OS 1 (Heating) — host-gated"
 preconditions: "Evaluate only in OS#1, the heating state: in deadband or cooling the discharge is meant to sit below any heating setpoint, and the rule would be comparing against a number nothing is chasing. The fan must be running and delivering air, since a discharge temperature means nothing in a still coil — an FCU whose fan has failed while its loop pins the valve open can produce exactly this signature, with a downstream sensor drifting toward duct ambient, and that is a fan fault, not a coil fault. Suspend evaluation for a mode delay after any change of operating state, while the valve is stroking and the coil is still charging; G36 uses 30 min for an AHU and an FCU coil settles faster, but the graph carries no such timer. sat_sp must be the discharge setpoint the unit is actively controlling to, not a design constant, or the comparison is against a fiction. sat must be trustworthy; nothing in this rule cross-checks it, and a discharge sensor reading 6 °C low fabricates this fault on a healthy unit every heating hour. Coil saturation is signalled in-rule by yHtgFullOk: when it is false the rule is making no claim, and the verdict is NO_EVAL rather than healthy."

@@ -18,7 +18,7 @@ g36: "§5.22.6 FC#1"
 clusters: [CLU-01]
 suppresses: []
 suppressed_by: []
-related: [AHU-0004]
+related: [AHU-0004, FCU-0006]
 playbooks: [fcu-faults]
 operating_states: "OS 1–4 (all)"
 preconditions: "The operating_state encoding must be stable for the life of the deployment — re-mapping the enum mid-stream registers as a transition on every unit whose state moved, across the whole building at once. count_scale must equal count_window divided by the host's tick interval; the shipped 20.0 is right only on a 180 s tick, and a wrong value produces a plausible number rather than an error (see Deviations). The host tick must sit inside 57.15 s ≤ dt ≤ 450 s for the count to be both retained and reachable. Operator activity is not a fault: commissioning, manual mode forcing, and scheduled occupancy testing must be excluded host-side, since a deliberate mode change counts the same as an oscillation — this matters more on an FCU than on an AHU, because a guest or tenant at a wall thermostat produces exactly that signal. Warm-up evaluability is signalled in-rule by yWindowFull: while it is false the count is an extrapolated rate rather than a completed-hour count, and the verdict is NO_EVAL, not healthy. The same is true whenever any gate above is unmet."

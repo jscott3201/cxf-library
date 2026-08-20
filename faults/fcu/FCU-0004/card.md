@@ -19,10 +19,10 @@ g36: "§5.22.6 FC#4"
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [FCU-0005, FCU-0002]
+related: [FCU-0005, FCU-0002, FCU-0006]
 playbooks: [fcu-faults]
 operating_states: "OS#2 (no active coils) — host-gated"
-preconditions: "The fan must be running. `rat` and `sat` are a coil entering and leaving temperature only while air is crossing the coil; on a cycling-fan FCU the discharge sensor sits in stagnant air over a coil full of chilled water between cycles and reads several degrees cold, which is this fault's exact signature and none of its meaning. The FCU point dictionary carries no fan status, fan command, or airflow point, so the host owns that gate entirely and cannot delegate it to the rule (`fan_off_standing_water_reads_as_a_leak` is the vector that pins the consequence). Suspend evaluation for a settling window after the cooling valve closes — a coil surrendering the chilled water standing in it shows the same drop for several minutes. The heating coil should also be off: a heating call warms the discharge and can only hide this fault, never fabricate it, so the masking is a miss rather than a false alarm, but a host that wants OS#2 as the reference scopes it should gate on `htg_vlv_cmd` too, which this rule does not read. Both sensors must be in the airstream and trustworthy: a `rat` bound to a wall-mounted space sensor, a discharge sensor in a plenum shared with another unit, or a cabinet drawing ducted outdoor air upstream of the coil all break the binding with no other symptom, and the outdoor-air case biases this rule toward false alarms in winter. Nothing in this rule cross-checks either sensor. When any gate is unmet the verdict is NO_EVAL, not healthy — as it is whenever the in-rule output yCmdOk reads false."
+preconditions: "The fan must be running. `rat` and `sat` are a coil entering and leaving temperature only while air is crossing the coil; on a cycling-fan FCU the discharge sensor sits in stagnant air over a coil full of chilled water between cycles and reads several degrees cold, which is this fault's exact signature and none of its meaning. This graph does not consume the dictionary's canonical `fan_cmd` or `fan_status`, so the host must gate it on trusted fan proof; an FCU-0006 fail-to-start makes this verdict NO_EVAL (`fan_off_standing_water_reads_as_a_leak` pins the consequence). Suspend evaluation for a settling window after the cooling valve closes — a coil surrendering the chilled water standing in it shows the same drop for several minutes. The heating coil should also be off: a heating call warms the discharge and can only hide this fault, never fabricate it, so the masking is a miss rather than a false alarm, but a host that wants OS#2 as the reference scopes it should gate on `htg_vlv_cmd` too, which this rule does not read. Both sensors must be in the airstream and trustworthy: a `rat` bound to a wall-mounted space sensor, a discharge sensor in a plenum shared with another unit, or a cabinet drawing ducted outdoor air upstream of the coil all break the binding with no other symptom, and the outdoor-air case biases this rule toward false alarms in winter. Nothing in this rule cross-checks either sensor. When any gate is unmet the verdict is NO_EVAL, not healthy — as it is whenever the in-rule output yCmdOk reads false."
 points:
   - clg_vlv_cmd
   - sat
@@ -197,13 +197,11 @@ fan there is nothing to attribute at all.
   configuration breaks the binding in the dangerous direction — a cabinet drawing
   outdoor air upstream of the coil presents a mixture colder than the return
   sensor reads, so `rat − sat` shows a winter drop with no leak at all.
-- **The fan-running gate cannot be bound in v1.** The rule's most important
-  precondition is that air is moving, and the FCU point dictionary carries no fan
-  status, fan command, or airflow point, so the gate lives in `preconditions`
-  with nothing in the graph enforcing it. A cycling-fan FCU evaluated between
-  cycles is the realistic way to get a false alarm out of this rule
-  (`fan_off_standing_water_reads_as_a_leak` pins it). Adding `fan_status` to the
-  dictionary is the fix.
+- **The fan-running gate remains host-side.** The dictionary now defines
+  `fan_cmd` and `fan_status` for FCU-0006, but this graph does not consume them.
+  A cycling-fan FCU evaluated between cycles is the realistic way to get a false
+  alarm out of this rule (`fan_off_standing_water_reads_as_a_leak` pins it).
+  Gate on trusted fan proof and treat FCU-0006 fail-to-start as NO_EVAL here.
 - **`yCmdOk` is the library's, not the reference's.** Exposing the command
   conjunct as a boundary output adds no logic and changes no verdict; it lets the
   host distinguish "the coil is shut and quiet" from "the coil is cooling, ask me

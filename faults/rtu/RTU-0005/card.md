@@ -19,7 +19,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: [AHU-0028]
-related: [AHU-0021, AHU-0030, RTU-0006, RTU-0004]
+related: [AHU-0021, AHU-0030, RTU-0006, RTU-0004, RTU-0010]
 playbooks: [economizer-failure]
 operating_states: "occupied operation with the economizer locked out (host-gated); the reference's economizer_should_be_inactive(oat, mode) term lives in preconditions, not in the graph"
 preconditions: "Supply fan running. The host must not evaluate while the economizer is legitimately open — drawing more than the design minimum is the point of economizing, and these three temperatures cannot tell that apart from a damper that never closed. MAT must pass its integrity gate (AHU-0028, see suppressed_by): the fraction is a ratio of temperature differences, so a biased mixed-air reading moves it directly. The temperature-difference gate is signalled in-rule by yTempDeltaOk; when it is false the verdict is NO_EVAL, not healthy."

@@ -18,10 +18,10 @@ g36: "§5.22.6 FC#5"
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [FCU-0004, FCU-0003]
+related: [FCU-0004, FCU-0003, FCU-0006]
 playbooks: [fcu-faults]
 operating_states: "OS#2 (no active coils) — host-gated"
-preconditions: "The fan must be running. sat is only a coil leaving temperature while air is moving over the coil; on a cycling-fan FCU the discharge sensor sits in stagnant duct air between cycles and reads whatever the coil above it is doing, which is this fault's exact signature and none of its meaning. The FCU point dictionary carries no fan status or fan command, so the host owns this gate entirely and cannot delegate it to the rule (see Deviations). Suspend evaluation for a settling window after the heating valve closes — a coil giving up the hot water standing in it shows the same rise for several minutes, and alarm_delay is sized to ride out the usual case rather than to replace the gate. rat and sat must both be trustworthy and must both be in the airstream: this binding uses them as the coil entering and leaving temperatures, so a return sensor mounted on the wall as a space sensor, or a discharge sensor in a supply plenum shared with another unit, breaks the premise with no other symptom. Nothing in this rule cross-checks either sensor. When any gate is unmet the verdict is NO_EVAL, not healthy — as it is whenever the in-rule output yCmdOk reads false."
+preconditions: "The fan must be running. sat is only a coil leaving temperature while air is moving over the coil; on a cycling-fan FCU the discharge sensor sits in stagnant duct air between cycles and reads whatever the coil above it is doing, which is this fault's exact signature and none of its meaning. This graph does not consume the dictionary's canonical `fan_cmd` or `fan_status`, so the host must gate it on trusted fan proof; an FCU-0006 fail-to-start makes this verdict NO_EVAL (see Deviations). Suspend evaluation for a settling window after the heating valve closes — a coil giving up the hot water standing in it shows the same rise for several minutes, and alarm_delay is sized to ride out the usual case rather than to replace the gate. rat and sat must both be trustworthy and must both be in the airstream: this binding uses them as the coil entering and leaving temperatures, so a return sensor mounted on the wall as a space sensor, or a discharge sensor in a supply plenum shared with another unit, breaks the premise with no other symptom. Nothing in this rule cross-checks either sensor. When any gate is unmet the verdict is NO_EVAL, not healthy — as it is whenever the in-rule output yCmdOk reads false."
 points:
   - htg_vlv_cmd
   - sat
@@ -199,12 +199,11 @@ nothing to attribute at all.
   configurations break the binding outright — a `rat` bound to a wall-mounted
   space sensor, and a four-pipe unit taking ducted outdoor air upstream of the
   coils.
-- **The fan-running gate cannot be bound in v1.** The rule's most important
-  precondition is that air is moving, and the FCU point dictionary carries no fan
-  status, fan command, or airflow point, so the gate lives in `preconditions`
-  with nothing in the graph enforcing it. A cycling-fan FCU evaluated between
-  cycles is the realistic way to get a false alarm out of this rule; adding
-  `fan_status` to the dictionary is the fix.
+- **The fan-running gate remains host-side.** The dictionary now defines
+  `fan_cmd` and `fan_status` for FCU-0006, but this graph does not consume them.
+  A cycling-fan FCU evaluated between cycles is the realistic way to get a false
+  alarm out of this rule. Gate on trusted fan proof and treat FCU-0006
+  fail-to-start as NO_EVAL here.
 - **`yCmdOk` is the library's, not the reference's.** Exposing the command
   conjunct as a boundary output adds no logic and changes no verdict; it lets the
   host distinguish "the coil is shut and quiet" from "the coil is heating, ask me

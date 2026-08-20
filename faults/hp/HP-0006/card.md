@@ -18,7 +18,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [HP-0003, HP-0004, HP-0001]
+related: [HP-0003, HP-0004, HP-0001, HP-0007]
 playbooks: [heat-pump-faults]
 operating_states: "cooling, compressor running and settled — the source's direction chart is cooling-mode only (see Deviations)"
 preconditions: "The compressor must be running and must have held its current capacity for at least 15 min: the source's own steady-state detector needed 6-15 min after a start before its features settled, and a unit still pulling down shows deviations on physics rather than on fault. Defrost must be excluded, not merely tolerated — a defrost cycle reverses the circuit deliberately and scrambles every refrigerant-side temperature this rule reads, so the host gates on defrost_status. The four nominals are commissioning values, not library constants; until the host has written them from this unit's own no-fault operation at the condition the instance runs in, the rule is comparing against the source rig's numbers and means nothing (see Deviations). Nothing in the rule cross-checks its inputs: a drifted discharge sensor, or a P-T lookup configured for the wrong refrigerant, moves a conjunct on its own. TXV evaluability is signalled in-rule by yTxvOk; when it is false the verdict is NO_EVAL, not healthy."
