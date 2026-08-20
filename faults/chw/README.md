@@ -71,7 +71,10 @@ a weaker per-machine proxy; it changes the question.
 The PR 04 point additions pin ASHRAE 223 to the inspected public-review
 artifact `1.0.0-ppr.2.1` (SHA-256
 `1f156f9938c0be430d2216e01e31bb183c438ba318d8d4a23d2f074ebcd6f573`),
-replacing the former unverified `v1.0.0-2026` label. Brick 1.4.4 provides exact
+replacing the former unverified `v1.0.0-2026` label. The migration also
+replaces legacy `Water`/`Refrigerant` and free-text aspect shorthands with
+artifact-defined local names such as `Water-ChilledWater`, `Fluid-Water`,
+`Constituent-Refrigerant`, and `Aspect-Setpoint`. Brick 1.4.4 provides exact
 generic `Start_Stop_Command` and `Run_Status` classes on a `Chiller`.
 
 CLU-06 is not broadened. Tracking, proof, and cycling improve diagnosis but do

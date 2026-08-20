@@ -23,7 +23,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "Chilled-water plant point dictionary. Owning equipment: brick:Chiller / brick:Chilled_Water_Loop (both verified in Brick 1.4.4). On multi-chiller plants, machine rules require a coherent per-chiller identity; loop-common temperature/setpoint points are valid only where the card explicitly permits them. ASHRAE 223 mappings were checked against 223p-1.0.0-ppr2.1.ttl (owl:versionInfo 1.0.0-ppr.2.1; SHA-256 1f156f9938c0be430d2216e01e31bb183c438ba318d8d4a23d2f074ebcd6f573), replacing the former unverified v1.0.0-2026 label. The reference expresses chiller output in tons; 1 ton = 3.517 kW thermal and conversion belongs at binding, not in the graph.",
+  "notes": "Chilled-water plant point dictionary. Owning equipment: brick:Chiller / brick:Chilled_Water_Loop (both verified in Brick 1.4.4). On multi-chiller plants, machine rules require a coherent per-chiller identity; loop-common temperature/setpoint points are valid only where the card explicitly permits them. ASHRAE 223 local names were checked against 223p-1.0.0-ppr2.1.ttl (owl:versionInfo 1.0.0-ppr.2.1; SHA-256 1f156f9938c0be430d2216e01e31bb183c438ba318d8d4a23d2f074ebcd6f573), replacing the former unverified v1.0.0-2026 label. Water-ChilledWater identifies the chilled-water circuit, Fluid-Water intentionally leaves condenser-water composition generic, and Constituent-Refrigerant identifies the refrigerant behind host-derived saturation properties. The reference expresses chiller output in tons; 1 ton = 3.517 kW thermal and conversion belongs at binding, not in the graph.",
   "points": [
     {
       "name": "chiller_kw",
@@ -111,13 +111,11 @@
         "property_class": "QuantifiableObservableProperty",
         "quantitykind": "Temperature",
         "unit": "DEG_C",
-        "medium": "Water",
-        "aspects": [
-          "leaving"
-        ]
+        "medium": "Fluid-Water",
+        "aspects": []
       },
       "provisional": false,
-      "notes": "brick:Leaving_Condenser_Water_Temperature_Sensor grep-verified. Reference Haystack markers: condenser, water, leaving, temp, sensor. Baseline regressor input for CHW-0001 (condenser lift proxy). LOOP-SIDE WARNING: this is the WARM side (chiller-leaving, chiller-to-tower). A future cooling-tower approach rule needs the COLD side (tower-leaving, tower-to-chiller = entering condenser water) — a different point; do not wire a tower rule here by name alone (internal deep-read finding, 2026-08-18)."
+      "notes": "brick:Leaving_Condenser_Water_Temperature_Sensor is exact in Brick 1.4.4. ASHRAE 223 uses Fluid-Water on the connection point; leaving direction is topology in the pattern, not a nonexistent aspect local name. Baseline regressor input for CHW-0001 (condenser lift proxy). LOOP-SIDE WARNING: this is the WARM side (chiller-leaving, chiller-to-tower). A future cooling-tower approach rule needs the COLD side (tower-leaving, tower-to-chiller = entering condenser water) — a different point; do not wire a tower rule here by name alone (internal deep-read finding, 2026-08-18)."
     },
     {
       "name": "chwst",
@@ -131,13 +129,11 @@
         "property_class": "QuantifiableObservableProperty",
         "quantitykind": "Temperature",
         "unit": "DEG_C",
-        "medium": "Water",
-        "aspects": [
-          "leaving"
-        ]
+        "medium": "Water-ChilledWater",
+        "aspects": []
       },
       "provisional": false,
-      "notes": "brick:Leaving_Chilled_Water_Temperature_Sensor verified in Brick 1.4.4. For CHW-0007 prefer the individual chiller evaporator/barrel outlet. A common mixed-header value is acceptable only when the active staged machine(s) genuinely control that same header target; it is not a per-machine proxy by name alone. CHW-0001 may use the fitted model's documented machine/plant boundary; CHW-0004 intentionally uses loop supply."
+      "notes": "brick:Leaving_Chilled_Water_Temperature_Sensor is exact in Brick 1.4.4. ASHRAE 223 uses Water-ChilledWater on the connection point; leaving direction is expressed by topology rather than an aspect. For CHW-0007 prefer the individual chiller evaporator/barrel outlet. A common mixed-header value is acceptable only when the active staged machine(s) genuinely control that same header target; it is not a per-machine proxy by name alone. CHW-0001 may use the fitted model's documented machine/plant boundary; CHW-0004 intentionally uses loop supply."
     },
     {
       "name": "chwrt",
@@ -151,13 +147,11 @@
         "property_class": "QuantifiableObservableProperty",
         "quantitykind": "Temperature",
         "unit": "DEG_C",
-        "medium": "Water",
-        "aspects": [
-          "entering"
-        ]
+        "medium": "Water-ChilledWater",
+        "aspects": []
       },
       "provisional": false,
-      "notes": "brick:Entering_Chilled_Water_Temperature_Sensor grep-verified — 'return' at the plant is 'entering' at the chiller; Brick 1.4.4 also carries Chilled_Water_Return_Temperature_Sensor, but the entering-form matches the chiller-owned binding these rules assume. Consumed by CHW-0004."
+      "notes": "brick:Entering_Chilled_Water_Temperature_Sensor is exact in Brick 1.4.4 — 'return' at the plant is 'entering' at the chiller. ASHRAE 223 uses Water-ChilledWater on the connection point; entering direction is expressed by topology rather than an aspect. Brick 1.4.4 also carries Chilled_Water_Return_Temperature_Sensor, but the entering-form matches the chiller-owned binding these rules assume. Consumed by CHW-0004."
     },
     {
       "name": "chiller_load",
@@ -189,14 +183,13 @@
         "property_class": "QuantifiableActuatableProperty",
         "quantitykind": "Temperature",
         "unit": "DEG_C",
-        "medium": "Water",
+        "medium": "Water-ChilledWater",
         "aspects": [
-          "leaving",
-          "setpoint"
+          "Aspect-Setpoint"
         ]
       },
       "provisional": false,
-      "notes": "brick:Leaving_Chilled_Water_Temperature_Setpoint verified in Brick 1.4.4. CHW-0002 watches the loop setpoint range. CHW-0007 requires the final active target controlling its bound chwst: prefer the individual chiller's delivered target, or use a common header setpoint only when the staged machines truly control that same mixed-header point. A supervisory request upstream of local reset, demand, or safety limits is not the active target."
+      "notes": "brick:Leaving_Chilled_Water_Temperature_Setpoint is exact in Brick 1.4.4. ASHRAE 223 uses Water-ChilledWater plus the exact Aspect-Setpoint; leaving direction belongs to connection topology. CHW-0002 watches the loop setpoint range. CHW-0007 requires the final active target controlling its bound chwst: prefer the individual chiller's delivered target, or use a common header setpoint only when the staged machines truly control that same mixed-header point. A supervisory request upstream of local reset, demand, or safety limits is not the active target."
     },
     {
       "name": "dp_sp",
@@ -210,14 +203,14 @@
         "property_class": "QuantifiableActuatableProperty",
         "quantitykind": "PressureDifference",
         "unit": "KiloPA",
-        "medium": "Water",
+        "medium": "Water-ChilledWater",
         "aspects": [
-          "differential",
-          "setpoint"
+          "Aspect-Delta",
+          "Aspect-Setpoint"
         ]
       },
       "provisional": false,
-      "notes": "brick:Chilled_Water_Differential_Pressure_Setpoint grep-verified. CHW-0003 watches this point's range (AHU-0024 dsp_sp precedent)."
+      "notes": "brick:Chilled_Water_Differential_Pressure_Setpoint is exact in Brick 1.4.4. ASHRAE 223 uses Water-ChilledWater with exact Aspect-Delta and Aspect-Setpoint terms. CHW-0003 watches this point's range (AHU-0024 dsp_sp precedent)."
     },
     {
       "name": "chw_valve_max",
@@ -227,17 +220,17 @@
       "qudt_unit": "PERCENT",
       "brick": null,
       "s223": {
-        "pattern": "host-derived aggregate; no single physical point",
-        "property_class": "QuantifiableObservableProperty",
+        "pattern": "Host Function hasOutput QuantifiableProperty; no single physical point",
+        "property_class": "QuantifiableProperty",
         "quantitykind": "DimensionlessRatio",
         "unit": "PERCENT",
         "medium": null,
         "aspects": [
-          "aggregate-max"
+          "Aspect-Maximum"
         ]
       },
       "provisional": true,
-      "notes": "HOST-DERIVED (zone_reheat_fraction / satisfied_zone_fraction precedent): the reference's chw_valve_positions is a vector across AHU/FCU cooling coils; the rule needs only its max, so the host binds max() over the coil valve commands it serves. CHW-0003's 'no coil starving' conjunct. Engine vector blocks could compute this in-graph once the points contract grows vector bindings (tracked in internal engine-block-inventory research notes).",
+      "notes": "HOST-DERIVED (zone_reheat_fraction / satisfied_zone_fraction precedent): the reference's chw_valve_positions is a vector across AHU/FCU cooling coils; the rule needs only its max, so the host binds max() over the coil valve commands it serves. ASHRAE 223 PPR2.1 provides Function/hasOutput/QuantifiableProperty and Aspect-Maximum; the exact cross-equipment aggregation pattern remains provisional. CHW-0003's 'no coil starving' conjunct. Engine vector blocks could compute this in-graph once the points contract grows vector bindings (tracked in internal engine-block-inventory research notes).",
       "derived": true
     },
     {
@@ -248,18 +241,15 @@
       "qudt_unit": "DEG_C",
       "brick": null,
       "s223": {
-        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
-        "property_class": "QuantifiableObservableProperty",
+        "pattern": "Host Function hasOutput QuantifiableProperty derived from refrigerant pressure and a refrigerant-specific P-T relation",
+        "property_class": "QuantifiableProperty",
         "quantitykind": "Temperature",
         "unit": "DEG_C",
-        "medium": "Refrigerant",
-        "aspects": [
-          "condensing",
-          "derived"
-        ]
+        "medium": "Constituent-Refrigerant",
+        "aspects": []
       },
       "provisional": true,
-      "notes": "Host-derived P-T saturation lookup from measured discharge/liquid pressure (hp dict precedent, duplicated per the lint's own-family resolution rule). Consumed by CHW-0005 condenser-approach-high: approach = cond_sat_temp − cwst. Refrigerant-specific lookup is the host's, documented per binding.",
+      "notes": "Host-derived P-T saturation lookup from measured discharge/liquid pressure (hp dict precedent, duplicated per the lint's own-family resolution rule). ASHRAE 223 PPR2.1 provides Function/hasOutput/QuantifiableProperty and Constituent-Refrigerant, but no exact condensing or derived aspect; that semantic detail remains in the derivation record. Consumed by CHW-0005 condenser-approach-high: approach = cond_sat_temp − cwst. Refrigerant-specific lookup is the host's, documented per binding.",
       "derived": true
     },
     {
@@ -270,18 +260,15 @@
       "qudt_unit": "DEG_C",
       "brick": null,
       "s223": {
-        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
-        "property_class": "QuantifiableObservableProperty",
+        "pattern": "Host Function hasOutput QuantifiableProperty derived from refrigerant pressure and a refrigerant-specific P-T relation",
+        "property_class": "QuantifiableProperty",
         "quantitykind": "Temperature",
         "unit": "DEG_C",
-        "medium": "Refrigerant",
-        "aspects": [
-          "evaporating",
-          "derived"
-        ]
+        "medium": "Constituent-Refrigerant",
+        "aspects": []
       },
       "provisional": true,
-      "notes": "Mirror of the hp dict entry (duplicated per the lint's own-family resolution rule; same refrigerant P-T host obligation — the lookup is refrigerant-specific and lives at the host). CHW-0006 evaporator approach = chwst − evap_sat_temp; healthy approach is small and positive, and tube fouling or low charge widens it.",
+      "notes": "Mirror of the hp dict entry (duplicated per the lint's own-family resolution rule; same refrigerant P-T host obligation — the lookup is refrigerant-specific and lives at the host). ASHRAE 223 PPR2.1 provides Function/hasOutput/QuantifiableProperty and Constituent-Refrigerant, but no exact evaporating or derived aspect; that semantic detail remains in the derivation record. CHW-0006 evaporator approach = chwst − evap_sat_temp; healthy approach is small and positive, and tube fouling or low charge widens it.",
       "derived": true
     }
   ]
