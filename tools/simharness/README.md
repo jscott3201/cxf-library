@@ -155,6 +155,21 @@ prototype's constant-HWST-at-low-load operation (excluded by-construction);
 Atlanta January never crosses CHW-0004's 40% chiller-load floor — season
 selection matters per family.
 
+PR 03 adds a separate **per-pump adapter** for PMP-0004/PMP-0005 instead of
+reusing those aggregate HW proxies. Each `Pump:VariableSpeed` instance keeps its
+own series: `pump_status` is disclosed as strictly positive pump active power
+(the prototype's variable-speed pump legitimately draws single-digit watts),
+`pump_flow` is native branch mass-flow magnitude converted to L/s at 997 kg/m³,
+and `pump_kw` is W/1000. At the native 300 s replay tick PMP-0004's copied graph
+is retuned to `count_scale=3600/300=12`; its run can check healthy FPR for starts
+that survive sampling, but cycles completed inside one tick remain invisible
+and the observable ceiling is only six starts/hour. EnergyPlus pump flow is
+nonnegative, so PMP-0005 replay checks `yFault` healthy behavior only—it cannot
+validate signed direction or reverse leakage. PMP-0006 remains excluded until a
+frozen expected-power model can be trained on known-good per-pump data and
+scored on a disjoint period; aggregate power or fitting the evaluation week
+would not be a valid baseline comparison.
+
 ## First results (single building, superseded by the fleet sweep above) (B2B OfficeMedium-4004, Albuquerque, July week, 3 loops)
 
 **16 of 18 auto-eligible AHU rules replayed clean across all three loops

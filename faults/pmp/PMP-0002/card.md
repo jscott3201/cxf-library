@@ -17,7 +17,7 @@ g36: null
 clusters: []
 suppresses: [PMP-0001]
 suppressed_by: []
-related: [PMP-0001, VFD-0002]
+related: [PMP-0001, PMP-0005, PMP-0006, VFD-0002]
 playbooks: [vfd-pump-faults]
 operating_states: "pump proven running"
 preconditions: "pump_dp must be the differential pressure ACROSS THIS PUMP — discharge minus suction — and the point dictionary marks it provisional for exactly this reason. A loop or decoupler DP bound here breaks the rule rather than degrading it: depending on where the taps sit, a deadhead can read high, unchanged, or low, and in the last case the rule is silent forever on the fault it exists to find. Confirm the tap location at binding review. deadhead_dp_threshold must then be set from this pump's curve and deadhead_flow_threshold from this loop's design flow; both shipped values are placeholders (see Deviations), and the DP one is the more dangerous of the two because the reference's 150%-of-design multiplier is above the shutoff head of many pumps. All three points must belong to the same pump; on a headered set a common loop flow meter or a header DP tap bound to each pump makes the rule read one machine's hydraulics onto another. The pump must be proven running by rotation — a current switch or drive feedback — and when pump_status is false this rule has no verdict at all: the host reports NO_EVAL, not healthy. There is no in-rule evaluability output (see Deviations), so that gate is the host's to enforce."

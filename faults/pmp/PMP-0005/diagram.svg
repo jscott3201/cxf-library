@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1630" height="470" viewBox="0 0 1630 470">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#718096"/></marker></defs>
+<style>.title{font:700 20px sans-serif;fill:#172033}.port{font:600 13px sans-serif;fill:#172033}.inst{font:700 12px sans-serif;fill:#172033}.cls{font:9px sans-serif;fill:#4b5563}.wire{stroke:#718096;stroke-width:2;fill:none;marker-end:url(#arrow)}.in{fill:#dbeafe;stroke:#2563eb;stroke-width:1.5}.out{fill:#fee2e2;stroke:#dc2626;stroke-width:1.5}.blk{fill:#f8fafc;stroke:#64748b;stroke-width:1.5}</style>
+<text x="24" y="30" class="title">PMP-0005 block graph</text>
+<path d="M175 109 H202.5 V82 H230" class="wire"/>
+<path d="M175 109 H202.5 V182 H230" class="wire"/>
+<path d="M450 182 H470 V182 H475" class="wire"/>
+<path d="M175 349 H202.5 V342 H230" class="wire"/>
+<path d="M420 342 H570 V102 H720" class="wire"/>
+<path d="M420 342 H570 V262 H720" class="wire"/>
+<path d="M450 82 H585 V102 H720" class="wire"/>
+<path d="M695 182 H715 V262 H720" class="wire"/>
+<path d="M910 102 H937.5 V182 H965" class="wire"/>
+<path d="M910 262 H937.5 V182 H965" class="wire"/>
+<path d="M910 102 H1172.5 V92 H1435" class="wire"/>
+<path d="M910 262 H1172.5 V272 H1435" class="wire"/>
+<path d="M1130 182 H1157.5 V182 H1185" class="wire"/>
+<path d="M1385 182 H1410 V182 H1435" class="wire"/>
+<rect x="20" y="92" width="155" height="34" rx="17" class="in"/>
+<text x="97.5" y="114" text-anchor="middle" class="port">pump_flow</text>
+<rect x="20" y="332" width="155" height="34" rx="17" class="in"/>
+<text x="97.5" y="354" text-anchor="middle" class="port">pump_status</text>
+<rect x="230" y="55" width="220" height="54" rx="8" class="blk"/>
+<text x="242" y="73" class="inst">forward</text>
+<text x="242" y="90" class="cls">GreaterThreshold · 1 L/s</text>
+<rect x="230" y="155" width="220" height="54" rx="8" class="blk"/>
+<text x="242" y="173" class="inst">negate</text>
+<text x="242" y="190" class="cls">MultiplyByParameter · -1</text>
+<rect x="475" y="155" width="220" height="54" rx="8" class="blk"/>
+<text x="487" y="173" class="inst">reverse</text>
+<text x="487" y="190" class="cls">GreaterThreshold · 1 L/s</text>
+<rect x="230" y="315" width="190" height="54" rx="8" class="blk"/>
+<text x="242" y="333" class="inst">off</text>
+<text x="242" y="350" class="cls">Logical.Not</text>
+<rect x="720" y="75" width="190" height="54" rx="8" class="blk"/>
+<text x="732" y="93" class="inst">forwardStopped</text>
+<text x="732" y="110" class="cls">Logical.And</text>
+<rect x="720" y="235" width="190" height="54" rx="8" class="blk"/>
+<text x="732" y="253" class="inst">reverseStopped</text>
+<text x="732" y="270" class="cls">Logical.And</text>
+<rect x="965" y="155" width="165" height="54" rx="8" class="blk"/>
+<text x="977" y="173" class="inst">anyFlow</text>
+<text x="977" y="190" class="cls">Logical.Or</text>
+<rect x="1185" y="155" width="200" height="54" rx="8" class="blk"/>
+<text x="1197" y="173" class="inst">persist</text>
+<text x="1197" y="190" class="cls">TrueDelay · 300 s</text>
+<rect x="1435" y="75" width="165" height="34" rx="17" class="out"/>
+<text x="1517.5" y="97" text-anchor="middle" class="port">yForwardFlow</text>
+<rect x="1435" y="255" width="165" height="34" rx="17" class="out"/>
+<text x="1517.5" y="277" text-anchor="middle" class="port">yReverseFlow</text>
+<rect x="1435" y="165" width="165" height="34" rx="17" class="out"/>
+<text x="1517.5" y="187" text-anchor="middle" class="port">yFault</text>
+</svg>

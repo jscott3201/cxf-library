@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | VFD-0001 through VFD-0005 (VFD-0002..0005 are library additions to the reference's line), PMP-0001, PMP-0002, AHU-0039, PMP-0003 |
+| **Applies to** | VFD-0001 through VFD-0005, PMP-0001 through PMP-0006, AHU-0039 |
 | **Fix complexity** | On-site service required |
 | **Typical time** | 2–4 h |
 | **Typical cost** | $200–$2,000 |
@@ -10,10 +10,7 @@
 
 Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 167–168).
 
-The pump rules named above are verified in this library:
-[PMP-0001](../faults/pmp/PMP-0001/card.md) and
-[PMP-0002](../faults/pmp/PMP-0002/card.md) (family index:
-[faults/pmp](../faults/pmp/README.md)).
+Pump family index: [faults/pmp](../faults/pmp/README.md).
 
 ## Decision tree
 
@@ -95,29 +92,71 @@ approved operating and electrical-safety procedure.
 4. If the VFD is failing, replacement is typically $500–$2,000 depending on
    motor horsepower; confirm the diagnosis before replacement.
 
-## Step 6 — Pump on with no flow / deadheading (PMP-0001, PMP-0002)
+## Step 6 — Separate pump delivery signatures (PMP-0001, PMP-0002, PMP-0003, PMP-0005)
 
-1. **Remote fix:** check the differential pressure setpoint — it may be set too
-   high, forcing the pump to work against closed valves.
-2. **Remote fix:** implement a differential pressure reset sequence if one
+1. Validate command and independent run proof first. An active PMP-0003 makes
+   a stopped/running inference unreliable; resolve that before replacing a
+   hydraulic component.
+2. Confirm flow and DP belong to this individual pump branch. A common-header
+   flow point cannot distinguish a failed lag branch or a passing check valve.
+3. Running with no flow is PMP-0001. Running with high pump DP and low flow is
+   the more specific deadhead signature PMP-0002. A stopped branch with flow is
+   PMP-0005; do not treat these mutually different premises as one alarm.
+4. For PMP-0005, verify meter sign and zero, then compare flow with other-pump
+   status and header pressure. Inspect the discharge check valve, isolation
+   valves, bypass paths, and approved gravity/free-cooling arrangements.
+5. **Remote fix:** check the differential pressure setpoint — it may be set too
+   high, forcing the active pump to work against closed valves.
+6. **Remote fix:** implement a differential pressure reset sequence if one
    doesn't exist — the same trim-and-respond logic as air-handler duct static
    pressure reset (see the [missing-reset](missing-reset.md) playbook).
    EEM-10: 0.5–2% site energy savings.
-3. **On-site:** check for closed isolation valves downstream of the pump.
-4. **On-site:** check the strainer for blockage.
-5. **On-site:** verify the pump impeller condition — damaged impellers produce
+7. **On-site:** check for closed isolation valves and a blocked strainer.
+8. **On-site:** verify the pump impeller and coupling — damage can produce
    no flow despite the motor running.
-6. For variable-primary CHW systems, verify the minimum-flow bypass valve is
+9. For variable-primary CHW systems, verify the minimum-flow bypass valve is
    functioning. Without it, the lead pump may deadhead when all AHU valves
    close.
 
-## Step 7 — Confirm resolution
+## Step 7 — Review starts and staging (PMP-0004)
+
+1. Use per-pump proof and a fixed evaluator tick that can resolve the shortest
+   cycle. At the defaults, acquire at 60 seconds and set
+   `count_scale=evaluation_window/tick`; COV loss can hide starts.
+2. Compare each start with plant enable, lead/lag transfer, DP/temperature
+   demand, minimum on/off timers, and any approved exercise sequence.
+3. Check whether VFD speed/process hunting (VFD-0004) is repeatedly crossing a
+   run threshold. Fix the unstable loop before changing motor protection.
+4. Inspect overload, safety, and drive fault histories for trip/auto-reset
+   cycling. A chattering proof device can create the same count.
+5. Apply the pump/motor manufacturer's starts-per-hour limit; the library's
+   default is only a commissioning placeholder.
+
+## Step 8 — Compare actual and expected power (PMP-0006)
+
+1. Confirm actual and expected kW cover the same pump motor/drive circuit and
+   the expected model is ready, fresh, in-domain, and fitted on known-good data.
+2. Compare power with speed, individual-branch flow, differential pressure,
+   staging, and fluid condition. A model indexed on a different pump
+   configuration is not a degradation finding.
+3. Resolve same-drive VFD tracking or mode/bypass findings before trusting a
+   baseline that uses those signals. Scope any suppression to this pump/drive.
+4. Check power-sensor scaling and phase coverage before mechanical work.
+5. After control and sensor checks, inspect strainers, impeller, coupling,
+   alignment, bearings, seals, motor, and drive. Refit the baseline only after
+   the equipment is known clean; never train the fault into normal.
+
+## Step 9 — Confirm resolution
 
 1. Verify the drive remains in the commissioned remote-auto state with bypass
    inactive whenever normal operation is expected.
 2. Verify output tracks command within the commissioned tolerance.
 3. Verify the process returns within its allowance band without sustained
    minimum/maximum saturation or material hunting.
-4. For pumps, verify flow is present and differential pressure is in range.
-5. Confirm suppressions release on the same drive instance and observe for at
-   least two hunting windows before closing an instability finding.
+4. For pumps, verify expected branch flow/DP, zero stopped-branch flow, and a
+   compliant per-pump start count over at least one full evaluation window.
+5. Where PMP-0006 applies, verify actual power returns inside the commissioned
+   residual band without refitting on the faulty interval.
+6. Confirm suppressions release on the same equipment instance and observe for
+   at least two hunting/baseline windows before closing an instability or
+   degradation finding.

@@ -18,7 +18,7 @@ g36: null
 clusters: []
 suppresses: [VFD-0002, VFD-0003, VFD-0004]
 suppressed_by: []
-related: [VFD-0001]
+related: [VFD-0001, PMP-0006]
 playbooks: [vfd-pump-faults]
 operating_states: "final drive enable commanded while remote automatic control is expected"
 preconditions: "Remote BAS automatic operation must be expected for this exact interval. Exclude approved maintenance or emergency bypass, fire/smoke operation, commissioning, functional tests, manual tuning, and authorized local operation. vfd_enable_cmd must be the final drive-level request downstream of normal schedule and interlocks; a system enable several sequence layers upstream is insufficient. vfd_auto_status must prove the commissioned source/authority is remote BAS auto, not merely local PID auto, keypad auto, enabled, ready, or remotely on. vfd_bypass_status must prove the active motor power path, not bypass availability, readiness, or command. Unknown multi-state values and stale telemetry are NO_EVAL, not false. Suppression and evaluation must be scoped to the same drive instance."

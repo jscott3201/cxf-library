@@ -586,6 +586,30 @@
       "legacy_id": null
     },
     {
+      "id": "PMP-0004",
+      "family": "pmp",
+      "name": "Pump short-cycling",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "PMP-0005",
+      "family": "pmp",
+      "name": "Flow through stopped pump",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "PMP-0006",
+      "family": "pmp",
+      "name": "Pump input-power degradation",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
       "id": "RTU-0001",
       "family": "rtu",
       "name": "Compressor short-cycling",

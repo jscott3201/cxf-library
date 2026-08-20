@@ -8,11 +8,11 @@
     },
     "s223": {
       "iri": "http://data.ashrae.org/standard223#",
-      "verified_version": "v1.0.0-2026"
+      "verified_version": "1.0.0-ppr.2.1"
     },
     "s223_g36": {
       "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#",
-      "verified_version": "v1.0.0-2026"
+      "verified_version": "1.0.0-ppr.2.1"
     },
     "quantitykind": {
       "iri": "http://qudt.org/vocab/quantitykind/",
@@ -23,7 +23,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "Hydronic pump point dictionary (reference ch.15, PMP-0001/PMP-0002). Loop-agnostic: the same four points serve CHW, HW, and condenser-water pumps; owning equipment is brick:Pump (verified in Brick 1.4.4; use the loop-specific subclass at binding time if the site model has one). The reference states no_flow/deadhead thresholds as percent-of-design; the rules carry absolute-unit parameters, so binding a site means converting design flow/head into the loop's own units first — the same site-specific placeholder discipline as VAV-0001's ventilation_requirement.",
+  "notes": "Hydronic pump point dictionary. Loop-agnostic: the same canonical points serve CHW, HW, condenser-water, and other hydronic pumps; owning equipment is brick:Pump (verified in Brick 1.4.4; use the loop-specific subclass at binding time if the site model has one). ASHRAE 223 mappings were checked against ontology artifact 223p-1.0.0-ppr2.1.ttl (owl:versionInfo 1.0.0-ppr.2.1; SHA-256 1f156f9938c0be430d2216e01e31bb183c438ba318d8d4a23d2f074ebcd6f573), not an inferred final 2026 release label. The reference states no_flow/deadhead thresholds as percent-of-design; the rules carry absolute-unit parameters, so binding a site means converting design flow/head into the loop's own units first.",
   "points": [
     {
       "name": "pump_cmd",
@@ -65,7 +65,7 @@
     },
     {
       "name": "pump_flow",
-      "description": "Pump-associated water flow",
+      "description": "Individual pump-branch water flow (canonical signed direction, when available: positive from suction to discharge)",
       "kind": "real",
       "unit": "L/s",
       "qudt_unit": "L-PER-SEC",
@@ -79,7 +79,7 @@
         "aspects": []
       },
       "provisional": false,
-      "notes": "brick:Water_Flow_Sensor grep-verified in Brick 1.4.4. Reference Haystack markers: water, flow, sensor. The reference's no_flow_threshold (5% of design) and deadhead_flow_threshold (10% of design) are percent-of-design; rules ship absolute L/s placeholders that MUST be set from the loop's design flow at binding."
+      "notes": "brick:Water_Flow_Sensor verified in Brick 1.4.4. The point is on THIS pump branch; common-header flow is invalid. When signed, canonical positive is suction-to-discharge and negative is reverse. A nonnegative magnitude binding remains valid for PMP-0001/PMP-0002 and can support PMP-0005 yFault, but neither PMP-0005 direction label is trustworthy because reverse physical flow may also be reported positive. The older rules' 5%/10%-of-design thresholds ship as absolute L/s placeholders that MUST be set from design flow."
     },
     {
       "name": "pump_dp",
@@ -98,6 +98,43 @@
       },
       "provisional": true,
       "notes": "brick:Water_Differential_Pressure_Sensor grep-verified in Brick 1.4.4, but marked provisional because sites trend this two ways — across the pump (deadhead reads HIGH) or across the loop/decoupler (deadhead may read high or low depending on tap location). PMP-0002's logic assumes the ACROSS-THE-PUMP reading; binding a loop-DP point instead inverts the diagnosis and must be caught at binding review. deadhead_dp_threshold (150% of design head) ships as an absolute kPa placeholder."
+    },
+    {
+      "name": "pump_kw",
+      "description": "Electrical active input power of this pump motor/drive assembly",
+      "kind": "real",
+      "unit": "kW",
+      "qudt_unit": "KiloW",
+      "brick": "Active_Power_Sensor",
+      "s223": {
+        "pattern": "ElectricityMeter reports a QuantifiableObservableProperty with ActivePower and KiloW at the pump motor/VFD electrical Connection or ConnectionPoint; the deployment associates that circuit with the Pump",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "ActivePower",
+        "unit": "KiloW",
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "brick:Active_Power_Sensor is exact in Brick 1.4.4; QUDT ActivePower and KiloW are exact. Bind true active input power for this pump's motor/drive assembly, not apparent power, a current-derived proxy, VFD output power, or an aggregate panel serving parallel pumps/auxiliaries. The electrical and averaging boundary must match pump_kw_expected."
+    },
+    {
+      "name": "pump_kw_expected",
+      "description": "Expected electrical pump input power at the current operating condition (host-fitted baseline)",
+      "kind": "real",
+      "unit": "kW",
+      "qudt_unit": "KiloW",
+      "brick": null,
+      "s223": {
+        "pattern": "Host model represented as a Function whose hasOutput is a QuantifiableProperty for ActivePower",
+        "property_class": "QuantifiableProperty",
+        "quantitykind": "ActivePower",
+        "unit": "KiloW",
+        "medium": null,
+        "aspects": []
+      },
+      "derived": true,
+      "provisional": true,
+      "notes": "HOST-DERIVED virtual point, classified SITE_FITTED. The host fits a model on a known-good period and publishes expected input power for the CURRENT condition only while the model is ready, fresh, and in-domain. Record the fit period, model version, validation error, update/freeze policy, and inputs (for example speed, branch flow, differential pressure, staging, and fluid properties); actual and expected must cover the same electrical/averaging boundary. Brick 1.4.4 has no exact expected-power point. 223 PPR2.1 supports Function/hasOutput/QuantifiableProperty, but has no exact predicted or derived aspect; Aspect-Nominal is rejected because this value changes with operating condition."
     }
   ]
 }

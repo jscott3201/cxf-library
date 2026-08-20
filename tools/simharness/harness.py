@@ -343,14 +343,18 @@ PLANT_EXCLUDE = {
     "HW-0002": "host-fitted baseline placeholders — needs a per-plant fit first",
     "HW-0008": "reset-class: constant scheduled HW setpoint, fires by construction",
     "HW-0007": "by-construction: constant HWST at low evening load IS the retuning condition it detects (no HWST reset in the prototype); verified firing correctly, Jan week",
+    "PMP-0006": "requires a frozen expected-power model fitted on disjoint known-good per-pump data",
 }
 PLANT_MAPPED = {"chwst", "chwrt", "chwst_sp", "chiller_load", "boiler_status",
                 "hw_pump_status", "hws_temp", "hwr_temp", "hws_temp_sp",
                 "hw_pump_vfd_speed", "oat"}
+PMP_MAPPED = {"pump_status", "pump_flow", "pump_kw"}
 # rule -> gate key; rules absent here replay ungated (lead margin only):
 # unnecessary-operation rules must NOT be gated on the equipment they accuse.
 PLANT_GATE = {"CHW-0004": "chw_load40", "HW-0004": "hw_on", "HW-0007": "hw_on"}
 PUMP_ON_W = 100.0
+PMP_ON_W = 0.0
+WATER_DENSITY_KG_M3 = 997.0
 
 
 def plant_nodes(b: dict) -> dict:
@@ -461,7 +465,36 @@ def extract_plant(csv_path: Path, pn: dict, b: dict) -> dict:
             # (affinity-law approximation; documented proxy)
             "hw_pump_vfd_speed": [round(max(v) / fmax * 100.0, ROUND) for v in zip(*flows)],
         }
+        fams["_pumps"] = {
+            p: {
+                # EnergyPlus has no independent proof point in this prototype;
+                # disclose any strictly positive pump active power as the
+                # per-pump run-status proxy. A 100 W cutoff is invalid here:
+                # this variable-speed pump legitimately draws single-digit W.
+                "pump_status": [v > PMP_ON_W for v in watts],
+                # Native pump mass flow is a nonnegative branch magnitude. The
+                # density conversion supports PMP-0005 yFault FPR only, not its
+                # signed direction outputs or a reverse-flow TPR claim.
+                "pump_flow": [round(v * 1000.0 / WATER_DENSITY_KG_M3, ROUND)
+                              for v in mass_flow],
+                "pump_kw": [round(v / 1000.0, ROUND) for v in watts],
+            }
+            for p, watts, mass_flow in zip(h["pumps"], pump_w, flows)
+        }
     return fams
+
+
+def write_plant_rule_copy(rule_dir: Path, target: Path, rid: str) -> None:
+    """Copy a rule graph and apply replay-cadence parameter coupling."""
+    graph = json.loads((rule_dir / "rule.cxf.jsonld").read_text())
+    if rid == "PMP-0004":
+        expected = 3600.0 / STEP_S
+        matches = [n for n in graph["@graph"]
+                   if n.get("@id", "").endswith(".count.k")]
+        if len(matches) != 1:
+            raise ValueError(f"{rid}: expected one count.k parameter, got {len(matches)}")
+        matches[0]["S231:value"]["@value"] = str(expected)
+    target.write_text(json.dumps(graph, indent=2))
 
 
 def plant_gate_windows(key: str | None, pts: dict, n: int) -> list:
@@ -626,6 +659,7 @@ def main():
             print(f"plant loops: {list(pn)}; running EnergyPlus…")
             csv_path = run_energyplus(pj, epw, out / "ep")
         fams = extract_plant(csv_path, pn, b)
+        pumps = fams.pop("_pumps", {})
         if "tower" in fams:
             tp = fams.pop("tower")
             on = tp["tower_fan_on"]
@@ -658,7 +692,13 @@ def main():
                         print(f"  excluded {rid}: {PLANT_EXCLUDE[rid]}")
                     else:
                         rules[rid] = r
+        pump_rules = eligible_rules(families=("pmp",), mapped=PMP_MAPPED)
+        for rid in list(pump_rules):
+            if rid in PLANT_EXCLUDE:
+                print(f"  excluded {rid}: {PLANT_EXCLUDE[rid]}")
+                pump_rules.pop(rid)
         print(f"eligible plant rules: {sorted(rules)}")
+        print(f"eligible per-pump rules: {sorted(pump_rules)} across {len(pumps)} pump(s)")
         replay = out / "replay"
         if replay.exists():
             shutil.rmtree(replay)
@@ -688,6 +728,34 @@ def main():
                 "clock": {"step_s": STEP_S, "horizon_s": (n - 1) * STEP_S},
                 "scenarios": [scen]}, indent=1))
             dirs.append(d)
+        for rid, r in pump_rules.items():
+            for pump_name, pts in pumps.items():
+                n = len(pts["pump_status"])
+                wins = plant_gate_windows(None, pts, n)
+                if not wins:
+                    continue
+                safe_name = re.sub(r"[^a-z0-9]+", "_", pump_name.lower()).strip("_")
+                d = replay / f"{rid}__{safe_name}"
+                d.mkdir(parents=True)
+                write_plant_rule_copy(r["dir"], d / "rule.cxf.jsonld", rid)
+                scen = {
+                    "name": f"{bdir.name}_{safe_name}".replace("-", "_").replace(".", "_").lower(),
+                    "description": (
+                        f"Healthy-baseline EnergyPlus week ({bdir.name}), per pump {pump_name}; "
+                        "strictly positive pump power is a disclosed run-status proxy and kg/s is converted to "
+                        f"nonnegative L/s at {WATER_DENSITY_KG_M3} kg/m3. PMP-0004 uses "
+                        f"count_scale={3600.0 / STEP_S:g} at the {STEP_S}s replay tick; "
+                        "cycles completed between ticks and reverse flow are not observable."
+                    ),
+                    "inputs": {p: to_steps(pts[p]) for p in r["points"]},
+                    "expect": [{"output": "yFault", "from_s": a, "to_s": b_,
+                                "equals": False} for a, b_ in wins],
+                }
+                (d / "vectors.json").write_text(json.dumps({
+                    "schema": "cxf-library/vectors/v1",
+                    "clock": {"step_s": STEP_S, "horizon_s": (n - 1) * STEP_S},
+                    "scenarios": [scen]}, indent=1))
+                dirs.append(d)
         rr = subprocess.run(["cargo", "run", "--quiet", "--manifest-path",
                              str(REPO / "tools/verify/Cargo.toml"), "--", *map(str, dirs)],
                             capture_output=True, text=True, cwd=REPO)

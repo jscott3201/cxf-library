@@ -18,7 +18,7 @@ g36: null
 clusters: []
 suppresses: [VFD-0002, VFD-0003, VFD-0004]
 suppressed_by: []
-related: [VFD-0002, VFD-0003, VFD-0004, VFD-0005]
+related: [VFD-0002, VFD-0003, VFD-0004, VFD-0005, PMP-0006]
 playbooks: [vfd-pump-faults]
 operating_states: "drive commanded to run above its minimum speed"
 preconditions: "vfd_speed_cmd and vfd_speed must be the same drive's command and feedback, both scaled 0-100% of rated speed. The rule does no unit conversion: a site trending feedback in Hz against a percent command reads as a permanent 40-point deviation on a 60 Hz drive. Both points must be fresh — a stale feedback value held at its last reading is a communication fault (diagnosis 4), which this rule reports as a drive fault, the right alarm for the wrong reason. Where the site trends both a drive-reported speed and a tachometer, prefer the drive-reported value, since diagnosis 5 is the tachometer itself. Command evaluability is signalled in-rule by yCmdOk: when it is false the verdict is NO_EVAL, not healthy, and in particular a drive commanded off is not evaluated at all."
