@@ -1,0 +1,392 @@
+{
+  "@context": {
+    "S231": "http://data.ashrae.org/S231P#",
+    "base": "urn:cxf-library:hp-0007#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007",
+      "@type": "S231:Block",
+      "S231:label": "hp_0007",
+      "S231:containsBlock": [
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.notStatus"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.failCandidate"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.startProof"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.notCommand"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.unexpectedCandidate"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.stopProof"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.anyFault"
+        }
+      ],
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.comp_cmd"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.comp_status"
+        }
+      ],
+      "S231:hasOutput": [
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.yFault"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.yFailToStart"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.yUnexpectedRun"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.notStatus",
+      "@type": "urn:cxf-library:hp-0007#Buildings.Controls.OBC.CDL.Logical.Not",
+      "S231:label": "notStatus",
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hp-0007#hp_0007.notStatus.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-0007#hp_0007.notStatus.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.notStatus.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.notStatus.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hp-0007#hp_0007.failCandidate.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.failCandidate",
+      "@type": "urn:cxf-library:hp-0007#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "failCandidate",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.failCandidate.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.failCandidate.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-0007#hp_0007.failCandidate.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.failCandidate.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.failCandidate.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.failCandidate.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hp-0007#hp_0007.startProof.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.startProof",
+      "@type": "urn:cxf-library:hp-0007#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "startProof",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.startProof.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.startProof.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hp-0007#hp_0007.startProof.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-0007#hp_0007.startProof.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.startProof.delayTime",
+      "S231:value": {
+        "@value": "300.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.startProof.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.startProof.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.startProof.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.anyFault.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.yFailToStart"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.notCommand",
+      "@type": "urn:cxf-library:hp-0007#Buildings.Controls.OBC.CDL.Logical.Not",
+      "S231:label": "notCommand",
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hp-0007#hp_0007.notCommand.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-0007#hp_0007.notCommand.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.notCommand.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.notCommand.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hp-0007#hp_0007.unexpectedCandidate.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.unexpectedCandidate",
+      "@type": "urn:cxf-library:hp-0007#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "unexpectedCandidate",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.unexpectedCandidate.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.unexpectedCandidate.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-0007#hp_0007.unexpectedCandidate.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.unexpectedCandidate.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.unexpectedCandidate.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.unexpectedCandidate.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hp-0007#hp_0007.stopProof.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.stopProof",
+      "@type": "urn:cxf-library:hp-0007#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "stopProof",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.stopProof.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.stopProof.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hp-0007#hp_0007.stopProof.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-0007#hp_0007.stopProof.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.stopProof.delayTime",
+      "S231:value": {
+        "@value": "120.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.stopProof.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.stopProof.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.stopProof.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.anyFault.u2"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.yUnexpectedRun"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.anyFault",
+      "@type": "urn:cxf-library:hp-0007#Buildings.Controls.OBC.CDL.Logical.Or",
+      "S231:label": "anyFault",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.anyFault.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.anyFault.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hp-0007#hp_0007.anyFault.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.anyFault.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.anyFault.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.anyFault.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hp-0007#hp_0007.yFault"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.comp_cmd",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.failCandidate.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.notCommand.u"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.comp_status",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.notStatus.u"
+        },
+        {
+          "@id": "urn:cxf-library:hp-0007#hp_0007.unexpectedCandidate.u2"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.yFault",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.yFailToStart",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hp-0007#hp_0007.yUnexpectedRun",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    }
+  ]
+}

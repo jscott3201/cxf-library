@@ -159,11 +159,11 @@ longest.
   physical split takes minutes to follow, and nothing in-graph holds evaluation
   off across it.
 - **`comp_status` is the runtime gate, not `comp_stage > 0`.** The gate asks one
-  question — is a compressor running — which `comp_status` answers directly
-  ("true = at least one compressor running") while the integer route needs an
-  `Integers.GreaterThreshold` to reach the same boolean. The dictionary's
-  OR-undercount warning is about counting starts (RTU-0001), not about whether
-  anything is running, so it does not bite here.
+  question — is a compressor running — which `comp_status` answers directly.
+  This rule may use an explicitly documented any-running aggregate while the
+  integer route needs an `Integers.GreaterThreshold` to reach the same boolean.
+  The dictionary's OR-undercount warning is about counting starts (RTU-0001),
+  not about whether anything is running, so it does not bite here.
 - **The TrueDelay sits on the compressor condition, not on the fault
   condition.** Settling is a property of the machine, not of the finding: a
   timer fed the AND would restart its clock every time the split dipped under

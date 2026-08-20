@@ -12,21 +12,28 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 168–169).
 
 ## Step 1 — Verify the fault
 
-1. **Compressor short-cycling (RTU-0001):** pull the compressor run status
+1. **Supply-fan prerequisite (RTU-0010):** before interpreting capacity,
+   temperature split, or refrigerant signatures, compare the final supply-fan
+   command with independent proof for that fan. A fail-to-start contests the
+   airflow premise of RTU-0002 through RTU-0006. A commanded post-heat fan run
+   must keep the final command true; purge, smoke control, and local hand modes
+   omitted from the command are host NO_EVAL, not timer exceptions. Follow the
+   [proof-of-operation](proof-of-operation.md) playbook for the mismatch itself.
+2. **Compressor short-cycling (RTU-0001):** pull the compressor run status
    trend and count starts per hour — more than 6 starts/hr indicates
    short-cycling. Check minimum on-time per cycle: less than 5 minutes is
    abnormal. (Albayati et al. 2023 achieved 95.7% accuracy on RTU fault
    classification with semi-supervised learning; the trend check remains the
    ground truth.)
-2. **Evaporator fouling (RTU-0002):** calculate the temperature split
+3. **Evaporator fouling (RTU-0002):** calculate the temperature split
    RAT − SAT during steady-state cooling and compare to the baseline split
    for the current compressor stage. A 25% or greater reduction indicates
    fouling. Typical baselines: 8 °C (14 °F) at stage 1, 12 °C (22 °F) at
    stage 2.
-3. **Condenser fouling (RTU-0007):** measure condenser leaving air
+4. **Condenser fouling (RTU-0007):** measure condenser leaving air
    temperature minus OAT and compare to baseline for the current stage and
    OAT. A 30% or greater increase indicates fouling.
-4. **Refrigerant charge (RTU-0008/0009):** with the compressor settled at a
+5. **Refrigerant charge (RTU-0008/0009):** with the compressor settled at a
    steady stage, measure suction superheat and liquid subcooling at the
    service ports and compare to the unit's charging chart for the current
    conditions. High superheat with low subcooling indicates undercharge;
@@ -35,7 +42,22 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 168–169).
    it moves the same readings; low-ambient head-pressure control can mimic
    overcharge on a correctly charged unit.
 
-## Step 2 — On-site service
+## Step 2 — Remote triage
+
+1. Confirm command, proof, temperature, and stage timestamps are fresh and
+   aligned, and that each command/status pair has the same equipment scope.
+2. Review local/remote state, smoke and freeze safeties, purge and post-heat
+   states, compressor lockouts, and recent overrides or service activity.
+3. Correct only verified BAS binding or sequence defects. Never bypass smoke,
+   freeze, condensate, high/low-pressure, electrical, or OEM safeties, and do
+   not repeatedly reset compressor or fan lockouts.
+
+## Step 3 — On-site service
+
+Only qualified HVAC/refrigeration personnel may open panels, enter OEM service
+mode, or work on a refrigerant circuit. Follow the manufacturer's procedure,
+lockout/tagout requirements, and applicable refrigerant-recovery rules before
+approaching belts, capacitors, contactors, fans, or compressors.
 
 1. **Short-cycling — check in order of likelihood:**
    1. Thermostat differential: increase from 1 °F to 2–3 °F to prevent rapid
@@ -67,7 +89,7 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 168–169).
    4. Check that adjacent RTUs are not discharging hot air into this unit's
       condenser intake — rearranging discharge hoods can fix this.
 
-## Step 3 — Confirm resolution
+## Step 4 — Confirm resolution
 
 1. **Short-cycling:** monitor starts per hour over 48 hours. Target: fewer
    than 6 starts/hr with minimum 5-minute on-time.
@@ -78,5 +100,8 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 168–169).
    not against the alarm clearing.)
 3. **Condenser fouling:** recalculate the condenser split — it should return
    to within 20% of baseline.
-4. Schedule preventive maintenance: quarterly filter changes, annual coil
+4. **Supply fan:** through a normal controller-owned cycle, verify the final
+   command and independent proof agree after commissioned pickup/dropout times.
+   Do not force operation or bypass an interlock.
+5. Schedule preventive maintenance: quarterly filter changes, annual coil
    cleaning. For multi-RTU sites, service all units in the same visit.

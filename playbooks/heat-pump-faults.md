@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | HP-0001 (COP degradation), HP-0002 (defrost anomaly), HP-0003 (reversing valve), HP-0004 (undercharge), HP-0005 (overcharge), HP-0006 (valve internal leakage) |
+| **Applies to** | HP-0001 (COP degradation), HP-0002 (defrost anomaly), HP-0003 (reversing valve), HP-0004 (undercharge), HP-0005 (overcharge), HP-0006 (valve internal leakage), HP-0007 (compressor proof) |
 | **Fix complexity** | On-site service required |
 | **Typical time** | 2–6 h on-site |
 | **Typical cost** | $200–$1,500 (refrigerant/defrost) / $500–$3,000 (reversing valve) / $3,000–$8,000 (compressor) |
@@ -12,26 +12,54 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 169–170).
 
 ## Step 1 — Verify the fault
 
-1. **COP degradation (HP-0001):** calculate measured COP as thermal output
+1. **Compressor proof (HP-0007):** first compare the final command with
+   independent run proof for the same compressor or explicitly documented
+   compressor group. Review OEM lockouts, defrost state, anti-cycle logic, and
+   safety status. If any of those states can withhold operation, they must be
+   reflected in the final command or make the rule NO_EVAL; do not use an
+   upstream thermostat demand or fleet request as the command.
+2. **COP degradation (HP-0001):** calculate measured COP as thermal output
    divided by electrical input and compare it to the baseline regression model
    (COP vs. OAT). A 15% or greater drop below the baseline curve indicates
    degradation. Evaluate heating and cooling modes separately — degradation may
    appear in only one mode. Ensure the baseline R² > 0.6 before trusting the
    comparison.
-2. **Defrost anomaly (HP-0002):** count defrost cycles per hour — more than
+3. **Defrost anomaly (HP-0002):** count defrost cycles per hour — more than
    4/hr is excessive. Check individual defrost duration — more than 15 minutes
    per cycle is abnormal. Check for defrost initiating when OAT is above 7 °C
    (45 °F); defrost should not be needed at mild temperatures.
-3. **Reversing valve (HP-0003):** after a mode change command, wait 10
+4. **Reversing valve (HP-0003):** after a mode change command, wait 10
    minutes for the system to settle. In cooling mode, SAT should be well below
    RAT — if SAT > RAT, the valve has not switched. In heating mode, SAT should
    be well above RAT — if SAT < RAT, the valve has not switched. This is a
    Severity 2 (high) fault: the unit is actively working against its intended
    purpose.
 
-## Step 2 — On-site service
+## Step 2 — Remote triage
 
-1. **COP degradation:**
+1. Confirm command and proof timestamps are fresh, aligned, and scoped to the
+   same physical compressor. An aggregate OR can hide a failed lag compressor.
+2. Review controller and VFD/OEM fault histories, local/remote state, defrost,
+   pressure and temperature safeties, anti-cycle timing, and recent service.
+3. Correct only verified BAS binding or sequence defects. Never bypass smoke,
+   freeze, condensate, high/low-pressure, electrical, or OEM safeties, and do
+   not repeatedly reset a compressor lockout.
+
+## Step 3 — On-site service
+
+Only qualified HVAC/refrigeration personnel may open electrical panels, enter
+OEM service mode, or work on a refrigerant circuit. Follow the manufacturer's
+procedure, lockout/tagout requirements, and applicable refrigerant-recovery
+rules before approaching capacitors, contactors, motors, or compressors.
+
+1. **Compressor proof:**
+   1. Verify the final output at the controller and the independent proof at the
+      same compressor without forcing or bypassing an interlock.
+   2. Inspect approved terminals, contactors, overloads, current/speed proof,
+      and wiring under the manufacturer's de-energized test procedure.
+   3. Diagnose any active OEM safety or lockout before attempting a single
+      manufacturer-authorized reset.
+2. **COP degradation:**
    1. Check refrigerant charge — undercharge is the most common fault per
       Barandier (2023). Measure subcooling and superheat.
    2. Check for refrigerant overcharge — also degrades COP, but less common.
@@ -40,14 +68,14 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 169–170).
    4. Check compressor amp draw against nameplate — elevated amps suggest
       mechanical degradation.
    5. Check for non-condensable gases in the refrigerant circuit.
-2. **Defrost anomaly:**
+3. **Defrost anomaly:**
    1. Inspect the outdoor coil for heavy ice or frost buildup.
    2. Check the defrost temperature sensor — a failed sensor can trigger
       continuous defrost.
    3. Check the defrost control board for fault codes.
    4. If the unit uses time-temperature defrost, verify the timer settings
       match the manufacturer's recommendation.
-3. **Reversing valve:**
+4. **Reversing valve:**
    1. Check the reversing valve solenoid — listen for a click when the mode
       changes. No click indicates a failed solenoid ($100–$300 to replace).
    2. Check the wiring between the thermostat/controller and the reversing
@@ -58,11 +86,14 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 169–170).
    4. If the valve body has failed, replace the reversing valve ($500–$2,000
       plus refrigerant recovery).
 
-## Step 3 — Confirm resolution
+## Step 4 — Confirm resolution
 
-1. **COP:** monitor measured COP for 7 days — it should return to within 10%
+1. **Compressor proof:** through a normal OEM-controlled cycle, verify command
+   and independent proof agree after the commissioned pickup/dropout allowances.
+   Do not force a compressor start or bypass anti-cycle and safety logic.
+2. **COP:** monitor measured COP for 7 days — it should return to within 10%
    of the baseline curve.
-2. **Defrost:** monitor defrost frequency and duration for 48 hours. Target:
+3. **Defrost:** monitor defrost frequency and duration for 48 hours. Target:
    fewer than 4 cycles/hr, less than 10 minutes each.
-3. **Reversing valve:** command multiple mode switches and verify SAT responds
-   correctly each time.
+4. **Reversing valve:** use manufacturer-approved operation to verify multiple
+   mode changes and confirm SAT responds correctly each time.

@@ -1,0 +1,1276 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 10,
+    "horizon_s": 2400
+  },
+  "scenarios": [
+    {
+      "name": "agreement_stopped",
+      "description": "Command and independent proof agree off; every direction remains clear.",
+      "inputs": {
+        "sf_cmd": false,
+        "sf_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "agreement_running",
+      "description": "Command and independent proof agree on; every direction remains clear.",
+      "inputs": {
+        "sf_cmd": true,
+        "sf_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "fail_to_start_at_initialization",
+      "description": "A standing commanded-on/unproved mismatch is clear one tick before 60 s, asserts exactly at 60 s, and remains true after the initialization-safe start timer.",
+      "inputs": {
+        "sf_cmd": true,
+        "sf_status": false
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 50,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 60,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 50,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 60,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "unexpected_run_at_initialization",
+      "description": "A standing command-off/proven-on mismatch is clear one tick before 120 s, asserts exactly at 120 s, and remains true after the initialization-safe stop timer.",
+      "inputs": {
+        "sf_cmd": false,
+        "sf_status": true
+      },
+      "expect": [
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 110,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 120,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 110,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 120,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "normal_delayed_start_and_stop",
+      "description": "Status proves one tick inside both configured allowances, so ordinary start and stop latency never alarms.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 1200,
+            "value": false
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 350,
+            "value": true
+          },
+          {
+            "t": 1310,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "start_mismatch_ends_one_tick_before_proof",
+      "description": "A start mismatch beginning at 300 s clears at 350 s, one 10 s evaluator step before maturity, and never alarms.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 350,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "start_mismatch_ends_at_proof_boundary",
+      "description": "The start mismatch clears exactly 60 s after it begins. Agreement on the maturity tick wins and no alarm is asserted.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 360,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "stop_mismatch_ends_one_tick_before_proof",
+      "description": "A stop mismatch beginning at 300 s clears at 410 s, one 10 s evaluator step before maturity, and never alarms.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 300,
+            "value": false
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 410,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "stop_mismatch_ends_at_proof_boundary",
+      "description": "The stop mismatch clears exactly 120 s after it begins. Agreement on the maturity tick wins and no alarm is asserted.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 300,
+            "value": false
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 420,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_start_alarm_recovers",
+      "description": "A fail-to-start persists past its proof time, then clears immediately when independent proof arrives.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 460,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 350,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 360,
+          "to_s": 450,
+          "equals": true
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 460,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 350,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 450,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 460,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_stop_alarm_recovers",
+      "description": "An unexpected run persists past its proof time, then clears immediately when proof drops.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 300,
+            "value": false
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 520,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 410,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 420,
+          "to_s": 510,
+          "equals": true
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 520,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 410,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 420,
+          "to_s": 510,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 520,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "pending_direction_reversal_starts_fresh_lane",
+      "description": "Command and status swap while fail-to-start is pending. The old lane resets and the unexpected-run lane must serve its complete independent timer.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 40,
+            "value": false
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 40,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 150,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 160,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 150,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 160,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "mature_direction_reversal_hands_off",
+      "description": "A mature fail-to-start reverses directly into unexpected-run. The old flag clears on the reversal tick, yFault has a real gap, and the opposite lane serves a fresh complete stop timer.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 400,
+            "value": false
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 400,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 60,
+          "to_s": 390,
+          "equals": true
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 400,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 510,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 520,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 60,
+          "to_s": 390,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 400,
+          "to_s": 510,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 520,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "two_short_start_mismatches_do_not_accumulate",
+      "description": "Two commanded-on/unproved episodes are separated by agreement; elapsed time cannot transfer across the reset.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 340,
+            "value": false
+          },
+          {
+            "t": 900,
+            "value": true
+          },
+          {
+            "t": 940,
+            "value": false
+          }
+        ],
+        "sf_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_stop_mismatches_do_not_accumulate",
+      "description": "Two proven-on/uncommanded episodes are separated by agreement; elapsed time cannot transfer across the reset.",
+      "inputs": {
+        "sf_cmd": false,
+        "sf_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 400,
+            "value": false
+          },
+          {
+            "t": 900,
+            "value": true
+          },
+          {
+            "t": 1000,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "command_chatter_never_matures",
+      "description": "The final command chatters faster than either proof window while status is off; no continuous mismatch matures.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 340,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          },
+          {
+            "t": 640,
+            "value": false
+          },
+          {
+            "t": 900,
+            "value": true
+          },
+          {
+            "t": 940,
+            "value": false
+          }
+        ],
+        "sf_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "status_chatter_never_matures",
+      "description": "Independent proof chatters against a held-on command; every unproved interval clears before the start timer.",
+      "inputs": {
+        "sf_cmd": true,
+        "sf_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 300,
+            "value": false
+          },
+          {
+            "t": 340,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          },
+          {
+            "t": 640,
+            "value": true
+          },
+          {
+            "t": 900,
+            "value": false
+          },
+          {
+            "t": 940,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "unexpected_run_chatter_never_matures",
+      "description": "Independent proof chatters on against a held-off command; every unexpected-run interval clears before the stop timer.",
+      "inputs": {
+        "sf_cmd": false,
+        "sf_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 400,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          },
+          {
+            "t": 700,
+            "value": false
+          },
+          {
+            "t": 900,
+            "value": true
+          },
+          {
+            "t": 1000,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "upstream_enable_raw_false_positive",
+      "description": "An upstream enable held true while downstream logic correctly withholds operation produces a raw fail-to-start alarm; this pins why only the final command is a valid binding.",
+      "inputs": {
+        "sf_cmd": true,
+        "sf_status": false
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 50,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 60,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 50,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 60,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "command_echo_raw_blind_spot",
+      "description": "A status echo follows the command while the device is mechanically stopped. The pair agrees and the graph stays silent, pinning why proof must be independent.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "manual_local_run_is_host_excluded",
+      "description": "A locally commanded device is proven on while the BAS final command is off. The raw unexpected-run alarm is correct; approved service or hand operation is host NO_EVAL.",
+      "inputs": {
+        "sf_cmd": false,
+        "sf_status": true
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 110,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 120,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 110,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 120,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "occupied_continuous_fan_transition",
+      "description": "A continuously commanded and proven fan remains in agreement across an occupancy transition; schedule state is intentionally not an input to this final-command proof rule.",
+      "inputs": {
+        "sf_cmd": true,
+        "sf_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "valid_ninety_second_post_heat_run",
+      "description": "A true final command remains on through the 90 s post-heat run; command and proof drop together at 390 s, so the sequence stays in agreement.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 390,
+            "value": false
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 390,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "proof_dropout_lingers_ninety_seconds",
+      "description": "The final command drops at 300 s and electrical/airflow proof lingers for 90 s during mechanical coast or sensor dropout. The 120 s stop allowance accepts it without treating an active post-heat sequence as uncommanded.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 300,
+            "value": false
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 390,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "proof_remains_on_beyond_stop_timer",
+      "description": "Fan proof remains on beyond the 120 s coast/dropout allowance after final command-off: unexpected-run asserts exactly at 420 s and clears when proof drops.",
+      "inputs": {
+        "sf_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 300,
+            "value": false
+          }
+        ],
+        "sf_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 410,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 420,
+          "to_s": 590,
+          "equals": true
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 600,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 410,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 420,
+          "to_s": 590,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 600,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "purge_raw_behavior_is_host_excluded",
+      "description": "A purge or smoke-control owner runs the fan while an upstream BAS command stays off. The raw unexpected-run alarm pins the required final-command or host-gate obligation.",
+      "inputs": {
+        "sf_cmd": false,
+        "sf_status": true
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 110,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 120,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 110,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 120,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}

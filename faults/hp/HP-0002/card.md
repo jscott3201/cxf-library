@@ -18,7 +18,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [HP-0001, HP-0003]
+related: [HP-0001, HP-0003, HP-0007]
 playbooks: [heat-pump-faults]
 operating_states: "heating mode"
 preconditions: "The unit must be in heating mode with the compressor running — the reference's operating state, and outside it defrost_status carries no information this rule can read. The host must report NO_EVAL for the first count_window (1 h) after engine start: while the moving average's window fills, its divisor is elapsed time rather than the window, so the frequency branch reads an extrapolated rate instead of a completed-hour count, and alarm_delay (30 min) is too short to cover that hour on its own. The host tick interval must sit inside the band the count arithmetic and the edge counter jointly allow, and count_scale must be retuned with it (see Deviations). defrost_status must be the unit's own defrost-active flag sampled faster than its shortest cycle; a defrost shorter than one tick is invisible to the counter."

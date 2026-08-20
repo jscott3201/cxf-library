@@ -19,7 +19,7 @@ g36: "§5.22.6 FC#3"
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [FCU-0002, FCU-0004]
+related: [FCU-0002, FCU-0004, FCU-0006]
 playbooks: [fcu-faults]
 operating_states: "OS#3 (cooling) — host-gated"
 preconditions: "The fan must be running and the unit in its cooling operating state. A fan coil with a stopped fan holds stagnant air on the discharge sensor, which reads at room temperature and looks exactly like a coil that has lost capacity. Suspend evaluation for a settling period after any mode change, occupancy transition, or valve-sequence changeover, while the coil has not caught up. `clg_vlv_cmd` must be the command the FCU controller is issuing, not a position feedback: this rule asks whether the loop has run out of capacity to ask for, and a feedback that disagrees with its command is a stuck-actuator finding. `sat_sp` must be a discharge setpoint the sequence is actually holding — many fan coils control to zone temperature and have no discharge setpoint at all, and a host that synthesizes one from the zone setpoint will manufacture faults every mild afternoon; on such a unit omit the rule rather than bind it. Where the host also runs FCU-0004, treat a concurrent cooling-coil leak as a separate finding rather than an explanation of this one; the leak makes the discharge colder, not warmer. When any gate is unmet the verdict is NO_EVAL, not healthy."
@@ -189,9 +189,9 @@ same unit.
   A steady miss against a saturated valve reads the same either way.
 - **Operating states and the settling window are host-side preconditions.** A
   verdict outside the cooling state or inside a transition window is NO_EVAL. Fan
-  status matters more here than on an air handler and leads the list, because the
-  FCU point dictionary carries no fan status or fan speed point for the graph to
-  read.
+  status matters more here than on an air handler and leads the list. The
+  dictionary now defines canonical `fan_status`, but this older graph does not
+  consume it; the host must gate evaluation on trusted fan proof.
 - **`yClgFullOk` is the library's, not the reference's.** Exposing the
   saturation conjunct as a boundary output adds no logic and changes no verdict;
   it lets the host distinguish "the coil is keeping up" from "the loop has not

@@ -22,9 +22,11 @@ Point dictionary: [`points/rtu.points.json`](../../points/rtu.points.json).
 | RTU-0007 | Condenser airflow restriction | 3 | statistical | **verified** |
 | RTU-0008 | Refrigerant undercharge — superheat/subcooling divergence | 3 | rule | **verified** |
 | RTU-0009 | Refrigerant overcharge — high liquid subcooling | 3 | rule | **verified** |
+| RTU-0010 | RTU supply-fan proof-of-operation failure | 2 | rule | **verified** |
 
-Severity and method per the reference's ch.11 cards (its §5.8.3 index carries
-no severity column). RTU-0007 shipped once the host-fitted-baseline
+Severity and method for RTU-0001..009 follow the reference's ch.11 cards (its
+§5.8.3 index carries no severity column); RTU-0010 is a severity-2 library
+proof-of-operation adaptation. RTU-0007 shipped once the host-fitted-baseline
 convention resolved its two-variable (stage AND outdoor temperature) curve
 as the derived point `cond_split_baseline`; its remaining constraint is the
 condenser leaving-air temperature sensor most packaged units lack, declared
@@ -41,3 +43,7 @@ on the card as a retrofit gate rather than a deferral.
   062 graph is equipment-agnostic).
 - **RTU-0004** is a CLU-03 member (economizer failure, trigger AHU-0017's
   cluster) and shares the economizer-failure playbook.
+- **RTU-0010** compares the final supply-fan command with independent proof.
+  Read its direction before RTU-0001..006 and RTU-0008/0009: fail-to-start
+  contests their running/airflow premise or evidence quality, while unexpected
+  operation does not make their physical evidence invalid by itself.

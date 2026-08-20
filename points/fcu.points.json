@@ -8,11 +8,11 @@
     },
     "s223": {
       "iri": "http://data.ashrae.org/standard223#",
-      "verified_version": "v1.0.0-2026"
+      "verified_version": "1.0.0-ppr.2.1"
     },
     "s223_g36": {
       "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#",
-      "verified_version": "v1.0.0-2026"
+      "verified_version": "1.0.0-ppr.2.1"
     },
     "quantitykind": {
       "iri": "http://qudt.org/vocab/quantitykind/",
@@ -23,7 +23,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "Fan coil unit point dictionary. All points carry from the AHU dictionary (the FCU is a two-coil air handler in miniature); rat doubles as the coil entering temperature and sat as the leaving temperature for the inactive-coil leak pair (FCU-0004/FCU-0005), per the same proxy-binding note G36 makes for RTU coil temperatures.",
+  "notes": "Fan coil unit point dictionary. All points carry from the AHU dictionary (the FCU is a two-coil air handler in miniature); rat doubles as the coil entering temperature and sat as the leaving temperature for the inactive-coil leak pair (FCU-0004/FCU-0005), per the same proxy-binding note G36 makes for RTU coil temperatures. ASHRAE 223 mappings are pinned to the public-review artifact 223p-1.0.0-ppr2.1.ttl (owl:versionInfo 1.0.0-ppr.2.1; SHA-256 1f156f9938c0be430d2216e01e31bb183c438ba318d8d4a23d2f074ebcd6f573), not an inferred final 2026 release. That artifact imports QUDT 3.1.8; the quantity-kind and unit local names here were independently checked against the repository-declared QUDT 3.1.4 artifacts.",
   "points": [
     {
       "name": "operating_state",
@@ -36,6 +36,44 @@
       "s223": null,
       "provisional": true,
       "notes": "Distinct from expected_mode: that point is what the mode SHOULD be given conditions (AHU-0029 compares actuators against it); this one is what the sequence says the state IS (AHU-0004 counts how often it changes). Hosts typically read it from the BAS mode/state enum or derive it per G36 Section 5.16.14. Value-level semantics are deliberately unspecified here since only transitions are consumed; a host must simply keep the encoding stable, as any re-mapping mid-stream registers as a spurious transition. [FCU dictionary] Brick class and 223P pattern carried over (equipment-independent); for an FCU the state space is G36 s5.22's OS#1-#4; only transitions are consumed (FCU-0001), so any stable enum binds."
+    },
+    {
+      "name": "fan_cmd",
+      "description": "Final command requesting operation of this FCU fan",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Start_Stop_Command",
+      "s223": {
+        "pattern": "EnumeratedActuatableProperty on the Fan contained by the FanCoilUnit via hasProperty",
+        "property_class": "EnumeratedActuatableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": false,
+      "notes": "Attach brick:Start_Stop_Command to the contained brick:Fan, not the FCU/unit enable. PPR2.1 s223:FanCoilUnit requires a contained s223:Fan; g36:Fan requires this Binary-OnOff actuatable property. Bind after normal sequence ownership and interlocks."
+    },
+    {
+      "name": "fan_status",
+      "description": "Independent run proof for this FCU fan",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Fan_On_Off_Status",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty on the Fan contained by the FanCoilUnit via hasProperty",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": false,
+      "notes": "Attach brick:Fan_On_Off_Status to the same contained brick:Fan. The PPR2.1 Binary-OnOff fan-status pattern is attested in the public G36 AHU model. Require independent current, speed/rotation, airflow, or auxiliary proof; command echo is invalid."
     },
     {
       "name": "sat",

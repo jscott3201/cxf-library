@@ -18,7 +18,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [HP-0002, HP-0003, HP-0004, HP-0005, RTU-0002]
+related: [HP-0002, HP-0003, HP-0004, HP-0005, RTU-0002, HP-0007]
 playbooks: [heat-pump-faults]
 operating_states: "heating or cooling, evaluated separately — one rule instance per mode, each carrying that mode's fitted line"
 preconditions: "The compressor must have run for min_runtime_for_eval (15 min) at its current capacity before the quotient means anything; a unit still pulling down after a start, or coming out of a defrost cycle, reads degraded on physics rather than on fault. The host owns the baseline: it runs the learning_period_days (14 d) regression of COP against oat for THIS mode, confirms R² > 0.6, and writes the result into cop_baseline_slope and cop_baseline_intercept with set_param. Until it has done so the rule is comparing against the shipped placeholders and means nothing (see Deviations). oat must also lie inside the range the line was fitted over — the graph extrapolates the line forever and says nothing about where the fit stops being physical. thermal_power is almost always a host-computed virtual point; its provenance is part of the R² precondition, not separate from it. Compressor evaluability is signalled in-rule by yPowerOk; when it is false the verdict is NO_EVAL, not healthy."

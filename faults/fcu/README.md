@@ -17,16 +17,24 @@ Point dictionary: [`points/fcu.points.json`](../../points/fcu.points.json).
 | FCU-0003 | SAT too high in full cooling | 3 | rule | **verified** |
 | FCU-0004 | Inactive cooling coil temperature drop (leak) | 3 | rule | **verified** |
 | FCU-0005 | Inactive heating coil temperature rise (leak) | 3 | rule | **verified** |
+| FCU-0006 | FCU fan proof-of-operation failure | 2 | rule | **verified** |
 
-Severity and method per the reference's ch.12 cards (its §5.8.5 index carries
-no severity column). Every rule here is a sibling of a verified AHU pattern:
+Severity and method for FCU-0001..005 follow the reference's ch.12 cards (its
+§5.8.5 index carries no severity column); FCU-0006 is a severity-2 library
+proof-of-operation adaptation. The first five rules are siblings of verified
+AHU patterns:
 FC-001 mirrors AHU-0004's rolling transition counter, FC-002/003 mirror the
 AHU-0007/AHU-0013 saturated-coil pair, FC-004/005 mirror the AHU-0014/AHU-0015
 inactive-coil signatures with rat/sat as the entering/leaving proxies.
 
 ## Relationships
 
-- FCU-0001..005 share the fcu-faults playbook.
+- FCU-0001..006 share the fcu-faults playbook.
+- FCU-0006 compares the final fan command with independent proof. Its
+  fail-to-start direction contests the airflow premise of FCU-0002..005; the
+  unexpected-run direction can leave those temperature signatures meaningful,
+  so the relationship is informational rather than a whole-rule suppression.
+- Passive/convection terminal units do not instantiate FCU-0006.
 - FC-004/005 are the zone-scale members of the simultaneous-conditioning
   family (AHU-0016's world): a leaking valve conditions air nobody asked
   to condition.

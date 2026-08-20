@@ -466,6 +466,14 @@
       "legacy_id": "FCU-FC-005"
     },
     {
+      "id": "FCU-0006",
+      "family": "fcu",
+      "name": "FCU fan proof-of-operation failure",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
       "id": "HP-0001",
       "family": "hp",
       "name": "COP degradation vs baseline",
@@ -512,6 +520,14 @@
       "method": "rule",
       "status": "verified",
       "legacy_id": "HP-FC-055"
+    },
+    {
+      "id": "HP-0007",
+      "family": "hp",
+      "name": "Heat-pump compressor proof-of-operation failure",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
     },
     {
       "id": "HW-0001",
@@ -725,6 +741,14 @@
       "id": "RTU-0009",
       "family": "rtu",
       "name": "Refrigerant overcharge \u2014 high liquid subcooling",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "RTU-0010",
+      "family": "rtu",
+      "name": "RTU supply-fan proof-of-operation failure",
       "method": "rule",
       "status": "verified",
       "legacy_id": null

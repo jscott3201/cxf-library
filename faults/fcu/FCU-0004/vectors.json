@@ -384,7 +384,7 @@
     },
     {
       "name": "fan_off_standing_water_reads_as_a_leak",
-      "description": "The known hole, pinned so it cannot change silently: with the fan stopped, the discharge sensor sits in still air over a coil full of chilled water and reads 15 \u00b0C while the return sensor reads the room at 22 \u00b0C. No air is moving and nothing is being wasted, but the rule alarms. The FCU point dictionary carries no fan status for the graph to read, so this gate is the host's \u2014 see preconditions",
+      "description": "The known hole, pinned so it cannot change silently: with the fan stopped, the discharge sensor sits in still air over a coil full of chilled water and reads 15 \u00b0C while the return sensor reads the room at 22 \u00b0C. No air is moving and nothing is being wasted, but the rule alarms. Canonical fan status now exists for FCU-0006, but this graph does not consume it, so this gate remains the host's \u2014 see preconditions",
       "inputs": {
         "clg_vlv_cmd": 0.0,
         "sat": 15.0,

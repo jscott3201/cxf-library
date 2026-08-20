@@ -8,11 +8,11 @@
     },
     "s223": {
       "iri": "http://data.ashrae.org/standard223#",
-      "verified_version": "v1.0.0-2026"
+      "verified_version": "1.0.0-ppr.2.1"
     },
     "s223_g36": {
       "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#",
-      "verified_version": "v1.0.0-2026"
+      "verified_version": "1.0.0-ppr.2.1"
     },
     "quantitykind": {
       "iri": "http://qudt.org/vocab/quantitykind/",
@@ -23,7 +23,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "RTU (packaged rooftop unit) point dictionary. Shared air-side points carry their Brick classes and 223P patterns from the AHU dictionary (see per-point notes); the owning equipment class is brick:Rooftop_Unit / brick:RTU (both verified in Brick 1.4.4). RTU-specific points (comp_status, comp_stage, htg_status) are grep-verified against Brick 1.4.4 but have no reference-model instance check, hence provisional.",
+  "notes": "RTU (packaged rooftop unit) point dictionary. Shared air-side points carry their Brick classes and 223P patterns from the AHU dictionary (see per-point notes); the owning equipment class is brick:Rooftop_Unit / brick:RTU (both verified in Brick 1.4.4). RTU-specific points (comp_status, comp_stage, htg_status) are grep-verified against Brick 1.4.4 but have no reference-model instance check, hence provisional. ASHRAE 223 mappings are pinned to the public-review artifact 223p-1.0.0-ppr2.1.ttl (owl:versionInfo 1.0.0-ppr.2.1; SHA-256 1f156f9938c0be430d2216e01e31bb183c438ba318d8d4a23d2f074ebcd6f573), not an inferred final 2026 release. That artifact imports QUDT 3.1.8; the quantity-kind and unit local names here were independently checked against the repository-declared QUDT 3.1.4 artifacts.",
   "points": [
     {
       "name": "sat",
@@ -124,8 +124,27 @@
       "notes": "Attach via isPointOf to brick:Outside_Damper or Economizer_Damper. In the 223P reference model the damper equipment carries hasRole Role-Economizer (Role-OutdoorAirIntake for a non-economizer minimum-OA damper). Verified at g36:DamperOrShape1 and instance MultipleZoneAhu-economizer-oa-damper-command. [RTU dictionary] Brick point class and 223P property pattern are equipment-independent and carried from the AHU dictionary, where instance-level verification was done against the AHU reference model; here the owning equipment is brick:Rooftop_Unit (alias RTU, verified in Brick 1.4.4) and no packaged-unit reference instance has been checked, so treat the 223P attachment as pattern guidance."
     },
     {
+      "name": "sf_cmd",
+      "description": "Final command requesting operation of this RTU supply fan",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Start_Stop_Command",
+      "s223": {
+        "pattern": "EnumeratedActuatableProperty on the supply Fan via hasProperty",
+        "property_class": "EnumeratedActuatableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": false,
+      "notes": "Attach brick:Start_Stop_Command to brick:Supply_Fan. PPR2.1 g36:Fan and the public MultipleZoneAhu supply-fan instance attest the Binary-OnOff actuatable property; the fan carries Role-Supply. Unit enable is invalid unless demonstrably identical to the final fan output."
+    },
+    {
       "name": "sf_status",
-      "description": "Supply fan run status",
+      "description": "Independent run proof for this RTU supply fan",
       "kind": "bool",
       "unit": "bool",
       "qudt_unit": null,
@@ -140,7 +159,7 @@
         "enumerationkind": "Binary-OnOff"
       },
       "provisional": false,
-      "notes": "Attach via isPointOf to brick:Supply_Fan. Deliberately not brick:Run_Status — its inherited definition routes equipment run status to the On/Off branch. 223P: hasEnumerationKind Binary-OnOff (OnOff-On/OnOff-Off), verified at instance MultipleZoneAhu-sa-fan-start-status; fan carries hasRole Role-Supply. [RTU dictionary] Brick point class and 223P property pattern are equipment-independent and carried from the AHU dictionary, where instance-level verification was done against the AHU reference model; here the owning equipment is brick:Rooftop_Unit (alias RTU, verified in Brick 1.4.4) and no packaged-unit reference instance has been checked, so treat the 223P attachment as pattern guidance."
+      "notes": "Attach via isPointOf to brick:Supply_Fan. Deliberately not brick:Run_Status — its inherited definition routes equipment run status to the On/Off branch. 223P: hasEnumerationKind Binary-OnOff (OnOff-On/OnOff-Off), verified at instance MultipleZoneAhu-sa-fan-start-status; fan carries hasRole Role-Supply. [RTU dictionary] Brick point class and 223P property pattern are equipment-independent and carried from the AHU dictionary, where instance-level verification was done against the AHU reference model; here the owning equipment is brick:Rooftop_Unit (alias RTU, verified in Brick 1.4.4) and no packaged-unit reference instance has been checked, so treat the 223P attachment as pattern guidance. RTU-0010 requires this proof to describe the same physical supply fan as sf_cmd; command echo is invalid."
     },
     {
       "name": "occ_schedule",
@@ -163,7 +182,7 @@
     },
     {
       "name": "comp_status",
-      "description": "Compressor run status (true = at least one compressor running)",
+      "description": "Independent run proof for the bound RTU compressor or compressor scope",
       "kind": "bool",
       "unit": "bool",
       "qudt_unit": null,
@@ -178,7 +197,7 @@
         "enumerationkind": "Binary-OnOff"
       },
       "provisional": true,
-      "notes": "Brick 1.4.4 has no Compressor_Run_Status class; the honest mapping is the generic On_Off_Status attached via isPointOf to brick:Compressor (class verified). On multi-compressor units, rules that ask whether ANY compressor is running (RTU-0003) may bind the OR of the individual statuses; RTU-0001 counts rising edges, and an OR UNDERCOUNTS cycling — a lag-compressor start while the lead is already running never moves the OR, so a two-stage unit can short-cycle its lag circuit and read healthy. Bind RTU-0001 per compressor. 223P pattern mirrors sf_status's Binary-OnOff enumeration; no packaged-unit reference instance checked."
+      "notes": "Brick 1.4.4 On_Off_Status and Compressor are exact generic classes; PPR2.1 EnumeratedObservableProperty and Binary-OnOff are exact, but no public compressor-property instance was found, so the attachment remains provisional. Default to one compressor/circuit for RTU-0001. An any-running OR is allowed for rules that explicitly need aggregate operation, but it must be documented and hides starts or failures while another compressor remains on."
     },
     {
       "name": "comp_stage",
@@ -187,16 +206,9 @@
       "unit": "1",
       "qudt_unit": "UNITLESS",
       "brick": "Stages_Status",
-      "s223": {
-        "pattern": "EnumeratedObservableProperty on the Compressor (or the RTU cooling section) via hasProperty",
-        "property_class": "EnumeratedObservableProperty",
-        "quantitykind": null,
-        "unit": null,
-        "medium": null,
-        "aspects": []
-      },
+      "s223": null,
       "provisional": true,
-      "notes": "brick:Stages_Status is verified in Brick 1.4.4 ('Indicates which stage a control loop or equipment is in') - an exact fit. Second integer point in the library (after operating_state); stage 0 means no compressor running. RTU-0002 interprets stages 1 and 2 against per-stage baselines and reports stages outside {1,2} as not evaluable via its yStageOk output; hosts with more stages extend by rebinding the baseline constants."
+      "notes": "brick:Stages_Status is verified in Brick 1.4.4 ('Indicates which stage a control loop or equipment is in') - an exact fit. Second integer point in the library (after operating_state); stage 0 means no compressor running. RTU-0002 interprets stages 1 and 2 against per-stage baselines and reports stages outside {1,2} as not evaluable via its yStageOk output; hosts with more stages extend by rebinding the baseline constants. No standard PPR2.1 EnumerationKind defines this site-specific integer stage encoding, so the s223 mapping is null until a deployment supplies a custom enumeration."
     },
     {
       "name": "htg_status",
@@ -221,19 +233,16 @@
       "name": "cond_leaving_temp",
       "description": "Condenser leaving air temperature (air discharged off the condenser coil)",
       "kind": "real",
-      "unit": "degC",
+      "unit": "°C",
       "qudt_unit": "DEG_C",
       "brick": null,
       "s223": {
-        "pattern": "Sensor observes QuantifiableObservableProperty on the condenser air leaving connection point",
+        "pattern": "Sensor observes a QuantifiableObservableProperty at the condenser-air OutletConnectionPoint",
         "property_class": "QuantifiableObservableProperty",
         "quantitykind": "Temperature",
         "unit": "DEG_C",
-        "medium": "Air",
-        "aspects": [
-          "leaving",
-          "condenser"
-        ]
+        "medium": "Fluid-Air",
+        "aspects": []
       },
       "provisional": true,
       "notes": "No exact Brick 1.4.4 class found for condenser LEAVING air (brick: null, refrigerant-side precedent from the hp dict). Most packaged RTUs lack this sensor — the original deferral reason for RTU-0007; a strap-on or discharge-plenum probe retrofit is the usual binding. Condenser split = cond_leaving_temp − oat."
@@ -246,17 +255,16 @@
       "qudt_unit": "K",
       "brick": null,
       "s223": {
-        "pattern": "QuantifiableObservableProperty, host-computed",
-        "property_class": "QuantifiableObservableProperty",
+        "pattern": "Host baseline Function hasOutput a QuantifiableProperty",
+        "property_class": "QuantifiableProperty",
         "quantitykind": "TemperatureDifference",
         "unit": "K",
         "medium": null,
-        "aspects": [
-          "derived"
-        ]
+        "aspects": []
       },
       "derived": true,
-      "notes": "HOST-DERIVED virtual point (evap_sat_temp / zone_reheat_fraction precedent): the reference's baseline_condenser_split(comp_stage, oat) — a per-stage curve against OAT fitted from known-clean operation. The host documents the fit window and guarantees the published value is strictly positive (RTU-0007 divides by it). This is the two-variable baseline that originally deferred the fault; publishing the fit as an ordinary point resolves it."
+      "notes": "HOST-DERIVED virtual point (evap_sat_temp / zone_reheat_fraction precedent): the reference's baseline_condenser_split(comp_stage, oat) — a per-stage curve against OAT fitted from known-clean operation. The host documents the fit window and guarantees the published value is strictly positive (RTU-0007 divides by it). This is the two-variable baseline that originally deferred the fault; publishing the fit as an ordinary point resolves it.",
+      "provisional": true
     },
     {
       "name": "suction_temp",
@@ -266,14 +274,12 @@
       "qudt_unit": "DEG_C",
       "brick": null,
       "s223": {
-        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "pattern": "Sensor observes a QuantifiableObservableProperty at the Compressor suction ConnectionPoint",
         "property_class": "QuantifiableObservableProperty",
         "quantitykind": "Temperature",
         "unit": "DEG_C",
-        "medium": "Refrigerant",
-        "aspects": [
-          "suction"
-        ]
+        "medium": "Constituent-Refrigerant",
+        "aspects": []
       },
       "provisional": true,
       "notes": "Mirror of the hp dict entry (duplicated per the lint's own-family resolution rule; same derivation/placement obligations). Consumed by the RTU-0008/0009 charge pair — superheat = suction_temp − evap_sat_temp, subcooling = cond_sat_temp − liquid_temp. Original hp note: No Brick 1.4.4 suction-temperature class (only Refrigerant_Level_Sensor exists refrigerant-side); null mapping per defrost_status precedent. Superheat = suction_temp - evap_sat_temp."
@@ -286,14 +292,12 @@
       "qudt_unit": "DEG_C",
       "brick": null,
       "s223": {
-        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
+        "pattern": "Sensor observes a QuantifiableObservableProperty at the condenser liquid-line outlet ConnectionPoint",
         "property_class": "QuantifiableObservableProperty",
         "quantitykind": "Temperature",
         "unit": "DEG_C",
-        "medium": "Refrigerant",
-        "aspects": [
-          "liquid-line"
-        ]
+        "medium": "Constituent-Refrigerant",
+        "aspects": []
       },
       "provisional": true,
       "notes": "Mirror of the hp dict entry (duplicated per the lint's own-family resolution rule; same derivation/placement obligations). Consumed by the RTU-0008/0009 charge pair — superheat = suction_temp − evap_sat_temp, subcooling = cond_sat_temp − liquid_temp. Original hp note: No Brick 1.4.4 class; null mapping. Subcooling = cond_sat_temp - liquid_temp."
@@ -306,15 +310,12 @@
       "qudt_unit": "DEG_C",
       "brick": null,
       "s223": {
-        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
-        "property_class": "QuantifiableObservableProperty",
+        "pattern": "Function hasOutput a QuantifiableProperty derived from refrigerant pressure and a refrigerant-specific pressure-temperature relation",
+        "property_class": "QuantifiableProperty",
         "quantitykind": "Temperature",
         "unit": "DEG_C",
-        "medium": "Refrigerant",
-        "aspects": [
-          "evaporating",
-          "derived"
-        ]
+        "medium": "Constituent-Refrigerant",
+        "aspects": []
       },
       "provisional": true,
       "notes": "Mirror of the hp dict entry (duplicated per the lint's own-family resolution rule; same derivation/placement obligations). Consumed by the RTU-0008/0009 charge pair — superheat = suction_temp − evap_sat_temp, subcooling = cond_sat_temp − liquid_temp. Original hp note: HOST-DERIVED virtual point (zone_reheat_fraction/chw_valve_max precedent): the P-T relationship is refrigerant-specific and lives at the host, never in a rule graph. Derivation MUST match the site's refrigerant.",
@@ -328,15 +329,12 @@
       "qudt_unit": "DEG_C",
       "brick": null,
       "s223": {
-        "pattern": "QuantifiableObservableProperty on the equipment via hasProperty",
-        "property_class": "QuantifiableObservableProperty",
+        "pattern": "Function hasOutput a QuantifiableProperty derived from refrigerant pressure and a refrigerant-specific pressure-temperature relation",
+        "property_class": "QuantifiableProperty",
         "quantitykind": "Temperature",
         "unit": "DEG_C",
-        "medium": "Refrigerant",
-        "aspects": [
-          "condensing",
-          "derived"
-        ]
+        "medium": "Constituent-Refrigerant",
+        "aspects": []
       },
       "provisional": true,
       "notes": "Mirror of the hp dict entry (duplicated per the lint's own-family resolution rule; same derivation/placement obligations). Consumed by the RTU-0008/0009 charge pair — superheat = suction_temp − evap_sat_temp, subcooling = cond_sat_temp − liquid_temp. Original hp note: HOST-DERIVED virtual point, same convention and refrigerant caveat as evap_sat_temp.",
