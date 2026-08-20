@@ -1,0 +1,301 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 30,
+    "horizon_s": 2400
+  },
+  "scenarios": [
+    {
+      "name": "disabled_unit_holds_the_alarm_down",
+      "description": "The raw graph receives a warm OAT and an active frost flag, but erv_enabled is false. This pins the in-graph enable gate; maintenance and test exclusions remain host-side.",
+      "inputs": {
+        "oat": 10.0,
+        "erv_frost_prot": true,
+        "erv_enabled": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "frost_protection_below_release_is_healthy",
+      "description": "Protection is active at 0 C, below the adopted +5 C release line, so the sequence may legitimately remain in frost mode.",
+      "inputs": {
+        "oat": 0.0,
+        "erv_frost_prot": true,
+        "erv_enabled": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "oat_exactly_at_release_is_healthy",
+      "description": "GreaterThreshold is strict: OAT exactly at release_oat does not start persistence.",
+      "inputs": {
+        "oat": 5.0,
+        "erv_frost_prot": true,
+        "erv_enabled": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "warm_frost_mode_asserts_at_the_delay",
+      "description": "OAT is just above the release line from initialization. delayOnInit serves the full 900 s: false through 870, true from 900.",
+      "inputs": {
+        "oat": 5.1,
+        "erv_frost_prot": true,
+        "erv_enabled": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 870,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 900,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "warm_excursion_just_short_of_delay_stays_clear",
+      "description": "The warm interval lasts 870 s on the 30 s grid, one sample short of persistence, then OAT returns to the safe side.",
+      "inputs": {
+        "oat": [
+          {
+            "t": 0,
+            "value": 0.0
+          },
+          {
+            "t": 300,
+            "value": 5.1
+          },
+          {
+            "t": 1170,
+            "value": 5.0
+          }
+        ],
+        "erv_frost_prot": true,
+        "erv_enabled": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "warm_excursion_asserts_after_crossing",
+      "description": "The candidate begins at t=300 and matures exactly 900 s later at t=1200.",
+      "inputs": {
+        "oat": [
+          {
+            "t": 0,
+            "value": 0.0
+          },
+          {
+            "t": 300,
+            "value": 5.1
+          }
+        ],
+        "erv_frost_prot": true,
+        "erv_enabled": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1170,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1200,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "frost_flag_clear_restarts_persistence",
+      "description": "The frost flag clears for 300 s during a warm spell, resetting the clock; the second active interval matures at t=2100.",
+      "inputs": {
+        "oat": 10.0,
+        "erv_frost_prot": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 900,
+            "value": false
+          },
+          {
+            "t": 1200,
+            "value": true
+          }
+        ],
+        "erv_enabled": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2070,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 2100,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "repeated_short_warm_excursions_do_not_accumulate",
+      "description": "Three 300 s warm excursions are separated by boundary crossings. TrueDelay discards rather than accumulates their time.",
+      "inputs": {
+        "oat": [
+          {
+            "t": 0,
+            "value": 0.0
+          },
+          {
+            "t": 300,
+            "value": 10.0
+          },
+          {
+            "t": 600,
+            "value": 0.0
+          },
+          {
+            "t": 900,
+            "value": 10.0
+          },
+          {
+            "t": 1200,
+            "value": 0.0
+          },
+          {
+            "t": 1500,
+            "value": 10.0
+          },
+          {
+            "t": 1800,
+            "value": 0.0
+          }
+        ],
+        "erv_frost_prot": true,
+        "erv_enabled": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "sequence_release_clears_an_active_alarm",
+      "description": "A standing warm-weather alarm clears on the same tick the frost sequence releases.",
+      "inputs": {
+        "oat": 10.0,
+        "erv_frost_prot": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 1200,
+            "value": false
+          }
+        ],
+        "erv_enabled": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 870,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 900,
+          "to_s": 1170,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1200,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "oat_returns_to_release_on_the_maturity_tick",
+      "description": "OAT clears at exactly t=900. Inputs stage before the timer evaluates that tick, so the alarm never flashes.",
+      "inputs": {
+        "oat": [
+          { "t": 0, "value": 5.1 },
+          { "t": 900, "value": 5.0 }
+        ],
+        "erv_frost_prot": true,
+        "erv_enabled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 2400, "equals": false }
+      ]
+    },
+    {
+      "name": "frost_releases_one_tick_after_maturity",
+      "description": "The violation survives through t=900 and clears at t=930, producing exactly one alarmed sample on the 30 s clock.",
+      "inputs": {
+        "oat": 5.1,
+        "erv_frost_prot": [
+          { "t": 0, "value": true },
+          { "t": 930, "value": false }
+        ],
+        "erv_enabled": true
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 870, "equals": false },
+        { "output": "yFault", "from_s": 900, "to_s": 900, "equals": true },
+        { "output": "yFault", "from_s": 930, "to_s": 2400, "equals": false }
+      ]
+    }
+  ]
+}

@@ -230,12 +230,12 @@ scope 2. Avoided-emissions basis: marginal operating emissions rate (MOER).
 
 ## Notes
 
-The [erv-effectiveness](../../../playbooks/erv-effectiveness.md) playbook orders
-the service: clean the wheel or plate core first, then — on wheel units — check
-that the wheel is actually turning, because a failed drive motor or slipped belt
-produces the most extreme readings and is the failure a cleaning visit will not
-fix. Check the bypass damper before condemning the core. The playbook's
-resolution target is effectiveness back within 15% of the commissioned value,
-the same 15 points this rule alarms at, so a device cleaned to just inside the
-alarm point has met the target by exactly the margin that clears the alarm and
-is worth re-measuring next season.
+The [erv-effectiveness](../../../playbooks/erv-effectiveness.md) playbook starts
+with operating/frost state, proves any active recovery device, and compares the
+two air streams before recalculating effectiveness or cleaning the core. That
+order avoids condemning heat-transfer media for a stopped wheel, intentional
+frost sequence, bypass condition, or airflow problem. Its resolution target is
+effectiveness back within 15% of the commissioned value, the same 15 points this
+rule alarms at, so a device restored just inside the alarm point has met the
+target by exactly the margin that clears the alarm and is worth re-measuring
+next season.

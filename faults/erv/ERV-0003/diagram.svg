@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1260 330" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+  <g>
+    <rect x="12" y="35" width="120" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="72" y="54" text-anchor="middle" fill="#1e3a8a">oat</text>
+    <rect x="12" y="140" width="150" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="87" y="159" text-anchor="middle" fill="#1e3a8a">erv_frost_prot</text>
+    <rect x="12" y="245" width="130" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="77" y="264" text-anchor="middle" fill="#1e3a8a">erv_enabled</text>
+  </g>
+  <rect x="230" y="23" width="210" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="335" y="46" text-anchor="middle" fill="#24292f" font-weight="bold">aboveRelease</text>
+  <text x="335" y="65" text-anchor="middle" fill="#57606a" font-size="11">GreaterThreshold · 5 °C</text>
+  <rect x="525" y="103" width="180" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="615" y="126" text-anchor="middle" fill="#24292f" font-weight="bold">warmFrost</text>
+  <text x="615" y="145" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="790" y="183" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="875" y="206" text-anchor="middle" fill="#24292f" font-weight="bold">armed</text>
+  <text x="875" y="225" text-anchor="middle" fill="#57606a" font-size="11">Logical.And</text>
+  <rect x="1035" y="183" width="170" height="58" rx="6" fill="#f6f8fa" stroke="#57606a"/>
+  <text x="1120" y="206" text-anchor="middle" fill="#24292f" font-weight="bold">persist</text>
+  <text x="1120" y="225" text-anchor="middle" fill="#57606a" font-size="11">TrueDelay · 900 s</text>
+  <rect x="1110" y="276" width="90" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="1155" y="295" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 132 50 H 226"/>
+    <path d="M 440 52 H 485 V 118 H 521"/>
+    <path d="M 162 155 H 521"/>
+    <path d="M 705 132 H 750 V 198 H 786"/>
+    <path d="M 142 260 H 750 V 226 H 786"/>
+    <path d="M 960 212 H 1031"/>
+    <path d="M 1120 241 V 272"/>
+  </g>
+  <g fill="#7d8590" font-size="9">
+    <text x="503" y="115">u1</text><text x="503" y="151">u2</text>
+    <text x="768" y="195">u1</text><text x="768" y="235">u2</text>
+  </g>
+  <text x="230" y="316" fill="#7d8590" font-size="11">Warm OAT, active frost state, and enable must remain true continuously; any false conjunct resets the full delay.</text>
+</svg>

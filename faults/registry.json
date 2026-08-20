@@ -378,6 +378,30 @@
       "legacy_id": "ERV-FC-051"
     },
     {
+      "id": "ERV-0003",
+      "family": "erv",
+      "name": "Frost protection active above release conditions",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "ERV-0004",
+      "family": "erv",
+      "name": "Recovery device proof-of-operation failure",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "ERV-0005",
+      "family": "erv",
+      "name": "Supply/exhaust airflow imbalance",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
       "id": "FCU-0001",
       "family": "fcu",
       "name": "Excessive operating state changes",

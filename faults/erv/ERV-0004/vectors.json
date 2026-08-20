@@ -1,0 +1,560 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 30,
+    "horizon_s": 1800
+  },
+  "scenarios": [
+    {
+      "name": "agreement_in_both_states_is_silent",
+      "description": "Command and independent status agree through one on/off cycle, covering both healthy truth-table rows.",
+      "inputs": {
+        "erv_recovery_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 900,
+            "value": false
+          }
+        ],
+        "erv_recovery_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 900,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "fail_to_start_asserts_at_start_proof_time",
+      "description": "The command rises at t=300 and proof never follows. The start branch asserts exactly 120 s later.",
+      "inputs": {
+        "erv_recovery_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          }
+        ],
+        "erv_recovery_status": false
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 390,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 420,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 420,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "unexpected_run_asserts_at_stop_proof_time",
+      "description": "Status rises against an off command at t=300. The unexpected-run branch asserts at t=420.",
+      "inputs": {
+        "erv_recovery_cmd": false,
+        "erv_recovery_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 390,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 420,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 420,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "healthy_start_proves_just_before_the_window",
+      "description": "Independent proof follows 90 s after command, one sample before the 120 s window, so no alarm appears.",
+      "inputs": {
+        "erv_recovery_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          }
+        ],
+        "erv_recovery_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 390,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "healthy_stop_coasts_down_just_before_the_window",
+      "description": "A wheel status remains true for 90 s after command-off, then drops before stop_proof_time.",
+      "inputs": {
+        "erv_recovery_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 300,
+            "value": false
+          }
+        ],
+        "erv_recovery_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 390,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "command_chatter_restarts_the_start_timer",
+      "description": "A one-sample command drop resets the start clock. The alarm moves from t=420 to t=600.",
+      "inputs": {
+        "erv_recovery_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 390,
+            "value": false
+          },
+          {
+            "t": 480,
+            "value": true
+          }
+        ],
+        "erv_recovery_status": false
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 570,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 600,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "status_chatter_never_matures",
+      "description": "Status alternates every 90 s against a held-on command; no fail-to-start interval survives the 120 s window.",
+      "inputs": {
+        "erv_recovery_cmd": true,
+        "erv_recovery_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 90,
+            "value": true
+          },
+          {
+            "t": 180,
+            "value": false
+          },
+          {
+            "t": 270,
+            "value": true
+          },
+          {
+            "t": 360,
+            "value": false
+          },
+          {
+            "t": 450,
+            "value": true
+          },
+          {
+            "t": 540,
+            "value": false
+          },
+          {
+            "t": 630,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "direction_flip_never_asserts_both",
+      "description": "A mature fail-to-start becomes unexpected run at t=600. The first flag clears immediately and the second serves its own window.",
+      "inputs": {
+        "erv_recovery_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          }
+        ],
+        "erv_recovery_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 120,
+          "to_s": 570,
+          "equals": true
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 600,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 690,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 720,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 120,
+          "to_s": 570,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 600,
+          "to_s": 690,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 720,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "restart_into_a_mismatch_serves_the_full_window",
+      "description": "The model initializes with status on and command off. delayOnInit keeps the first 120 s quiet.",
+      "inputs": {
+        "erv_recovery_cmd": false,
+        "erv_recovery_status": true
+      },
+      "expect": [
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 90,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 120,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "proof_recovery_clears_on_the_same_tick",
+      "description": "A mature fail-to-start clears immediately when independent proof arrives; the delay does not impose an off-delay.",
+      "inputs": {
+        "erv_recovery_cmd": true,
+        "erv_recovery_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 90,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 120,
+          "to_s": 570,
+          "equals": true
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 600,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 600,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "unexpected_run_recovery_clears_on_the_same_tick",
+      "description": "A mature unexpected-run mismatch clears immediately when independent proof drops; the stop lane has no off-delay.",
+      "inputs": {
+        "erv_recovery_cmd": false,
+        "erv_recovery_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 90,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 120,
+          "to_s": 570,
+          "equals": true
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 600,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 600,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "start_proof_arrives_on_the_boundary",
+      "description": "Independent proof arrives at exactly t=120. The input update is staged before TrueDelay on that tick, so no one-sample alarm appears.",
+      "inputs": {
+        "erv_recovery_cmd": true,
+        "erv_recovery_status": [
+          { "t": 0, "value": false },
+          { "t": 120, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yFailToStart", "from_s": 0, "to_s": 1800, "equals": false },
+        { "output": "yUnexpectedRun", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    },
+    {
+      "name": "start_proof_arrives_one_tick_after_the_boundary",
+      "description": "Proof arrives at t=150. The fail-to-start and roll-up outputs are true only on the t=120 sample, then clear immediately.",
+      "inputs": {
+        "erv_recovery_cmd": true,
+        "erv_recovery_status": [
+          { "t": 0, "value": false },
+          { "t": 150, "value": true }
+        ]
+      },
+      "expect": [
+        { "output": "yFailToStart", "from_s": 0, "to_s": 90, "equals": false },
+        { "output": "yFailToStart", "from_s": 120, "to_s": 120, "equals": true },
+        { "output": "yFailToStart", "from_s": 150, "to_s": 1800, "equals": false },
+        { "output": "yFault", "from_s": 120, "to_s": 120, "equals": true },
+        { "output": "yFault", "from_s": 150, "to_s": 1800, "equals": false },
+        { "output": "yUnexpectedRun", "from_s": 0, "to_s": 1800, "equals": false }
+      ]
+    }
+  ]
+}
