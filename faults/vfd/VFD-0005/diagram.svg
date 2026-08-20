@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1360 440" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="7">
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#7d8590"/></marker></defs>
+  <g fill="#dbeafe" stroke="#3b82f6"><rect x="12" y="65" width="155" height="30" rx="15"/><rect x="12" y="190" width="165" height="30" rx="15"/><rect x="12" y="325" width="180" height="30" rx="15"/></g>
+  <g fill="#1e3a8a" text-anchor="middle"><text x="89" y="84">vfd_enable_cmd</text><text x="94" y="209">vfd_auto_status</text><text x="102" y="344">vfd_bypass_status</text></g>
+  <g fill="#f6f8fa" stroke="#57606a"><rect x="250" y="175" width="125" height="58" rx="6"/><rect x="470" y="100" width="165" height="58" rx="6"/><rect x="470" y="300" width="165" height="58" rx="6"/><rect x="700" y="235" width="120" height="58" rx="6"/><rect x="890" y="135" width="120" height="58" rx="6"/><rect x="1080" y="135" width="165" height="58" rx="6"/></g>
+  <g fill="#24292f" font-weight="bold" text-anchor="middle"><text x="312" y="198">notAuto</text><text x="552" y="123">notAutoEnabled</text><text x="552" y="323">bypassEnabled</text><text x="760" y="258">anyMode</text><text x="950" y="158">candidate</text><text x="1162" y="158">persist</text></g>
+  <g fill="#57606a" font-size="7" text-anchor="middle"><text x="312" y="217">Logical.Not</text><text x="552" y="142">Logical.And</text><text x="552" y="342">Logical.And</text><text x="760" y="277">Logical.Or</text><text x="950" y="177">Logical.And</text><text x="1162" y="177">TrueDelay · 300 s</text></g>
+  <g fill="#fee2e2" stroke="#dc2626"><rect x="540" y="45" width="125" height="30" rx="15"/><rect x="540" y="385" width="110" height="30" rx="15"/><rect x="1270" y="149" width="78" height="30" rx="15"/></g>
+  <g fill="#7f1d1d" text-anchor="middle"><text x="602" y="64">yNotAuto</text><text x="595" y="404">yBypass</text><text x="1309" y="168">yFault</text></g>
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M177 205 H246"/><path d="M375 204 H420 V143 H466"/><path d="M167 80 H420 V115 H466"/><path d="M635 129 V79 H602 V79"/>
+    <path d="M167 80 H430 V315 H466"/><path d="M192 340 H466"/><path d="M552 358 V381"/>
+    <path d="M375 204 H660 V250 H696"/><path d="M192 340 H660 V278 H696"/><path d="M820 264 H850 V178 H886"/><path d="M167 80 H850 V150 H886"/>
+    <path d="M1010 164 H1076"/><path d="M1245 164 H1266"/>
+  </g>
+  <text x="300" y="430" fill="#7d8590" font-size="9">Immediate enabled direction flags feed one shared mode-settle timer; a branch handoff without a clean auto state does not reset it.</text>
+</svg>

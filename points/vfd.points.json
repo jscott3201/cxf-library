@@ -8,11 +8,11 @@
     },
     "s223": {
       "iri": "http://data.ashrae.org/standard223#",
-      "verified_version": "v1.0.0-2026"
+      "verified_version": "1.0.0-ppr.2.1"
     },
     "s223_g36": {
       "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#",
-      "verified_version": "v1.0.0-2026"
+      "verified_version": "1.0.0-ppr.2.1"
     },
     "quantitykind": {
       "iri": "http://qudt.org/vocab/quantitykind/",
@@ -23,7 +23,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "Variable frequency drive point dictionary. The VFD family's rules are application-agnostic (fan, pump); the process-variable pair is deliberately untyped beyond 'the controlled variable in its own units' and marked provisional. Owning equipment: brick:Variable_Frequency_Drive (verified in Brick 1.4.4).",
+  "notes": "Variable frequency drive point dictionary. The VFD family's rules are application-agnostic (fan, pump); the process-variable pair is deliberately untyped beyond 'the controlled variable in its own units' and marked provisional. Owning equipment: brick:Variable_Frequency_Drive (verified in Brick 1.4.4). ASHRAE 223 mappings were checked against local artifact 223p-1.0.0-ppr2.1.ttl, SHA-256 1f156f9938c0be430d2216e01e31bb183c438ba318d8d4a23d2f074ebcd6f573; this is a public-review artifact pin, not a claim of a later published release.",
   "points": [
     {
       "name": "vfd_speed_cmd",
@@ -34,14 +34,14 @@
       "brick": "Speed_Setpoint",
       "s223": {
         "pattern": "QuantifiableActuatableProperty on the VFD via hasProperty",
-        "property_class": "QuantifiableObservableProperty",
-        "quantitykind": null,
-        "unit": null,
+        "property_class": "QuantifiableActuatableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
         "medium": null,
         "aspects": []
       },
-      "provisional": false,
-      "notes": "brick:Speed_Setpoint grep-verified in Brick 1.4.4 (the commanded speed the drive is asked to track)."
+      "provisional": true,
+      "notes": "brick:Speed_Setpoint is an exact Brick 1.4.4 class, but Brick's inherited Speed quantity does not list PERCENT as an applicable unit; the normalized percent binding is therefore provisional. ASHRAE 223 PPR2.1's g36:FanWithVFD shape explicitly uses a QuantifiableActuatableProperty with quantity kind DimensionlessRatio for the drive speed command; this dictionary narrows that ratio to PERCENT."
     },
     {
       "name": "vfd_speed",
@@ -53,13 +53,13 @@
       "s223": {
         "pattern": "Sensor observes QuantifiableObservableProperty on the driven motor via hasProperty",
         "property_class": "QuantifiableObservableProperty",
-        "quantitykind": null,
-        "unit": null,
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
         "medium": null,
         "aspects": []
       },
-      "provisional": false,
-      "notes": "brick:Motor_Speed_Sensor grep-verified in Brick 1.4.4; brick:Speed_Status is the drive-reported alternative — bind whichever the site trends, but note VFD-0001 diagnosis 5 (tachometer failure) argues for the drive-reported value where both exist."
+      "provisional": true,
+      "notes": "brick:Motor_Speed_Sensor is an exact Brick 1.4.4 class and brick:Speed_Status is the drive-reported alternative, but Brick's inherited Speed quantity does not list PERCENT as an applicable unit; the normalized percent binding is therefore provisional. Bind whichever the site trends, but note VFD-0001 diagnosis 5 (tachometer failure) argues for the drive-reported value where both exist. ASHRAE 223 represents the normalized feedback as a DimensionlessRatio QuantifiableObservableProperty in PERCENT."
     },
     {
       "name": "vfd_process_value",
@@ -82,6 +82,67 @@
       "s223": null,
       "provisional": true,
       "notes": "See vfd_process_value; the pair must be bound from the same loop in the same units."
+    },
+    {
+      "name": "vfd_enable_cmd",
+      "description": "Final BAS command requesting VFD operation/control",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "VFD_Enable_Command",
+      "s223": {
+        "pattern": "EnumeratedActuatableProperty on the VFD via hasProperty, with hasEnumerationKind Binary-OnOff",
+        "property_class": "EnumeratedActuatableProperty",
+        "enumerationkind": "Binary-OnOff",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "brick:VFD_Enable_Command is an exact Brick 1.4.4 class. Bind the final drive-level command downstream of schedule and normal equipment interlocks; a system request several sequence layers upstream is not equivalent. ASHRAE 223 represents the command as an EnumeratedActuatableProperty with s223:Binary-OnOff."
+    },
+    {
+      "name": "vfd_auto_status",
+      "description": "True when the drive is accepting remote automatic control from the BAS/control loop",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Manual_Auto_Status",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty on the VFD via hasProperty, with hasEnumerationKind Binary-Logical and hasAspect Aspect-OperatingMode; true denotes the deployment's verified remote-auto state",
+        "property_class": "EnumeratedObservableProperty",
+        "enumerationkind": "Binary-Logical",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [
+          "Aspect-OperatingMode"
+        ]
+      },
+      "provisional": true,
+      "notes": "brick:Manual_Auto_Status is exact in Brick 1.4.4 for manual-versus-automatic operation, but it does not by itself prove that 'auto' is remote BAS control rather than a drive-local automatic source; that deployment-specific narrowing keeps this canonical point provisional. Enabled and automatic are not equivalent. ASHRAE 223 uses a Binary-Logical EnumeratedObservableProperty with Aspect-OperatingMode whose true value must be mapped to the verified remote-auto state."
+    },
+    {
+      "name": "vfd_bypass_status",
+      "description": "True while the motor is operating through a bypass path rather than regulated VFD output",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": null,
+      "s223": {
+        "pattern": "EnumeratedObservableProperty on the drive/bypass assembly via hasProperty, with hasEnumerationKind Binary-Logical and hasAspect Aspect-OperatingMode",
+        "property_class": "EnumeratedObservableProperty",
+        "enumerationkind": "Binary-Logical",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [
+          "Aspect-OperatingMode"
+        ]
+      },
+      "provisional": true,
+      "notes": "Brick 1.4.4 has brick:Bypass_Command but no exact bypass-status class; using the command would confuse request with proof, so the Brick mapping is null. In ASHRAE 223 this is a Binary-Logical observable operating-mode property on the drive/bypass assembly; native bypass-contactor proof may instead be represented as Binary-OnOff, but the canonical binding still means confirmed active bypass, not a request. Approved emergency or maintenance bypass is an operating-state exclusion, not a different point meaning."
     }
   ]
 }

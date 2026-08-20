@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2320 760" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="8">
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#7d8590"/></marker></defs>
+  <g fill="#dbeafe" stroke="#3b82f6">
+    <rect x="10" y="105" width="150" height="30" rx="15"/>
+    <rect x="10" y="405" width="180" height="30" rx="15"/>
+    <rect x="10" y="610" width="155" height="30" rx="15"/>
+  </g>
+  <g fill="#1e3a8a" text-anchor="middle"><text x="85" y="124">vfd_speed</text><text x="100" y="424">vfd_process_value</text><text x="87" y="629">vfd_process_sp</text></g>
+
+  <g fill="#f6f8fa" stroke="#57606a">
+    <rect x="210" y="35" width="145" height="52" rx="6"/><rect x="390" y="35" width="145" height="52" rx="6"/><rect x="570" y="35" width="145" height="52" rx="6"/><rect x="750" y="35" width="145" height="52" rx="6"/>
+    <rect x="930" y="35" width="145" height="52" rx="6"/><rect x="1110" y="35" width="145" height="52" rx="6"/><rect x="1290" y="35" width="145" height="52" rx="6"/><rect x="1470" y="35" width="145" height="52" rx="6"/>
+    <rect x="570" y="175" width="145" height="52" rx="6"/><rect x="750" y="175" width="145" height="52" rx="6"/><rect x="930" y="175" width="145" height="52" rx="6"/><rect x="1110" y="175" width="145" height="52" rx="6"/><rect x="1680" y="105" width="145" height="52" rx="6"/>
+
+    <rect x="210" y="395" width="145" height="52" rx="6"/><rect x="390" y="325" width="145" height="52" rx="6"/><rect x="570" y="325" width="145" height="52" rx="6"/><rect x="750" y="325" width="145" height="52" rx="6"/>
+    <rect x="930" y="325" width="145" height="52" rx="6"/><rect x="1110" y="325" width="145" height="52" rx="6"/><rect x="1290" y="325" width="145" height="52" rx="6"/><rect x="1470" y="325" width="145" height="52" rx="6"/><rect x="1650" y="325" width="145" height="52" rx="6"/>
+    <rect x="570" y="535" width="145" height="52" rx="6"/><rect x="750" y="535" width="145" height="52" rx="6"/><rect x="930" y="535" width="145" height="52" rx="6"/><rect x="1850" y="430" width="145" height="52" rx="6"/>
+
+    <rect x="2015" y="260" width="120" height="52" rx="6"/><rect x="2170" y="260" width="135" height="52" rx="6"/>
+  </g>
+
+  <g fill="#24292f" font-size="7" font-weight="bold" text-anchor="middle">
+    <text x="282" y="55">muSpeed</text><text x="462" y="55">above</text><text x="642" y="55">flip</text><text x="822" y="55">pulseInt</text>
+    <text x="1002" y="55">pulseReal</text><text x="1182" y="55">crossRate</text><text x="1362" y="55">crossCount</text><text x="1542" y="55">crossHigh</text>
+    <text x="642" y="195">speedDev</text><text x="822" y="195">absSpeedDev</text><text x="1002" y="195">speedMad</text><text x="1182" y="195">amplitudeHigh</text><text x="1752" y="125">speedBoth</text>
+    <text x="282" y="415">pvErr</text><text x="462" y="345">muProcess</text><text x="642" y="345">processAbove</text><text x="822" y="345">processFlip</text>
+    <text x="1002" y="345">processPulseInt</text><text x="1182" y="345">processPulseReal</text><text x="1362" y="345">processCrossRate</text><text x="1542" y="345" font-size="6">processCrossCount</text><text x="1722" y="345">processCrossHigh</text>
+    <text x="642" y="555">absPvErr</text><text x="822" y="555">pvMae</text><text x="1002" y="555">pvBandHigh</text><text x="1922" y="450">processBoth</text>
+    <text x="2075" y="280">candidate</text><text x="2237" y="280">persist</text>
+  </g>
+  <g fill="#57606a" font-size="6" text-anchor="middle">
+    <text x="282" y="73">Reals.MovingAverage</text><text x="462" y="73">Reals.Greater</text><text x="642" y="73">Logical.Change</text><text x="822" y="73">BooleanToInteger</text>
+    <text x="1002" y="73">IntegerToReal</text><text x="1182" y="73">Reals.MovingAverage</text><text x="1362" y="73">MultiplyByParameter</text><text x="1542" y="73">GreaterThreshold</text>
+    <text x="642" y="213">Reals.Subtract</text><text x="822" y="213">Reals.Abs</text><text x="1002" y="213">Reals.MovingAverage</text><text x="1182" y="213">GreaterThreshold</text><text x="1752" y="143">Logical.And</text>
+    <text x="282" y="433">Reals.Subtract</text><text x="462" y="363">Reals.MovingAverage</text><text x="642" y="363">Reals.Greater</text><text x="822" y="363">Logical.Change</text>
+    <text x="1002" y="363">BooleanToInteger</text><text x="1182" y="363">IntegerToReal</text><text x="1362" y="363">Reals.MovingAverage</text><text x="1542" y="363">MultiplyByParameter</text><text x="1722" y="363">GreaterThreshold</text>
+    <text x="642" y="573">Reals.Abs</text><text x="822" y="573">Reals.MovingAverage</text><text x="1002" y="573">GreaterThreshold</text><text x="1922" y="468">Logical.And</text>
+    <text x="2075" y="298">Logical.And</text><text x="2237" y="298">TrueDelay · 300 s</text>
+  </g>
+
+  <g fill="#fee2e2" stroke="#dc2626"><rect x="1680" y="185" width="145" height="30" rx="15"/><rect x="1835" y="530" width="175" height="30" rx="15"/><rect x="2200" y="365" width="105" height="30" rx="15"/></g>
+  <g fill="#7f1d1d" text-anchor="middle"><text x="1752" y="204">ySpeedHunting</text><text x="1922" y="549">yProcessUnstable</text><text x="2252" y="384">yFault</text></g>
+
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M160 120 H190 V61 H206"/><path d="M355 61 H386"/><path d="M160 120 H370 V73 H386"/><path d="M535 61 H566"/><path d="M715 61 H746"/><path d="M895 61 H926"/><path d="M1075 61 H1106"/><path d="M1255 61 H1286"/><path d="M1435 61 H1466"/>
+    <path d="M160 120 H550 V201 H566"/><path d="M355 61 H550 V185 H566"/><path d="M715 201 H746"/><path d="M895 201 H926"/><path d="M1075 201 H1106"/>
+    <path d="M1615 61 H1650 V120 H1676"/><path d="M1255 201 H1650 V145 H1676"/><path d="M1752 157 V181"/>
+
+    <path d="M190 420 H206"/><path d="M165 625 H195 V435 H206"/><path d="M355 421 H370 V351 H386"/><path d="M355 421 H550 V363 H566"/><path d="M535 351 H566"/><path d="M715 351 H746"/><path d="M895 351 H926"/><path d="M1075 351 H1106"/><path d="M1255 351 H1286"/><path d="M1435 351 H1466"/><path d="M1615 351 H1646"/>
+    <path d="M355 421 H550 V561 H566"/><path d="M715 561 H746"/><path d="M895 561 H926"/>
+    <path d="M1795 351 H1820 V445 H1846"/><path d="M1075 561 H1820 V470 H1846"/><path d="M1922 482 V526"/>
+
+    <path d="M1825 131 H1980 V275 H2011"/><path d="M1995 456 H2000 V300 H2011"/><path d="M2135 286 H2166"/><path d="M2237 312 V361"/>
+  </g>
+  <text x="460" y="710" fill="#7d8590" font-size="9">Each elementary CXF block is shown separately. Both crossing-count/magnitude lanes must overlap continuously before the delayed fault asserts.</text>
+</svg>

@@ -16,9 +16,9 @@ source:
   - "Engineering best practice"
 g36: null
 clusters: []
-suppresses: [VFD-0002]
+suppresses: [VFD-0002, VFD-0003, VFD-0004]
 suppressed_by: []
-related: [VFD-0002]
+related: [VFD-0002, VFD-0003, VFD-0004, VFD-0005]
 playbooks: [vfd-pump-faults]
 operating_states: "drive commanded to run above its minimum speed"
 preconditions: "vfd_speed_cmd and vfd_speed must be the same drive's command and feedback, both scaled 0-100% of rated speed. The rule does no unit conversion: a site trending feedback in Hz against a percent command reads as a permanent 40-point deviation on a 60 Hz drive. Both points must be fresh — a stale feedback value held at its last reading is a communication fault (diagnosis 4), which this rule reports as a drive fault, the right alarm for the wrong reason. Where the site trends both a drive-reported speed and a tachometer, prefer the drive-reported value, since diagnosis 5 is the tachometer itself. Command evaluability is signalled in-rule by yCmdOk: when it is false the verdict is NO_EVAL, not healthy, and in particular a drive commanded off is not evaluated at all."
@@ -178,12 +178,11 @@ the drive serves, neither of which this rule measures.
   nothing is lost, and CDL Reals has no `GreaterEqual` to express the inclusive
   form anyway. A deviation of exactly 5.0 points reads healthy; the disagreement
   is measure-zero on a real-valued signal and both sides are pinned.
-- **`suppresses: [VFD-0002]` is an authored relationship**, not the
-  reference's, which declares no suppression for either card. VFD-0002 reads
-  the same `vfd_speed` feedback and asks whether the drive is parked at minimum;
-  a drive whose feedback is not tracking its command cannot support that premise,
-  so a live VFD-0001 makes VFD-0002's verdict unreliable rather than merely
-  co-occurring. VFD-0002 carries the matching `suppressed_by`.
+- **`suppresses: [VFD-0002, VFD-0003, VFD-0004]` is an authored relationship**,
+  not the reference's. All three rules infer operating limits or motion from the
+  same `vfd_speed` feedback; a drive not tracking its command cannot support
+  those premises. Each card carries the matching `suppressed_by`. Suppression
+  must be instance-scoped to the same physical drive.
 - **Both points are percent of rated speed and the rule converts nothing.** The
   point dictionary declares `%` for both; a drive trended in Hz must be scaled
   before binding. Stated in the preconditions because the failure mode is a

@@ -1,0 +1,6465 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 7200
+  },
+  "scenarios": [
+    {
+      "name": "constant_speed_first_sample_artifact",
+      "description": "Constant speed and satisfied PV remain clear. The speed-mean crossing branch has a zero-area initialization pulse and one harmless fill artifact, neither of which can satisfy both speed criteria.",
+      "inputs": {
+        "vfd_speed": 50.0,
+        "vfd_process_value": 100.0,
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "load_step_monotonic_recovery",
+      "description": "After a settled baseline, speed moves once from 50% to 60% while PV carries a 20-unit error for only five minutes. The error area is below pv_allowance_band times the window and the speed never repeatedly crosses its center.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 50.0
+          },
+          {
+            "t": 1800,
+            "value": 60.0
+          }
+        ],
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 100.0
+          },
+          {
+            "t": 1800,
+            "value": 120.0
+          },
+          {
+            "t": 2100,
+            "value": 100.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "fast_shallow_dither",
+      "description": "A four-minute speed cycle crosses often but stays at +/-4%; its settled speed MAD is below the strict 5-point materiality threshold. PV is satisfied.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 54.0
+          },
+          {
+            "t": 120,
+            "value": 46.0
+          },
+          {
+            "t": 240,
+            "value": 54.0
+          },
+          {
+            "t": 360,
+            "value": 46.0
+          },
+          {
+            "t": 480,
+            "value": 54.0
+          },
+          {
+            "t": 600,
+            "value": 46.0
+          },
+          {
+            "t": 720,
+            "value": 54.0
+          },
+          {
+            "t": 840,
+            "value": 46.0
+          },
+          {
+            "t": 960,
+            "value": 54.0
+          },
+          {
+            "t": 1080,
+            "value": 46.0
+          },
+          {
+            "t": 1200,
+            "value": 54.0
+          },
+          {
+            "t": 1320,
+            "value": 46.0
+          },
+          {
+            "t": 1440,
+            "value": 54.0
+          },
+          {
+            "t": 1560,
+            "value": 46.0
+          },
+          {
+            "t": 1680,
+            "value": 54.0
+          },
+          {
+            "t": 1800,
+            "value": 46.0
+          },
+          {
+            "t": 1920,
+            "value": 54.0
+          },
+          {
+            "t": 2040,
+            "value": 46.0
+          },
+          {
+            "t": 2160,
+            "value": 54.0
+          },
+          {
+            "t": 2280,
+            "value": 46.0
+          },
+          {
+            "t": 2400,
+            "value": 54.0
+          },
+          {
+            "t": 2520,
+            "value": 46.0
+          },
+          {
+            "t": 2640,
+            "value": 54.0
+          },
+          {
+            "t": 2760,
+            "value": 46.0
+          },
+          {
+            "t": 2880,
+            "value": 54.0
+          },
+          {
+            "t": 3000,
+            "value": 46.0
+          },
+          {
+            "t": 3120,
+            "value": 54.0
+          },
+          {
+            "t": 3240,
+            "value": 46.0
+          },
+          {
+            "t": 3360,
+            "value": 54.0
+          },
+          {
+            "t": 3480,
+            "value": 46.0
+          },
+          {
+            "t": 3600,
+            "value": 54.0
+          },
+          {
+            "t": 3720,
+            "value": 46.0
+          },
+          {
+            "t": 3840,
+            "value": 54.0
+          },
+          {
+            "t": 3960,
+            "value": 46.0
+          },
+          {
+            "t": 4080,
+            "value": 54.0
+          },
+          {
+            "t": 4200,
+            "value": 46.0
+          },
+          {
+            "t": 4320,
+            "value": 54.0
+          },
+          {
+            "t": 4440,
+            "value": 46.0
+          },
+          {
+            "t": 4560,
+            "value": 54.0
+          },
+          {
+            "t": 4680,
+            "value": 46.0
+          },
+          {
+            "t": 4800,
+            "value": 54.0
+          },
+          {
+            "t": 4920,
+            "value": 46.0
+          },
+          {
+            "t": 5040,
+            "value": 54.0
+          },
+          {
+            "t": 5160,
+            "value": 46.0
+          },
+          {
+            "t": 5280,
+            "value": 54.0
+          },
+          {
+            "t": 5400,
+            "value": 46.0
+          },
+          {
+            "t": 5520,
+            "value": 54.0
+          },
+          {
+            "t": 5640,
+            "value": 46.0
+          },
+          {
+            "t": 5760,
+            "value": 54.0
+          },
+          {
+            "t": 5880,
+            "value": 46.0
+          },
+          {
+            "t": 6000,
+            "value": 54.0
+          },
+          {
+            "t": 6120,
+            "value": 46.0
+          },
+          {
+            "t": 6240,
+            "value": 54.0
+          },
+          {
+            "t": 6360,
+            "value": 46.0
+          },
+          {
+            "t": 6480,
+            "value": 54.0
+          },
+          {
+            "t": 6600,
+            "value": 46.0
+          },
+          {
+            "t": 6720,
+            "value": 54.0
+          },
+          {
+            "t": 6840,
+            "value": 46.0
+          },
+          {
+            "t": 6960,
+            "value": 54.0
+          },
+          {
+            "t": 7080,
+            "value": 46.0
+          }
+        ],
+        "vfd_process_value": 100.0,
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "speed_mad_just_below_threshold",
+      "description": "A +/-4.9% square speed wave brackets the computed materiality boundary from the nonfaulting side. Rolling MAD is not asserted at an exact equality edge; the process branch is independently active.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 54.9
+          },
+          {
+            "t": 120,
+            "value": 45.1
+          },
+          {
+            "t": 240,
+            "value": 54.9
+          },
+          {
+            "t": 360,
+            "value": 45.1
+          },
+          {
+            "t": 480,
+            "value": 54.9
+          },
+          {
+            "t": 600,
+            "value": 45.1
+          },
+          {
+            "t": 720,
+            "value": 54.9
+          },
+          {
+            "t": 840,
+            "value": 45.1
+          },
+          {
+            "t": 960,
+            "value": 54.9
+          },
+          {
+            "t": 1080,
+            "value": 45.1
+          },
+          {
+            "t": 1200,
+            "value": 54.9
+          },
+          {
+            "t": 1320,
+            "value": 45.1
+          },
+          {
+            "t": 1440,
+            "value": 54.9
+          },
+          {
+            "t": 1560,
+            "value": 45.1
+          },
+          {
+            "t": 1680,
+            "value": 54.9
+          },
+          {
+            "t": 1800,
+            "value": 45.1
+          },
+          {
+            "t": 1920,
+            "value": 54.9
+          },
+          {
+            "t": 2040,
+            "value": 45.1
+          },
+          {
+            "t": 2160,
+            "value": 54.9
+          },
+          {
+            "t": 2280,
+            "value": 45.1
+          },
+          {
+            "t": 2400,
+            "value": 54.9
+          },
+          {
+            "t": 2520,
+            "value": 45.1
+          },
+          {
+            "t": 2640,
+            "value": 54.9
+          },
+          {
+            "t": 2760,
+            "value": 45.1
+          },
+          {
+            "t": 2880,
+            "value": 54.9
+          },
+          {
+            "t": 3000,
+            "value": 45.1
+          },
+          {
+            "t": 3120,
+            "value": 54.9
+          },
+          {
+            "t": 3240,
+            "value": 45.1
+          },
+          {
+            "t": 3360,
+            "value": 54.9
+          },
+          {
+            "t": 3480,
+            "value": 45.1
+          },
+          {
+            "t": 3600,
+            "value": 54.9
+          },
+          {
+            "t": 3720,
+            "value": 45.1
+          },
+          {
+            "t": 3840,
+            "value": 54.9
+          },
+          {
+            "t": 3960,
+            "value": 45.1
+          },
+          {
+            "t": 4080,
+            "value": 54.9
+          },
+          {
+            "t": 4200,
+            "value": 45.1
+          },
+          {
+            "t": 4320,
+            "value": 54.9
+          },
+          {
+            "t": 4440,
+            "value": 45.1
+          },
+          {
+            "t": 4560,
+            "value": 54.9
+          },
+          {
+            "t": 4680,
+            "value": 45.1
+          },
+          {
+            "t": 4800,
+            "value": 54.9
+          },
+          {
+            "t": 4920,
+            "value": 45.1
+          },
+          {
+            "t": 5040,
+            "value": 54.9
+          },
+          {
+            "t": 5160,
+            "value": 45.1
+          },
+          {
+            "t": 5280,
+            "value": 54.9
+          },
+          {
+            "t": 5400,
+            "value": 45.1
+          },
+          {
+            "t": 5520,
+            "value": 54.9
+          },
+          {
+            "t": 5640,
+            "value": 45.1
+          },
+          {
+            "t": 5760,
+            "value": 54.9
+          },
+          {
+            "t": 5880,
+            "value": 45.1
+          },
+          {
+            "t": 6000,
+            "value": 54.9
+          },
+          {
+            "t": 6120,
+            "value": 45.1
+          },
+          {
+            "t": 6240,
+            "value": 54.9
+          },
+          {
+            "t": 6360,
+            "value": 45.1
+          },
+          {
+            "t": 6480,
+            "value": 54.9
+          },
+          {
+            "t": 6600,
+            "value": 45.1
+          },
+          {
+            "t": 6720,
+            "value": 54.9
+          },
+          {
+            "t": 6840,
+            "value": 45.1
+          },
+          {
+            "t": 6960,
+            "value": 54.9
+          },
+          {
+            "t": 7080,
+            "value": 45.1
+          }
+        ],
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 112.0
+          },
+          {
+            "t": 120,
+            "value": 88.0
+          },
+          {
+            "t": 240,
+            "value": 112.0
+          },
+          {
+            "t": 360,
+            "value": 88.0
+          },
+          {
+            "t": 480,
+            "value": 112.0
+          },
+          {
+            "t": 600,
+            "value": 88.0
+          },
+          {
+            "t": 720,
+            "value": 112.0
+          },
+          {
+            "t": 840,
+            "value": 88.0
+          },
+          {
+            "t": 960,
+            "value": 112.0
+          },
+          {
+            "t": 1080,
+            "value": 88.0
+          },
+          {
+            "t": 1200,
+            "value": 112.0
+          },
+          {
+            "t": 1320,
+            "value": 88.0
+          },
+          {
+            "t": 1440,
+            "value": 112.0
+          },
+          {
+            "t": 1560,
+            "value": 88.0
+          },
+          {
+            "t": 1680,
+            "value": 112.0
+          },
+          {
+            "t": 1800,
+            "value": 88.0
+          },
+          {
+            "t": 1920,
+            "value": 112.0
+          },
+          {
+            "t": 2040,
+            "value": 88.0
+          },
+          {
+            "t": 2160,
+            "value": 112.0
+          },
+          {
+            "t": 2280,
+            "value": 88.0
+          },
+          {
+            "t": 2400,
+            "value": 112.0
+          },
+          {
+            "t": 2520,
+            "value": 88.0
+          },
+          {
+            "t": 2640,
+            "value": 112.0
+          },
+          {
+            "t": 2760,
+            "value": 88.0
+          },
+          {
+            "t": 2880,
+            "value": 112.0
+          },
+          {
+            "t": 3000,
+            "value": 88.0
+          },
+          {
+            "t": 3120,
+            "value": 112.0
+          },
+          {
+            "t": 3240,
+            "value": 88.0
+          },
+          {
+            "t": 3360,
+            "value": 112.0
+          },
+          {
+            "t": 3480,
+            "value": 88.0
+          },
+          {
+            "t": 3600,
+            "value": 112.0
+          },
+          {
+            "t": 3720,
+            "value": 88.0
+          },
+          {
+            "t": 3840,
+            "value": 112.0
+          },
+          {
+            "t": 3960,
+            "value": 88.0
+          },
+          {
+            "t": 4080,
+            "value": 112.0
+          },
+          {
+            "t": 4200,
+            "value": 88.0
+          },
+          {
+            "t": 4320,
+            "value": 112.0
+          },
+          {
+            "t": 4440,
+            "value": 88.0
+          },
+          {
+            "t": 4560,
+            "value": 112.0
+          },
+          {
+            "t": 4680,
+            "value": 88.0
+          },
+          {
+            "t": 4800,
+            "value": 112.0
+          },
+          {
+            "t": 4920,
+            "value": 88.0
+          },
+          {
+            "t": 5040,
+            "value": 112.0
+          },
+          {
+            "t": 5160,
+            "value": 88.0
+          },
+          {
+            "t": 5280,
+            "value": 112.0
+          },
+          {
+            "t": 5400,
+            "value": 88.0
+          },
+          {
+            "t": 5520,
+            "value": 112.0
+          },
+          {
+            "t": 5640,
+            "value": 88.0
+          },
+          {
+            "t": 5760,
+            "value": 112.0
+          },
+          {
+            "t": 5880,
+            "value": 88.0
+          },
+          {
+            "t": 6000,
+            "value": 112.0
+          },
+          {
+            "t": 6120,
+            "value": 88.0
+          },
+          {
+            "t": 6240,
+            "value": 112.0
+          },
+          {
+            "t": 6360,
+            "value": 88.0
+          },
+          {
+            "t": 6480,
+            "value": 112.0
+          },
+          {
+            "t": 6600,
+            "value": 88.0
+          },
+          {
+            "t": 6720,
+            "value": 112.0
+          },
+          {
+            "t": 6840,
+            "value": 88.0
+          },
+          {
+            "t": 6960,
+            "value": 112.0
+          },
+          {
+            "t": 7080,
+            "value": 88.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "speed_mad_just_above_threshold",
+      "description": "A +/-5.1% square wave brackets the materiality boundary from the active side. Fast crossings and unstable process error allow the combined fault to mature.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 55.1
+          },
+          {
+            "t": 120,
+            "value": 44.9
+          },
+          {
+            "t": 240,
+            "value": 55.1
+          },
+          {
+            "t": 360,
+            "value": 44.9
+          },
+          {
+            "t": 480,
+            "value": 55.1
+          },
+          {
+            "t": 600,
+            "value": 44.9
+          },
+          {
+            "t": 720,
+            "value": 55.1
+          },
+          {
+            "t": 840,
+            "value": 44.9
+          },
+          {
+            "t": 960,
+            "value": 55.1
+          },
+          {
+            "t": 1080,
+            "value": 44.9
+          },
+          {
+            "t": 1200,
+            "value": 55.1
+          },
+          {
+            "t": 1320,
+            "value": 44.9
+          },
+          {
+            "t": 1440,
+            "value": 55.1
+          },
+          {
+            "t": 1560,
+            "value": 44.9
+          },
+          {
+            "t": 1680,
+            "value": 55.1
+          },
+          {
+            "t": 1800,
+            "value": 44.9
+          },
+          {
+            "t": 1920,
+            "value": 55.1
+          },
+          {
+            "t": 2040,
+            "value": 44.9
+          },
+          {
+            "t": 2160,
+            "value": 55.1
+          },
+          {
+            "t": 2280,
+            "value": 44.9
+          },
+          {
+            "t": 2400,
+            "value": 55.1
+          },
+          {
+            "t": 2520,
+            "value": 44.9
+          },
+          {
+            "t": 2640,
+            "value": 55.1
+          },
+          {
+            "t": 2760,
+            "value": 44.9
+          },
+          {
+            "t": 2880,
+            "value": 55.1
+          },
+          {
+            "t": 3000,
+            "value": 44.9
+          },
+          {
+            "t": 3120,
+            "value": 55.1
+          },
+          {
+            "t": 3240,
+            "value": 44.9
+          },
+          {
+            "t": 3360,
+            "value": 55.1
+          },
+          {
+            "t": 3480,
+            "value": 44.9
+          },
+          {
+            "t": 3600,
+            "value": 55.1
+          },
+          {
+            "t": 3720,
+            "value": 44.9
+          },
+          {
+            "t": 3840,
+            "value": 55.1
+          },
+          {
+            "t": 3960,
+            "value": 44.9
+          },
+          {
+            "t": 4080,
+            "value": 55.1
+          },
+          {
+            "t": 4200,
+            "value": 44.9
+          },
+          {
+            "t": 4320,
+            "value": 55.1
+          },
+          {
+            "t": 4440,
+            "value": 44.9
+          },
+          {
+            "t": 4560,
+            "value": 55.1
+          },
+          {
+            "t": 4680,
+            "value": 44.9
+          },
+          {
+            "t": 4800,
+            "value": 55.1
+          },
+          {
+            "t": 4920,
+            "value": 44.9
+          },
+          {
+            "t": 5040,
+            "value": 55.1
+          },
+          {
+            "t": 5160,
+            "value": 44.9
+          },
+          {
+            "t": 5280,
+            "value": 55.1
+          },
+          {
+            "t": 5400,
+            "value": 44.9
+          },
+          {
+            "t": 5520,
+            "value": 55.1
+          },
+          {
+            "t": 5640,
+            "value": 44.9
+          },
+          {
+            "t": 5760,
+            "value": 55.1
+          },
+          {
+            "t": 5880,
+            "value": 44.9
+          },
+          {
+            "t": 6000,
+            "value": 55.1
+          },
+          {
+            "t": 6120,
+            "value": 44.9
+          },
+          {
+            "t": 6240,
+            "value": 55.1
+          },
+          {
+            "t": 6360,
+            "value": 44.9
+          },
+          {
+            "t": 6480,
+            "value": 55.1
+          },
+          {
+            "t": 6600,
+            "value": 44.9
+          },
+          {
+            "t": 6720,
+            "value": 55.1
+          },
+          {
+            "t": 6840,
+            "value": 44.9
+          },
+          {
+            "t": 6960,
+            "value": 55.1
+          },
+          {
+            "t": 7080,
+            "value": 44.9
+          }
+        ],
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 112.0
+          },
+          {
+            "t": 120,
+            "value": 88.0
+          },
+          {
+            "t": 240,
+            "value": 112.0
+          },
+          {
+            "t": 360,
+            "value": 88.0
+          },
+          {
+            "t": 480,
+            "value": 112.0
+          },
+          {
+            "t": 600,
+            "value": 88.0
+          },
+          {
+            "t": 720,
+            "value": 112.0
+          },
+          {
+            "t": 840,
+            "value": 88.0
+          },
+          {
+            "t": 960,
+            "value": 112.0
+          },
+          {
+            "t": 1080,
+            "value": 88.0
+          },
+          {
+            "t": 1200,
+            "value": 112.0
+          },
+          {
+            "t": 1320,
+            "value": 88.0
+          },
+          {
+            "t": 1440,
+            "value": 112.0
+          },
+          {
+            "t": 1560,
+            "value": 88.0
+          },
+          {
+            "t": 1680,
+            "value": 112.0
+          },
+          {
+            "t": 1800,
+            "value": 88.0
+          },
+          {
+            "t": 1920,
+            "value": 112.0
+          },
+          {
+            "t": 2040,
+            "value": 88.0
+          },
+          {
+            "t": 2160,
+            "value": 112.0
+          },
+          {
+            "t": 2280,
+            "value": 88.0
+          },
+          {
+            "t": 2400,
+            "value": 112.0
+          },
+          {
+            "t": 2520,
+            "value": 88.0
+          },
+          {
+            "t": 2640,
+            "value": 112.0
+          },
+          {
+            "t": 2760,
+            "value": 88.0
+          },
+          {
+            "t": 2880,
+            "value": 112.0
+          },
+          {
+            "t": 3000,
+            "value": 88.0
+          },
+          {
+            "t": 3120,
+            "value": 112.0
+          },
+          {
+            "t": 3240,
+            "value": 88.0
+          },
+          {
+            "t": 3360,
+            "value": 112.0
+          },
+          {
+            "t": 3480,
+            "value": 88.0
+          },
+          {
+            "t": 3600,
+            "value": 112.0
+          },
+          {
+            "t": 3720,
+            "value": 88.0
+          },
+          {
+            "t": 3840,
+            "value": 112.0
+          },
+          {
+            "t": 3960,
+            "value": 88.0
+          },
+          {
+            "t": 4080,
+            "value": 112.0
+          },
+          {
+            "t": 4200,
+            "value": 88.0
+          },
+          {
+            "t": 4320,
+            "value": 112.0
+          },
+          {
+            "t": 4440,
+            "value": 88.0
+          },
+          {
+            "t": 4560,
+            "value": 112.0
+          },
+          {
+            "t": 4680,
+            "value": 88.0
+          },
+          {
+            "t": 4800,
+            "value": 112.0
+          },
+          {
+            "t": 4920,
+            "value": 88.0
+          },
+          {
+            "t": 5040,
+            "value": 112.0
+          },
+          {
+            "t": 5160,
+            "value": 88.0
+          },
+          {
+            "t": 5280,
+            "value": 112.0
+          },
+          {
+            "t": 5400,
+            "value": 88.0
+          },
+          {
+            "t": 5520,
+            "value": 112.0
+          },
+          {
+            "t": 5640,
+            "value": 88.0
+          },
+          {
+            "t": 5760,
+            "value": 112.0
+          },
+          {
+            "t": 5880,
+            "value": 88.0
+          },
+          {
+            "t": 6000,
+            "value": 112.0
+          },
+          {
+            "t": 6120,
+            "value": 88.0
+          },
+          {
+            "t": 6240,
+            "value": 112.0
+          },
+          {
+            "t": 6360,
+            "value": 88.0
+          },
+          {
+            "t": 6480,
+            "value": 112.0
+          },
+          {
+            "t": 6600,
+            "value": 88.0
+          },
+          {
+            "t": 6720,
+            "value": 112.0
+          },
+          {
+            "t": 6840,
+            "value": 88.0
+          },
+          {
+            "t": 6960,
+            "value": 112.0
+          },
+          {
+            "t": 7080,
+            "value": 88.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 2400,
+          "to_s": 7200,
+          "equals": true
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": true
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "speed_hunting_process_stable",
+      "description": "Material fast speed motion is present, but PV stays on setpoint; the speed diagnostic can guide tuning without producing the combined fault.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 60.0
+          },
+          {
+            "t": 120,
+            "value": 40.0
+          },
+          {
+            "t": 240,
+            "value": 60.0
+          },
+          {
+            "t": 360,
+            "value": 40.0
+          },
+          {
+            "t": 480,
+            "value": 60.0
+          },
+          {
+            "t": 600,
+            "value": 40.0
+          },
+          {
+            "t": 720,
+            "value": 60.0
+          },
+          {
+            "t": 840,
+            "value": 40.0
+          },
+          {
+            "t": 960,
+            "value": 60.0
+          },
+          {
+            "t": 1080,
+            "value": 40.0
+          },
+          {
+            "t": 1200,
+            "value": 60.0
+          },
+          {
+            "t": 1320,
+            "value": 40.0
+          },
+          {
+            "t": 1440,
+            "value": 60.0
+          },
+          {
+            "t": 1560,
+            "value": 40.0
+          },
+          {
+            "t": 1680,
+            "value": 60.0
+          },
+          {
+            "t": 1800,
+            "value": 40.0
+          },
+          {
+            "t": 1920,
+            "value": 60.0
+          },
+          {
+            "t": 2040,
+            "value": 40.0
+          },
+          {
+            "t": 2160,
+            "value": 60.0
+          },
+          {
+            "t": 2280,
+            "value": 40.0
+          },
+          {
+            "t": 2400,
+            "value": 60.0
+          },
+          {
+            "t": 2520,
+            "value": 40.0
+          },
+          {
+            "t": 2640,
+            "value": 60.0
+          },
+          {
+            "t": 2760,
+            "value": 40.0
+          },
+          {
+            "t": 2880,
+            "value": 60.0
+          },
+          {
+            "t": 3000,
+            "value": 40.0
+          },
+          {
+            "t": 3120,
+            "value": 60.0
+          },
+          {
+            "t": 3240,
+            "value": 40.0
+          },
+          {
+            "t": 3360,
+            "value": 60.0
+          },
+          {
+            "t": 3480,
+            "value": 40.0
+          },
+          {
+            "t": 3600,
+            "value": 60.0
+          },
+          {
+            "t": 3720,
+            "value": 40.0
+          },
+          {
+            "t": 3840,
+            "value": 60.0
+          },
+          {
+            "t": 3960,
+            "value": 40.0
+          },
+          {
+            "t": 4080,
+            "value": 60.0
+          },
+          {
+            "t": 4200,
+            "value": 40.0
+          },
+          {
+            "t": 4320,
+            "value": 60.0
+          },
+          {
+            "t": 4440,
+            "value": 40.0
+          },
+          {
+            "t": 4560,
+            "value": 60.0
+          },
+          {
+            "t": 4680,
+            "value": 40.0
+          },
+          {
+            "t": 4800,
+            "value": 60.0
+          },
+          {
+            "t": 4920,
+            "value": 40.0
+          },
+          {
+            "t": 5040,
+            "value": 60.0
+          },
+          {
+            "t": 5160,
+            "value": 40.0
+          },
+          {
+            "t": 5280,
+            "value": 60.0
+          },
+          {
+            "t": 5400,
+            "value": 40.0
+          },
+          {
+            "t": 5520,
+            "value": 60.0
+          },
+          {
+            "t": 5640,
+            "value": 40.0
+          },
+          {
+            "t": 5760,
+            "value": 60.0
+          },
+          {
+            "t": 5880,
+            "value": 40.0
+          },
+          {
+            "t": 6000,
+            "value": 60.0
+          },
+          {
+            "t": 6120,
+            "value": 40.0
+          },
+          {
+            "t": 6240,
+            "value": 60.0
+          },
+          {
+            "t": 6360,
+            "value": 40.0
+          },
+          {
+            "t": 6480,
+            "value": 60.0
+          },
+          {
+            "t": 6600,
+            "value": 40.0
+          },
+          {
+            "t": 6720,
+            "value": 60.0
+          },
+          {
+            "t": 6840,
+            "value": 40.0
+          },
+          {
+            "t": 6960,
+            "value": 60.0
+          },
+          {
+            "t": 7080,
+            "value": 40.0
+          }
+        ],
+        "vfd_process_value": 100.0,
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": true
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "slow_deep_speed_motion",
+      "description": "A deep ten-minute speed cycle has large MAD but only three mean crossings per 900-second window, below the strict count limit. PV remains unsatisfied, isolating the speed-frequency rejection.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 65.0
+          },
+          {
+            "t": 300,
+            "value": 35.0
+          },
+          {
+            "t": 600,
+            "value": 65.0
+          },
+          {
+            "t": 900,
+            "value": 35.0
+          },
+          {
+            "t": 1200,
+            "value": 65.0
+          },
+          {
+            "t": 1500,
+            "value": 35.0
+          },
+          {
+            "t": 1800,
+            "value": 65.0
+          },
+          {
+            "t": 2100,
+            "value": 35.0
+          },
+          {
+            "t": 2400,
+            "value": 65.0
+          },
+          {
+            "t": 2700,
+            "value": 35.0
+          },
+          {
+            "t": 3000,
+            "value": 65.0
+          },
+          {
+            "t": 3300,
+            "value": 35.0
+          },
+          {
+            "t": 3600,
+            "value": 65.0
+          },
+          {
+            "t": 3900,
+            "value": 35.0
+          },
+          {
+            "t": 4200,
+            "value": 65.0
+          },
+          {
+            "t": 4500,
+            "value": 35.0
+          },
+          {
+            "t": 4800,
+            "value": 65.0
+          },
+          {
+            "t": 5100,
+            "value": 35.0
+          },
+          {
+            "t": 5400,
+            "value": 65.0
+          },
+          {
+            "t": 5700,
+            "value": 35.0
+          },
+          {
+            "t": 6000,
+            "value": 65.0
+          },
+          {
+            "t": 6300,
+            "value": 35.0
+          },
+          {
+            "t": 6600,
+            "value": 65.0
+          },
+          {
+            "t": 6900,
+            "value": 35.0
+          }
+        ],
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 112.0
+          },
+          {
+            "t": 120,
+            "value": 88.0
+          },
+          {
+            "t": 240,
+            "value": 112.0
+          },
+          {
+            "t": 360,
+            "value": 88.0
+          },
+          {
+            "t": 480,
+            "value": 112.0
+          },
+          {
+            "t": 600,
+            "value": 88.0
+          },
+          {
+            "t": 720,
+            "value": 112.0
+          },
+          {
+            "t": 840,
+            "value": 88.0
+          },
+          {
+            "t": 960,
+            "value": 112.0
+          },
+          {
+            "t": 1080,
+            "value": 88.0
+          },
+          {
+            "t": 1200,
+            "value": 112.0
+          },
+          {
+            "t": 1320,
+            "value": 88.0
+          },
+          {
+            "t": 1440,
+            "value": 112.0
+          },
+          {
+            "t": 1560,
+            "value": 88.0
+          },
+          {
+            "t": 1680,
+            "value": 112.0
+          },
+          {
+            "t": 1800,
+            "value": 88.0
+          },
+          {
+            "t": 1920,
+            "value": 112.0
+          },
+          {
+            "t": 2040,
+            "value": 88.0
+          },
+          {
+            "t": 2160,
+            "value": 112.0
+          },
+          {
+            "t": 2280,
+            "value": 88.0
+          },
+          {
+            "t": 2400,
+            "value": 112.0
+          },
+          {
+            "t": 2520,
+            "value": 88.0
+          },
+          {
+            "t": 2640,
+            "value": 112.0
+          },
+          {
+            "t": 2760,
+            "value": 88.0
+          },
+          {
+            "t": 2880,
+            "value": 112.0
+          },
+          {
+            "t": 3000,
+            "value": 88.0
+          },
+          {
+            "t": 3120,
+            "value": 112.0
+          },
+          {
+            "t": 3240,
+            "value": 88.0
+          },
+          {
+            "t": 3360,
+            "value": 112.0
+          },
+          {
+            "t": 3480,
+            "value": 88.0
+          },
+          {
+            "t": 3600,
+            "value": 112.0
+          },
+          {
+            "t": 3720,
+            "value": 88.0
+          },
+          {
+            "t": 3840,
+            "value": 112.0
+          },
+          {
+            "t": 3960,
+            "value": 88.0
+          },
+          {
+            "t": 4080,
+            "value": 112.0
+          },
+          {
+            "t": 4200,
+            "value": 88.0
+          },
+          {
+            "t": 4320,
+            "value": 112.0
+          },
+          {
+            "t": 4440,
+            "value": 88.0
+          },
+          {
+            "t": 4560,
+            "value": 112.0
+          },
+          {
+            "t": 4680,
+            "value": 88.0
+          },
+          {
+            "t": 4800,
+            "value": 112.0
+          },
+          {
+            "t": 4920,
+            "value": 88.0
+          },
+          {
+            "t": 5040,
+            "value": 112.0
+          },
+          {
+            "t": 5160,
+            "value": 88.0
+          },
+          {
+            "t": 5280,
+            "value": 112.0
+          },
+          {
+            "t": 5400,
+            "value": 88.0
+          },
+          {
+            "t": 5520,
+            "value": 112.0
+          },
+          {
+            "t": 5640,
+            "value": 88.0
+          },
+          {
+            "t": 5760,
+            "value": 112.0
+          },
+          {
+            "t": 5880,
+            "value": 88.0
+          },
+          {
+            "t": 6000,
+            "value": 112.0
+          },
+          {
+            "t": 6120,
+            "value": 88.0
+          },
+          {
+            "t": 6240,
+            "value": 112.0
+          },
+          {
+            "t": 6360,
+            "value": 88.0
+          },
+          {
+            "t": 6480,
+            "value": 112.0
+          },
+          {
+            "t": 6600,
+            "value": 88.0
+          },
+          {
+            "t": 6720,
+            "value": 112.0
+          },
+          {
+            "t": 6840,
+            "value": 88.0
+          },
+          {
+            "t": 6960,
+            "value": 112.0
+          },
+          {
+            "t": 7080,
+            "value": 88.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "process_unstable_speed_stable",
+      "description": "PV alternates 12 units around setpoint while speed is fixed. The process diagnostic is active after warm-up, but the rule refuses to call it VFD hunting without material speed crossings.",
+      "inputs": {
+        "vfd_speed": 50.0,
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 112.0
+          },
+          {
+            "t": 120,
+            "value": 88.0
+          },
+          {
+            "t": 240,
+            "value": 112.0
+          },
+          {
+            "t": 360,
+            "value": 88.0
+          },
+          {
+            "t": 480,
+            "value": 112.0
+          },
+          {
+            "t": 600,
+            "value": 88.0
+          },
+          {
+            "t": 720,
+            "value": 112.0
+          },
+          {
+            "t": 840,
+            "value": 88.0
+          },
+          {
+            "t": 960,
+            "value": 112.0
+          },
+          {
+            "t": 1080,
+            "value": 88.0
+          },
+          {
+            "t": 1200,
+            "value": 112.0
+          },
+          {
+            "t": 1320,
+            "value": 88.0
+          },
+          {
+            "t": 1440,
+            "value": 112.0
+          },
+          {
+            "t": 1560,
+            "value": 88.0
+          },
+          {
+            "t": 1680,
+            "value": 112.0
+          },
+          {
+            "t": 1800,
+            "value": 88.0
+          },
+          {
+            "t": 1920,
+            "value": 112.0
+          },
+          {
+            "t": 2040,
+            "value": 88.0
+          },
+          {
+            "t": 2160,
+            "value": 112.0
+          },
+          {
+            "t": 2280,
+            "value": 88.0
+          },
+          {
+            "t": 2400,
+            "value": 112.0
+          },
+          {
+            "t": 2520,
+            "value": 88.0
+          },
+          {
+            "t": 2640,
+            "value": 112.0
+          },
+          {
+            "t": 2760,
+            "value": 88.0
+          },
+          {
+            "t": 2880,
+            "value": 112.0
+          },
+          {
+            "t": 3000,
+            "value": 88.0
+          },
+          {
+            "t": 3120,
+            "value": 112.0
+          },
+          {
+            "t": 3240,
+            "value": 88.0
+          },
+          {
+            "t": 3360,
+            "value": 112.0
+          },
+          {
+            "t": 3480,
+            "value": 88.0
+          },
+          {
+            "t": 3600,
+            "value": 112.0
+          },
+          {
+            "t": 3720,
+            "value": 88.0
+          },
+          {
+            "t": 3840,
+            "value": 112.0
+          },
+          {
+            "t": 3960,
+            "value": 88.0
+          },
+          {
+            "t": 4080,
+            "value": 112.0
+          },
+          {
+            "t": 4200,
+            "value": 88.0
+          },
+          {
+            "t": 4320,
+            "value": 112.0
+          },
+          {
+            "t": 4440,
+            "value": 88.0
+          },
+          {
+            "t": 4560,
+            "value": 112.0
+          },
+          {
+            "t": 4680,
+            "value": 88.0
+          },
+          {
+            "t": 4800,
+            "value": 112.0
+          },
+          {
+            "t": 4920,
+            "value": 88.0
+          },
+          {
+            "t": 5040,
+            "value": 112.0
+          },
+          {
+            "t": 5160,
+            "value": 88.0
+          },
+          {
+            "t": 5280,
+            "value": 112.0
+          },
+          {
+            "t": 5400,
+            "value": 88.0
+          },
+          {
+            "t": 5520,
+            "value": 112.0
+          },
+          {
+            "t": 5640,
+            "value": 88.0
+          },
+          {
+            "t": 5760,
+            "value": 112.0
+          },
+          {
+            "t": 5880,
+            "value": 88.0
+          },
+          {
+            "t": 6000,
+            "value": 112.0
+          },
+          {
+            "t": 6120,
+            "value": 88.0
+          },
+          {
+            "t": 6240,
+            "value": 112.0
+          },
+          {
+            "t": 6360,
+            "value": 88.0
+          },
+          {
+            "t": 6480,
+            "value": 112.0
+          },
+          {
+            "t": 6600,
+            "value": 88.0
+          },
+          {
+            "t": 6720,
+            "value": 112.0
+          },
+          {
+            "t": 6840,
+            "value": 88.0
+          },
+          {
+            "t": 6960,
+            "value": 112.0
+          },
+          {
+            "t": 7080,
+            "value": 88.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "count_exactly_allowed",
+      "description": "A 900-second repeating speed pattern produces six mean crossings per full window with material MAD. The strict count > 6 comparison keeps ySpeedHunting and the combined fault clear while the process branch is active.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 60.0
+          },
+          {
+            "t": 150,
+            "value": 40.0
+          },
+          {
+            "t": 300,
+            "value": 60.0
+          },
+          {
+            "t": 450,
+            "value": 40.0
+          },
+          {
+            "t": 600,
+            "value": 60.0
+          },
+          {
+            "t": 750,
+            "value": 40.0
+          },
+          {
+            "t": 900,
+            "value": 60.0
+          },
+          {
+            "t": 1050,
+            "value": 40.0
+          },
+          {
+            "t": 1200,
+            "value": 60.0
+          },
+          {
+            "t": 1350,
+            "value": 40.0
+          },
+          {
+            "t": 1500,
+            "value": 60.0
+          },
+          {
+            "t": 1650,
+            "value": 40.0
+          },
+          {
+            "t": 1800,
+            "value": 60.0
+          },
+          {
+            "t": 1950,
+            "value": 40.0
+          },
+          {
+            "t": 2100,
+            "value": 60.0
+          },
+          {
+            "t": 2250,
+            "value": 40.0
+          },
+          {
+            "t": 2400,
+            "value": 60.0
+          },
+          {
+            "t": 2550,
+            "value": 40.0
+          },
+          {
+            "t": 2700,
+            "value": 60.0
+          },
+          {
+            "t": 2850,
+            "value": 40.0
+          },
+          {
+            "t": 3000,
+            "value": 60.0
+          },
+          {
+            "t": 3150,
+            "value": 40.0
+          },
+          {
+            "t": 3300,
+            "value": 60.0
+          },
+          {
+            "t": 3450,
+            "value": 40.0
+          },
+          {
+            "t": 3600,
+            "value": 60.0
+          },
+          {
+            "t": 3750,
+            "value": 40.0
+          },
+          {
+            "t": 3900,
+            "value": 60.0
+          },
+          {
+            "t": 4050,
+            "value": 40.0
+          },
+          {
+            "t": 4200,
+            "value": 60.0
+          },
+          {
+            "t": 4350,
+            "value": 40.0
+          },
+          {
+            "t": 4500,
+            "value": 60.0
+          },
+          {
+            "t": 4650,
+            "value": 40.0
+          },
+          {
+            "t": 4800,
+            "value": 60.0
+          },
+          {
+            "t": 4950,
+            "value": 40.0
+          },
+          {
+            "t": 5100,
+            "value": 60.0
+          },
+          {
+            "t": 5250,
+            "value": 40.0
+          },
+          {
+            "t": 5400,
+            "value": 60.0
+          },
+          {
+            "t": 5550,
+            "value": 40.0
+          },
+          {
+            "t": 5700,
+            "value": 60.0
+          },
+          {
+            "t": 5850,
+            "value": 40.0
+          },
+          {
+            "t": 6000,
+            "value": 60.0
+          },
+          {
+            "t": 6150,
+            "value": 40.0
+          },
+          {
+            "t": 6300,
+            "value": 60.0
+          },
+          {
+            "t": 6450,
+            "value": 40.0
+          },
+          {
+            "t": 6600,
+            "value": 60.0
+          },
+          {
+            "t": 6750,
+            "value": 40.0
+          },
+          {
+            "t": 6900,
+            "value": 60.0
+          },
+          {
+            "t": 7050,
+            "value": 40.0
+          }
+        ],
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 112.0
+          },
+          {
+            "t": 120,
+            "value": 88.0
+          },
+          {
+            "t": 240,
+            "value": 112.0
+          },
+          {
+            "t": 360,
+            "value": 88.0
+          },
+          {
+            "t": 480,
+            "value": 112.0
+          },
+          {
+            "t": 600,
+            "value": 88.0
+          },
+          {
+            "t": 720,
+            "value": 112.0
+          },
+          {
+            "t": 840,
+            "value": 88.0
+          },
+          {
+            "t": 960,
+            "value": 112.0
+          },
+          {
+            "t": 1080,
+            "value": 88.0
+          },
+          {
+            "t": 1200,
+            "value": 112.0
+          },
+          {
+            "t": 1320,
+            "value": 88.0
+          },
+          {
+            "t": 1440,
+            "value": 112.0
+          },
+          {
+            "t": 1560,
+            "value": 88.0
+          },
+          {
+            "t": 1680,
+            "value": 112.0
+          },
+          {
+            "t": 1800,
+            "value": 88.0
+          },
+          {
+            "t": 1920,
+            "value": 112.0
+          },
+          {
+            "t": 2040,
+            "value": 88.0
+          },
+          {
+            "t": 2160,
+            "value": 112.0
+          },
+          {
+            "t": 2280,
+            "value": 88.0
+          },
+          {
+            "t": 2400,
+            "value": 112.0
+          },
+          {
+            "t": 2520,
+            "value": 88.0
+          },
+          {
+            "t": 2640,
+            "value": 112.0
+          },
+          {
+            "t": 2760,
+            "value": 88.0
+          },
+          {
+            "t": 2880,
+            "value": 112.0
+          },
+          {
+            "t": 3000,
+            "value": 88.0
+          },
+          {
+            "t": 3120,
+            "value": 112.0
+          },
+          {
+            "t": 3240,
+            "value": 88.0
+          },
+          {
+            "t": 3360,
+            "value": 112.0
+          },
+          {
+            "t": 3480,
+            "value": 88.0
+          },
+          {
+            "t": 3600,
+            "value": 112.0
+          },
+          {
+            "t": 3720,
+            "value": 88.0
+          },
+          {
+            "t": 3840,
+            "value": 112.0
+          },
+          {
+            "t": 3960,
+            "value": 88.0
+          },
+          {
+            "t": 4080,
+            "value": 112.0
+          },
+          {
+            "t": 4200,
+            "value": 88.0
+          },
+          {
+            "t": 4320,
+            "value": 112.0
+          },
+          {
+            "t": 4440,
+            "value": 88.0
+          },
+          {
+            "t": 4560,
+            "value": 112.0
+          },
+          {
+            "t": 4680,
+            "value": 88.0
+          },
+          {
+            "t": 4800,
+            "value": 112.0
+          },
+          {
+            "t": 4920,
+            "value": 88.0
+          },
+          {
+            "t": 5040,
+            "value": 112.0
+          },
+          {
+            "t": 5160,
+            "value": 88.0
+          },
+          {
+            "t": 5280,
+            "value": 112.0
+          },
+          {
+            "t": 5400,
+            "value": 88.0
+          },
+          {
+            "t": 5520,
+            "value": 112.0
+          },
+          {
+            "t": 5640,
+            "value": 88.0
+          },
+          {
+            "t": 5760,
+            "value": 112.0
+          },
+          {
+            "t": 5880,
+            "value": 88.0
+          },
+          {
+            "t": 6000,
+            "value": 112.0
+          },
+          {
+            "t": 6120,
+            "value": 88.0
+          },
+          {
+            "t": 6240,
+            "value": 112.0
+          },
+          {
+            "t": 6360,
+            "value": 88.0
+          },
+          {
+            "t": 6480,
+            "value": 112.0
+          },
+          {
+            "t": 6600,
+            "value": 88.0
+          },
+          {
+            "t": 6720,
+            "value": 112.0
+          },
+          {
+            "t": 6840,
+            "value": 88.0
+          },
+          {
+            "t": 6960,
+            "value": 112.0
+          },
+          {
+            "t": 7080,
+            "value": 88.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "one_crossing_over_limit",
+      "description": "A repeating seven-crossing pattern is one event above the allowed six, with material speed MAD and unstable process error; all raw criteria and the delayed fault remain active after warm-up.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 60.0
+          },
+          {
+            "t": 120,
+            "value": 40.0
+          },
+          {
+            "t": 240,
+            "value": 60.0
+          },
+          {
+            "t": 360,
+            "value": 40.0
+          },
+          {
+            "t": 480,
+            "value": 60.0
+          },
+          {
+            "t": 600,
+            "value": 40.0
+          },
+          {
+            "t": 720,
+            "value": 60.0
+          },
+          {
+            "t": 900,
+            "value": 40.0
+          },
+          {
+            "t": 1020,
+            "value": 60.0
+          },
+          {
+            "t": 1140,
+            "value": 40.0
+          },
+          {
+            "t": 1260,
+            "value": 60.0
+          },
+          {
+            "t": 1380,
+            "value": 40.0
+          },
+          {
+            "t": 1500,
+            "value": 60.0
+          },
+          {
+            "t": 1620,
+            "value": 40.0
+          },
+          {
+            "t": 1800,
+            "value": 60.0
+          },
+          {
+            "t": 1920,
+            "value": 40.0
+          },
+          {
+            "t": 2040,
+            "value": 60.0
+          },
+          {
+            "t": 2160,
+            "value": 40.0
+          },
+          {
+            "t": 2280,
+            "value": 60.0
+          },
+          {
+            "t": 2400,
+            "value": 40.0
+          },
+          {
+            "t": 2520,
+            "value": 60.0
+          },
+          {
+            "t": 2700,
+            "value": 40.0
+          },
+          {
+            "t": 2820,
+            "value": 60.0
+          },
+          {
+            "t": 2940,
+            "value": 40.0
+          },
+          {
+            "t": 3060,
+            "value": 60.0
+          },
+          {
+            "t": 3180,
+            "value": 40.0
+          },
+          {
+            "t": 3300,
+            "value": 60.0
+          },
+          {
+            "t": 3420,
+            "value": 40.0
+          },
+          {
+            "t": 3600,
+            "value": 60.0
+          },
+          {
+            "t": 3720,
+            "value": 40.0
+          },
+          {
+            "t": 3840,
+            "value": 60.0
+          },
+          {
+            "t": 3960,
+            "value": 40.0
+          },
+          {
+            "t": 4080,
+            "value": 60.0
+          },
+          {
+            "t": 4200,
+            "value": 40.0
+          },
+          {
+            "t": 4320,
+            "value": 60.0
+          },
+          {
+            "t": 4500,
+            "value": 40.0
+          },
+          {
+            "t": 4620,
+            "value": 60.0
+          },
+          {
+            "t": 4740,
+            "value": 40.0
+          },
+          {
+            "t": 4860,
+            "value": 60.0
+          },
+          {
+            "t": 4980,
+            "value": 40.0
+          },
+          {
+            "t": 5100,
+            "value": 60.0
+          },
+          {
+            "t": 5220,
+            "value": 40.0
+          },
+          {
+            "t": 5400,
+            "value": 60.0
+          },
+          {
+            "t": 5520,
+            "value": 40.0
+          },
+          {
+            "t": 5640,
+            "value": 60.0
+          },
+          {
+            "t": 5760,
+            "value": 40.0
+          },
+          {
+            "t": 5880,
+            "value": 60.0
+          },
+          {
+            "t": 6000,
+            "value": 40.0
+          },
+          {
+            "t": 6120,
+            "value": 60.0
+          },
+          {
+            "t": 6300,
+            "value": 40.0
+          },
+          {
+            "t": 6420,
+            "value": 60.0
+          },
+          {
+            "t": 6540,
+            "value": 40.0
+          },
+          {
+            "t": 6660,
+            "value": 60.0
+          },
+          {
+            "t": 6780,
+            "value": 40.0
+          },
+          {
+            "t": 6900,
+            "value": 60.0
+          },
+          {
+            "t": 7020,
+            "value": 40.0
+          }
+        ],
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 112.0
+          },
+          {
+            "t": 120,
+            "value": 88.0
+          },
+          {
+            "t": 240,
+            "value": 112.0
+          },
+          {
+            "t": 360,
+            "value": 88.0
+          },
+          {
+            "t": 480,
+            "value": 112.0
+          },
+          {
+            "t": 600,
+            "value": 88.0
+          },
+          {
+            "t": 720,
+            "value": 112.0
+          },
+          {
+            "t": 840,
+            "value": 88.0
+          },
+          {
+            "t": 960,
+            "value": 112.0
+          },
+          {
+            "t": 1080,
+            "value": 88.0
+          },
+          {
+            "t": 1200,
+            "value": 112.0
+          },
+          {
+            "t": 1320,
+            "value": 88.0
+          },
+          {
+            "t": 1440,
+            "value": 112.0
+          },
+          {
+            "t": 1560,
+            "value": 88.0
+          },
+          {
+            "t": 1680,
+            "value": 112.0
+          },
+          {
+            "t": 1800,
+            "value": 88.0
+          },
+          {
+            "t": 1920,
+            "value": 112.0
+          },
+          {
+            "t": 2040,
+            "value": 88.0
+          },
+          {
+            "t": 2160,
+            "value": 112.0
+          },
+          {
+            "t": 2280,
+            "value": 88.0
+          },
+          {
+            "t": 2400,
+            "value": 112.0
+          },
+          {
+            "t": 2520,
+            "value": 88.0
+          },
+          {
+            "t": 2640,
+            "value": 112.0
+          },
+          {
+            "t": 2760,
+            "value": 88.0
+          },
+          {
+            "t": 2880,
+            "value": 112.0
+          },
+          {
+            "t": 3000,
+            "value": 88.0
+          },
+          {
+            "t": 3120,
+            "value": 112.0
+          },
+          {
+            "t": 3240,
+            "value": 88.0
+          },
+          {
+            "t": 3360,
+            "value": 112.0
+          },
+          {
+            "t": 3480,
+            "value": 88.0
+          },
+          {
+            "t": 3600,
+            "value": 112.0
+          },
+          {
+            "t": 3720,
+            "value": 88.0
+          },
+          {
+            "t": 3840,
+            "value": 112.0
+          },
+          {
+            "t": 3960,
+            "value": 88.0
+          },
+          {
+            "t": 4080,
+            "value": 112.0
+          },
+          {
+            "t": 4200,
+            "value": 88.0
+          },
+          {
+            "t": 4320,
+            "value": 112.0
+          },
+          {
+            "t": 4440,
+            "value": 88.0
+          },
+          {
+            "t": 4560,
+            "value": 112.0
+          },
+          {
+            "t": 4680,
+            "value": 88.0
+          },
+          {
+            "t": 4800,
+            "value": 112.0
+          },
+          {
+            "t": 4920,
+            "value": 88.0
+          },
+          {
+            "t": 5040,
+            "value": 112.0
+          },
+          {
+            "t": 5160,
+            "value": 88.0
+          },
+          {
+            "t": 5280,
+            "value": 112.0
+          },
+          {
+            "t": 5400,
+            "value": 88.0
+          },
+          {
+            "t": 5520,
+            "value": 112.0
+          },
+          {
+            "t": 5640,
+            "value": 88.0
+          },
+          {
+            "t": 5760,
+            "value": 112.0
+          },
+          {
+            "t": 5880,
+            "value": 88.0
+          },
+          {
+            "t": 6000,
+            "value": 112.0
+          },
+          {
+            "t": 6120,
+            "value": 88.0
+          },
+          {
+            "t": 6240,
+            "value": 112.0
+          },
+          {
+            "t": 6360,
+            "value": 88.0
+          },
+          {
+            "t": 6480,
+            "value": 112.0
+          },
+          {
+            "t": 6600,
+            "value": 88.0
+          },
+          {
+            "t": 6720,
+            "value": 112.0
+          },
+          {
+            "t": 6840,
+            "value": 88.0
+          },
+          {
+            "t": 6960,
+            "value": 112.0
+          },
+          {
+            "t": 7080,
+            "value": 88.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 2400,
+          "to_s": 6900,
+          "equals": true
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 1800,
+          "to_s": 6900,
+          "equals": true
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 1800,
+          "to_s": 6900,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "pv_mae_exactly_threshold",
+      "description": "With established speed hunting, a constant absolute PV error of exactly 10.0 loop units leaves the strict process-MAE comparison false and blocks the fault.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 60.0
+          },
+          {
+            "t": 120,
+            "value": 40.0
+          },
+          {
+            "t": 240,
+            "value": 60.0
+          },
+          {
+            "t": 360,
+            "value": 40.0
+          },
+          {
+            "t": 480,
+            "value": 60.0
+          },
+          {
+            "t": 600,
+            "value": 40.0
+          },
+          {
+            "t": 720,
+            "value": 60.0
+          },
+          {
+            "t": 840,
+            "value": 40.0
+          },
+          {
+            "t": 960,
+            "value": 60.0
+          },
+          {
+            "t": 1080,
+            "value": 40.0
+          },
+          {
+            "t": 1200,
+            "value": 60.0
+          },
+          {
+            "t": 1320,
+            "value": 40.0
+          },
+          {
+            "t": 1440,
+            "value": 60.0
+          },
+          {
+            "t": 1560,
+            "value": 40.0
+          },
+          {
+            "t": 1680,
+            "value": 60.0
+          },
+          {
+            "t": 1800,
+            "value": 40.0
+          },
+          {
+            "t": 1920,
+            "value": 60.0
+          },
+          {
+            "t": 2040,
+            "value": 40.0
+          },
+          {
+            "t": 2160,
+            "value": 60.0
+          },
+          {
+            "t": 2280,
+            "value": 40.0
+          },
+          {
+            "t": 2400,
+            "value": 60.0
+          },
+          {
+            "t": 2520,
+            "value": 40.0
+          },
+          {
+            "t": 2640,
+            "value": 60.0
+          },
+          {
+            "t": 2760,
+            "value": 40.0
+          },
+          {
+            "t": 2880,
+            "value": 60.0
+          },
+          {
+            "t": 3000,
+            "value": 40.0
+          },
+          {
+            "t": 3120,
+            "value": 60.0
+          },
+          {
+            "t": 3240,
+            "value": 40.0
+          },
+          {
+            "t": 3360,
+            "value": 60.0
+          },
+          {
+            "t": 3480,
+            "value": 40.0
+          },
+          {
+            "t": 3600,
+            "value": 60.0
+          },
+          {
+            "t": 3720,
+            "value": 40.0
+          },
+          {
+            "t": 3840,
+            "value": 60.0
+          },
+          {
+            "t": 3960,
+            "value": 40.0
+          },
+          {
+            "t": 4080,
+            "value": 60.0
+          },
+          {
+            "t": 4200,
+            "value": 40.0
+          },
+          {
+            "t": 4320,
+            "value": 60.0
+          },
+          {
+            "t": 4440,
+            "value": 40.0
+          },
+          {
+            "t": 4560,
+            "value": 60.0
+          },
+          {
+            "t": 4680,
+            "value": 40.0
+          },
+          {
+            "t": 4800,
+            "value": 60.0
+          },
+          {
+            "t": 4920,
+            "value": 40.0
+          },
+          {
+            "t": 5040,
+            "value": 60.0
+          },
+          {
+            "t": 5160,
+            "value": 40.0
+          },
+          {
+            "t": 5280,
+            "value": 60.0
+          },
+          {
+            "t": 5400,
+            "value": 40.0
+          },
+          {
+            "t": 5520,
+            "value": 60.0
+          },
+          {
+            "t": 5640,
+            "value": 40.0
+          },
+          {
+            "t": 5760,
+            "value": 60.0
+          },
+          {
+            "t": 5880,
+            "value": 40.0
+          },
+          {
+            "t": 6000,
+            "value": 60.0
+          },
+          {
+            "t": 6120,
+            "value": 40.0
+          },
+          {
+            "t": 6240,
+            "value": 60.0
+          },
+          {
+            "t": 6360,
+            "value": 40.0
+          },
+          {
+            "t": 6480,
+            "value": 60.0
+          },
+          {
+            "t": 6600,
+            "value": 40.0
+          },
+          {
+            "t": 6720,
+            "value": 60.0
+          },
+          {
+            "t": 6840,
+            "value": 40.0
+          },
+          {
+            "t": 6960,
+            "value": 60.0
+          },
+          {
+            "t": 7080,
+            "value": 40.0
+          }
+        ],
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 110.0
+          },
+          {
+            "t": 120,
+            "value": 90.0
+          },
+          {
+            "t": 240,
+            "value": 110.0
+          },
+          {
+            "t": 360,
+            "value": 90.0
+          },
+          {
+            "t": 480,
+            "value": 110.0
+          },
+          {
+            "t": 600,
+            "value": 90.0
+          },
+          {
+            "t": 720,
+            "value": 110.0
+          },
+          {
+            "t": 840,
+            "value": 90.0
+          },
+          {
+            "t": 960,
+            "value": 110.0
+          },
+          {
+            "t": 1080,
+            "value": 90.0
+          },
+          {
+            "t": 1200,
+            "value": 110.0
+          },
+          {
+            "t": 1320,
+            "value": 90.0
+          },
+          {
+            "t": 1440,
+            "value": 110.0
+          },
+          {
+            "t": 1560,
+            "value": 90.0
+          },
+          {
+            "t": 1680,
+            "value": 110.0
+          },
+          {
+            "t": 1800,
+            "value": 90.0
+          },
+          {
+            "t": 1920,
+            "value": 110.0
+          },
+          {
+            "t": 2040,
+            "value": 90.0
+          },
+          {
+            "t": 2160,
+            "value": 110.0
+          },
+          {
+            "t": 2280,
+            "value": 90.0
+          },
+          {
+            "t": 2400,
+            "value": 110.0
+          },
+          {
+            "t": 2520,
+            "value": 90.0
+          },
+          {
+            "t": 2640,
+            "value": 110.0
+          },
+          {
+            "t": 2760,
+            "value": 90.0
+          },
+          {
+            "t": 2880,
+            "value": 110.0
+          },
+          {
+            "t": 3000,
+            "value": 90.0
+          },
+          {
+            "t": 3120,
+            "value": 110.0
+          },
+          {
+            "t": 3240,
+            "value": 90.0
+          },
+          {
+            "t": 3360,
+            "value": 110.0
+          },
+          {
+            "t": 3480,
+            "value": 90.0
+          },
+          {
+            "t": 3600,
+            "value": 110.0
+          },
+          {
+            "t": 3720,
+            "value": 90.0
+          },
+          {
+            "t": 3840,
+            "value": 110.0
+          },
+          {
+            "t": 3960,
+            "value": 90.0
+          },
+          {
+            "t": 4080,
+            "value": 110.0
+          },
+          {
+            "t": 4200,
+            "value": 90.0
+          },
+          {
+            "t": 4320,
+            "value": 110.0
+          },
+          {
+            "t": 4440,
+            "value": 90.0
+          },
+          {
+            "t": 4560,
+            "value": 110.0
+          },
+          {
+            "t": 4680,
+            "value": 90.0
+          },
+          {
+            "t": 4800,
+            "value": 110.0
+          },
+          {
+            "t": 4920,
+            "value": 90.0
+          },
+          {
+            "t": 5040,
+            "value": 110.0
+          },
+          {
+            "t": 5160,
+            "value": 90.0
+          },
+          {
+            "t": 5280,
+            "value": 110.0
+          },
+          {
+            "t": 5400,
+            "value": 90.0
+          },
+          {
+            "t": 5520,
+            "value": 110.0
+          },
+          {
+            "t": 5640,
+            "value": 90.0
+          },
+          {
+            "t": 5760,
+            "value": 110.0
+          },
+          {
+            "t": 5880,
+            "value": 90.0
+          },
+          {
+            "t": 6000,
+            "value": 110.0
+          },
+          {
+            "t": 6120,
+            "value": 90.0
+          },
+          {
+            "t": 6240,
+            "value": 110.0
+          },
+          {
+            "t": 6360,
+            "value": 90.0
+          },
+          {
+            "t": 6480,
+            "value": 110.0
+          },
+          {
+            "t": 6600,
+            "value": 90.0
+          },
+          {
+            "t": 6720,
+            "value": 110.0
+          },
+          {
+            "t": 6840,
+            "value": 90.0
+          },
+          {
+            "t": 6960,
+            "value": 110.0
+          },
+          {
+            "t": 7080,
+            "value": 90.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": true
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "pv_mae_just_over_threshold",
+      "description": "A 10.1-unit mean absolute PV error brackets the process boundary from the active side while the speed branch is materially hunting.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 60.0
+          },
+          {
+            "t": 120,
+            "value": 40.0
+          },
+          {
+            "t": 240,
+            "value": 60.0
+          },
+          {
+            "t": 360,
+            "value": 40.0
+          },
+          {
+            "t": 480,
+            "value": 60.0
+          },
+          {
+            "t": 600,
+            "value": 40.0
+          },
+          {
+            "t": 720,
+            "value": 60.0
+          },
+          {
+            "t": 840,
+            "value": 40.0
+          },
+          {
+            "t": 960,
+            "value": 60.0
+          },
+          {
+            "t": 1080,
+            "value": 40.0
+          },
+          {
+            "t": 1200,
+            "value": 60.0
+          },
+          {
+            "t": 1320,
+            "value": 40.0
+          },
+          {
+            "t": 1440,
+            "value": 60.0
+          },
+          {
+            "t": 1560,
+            "value": 40.0
+          },
+          {
+            "t": 1680,
+            "value": 60.0
+          },
+          {
+            "t": 1800,
+            "value": 40.0
+          },
+          {
+            "t": 1920,
+            "value": 60.0
+          },
+          {
+            "t": 2040,
+            "value": 40.0
+          },
+          {
+            "t": 2160,
+            "value": 60.0
+          },
+          {
+            "t": 2280,
+            "value": 40.0
+          },
+          {
+            "t": 2400,
+            "value": 60.0
+          },
+          {
+            "t": 2520,
+            "value": 40.0
+          },
+          {
+            "t": 2640,
+            "value": 60.0
+          },
+          {
+            "t": 2760,
+            "value": 40.0
+          },
+          {
+            "t": 2880,
+            "value": 60.0
+          },
+          {
+            "t": 3000,
+            "value": 40.0
+          },
+          {
+            "t": 3120,
+            "value": 60.0
+          },
+          {
+            "t": 3240,
+            "value": 40.0
+          },
+          {
+            "t": 3360,
+            "value": 60.0
+          },
+          {
+            "t": 3480,
+            "value": 40.0
+          },
+          {
+            "t": 3600,
+            "value": 60.0
+          },
+          {
+            "t": 3720,
+            "value": 40.0
+          },
+          {
+            "t": 3840,
+            "value": 60.0
+          },
+          {
+            "t": 3960,
+            "value": 40.0
+          },
+          {
+            "t": 4080,
+            "value": 60.0
+          },
+          {
+            "t": 4200,
+            "value": 40.0
+          },
+          {
+            "t": 4320,
+            "value": 60.0
+          },
+          {
+            "t": 4440,
+            "value": 40.0
+          },
+          {
+            "t": 4560,
+            "value": 60.0
+          },
+          {
+            "t": 4680,
+            "value": 40.0
+          },
+          {
+            "t": 4800,
+            "value": 60.0
+          },
+          {
+            "t": 4920,
+            "value": 40.0
+          },
+          {
+            "t": 5040,
+            "value": 60.0
+          },
+          {
+            "t": 5160,
+            "value": 40.0
+          },
+          {
+            "t": 5280,
+            "value": 60.0
+          },
+          {
+            "t": 5400,
+            "value": 40.0
+          },
+          {
+            "t": 5520,
+            "value": 60.0
+          },
+          {
+            "t": 5640,
+            "value": 40.0
+          },
+          {
+            "t": 5760,
+            "value": 60.0
+          },
+          {
+            "t": 5880,
+            "value": 40.0
+          },
+          {
+            "t": 6000,
+            "value": 60.0
+          },
+          {
+            "t": 6120,
+            "value": 40.0
+          },
+          {
+            "t": 6240,
+            "value": 60.0
+          },
+          {
+            "t": 6360,
+            "value": 40.0
+          },
+          {
+            "t": 6480,
+            "value": 60.0
+          },
+          {
+            "t": 6600,
+            "value": 40.0
+          },
+          {
+            "t": 6720,
+            "value": 60.0
+          },
+          {
+            "t": 6840,
+            "value": 40.0
+          },
+          {
+            "t": 6960,
+            "value": 60.0
+          },
+          {
+            "t": 7080,
+            "value": 40.0
+          }
+        ],
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 110.1
+          },
+          {
+            "t": 120,
+            "value": 89.9
+          },
+          {
+            "t": 240,
+            "value": 110.1
+          },
+          {
+            "t": 360,
+            "value": 89.9
+          },
+          {
+            "t": 480,
+            "value": 110.1
+          },
+          {
+            "t": 600,
+            "value": 89.9
+          },
+          {
+            "t": 720,
+            "value": 110.1
+          },
+          {
+            "t": 840,
+            "value": 89.9
+          },
+          {
+            "t": 960,
+            "value": 110.1
+          },
+          {
+            "t": 1080,
+            "value": 89.9
+          },
+          {
+            "t": 1200,
+            "value": 110.1
+          },
+          {
+            "t": 1320,
+            "value": 89.9
+          },
+          {
+            "t": 1440,
+            "value": 110.1
+          },
+          {
+            "t": 1560,
+            "value": 89.9
+          },
+          {
+            "t": 1680,
+            "value": 110.1
+          },
+          {
+            "t": 1800,
+            "value": 89.9
+          },
+          {
+            "t": 1920,
+            "value": 110.1
+          },
+          {
+            "t": 2040,
+            "value": 89.9
+          },
+          {
+            "t": 2160,
+            "value": 110.1
+          },
+          {
+            "t": 2280,
+            "value": 89.9
+          },
+          {
+            "t": 2400,
+            "value": 110.1
+          },
+          {
+            "t": 2520,
+            "value": 89.9
+          },
+          {
+            "t": 2640,
+            "value": 110.1
+          },
+          {
+            "t": 2760,
+            "value": 89.9
+          },
+          {
+            "t": 2880,
+            "value": 110.1
+          },
+          {
+            "t": 3000,
+            "value": 89.9
+          },
+          {
+            "t": 3120,
+            "value": 110.1
+          },
+          {
+            "t": 3240,
+            "value": 89.9
+          },
+          {
+            "t": 3360,
+            "value": 110.1
+          },
+          {
+            "t": 3480,
+            "value": 89.9
+          },
+          {
+            "t": 3600,
+            "value": 110.1
+          },
+          {
+            "t": 3720,
+            "value": 89.9
+          },
+          {
+            "t": 3840,
+            "value": 110.1
+          },
+          {
+            "t": 3960,
+            "value": 89.9
+          },
+          {
+            "t": 4080,
+            "value": 110.1
+          },
+          {
+            "t": 4200,
+            "value": 89.9
+          },
+          {
+            "t": 4320,
+            "value": 110.1
+          },
+          {
+            "t": 4440,
+            "value": 89.9
+          },
+          {
+            "t": 4560,
+            "value": 110.1
+          },
+          {
+            "t": 4680,
+            "value": 89.9
+          },
+          {
+            "t": 4800,
+            "value": 110.1
+          },
+          {
+            "t": 4920,
+            "value": 89.9
+          },
+          {
+            "t": 5040,
+            "value": 110.1
+          },
+          {
+            "t": 5160,
+            "value": 89.9
+          },
+          {
+            "t": 5280,
+            "value": 110.1
+          },
+          {
+            "t": 5400,
+            "value": 89.9
+          },
+          {
+            "t": 5520,
+            "value": 110.1
+          },
+          {
+            "t": 5640,
+            "value": 89.9
+          },
+          {
+            "t": 5760,
+            "value": 110.1
+          },
+          {
+            "t": 5880,
+            "value": 89.9
+          },
+          {
+            "t": 6000,
+            "value": 110.1
+          },
+          {
+            "t": 6120,
+            "value": 89.9
+          },
+          {
+            "t": 6240,
+            "value": 110.1
+          },
+          {
+            "t": 6360,
+            "value": 89.9
+          },
+          {
+            "t": 6480,
+            "value": 110.1
+          },
+          {
+            "t": 6600,
+            "value": 89.9
+          },
+          {
+            "t": 6720,
+            "value": 110.1
+          },
+          {
+            "t": 6840,
+            "value": 89.9
+          },
+          {
+            "t": 6960,
+            "value": 110.1
+          },
+          {
+            "t": 7080,
+            "value": 89.9
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 2400,
+          "to_s": 7200,
+          "equals": true
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": true
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "persistent_both_error_directions",
+      "description": "Material speed hunting paired with PV alternating above and below setpoint proves the process statistic is symmetric and the combined fault persists.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 60.0
+          },
+          {
+            "t": 120,
+            "value": 40.0
+          },
+          {
+            "t": 240,
+            "value": 60.0
+          },
+          {
+            "t": 360,
+            "value": 40.0
+          },
+          {
+            "t": 480,
+            "value": 60.0
+          },
+          {
+            "t": 600,
+            "value": 40.0
+          },
+          {
+            "t": 720,
+            "value": 60.0
+          },
+          {
+            "t": 840,
+            "value": 40.0
+          },
+          {
+            "t": 960,
+            "value": 60.0
+          },
+          {
+            "t": 1080,
+            "value": 40.0
+          },
+          {
+            "t": 1200,
+            "value": 60.0
+          },
+          {
+            "t": 1320,
+            "value": 40.0
+          },
+          {
+            "t": 1440,
+            "value": 60.0
+          },
+          {
+            "t": 1560,
+            "value": 40.0
+          },
+          {
+            "t": 1680,
+            "value": 60.0
+          },
+          {
+            "t": 1800,
+            "value": 40.0
+          },
+          {
+            "t": 1920,
+            "value": 60.0
+          },
+          {
+            "t": 2040,
+            "value": 40.0
+          },
+          {
+            "t": 2160,
+            "value": 60.0
+          },
+          {
+            "t": 2280,
+            "value": 40.0
+          },
+          {
+            "t": 2400,
+            "value": 60.0
+          },
+          {
+            "t": 2520,
+            "value": 40.0
+          },
+          {
+            "t": 2640,
+            "value": 60.0
+          },
+          {
+            "t": 2760,
+            "value": 40.0
+          },
+          {
+            "t": 2880,
+            "value": 60.0
+          },
+          {
+            "t": 3000,
+            "value": 40.0
+          },
+          {
+            "t": 3120,
+            "value": 60.0
+          },
+          {
+            "t": 3240,
+            "value": 40.0
+          },
+          {
+            "t": 3360,
+            "value": 60.0
+          },
+          {
+            "t": 3480,
+            "value": 40.0
+          },
+          {
+            "t": 3600,
+            "value": 60.0
+          },
+          {
+            "t": 3720,
+            "value": 40.0
+          },
+          {
+            "t": 3840,
+            "value": 60.0
+          },
+          {
+            "t": 3960,
+            "value": 40.0
+          },
+          {
+            "t": 4080,
+            "value": 60.0
+          },
+          {
+            "t": 4200,
+            "value": 40.0
+          },
+          {
+            "t": 4320,
+            "value": 60.0
+          },
+          {
+            "t": 4440,
+            "value": 40.0
+          },
+          {
+            "t": 4560,
+            "value": 60.0
+          },
+          {
+            "t": 4680,
+            "value": 40.0
+          },
+          {
+            "t": 4800,
+            "value": 60.0
+          },
+          {
+            "t": 4920,
+            "value": 40.0
+          },
+          {
+            "t": 5040,
+            "value": 60.0
+          },
+          {
+            "t": 5160,
+            "value": 40.0
+          },
+          {
+            "t": 5280,
+            "value": 60.0
+          },
+          {
+            "t": 5400,
+            "value": 40.0
+          },
+          {
+            "t": 5520,
+            "value": 60.0
+          },
+          {
+            "t": 5640,
+            "value": 40.0
+          },
+          {
+            "t": 5760,
+            "value": 60.0
+          },
+          {
+            "t": 5880,
+            "value": 40.0
+          },
+          {
+            "t": 6000,
+            "value": 60.0
+          },
+          {
+            "t": 6120,
+            "value": 40.0
+          },
+          {
+            "t": 6240,
+            "value": 60.0
+          },
+          {
+            "t": 6360,
+            "value": 40.0
+          },
+          {
+            "t": 6480,
+            "value": 60.0
+          },
+          {
+            "t": 6600,
+            "value": 40.0
+          },
+          {
+            "t": 6720,
+            "value": 60.0
+          },
+          {
+            "t": 6840,
+            "value": 40.0
+          },
+          {
+            "t": 6960,
+            "value": 60.0
+          },
+          {
+            "t": 7080,
+            "value": 40.0
+          }
+        ],
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 112.0
+          },
+          {
+            "t": 120,
+            "value": 88.0
+          },
+          {
+            "t": 240,
+            "value": 112.0
+          },
+          {
+            "t": 360,
+            "value": 88.0
+          },
+          {
+            "t": 480,
+            "value": 112.0
+          },
+          {
+            "t": 600,
+            "value": 88.0
+          },
+          {
+            "t": 720,
+            "value": 112.0
+          },
+          {
+            "t": 840,
+            "value": 88.0
+          },
+          {
+            "t": 960,
+            "value": 112.0
+          },
+          {
+            "t": 1080,
+            "value": 88.0
+          },
+          {
+            "t": 1200,
+            "value": 112.0
+          },
+          {
+            "t": 1320,
+            "value": 88.0
+          },
+          {
+            "t": 1440,
+            "value": 112.0
+          },
+          {
+            "t": 1560,
+            "value": 88.0
+          },
+          {
+            "t": 1680,
+            "value": 112.0
+          },
+          {
+            "t": 1800,
+            "value": 88.0
+          },
+          {
+            "t": 1920,
+            "value": 112.0
+          },
+          {
+            "t": 2040,
+            "value": 88.0
+          },
+          {
+            "t": 2160,
+            "value": 112.0
+          },
+          {
+            "t": 2280,
+            "value": 88.0
+          },
+          {
+            "t": 2400,
+            "value": 112.0
+          },
+          {
+            "t": 2520,
+            "value": 88.0
+          },
+          {
+            "t": 2640,
+            "value": 112.0
+          },
+          {
+            "t": 2760,
+            "value": 88.0
+          },
+          {
+            "t": 2880,
+            "value": 112.0
+          },
+          {
+            "t": 3000,
+            "value": 88.0
+          },
+          {
+            "t": 3120,
+            "value": 112.0
+          },
+          {
+            "t": 3240,
+            "value": 88.0
+          },
+          {
+            "t": 3360,
+            "value": 112.0
+          },
+          {
+            "t": 3480,
+            "value": 88.0
+          },
+          {
+            "t": 3600,
+            "value": 112.0
+          },
+          {
+            "t": 3720,
+            "value": 88.0
+          },
+          {
+            "t": 3840,
+            "value": 112.0
+          },
+          {
+            "t": 3960,
+            "value": 88.0
+          },
+          {
+            "t": 4080,
+            "value": 112.0
+          },
+          {
+            "t": 4200,
+            "value": 88.0
+          },
+          {
+            "t": 4320,
+            "value": 112.0
+          },
+          {
+            "t": 4440,
+            "value": 88.0
+          },
+          {
+            "t": 4560,
+            "value": 112.0
+          },
+          {
+            "t": 4680,
+            "value": 88.0
+          },
+          {
+            "t": 4800,
+            "value": 112.0
+          },
+          {
+            "t": 4920,
+            "value": 88.0
+          },
+          {
+            "t": 5040,
+            "value": 112.0
+          },
+          {
+            "t": 5160,
+            "value": 88.0
+          },
+          {
+            "t": 5280,
+            "value": 112.0
+          },
+          {
+            "t": 5400,
+            "value": 88.0
+          },
+          {
+            "t": 5520,
+            "value": 112.0
+          },
+          {
+            "t": 5640,
+            "value": 88.0
+          },
+          {
+            "t": 5760,
+            "value": 112.0
+          },
+          {
+            "t": 5880,
+            "value": 88.0
+          },
+          {
+            "t": 6000,
+            "value": 112.0
+          },
+          {
+            "t": 6120,
+            "value": 88.0
+          },
+          {
+            "t": 6240,
+            "value": 112.0
+          },
+          {
+            "t": 6360,
+            "value": 88.0
+          },
+          {
+            "t": 6480,
+            "value": 112.0
+          },
+          {
+            "t": 6600,
+            "value": 88.0
+          },
+          {
+            "t": 6720,
+            "value": 112.0
+          },
+          {
+            "t": 6840,
+            "value": 88.0
+          },
+          {
+            "t": 6960,
+            "value": 112.0
+          },
+          {
+            "t": 7080,
+            "value": 88.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 2400,
+          "to_s": 7200,
+          "equals": true
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": true
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "one_sided_oscillatory_process_offset",
+      "description": "PV oscillates between 20 and 30 units above setpoint while speed hunts. Crossings around the rolling process-error mean plus MAE from the real setpoint intentionally classify this one-sided oscillatory offset as unstable; this is broader than NIST's two-sided allowance-band CUSUM.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 60.0
+          },
+          {
+            "t": 120,
+            "value": 40.0
+          },
+          {
+            "t": 240,
+            "value": 60.0
+          },
+          {
+            "t": 360,
+            "value": 40.0
+          },
+          {
+            "t": 480,
+            "value": 60.0
+          },
+          {
+            "t": 600,
+            "value": 40.0
+          },
+          {
+            "t": 720,
+            "value": 60.0
+          },
+          {
+            "t": 840,
+            "value": 40.0
+          },
+          {
+            "t": 960,
+            "value": 60.0
+          },
+          {
+            "t": 1080,
+            "value": 40.0
+          },
+          {
+            "t": 1200,
+            "value": 60.0
+          },
+          {
+            "t": 1320,
+            "value": 40.0
+          },
+          {
+            "t": 1440,
+            "value": 60.0
+          },
+          {
+            "t": 1560,
+            "value": 40.0
+          },
+          {
+            "t": 1680,
+            "value": 60.0
+          },
+          {
+            "t": 1800,
+            "value": 40.0
+          },
+          {
+            "t": 1920,
+            "value": 60.0
+          },
+          {
+            "t": 2040,
+            "value": 40.0
+          },
+          {
+            "t": 2160,
+            "value": 60.0
+          },
+          {
+            "t": 2280,
+            "value": 40.0
+          },
+          {
+            "t": 2400,
+            "value": 60.0
+          },
+          {
+            "t": 2520,
+            "value": 40.0
+          },
+          {
+            "t": 2640,
+            "value": 60.0
+          },
+          {
+            "t": 2760,
+            "value": 40.0
+          },
+          {
+            "t": 2880,
+            "value": 60.0
+          },
+          {
+            "t": 3000,
+            "value": 40.0
+          },
+          {
+            "t": 3120,
+            "value": 60.0
+          },
+          {
+            "t": 3240,
+            "value": 40.0
+          },
+          {
+            "t": 3360,
+            "value": 60.0
+          },
+          {
+            "t": 3480,
+            "value": 40.0
+          },
+          {
+            "t": 3600,
+            "value": 60.0
+          },
+          {
+            "t": 3720,
+            "value": 40.0
+          },
+          {
+            "t": 3840,
+            "value": 60.0
+          },
+          {
+            "t": 3960,
+            "value": 40.0
+          },
+          {
+            "t": 4080,
+            "value": 60.0
+          },
+          {
+            "t": 4200,
+            "value": 40.0
+          },
+          {
+            "t": 4320,
+            "value": 60.0
+          },
+          {
+            "t": 4440,
+            "value": 40.0
+          },
+          {
+            "t": 4560,
+            "value": 60.0
+          },
+          {
+            "t": 4680,
+            "value": 40.0
+          },
+          {
+            "t": 4800,
+            "value": 60.0
+          },
+          {
+            "t": 4920,
+            "value": 40.0
+          },
+          {
+            "t": 5040,
+            "value": 60.0
+          },
+          {
+            "t": 5160,
+            "value": 40.0
+          },
+          {
+            "t": 5280,
+            "value": 60.0
+          },
+          {
+            "t": 5400,
+            "value": 40.0
+          },
+          {
+            "t": 5520,
+            "value": 60.0
+          },
+          {
+            "t": 5640,
+            "value": 40.0
+          },
+          {
+            "t": 5760,
+            "value": 60.0
+          },
+          {
+            "t": 5880,
+            "value": 40.0
+          },
+          {
+            "t": 6000,
+            "value": 60.0
+          },
+          {
+            "t": 6120,
+            "value": 40.0
+          },
+          {
+            "t": 6240,
+            "value": 60.0
+          },
+          {
+            "t": 6360,
+            "value": 40.0
+          },
+          {
+            "t": 6480,
+            "value": 60.0
+          },
+          {
+            "t": 6600,
+            "value": 40.0
+          },
+          {
+            "t": 6720,
+            "value": 60.0
+          },
+          {
+            "t": 6840,
+            "value": 40.0
+          },
+          {
+            "t": 6960,
+            "value": 60.0
+          },
+          {
+            "t": 7080,
+            "value": 40.0
+          }
+        ],
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 130.0
+          },
+          {
+            "t": 120,
+            "value": 120.0
+          },
+          {
+            "t": 240,
+            "value": 130.0
+          },
+          {
+            "t": 360,
+            "value": 120.0
+          },
+          {
+            "t": 480,
+            "value": 130.0
+          },
+          {
+            "t": 600,
+            "value": 120.0
+          },
+          {
+            "t": 720,
+            "value": 130.0
+          },
+          {
+            "t": 840,
+            "value": 120.0
+          },
+          {
+            "t": 960,
+            "value": 130.0
+          },
+          {
+            "t": 1080,
+            "value": 120.0
+          },
+          {
+            "t": 1200,
+            "value": 130.0
+          },
+          {
+            "t": 1320,
+            "value": 120.0
+          },
+          {
+            "t": 1440,
+            "value": 130.0
+          },
+          {
+            "t": 1560,
+            "value": 120.0
+          },
+          {
+            "t": 1680,
+            "value": 130.0
+          },
+          {
+            "t": 1800,
+            "value": 120.0
+          },
+          {
+            "t": 1920,
+            "value": 130.0
+          },
+          {
+            "t": 2040,
+            "value": 120.0
+          },
+          {
+            "t": 2160,
+            "value": 130.0
+          },
+          {
+            "t": 2280,
+            "value": 120.0
+          },
+          {
+            "t": 2400,
+            "value": 130.0
+          },
+          {
+            "t": 2520,
+            "value": 120.0
+          },
+          {
+            "t": 2640,
+            "value": 130.0
+          },
+          {
+            "t": 2760,
+            "value": 120.0
+          },
+          {
+            "t": 2880,
+            "value": 130.0
+          },
+          {
+            "t": 3000,
+            "value": 120.0
+          },
+          {
+            "t": 3120,
+            "value": 130.0
+          },
+          {
+            "t": 3240,
+            "value": 120.0
+          },
+          {
+            "t": 3360,
+            "value": 130.0
+          },
+          {
+            "t": 3480,
+            "value": 120.0
+          },
+          {
+            "t": 3600,
+            "value": 130.0
+          },
+          {
+            "t": 3720,
+            "value": 120.0
+          },
+          {
+            "t": 3840,
+            "value": 130.0
+          },
+          {
+            "t": 3960,
+            "value": 120.0
+          },
+          {
+            "t": 4080,
+            "value": 130.0
+          },
+          {
+            "t": 4200,
+            "value": 120.0
+          },
+          {
+            "t": 4320,
+            "value": 130.0
+          },
+          {
+            "t": 4440,
+            "value": 120.0
+          },
+          {
+            "t": 4560,
+            "value": 130.0
+          },
+          {
+            "t": 4680,
+            "value": 120.0
+          },
+          {
+            "t": 4800,
+            "value": 130.0
+          },
+          {
+            "t": 4920,
+            "value": 120.0
+          },
+          {
+            "t": 5040,
+            "value": 130.0
+          },
+          {
+            "t": 5160,
+            "value": 120.0
+          },
+          {
+            "t": 5280,
+            "value": 130.0
+          },
+          {
+            "t": 5400,
+            "value": 120.0
+          },
+          {
+            "t": 5520,
+            "value": 130.0
+          },
+          {
+            "t": 5640,
+            "value": 120.0
+          },
+          {
+            "t": 5760,
+            "value": 130.0
+          },
+          {
+            "t": 5880,
+            "value": 120.0
+          },
+          {
+            "t": 6000,
+            "value": 130.0
+          },
+          {
+            "t": 6120,
+            "value": 120.0
+          },
+          {
+            "t": 6240,
+            "value": 130.0
+          },
+          {
+            "t": 6360,
+            "value": 120.0
+          },
+          {
+            "t": 6480,
+            "value": 130.0
+          },
+          {
+            "t": 6600,
+            "value": 120.0
+          },
+          {
+            "t": 6720,
+            "value": 130.0
+          },
+          {
+            "t": 6840,
+            "value": 120.0
+          },
+          {
+            "t": 6960,
+            "value": 130.0
+          },
+          {
+            "t": 7080,
+            "value": 120.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 2400,
+          "to_s": 7200,
+          "equals": true
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": true
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "window_aging_clears",
+      "description": "The loop hunts through t=3600 s and then speed settles while PV remains 11 units off setpoint. The process diagnostic stays active; speed crossings and MAD must age out before the fault clears.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 60.0
+          },
+          {
+            "t": 120,
+            "value": 40.0
+          },
+          {
+            "t": 240,
+            "value": 60.0
+          },
+          {
+            "t": 360,
+            "value": 40.0
+          },
+          {
+            "t": 480,
+            "value": 60.0
+          },
+          {
+            "t": 600,
+            "value": 40.0
+          },
+          {
+            "t": 720,
+            "value": 60.0
+          },
+          {
+            "t": 840,
+            "value": 40.0
+          },
+          {
+            "t": 960,
+            "value": 60.0
+          },
+          {
+            "t": 1080,
+            "value": 40.0
+          },
+          {
+            "t": 1200,
+            "value": 60.0
+          },
+          {
+            "t": 1320,
+            "value": 40.0
+          },
+          {
+            "t": 1440,
+            "value": 60.0
+          },
+          {
+            "t": 1560,
+            "value": 40.0
+          },
+          {
+            "t": 1680,
+            "value": 60.0
+          },
+          {
+            "t": 1800,
+            "value": 40.0
+          },
+          {
+            "t": 1920,
+            "value": 60.0
+          },
+          {
+            "t": 2040,
+            "value": 40.0
+          },
+          {
+            "t": 2160,
+            "value": 60.0
+          },
+          {
+            "t": 2280,
+            "value": 40.0
+          },
+          {
+            "t": 2400,
+            "value": 60.0
+          },
+          {
+            "t": 2520,
+            "value": 40.0
+          },
+          {
+            "t": 2640,
+            "value": 60.0
+          },
+          {
+            "t": 2760,
+            "value": 40.0
+          },
+          {
+            "t": 2880,
+            "value": 60.0
+          },
+          {
+            "t": 3000,
+            "value": 40.0
+          },
+          {
+            "t": 3120,
+            "value": 60.0
+          },
+          {
+            "t": 3240,
+            "value": 40.0
+          },
+          {
+            "t": 3360,
+            "value": 60.0
+          },
+          {
+            "t": 3480,
+            "value": 40.0
+          },
+          {
+            "t": 3600,
+            "value": 50.0
+          }
+        ],
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 112.0
+          },
+          {
+            "t": 120,
+            "value": 88.0
+          },
+          {
+            "t": 240,
+            "value": 112.0
+          },
+          {
+            "t": 360,
+            "value": 88.0
+          },
+          {
+            "t": 480,
+            "value": 112.0
+          },
+          {
+            "t": 600,
+            "value": 88.0
+          },
+          {
+            "t": 720,
+            "value": 112.0
+          },
+          {
+            "t": 840,
+            "value": 88.0
+          },
+          {
+            "t": 960,
+            "value": 112.0
+          },
+          {
+            "t": 1080,
+            "value": 88.0
+          },
+          {
+            "t": 1200,
+            "value": 112.0
+          },
+          {
+            "t": 1320,
+            "value": 88.0
+          },
+          {
+            "t": 1440,
+            "value": 112.0
+          },
+          {
+            "t": 1560,
+            "value": 88.0
+          },
+          {
+            "t": 1680,
+            "value": 112.0
+          },
+          {
+            "t": 1800,
+            "value": 88.0
+          },
+          {
+            "t": 1920,
+            "value": 112.0
+          },
+          {
+            "t": 2040,
+            "value": 88.0
+          },
+          {
+            "t": 2160,
+            "value": 112.0
+          },
+          {
+            "t": 2280,
+            "value": 88.0
+          },
+          {
+            "t": 2400,
+            "value": 112.0
+          },
+          {
+            "t": 2520,
+            "value": 88.0
+          },
+          {
+            "t": 2640,
+            "value": 112.0
+          },
+          {
+            "t": 2760,
+            "value": 88.0
+          },
+          {
+            "t": 2880,
+            "value": 112.0
+          },
+          {
+            "t": 3000,
+            "value": 88.0
+          },
+          {
+            "t": 3120,
+            "value": 112.0
+          },
+          {
+            "t": 3240,
+            "value": 88.0
+          },
+          {
+            "t": 3360,
+            "value": 112.0
+          },
+          {
+            "t": 3480,
+            "value": 88.0
+          },
+          {
+            "t": 3600,
+            "value": 112.0
+          },
+          {
+            "t": 3720,
+            "value": 88.0
+          },
+          {
+            "t": 3840,
+            "value": 112.0
+          },
+          {
+            "t": 3960,
+            "value": 88.0
+          },
+          {
+            "t": 4080,
+            "value": 112.0
+          },
+          {
+            "t": 4200,
+            "value": 88.0
+          },
+          {
+            "t": 4320,
+            "value": 112.0
+          },
+          {
+            "t": 4440,
+            "value": 88.0
+          },
+          {
+            "t": 4560,
+            "value": 112.0
+          },
+          {
+            "t": 4680,
+            "value": 88.0
+          },
+          {
+            "t": 4800,
+            "value": 112.0
+          },
+          {
+            "t": 4920,
+            "value": 88.0
+          },
+          {
+            "t": 5040,
+            "value": 112.0
+          },
+          {
+            "t": 5160,
+            "value": 88.0
+          },
+          {
+            "t": 5280,
+            "value": 112.0
+          },
+          {
+            "t": 5400,
+            "value": 88.0
+          },
+          {
+            "t": 5520,
+            "value": 112.0
+          },
+          {
+            "t": 5640,
+            "value": 88.0
+          },
+          {
+            "t": 5760,
+            "value": 112.0
+          },
+          {
+            "t": 5880,
+            "value": 88.0
+          },
+          {
+            "t": 6000,
+            "value": 112.0
+          },
+          {
+            "t": 6120,
+            "value": 88.0
+          },
+          {
+            "t": 6240,
+            "value": 112.0
+          },
+          {
+            "t": 6360,
+            "value": 88.0
+          },
+          {
+            "t": 6480,
+            "value": 112.0
+          },
+          {
+            "t": 6600,
+            "value": 88.0
+          },
+          {
+            "t": 6720,
+            "value": 112.0
+          },
+          {
+            "t": 6840,
+            "value": 88.0
+          },
+          {
+            "t": 6960,
+            "value": 112.0
+          },
+          {
+            "t": 7080,
+            "value": 88.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 2400,
+          "to_s": 3480,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 5400,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 1800,
+          "to_s": 3480,
+          "equals": true
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 5400,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "warmup_burst_raw_behavior",
+      "description": "Eight tick-rate speed changes during the partial-window fill can be extrapolated above the rolling count threshold while PV is off setpoint. The raw result is pinned; hosts must report NO_EVAL during the first evaluation window.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 70.0
+          },
+          {
+            "t": 60,
+            "value": 30.0
+          },
+          {
+            "t": 120,
+            "value": 70.0
+          },
+          {
+            "t": 180,
+            "value": 30.0
+          },
+          {
+            "t": 240,
+            "value": 70.0
+          },
+          {
+            "t": 300,
+            "value": 30.0
+          },
+          {
+            "t": 360,
+            "value": 70.0
+          },
+          {
+            "t": 420,
+            "value": 30.0
+          },
+          {
+            "t": 480,
+            "value": 50.0
+          }
+        ],
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 112.0
+          },
+          {
+            "t": 120,
+            "value": 88.0
+          },
+          {
+            "t": 240,
+            "value": 112.0
+          },
+          {
+            "t": 360,
+            "value": 88.0
+          },
+          {
+            "t": 480,
+            "value": 112.0
+          },
+          {
+            "t": 600,
+            "value": 88.0
+          },
+          {
+            "t": 720,
+            "value": 112.0
+          },
+          {
+            "t": 840,
+            "value": 88.0
+          },
+          {
+            "t": 960,
+            "value": 112.0
+          },
+          {
+            "t": 1080,
+            "value": 88.0
+          },
+          {
+            "t": 1200,
+            "value": 112.0
+          },
+          {
+            "t": 1320,
+            "value": 88.0
+          },
+          {
+            "t": 1440,
+            "value": 112.0
+          },
+          {
+            "t": 1560,
+            "value": 88.0
+          },
+          {
+            "t": 1680,
+            "value": 112.0
+          },
+          {
+            "t": 1800,
+            "value": 88.0
+          },
+          {
+            "t": 1920,
+            "value": 112.0
+          },
+          {
+            "t": 2040,
+            "value": 88.0
+          },
+          {
+            "t": 2160,
+            "value": 112.0
+          },
+          {
+            "t": 2280,
+            "value": 88.0
+          },
+          {
+            "t": 2400,
+            "value": 112.0
+          },
+          {
+            "t": 2520,
+            "value": 88.0
+          },
+          {
+            "t": 2640,
+            "value": 112.0
+          },
+          {
+            "t": 2760,
+            "value": 88.0
+          },
+          {
+            "t": 2880,
+            "value": 112.0
+          },
+          {
+            "t": 3000,
+            "value": 88.0
+          },
+          {
+            "t": 3120,
+            "value": 112.0
+          },
+          {
+            "t": 3240,
+            "value": 88.0
+          },
+          {
+            "t": 3360,
+            "value": 112.0
+          },
+          {
+            "t": 3480,
+            "value": 88.0
+          },
+          {
+            "t": 3600,
+            "value": 112.0
+          },
+          {
+            "t": 3720,
+            "value": 88.0
+          },
+          {
+            "t": 3840,
+            "value": 112.0
+          },
+          {
+            "t": 3960,
+            "value": 88.0
+          },
+          {
+            "t": 4080,
+            "value": 112.0
+          },
+          {
+            "t": 4200,
+            "value": 88.0
+          },
+          {
+            "t": 4320,
+            "value": 112.0
+          },
+          {
+            "t": 4440,
+            "value": 88.0
+          },
+          {
+            "t": 4560,
+            "value": 112.0
+          },
+          {
+            "t": 4680,
+            "value": 88.0
+          },
+          {
+            "t": 4800,
+            "value": 112.0
+          },
+          {
+            "t": 4920,
+            "value": 88.0
+          },
+          {
+            "t": 5040,
+            "value": 112.0
+          },
+          {
+            "t": 5160,
+            "value": 88.0
+          },
+          {
+            "t": 5280,
+            "value": 112.0
+          },
+          {
+            "t": 5400,
+            "value": 88.0
+          },
+          {
+            "t": 5520,
+            "value": 112.0
+          },
+          {
+            "t": 5640,
+            "value": 88.0
+          },
+          {
+            "t": 5760,
+            "value": 112.0
+          },
+          {
+            "t": 5880,
+            "value": 88.0
+          },
+          {
+            "t": 6000,
+            "value": 112.0
+          },
+          {
+            "t": 6120,
+            "value": 88.0
+          },
+          {
+            "t": 6240,
+            "value": 112.0
+          },
+          {
+            "t": 6360,
+            "value": 88.0
+          },
+          {
+            "t": 6480,
+            "value": 112.0
+          },
+          {
+            "t": 6600,
+            "value": 88.0
+          },
+          {
+            "t": 6720,
+            "value": 112.0
+          },
+          {
+            "t": 6840,
+            "value": 88.0
+          },
+          {
+            "t": 6960,
+            "value": 112.0
+          },
+          {
+            "t": 7080,
+            "value": 88.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 720,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 300,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 420,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 3000,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 3000,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 1800,
+          "to_s": 7200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "setpoint_step_excluded_raw_behavior",
+      "description": "A setpoint step at t=1800 followed by sustained materially reversing speed raises the raw diagnostics and fault. Deployment must instead report NO_EVAL until reset and disturbance response are settled.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 50.0
+          },
+          {
+            "t": 1800,
+            "value": 60.0
+          },
+          {
+            "t": 1920,
+            "value": 40.0
+          },
+          {
+            "t": 2040,
+            "value": 60.0
+          },
+          {
+            "t": 2160,
+            "value": 40.0
+          },
+          {
+            "t": 2280,
+            "value": 60.0
+          },
+          {
+            "t": 2400,
+            "value": 40.0
+          },
+          {
+            "t": 2520,
+            "value": 60.0
+          },
+          {
+            "t": 2640,
+            "value": 40.0
+          },
+          {
+            "t": 2760,
+            "value": 60.0
+          },
+          {
+            "t": 2880,
+            "value": 40.0
+          },
+          {
+            "t": 3000,
+            "value": 60.0
+          },
+          {
+            "t": 3120,
+            "value": 40.0
+          },
+          {
+            "t": 3240,
+            "value": 60.0
+          },
+          {
+            "t": 3360,
+            "value": 40.0
+          },
+          {
+            "t": 3480,
+            "value": 60.0
+          },
+          {
+            "t": 3600,
+            "value": 40.0
+          },
+          {
+            "t": 3720,
+            "value": 60.0
+          },
+          {
+            "t": 3840,
+            "value": 40.0
+          },
+          {
+            "t": 3960,
+            "value": 60.0
+          },
+          {
+            "t": 4080,
+            "value": 40.0
+          },
+          {
+            "t": 4200,
+            "value": 60.0
+          },
+          {
+            "t": 4320,
+            "value": 40.0
+          },
+          {
+            "t": 4440,
+            "value": 60.0
+          },
+          {
+            "t": 4560,
+            "value": 40.0
+          },
+          {
+            "t": 4680,
+            "value": 60.0
+          },
+          {
+            "t": 4800,
+            "value": 40.0
+          },
+          {
+            "t": 4920,
+            "value": 60.0
+          },
+          {
+            "t": 5040,
+            "value": 40.0
+          },
+          {
+            "t": 5160,
+            "value": 60.0
+          },
+          {
+            "t": 5280,
+            "value": 40.0
+          },
+          {
+            "t": 5400,
+            "value": 60.0
+          },
+          {
+            "t": 5520,
+            "value": 40.0
+          },
+          {
+            "t": 5640,
+            "value": 60.0
+          },
+          {
+            "t": 5760,
+            "value": 40.0
+          },
+          {
+            "t": 5880,
+            "value": 60.0
+          },
+          {
+            "t": 6000,
+            "value": 40.0
+          },
+          {
+            "t": 6120,
+            "value": 60.0
+          },
+          {
+            "t": 6240,
+            "value": 40.0
+          },
+          {
+            "t": 6360,
+            "value": 60.0
+          },
+          {
+            "t": 6480,
+            "value": 40.0
+          },
+          {
+            "t": 6600,
+            "value": 60.0
+          },
+          {
+            "t": 6720,
+            "value": 40.0
+          },
+          {
+            "t": 6840,
+            "value": 60.0
+          },
+          {
+            "t": 6960,
+            "value": 40.0
+          },
+          {
+            "t": 7080,
+            "value": 60.0
+          }
+        ],
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 100.0
+          },
+          {
+            "t": 1800,
+            "value": 124.0
+          },
+          {
+            "t": 1920,
+            "value": 100.0
+          },
+          {
+            "t": 2040,
+            "value": 124.0
+          },
+          {
+            "t": 2160,
+            "value": 100.0
+          },
+          {
+            "t": 2280,
+            "value": 124.0
+          },
+          {
+            "t": 2400,
+            "value": 100.0
+          },
+          {
+            "t": 2520,
+            "value": 124.0
+          },
+          {
+            "t": 2640,
+            "value": 100.0
+          },
+          {
+            "t": 2760,
+            "value": 124.0
+          },
+          {
+            "t": 2880,
+            "value": 100.0
+          },
+          {
+            "t": 3000,
+            "value": 124.0
+          },
+          {
+            "t": 3120,
+            "value": 100.0
+          },
+          {
+            "t": 3240,
+            "value": 124.0
+          },
+          {
+            "t": 3360,
+            "value": 100.0
+          },
+          {
+            "t": 3480,
+            "value": 124.0
+          },
+          {
+            "t": 3600,
+            "value": 100.0
+          },
+          {
+            "t": 3720,
+            "value": 124.0
+          },
+          {
+            "t": 3840,
+            "value": 100.0
+          },
+          {
+            "t": 3960,
+            "value": 124.0
+          },
+          {
+            "t": 4080,
+            "value": 100.0
+          },
+          {
+            "t": 4200,
+            "value": 124.0
+          },
+          {
+            "t": 4320,
+            "value": 100.0
+          },
+          {
+            "t": 4440,
+            "value": 124.0
+          },
+          {
+            "t": 4560,
+            "value": 100.0
+          },
+          {
+            "t": 4680,
+            "value": 124.0
+          },
+          {
+            "t": 4800,
+            "value": 100.0
+          },
+          {
+            "t": 4920,
+            "value": 124.0
+          },
+          {
+            "t": 5040,
+            "value": 100.0
+          },
+          {
+            "t": 5160,
+            "value": 124.0
+          },
+          {
+            "t": 5280,
+            "value": 100.0
+          },
+          {
+            "t": 5400,
+            "value": 124.0
+          },
+          {
+            "t": 5520,
+            "value": 100.0
+          },
+          {
+            "t": 5640,
+            "value": 124.0
+          },
+          {
+            "t": 5760,
+            "value": 100.0
+          },
+          {
+            "t": 5880,
+            "value": 124.0
+          },
+          {
+            "t": 6000,
+            "value": 100.0
+          },
+          {
+            "t": 6120,
+            "value": 124.0
+          },
+          {
+            "t": 6240,
+            "value": 100.0
+          },
+          {
+            "t": 6360,
+            "value": 124.0
+          },
+          {
+            "t": 6480,
+            "value": 100.0
+          },
+          {
+            "t": 6600,
+            "value": 124.0
+          },
+          {
+            "t": 6720,
+            "value": 100.0
+          },
+          {
+            "t": 6840,
+            "value": 124.0
+          },
+          {
+            "t": 6960,
+            "value": 100.0
+          },
+          {
+            "t": 7080,
+            "value": 124.0
+          }
+        ],
+        "vfd_process_sp": [
+          {
+            "t": 0,
+            "value": 100.0
+          },
+          {
+            "t": 1800,
+            "value": 112.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 4200,
+          "to_s": 7200,
+          "equals": true
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 3600,
+          "to_s": 7200,
+          "equals": true
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 3600,
+          "to_s": 7200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "subtick_hunting_aliases_clear",
+      "description": "A host sampling once per minute cannot see an even number of reversals that occur and return between samples; the staged trace is therefore constant and every output stays clear. This pins the Nyquist limitation, not healthy plant behavior.",
+      "inputs": {
+        "vfd_speed": 50.0,
+        "vfd_process_value": 100.0,
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 0,
+          "to_s": 7200,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

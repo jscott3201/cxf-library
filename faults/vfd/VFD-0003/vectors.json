@@ -1,0 +1,1120 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 3600
+  },
+  "scenarios": [
+    {
+      "name": "healthy_mid_speed_satisfied",
+      "description": "At 60% speed with PV one loop unit above setpoint, neither saturation nor process-error direction is active.",
+      "inputs": {
+        "vfd_speed": 60.0,
+        "vfd_process_value": 101.0,
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yProcessHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yProcessLow",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "maximum_speed_satisfied",
+      "description": "The drive can sit at 100% without fault when the controlled process is within its configured error band.",
+      "inputs": {
+        "vfd_speed": 100.0,
+        "vfd_process_value": 105.0,
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yProcessHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yProcessLow",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "maximum_speed_process_high",
+      "description": "At 100% speed with PV 15 loop units above setpoint, the high diagnostic is immediate and the combined fault waits 15 minutes.",
+      "inputs": {
+        "vfd_speed": 100.0,
+        "vfd_process_value": 115.0,
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yProcessHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yProcessLow",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "maximum_speed_process_low",
+      "description": "The symmetric direction: PV 15 loop units below setpoint activates only yProcessLow and reaches the same persisted fault.",
+      "inputs": {
+        "vfd_speed": 100.0,
+        "vfd_process_value": 85.0,
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yProcessHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yProcessLow",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "speed_exactly_at_ceiling",
+      "description": "max_speed - speed_tolerance is 97%; the graph uses strict greater-than, so exactly 97% is not at maximum even though the raw high-error diagnostic is true.",
+      "inputs": {
+        "vfd_speed": 97.0,
+        "vfd_process_value": 115.0,
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yProcessHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yProcessLow",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "speed_just_beyond_ceiling",
+      "description": "At 97.1% the speed term passes; a 10.1-unit PV miss brackets both assembled strict boundaries from the faulting side.",
+      "inputs": {
+        "vfd_speed": 97.1,
+        "vfd_process_value": 110.1,
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yProcessHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yProcessLow",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "pv_error_exactly_at_threshold_high",
+      "description": "A positive error of exactly 10.0 loop units is not high under the strict comparator, even at 100% speed.",
+      "inputs": {
+        "vfd_speed": 100.0,
+        "vfd_process_value": 110.0,
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yProcessHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yProcessLow",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "pv_error_exactly_at_threshold_low",
+      "description": "The negative-error boundary is symmetric: PV exactly 10.0 units below setpoint does not activate yProcessLow.",
+      "inputs": {
+        "vfd_speed": 100.0,
+        "vfd_process_value": 90.0,
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yProcessHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yProcessLow",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "violation_shorter_than_duration",
+      "description": "A 14-minute high-process episode ends one sample before the 15-minute persistence can mature and never alarms.",
+      "inputs": {
+        "vfd_speed": 100.0,
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 115.0
+          },
+          {
+            "t": 840,
+            "value": 100.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "speed_release_resets_timer",
+      "description": "Six hundred seconds at maximum, one sample below the ceiling, then a fresh violation proves the conjunction timer resets rather than accumulating disjoint episodes.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 100.0
+          },
+          {
+            "t": 600,
+            "value": 90.0
+          },
+          {
+            "t": 660,
+            "value": 100.0
+          }
+        ],
+        "vfd_process_value": 115.0,
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1620,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "process_recovery_resets_timer",
+      "description": "The same reset through the process branch: a one-sample return inside the allowance band discards elapsed persistence before the miss returns.",
+      "inputs": {
+        "vfd_speed": 100.0,
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 85.0
+          },
+          {
+            "t": 600,
+            "value": 100.0
+          },
+          {
+            "t": 660,
+            "value": 85.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1620,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "initialization_violation_waits",
+      "description": "A violation present at engine initialization waits the full delay because persist.delayOnInit is true.",
+      "inputs": {
+        "vfd_speed": 98.0,
+        "vfd_process_value": 80.0,
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "stopped_drive_raw_behavior_host_gated",
+      "description": "With the drive stopped, the raw process-low diagnostic remains true but the high-speed term is false. The required enabled/auto/active-loop exclusion is host-side.",
+      "inputs": {
+        "vfd_speed": 0.0,
+        "vfd_process_value": 80.0,
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yProcessHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yProcessLow",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "mid_speed_raw_direction_switch",
+      "description": "At 50% speed the fault remains false while the raw process diagnostic switches from high to low at t=1800 s, proving the secondary outputs are not saturation-gated.",
+      "inputs": {
+        "vfd_speed": 50.0,
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 115.0
+          },
+          {
+            "t": 1800,
+            "value": 85.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yProcessHigh",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": true
+        },
+        {
+          "output": "yProcessHigh",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yProcessLow",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yProcessLow",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "both_just_beyond_low_boundaries",
+      "description": "The low-error mirror brackets both strict thresholds from the active side: speed 97.1% and PV 10.1 units below setpoint.",
+      "inputs": {
+        "vfd_speed": 97.1,
+        "vfd_process_value": 89.9,
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yProcessHigh",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yProcessLow",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "violation_ends_at_delay_boundary",
+      "description": "The candidate releases at the staged 900-second boundary before that tick is evaluated. No assertion is made on the boundary tick, and no fault appears.",
+      "inputs": {
+        "vfd_speed": 100.0,
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 115.0
+          },
+          {
+            "t": 900,
+            "value": 100.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_opposite_direction_episodes",
+      "description": "A short high-error episode and a separate low-error episode are divided by recovery. Direction changes do not let the shared persistence timer accumulate disjoint intervals.",
+      "inputs": {
+        "vfd_speed": 100.0,
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 115.0
+          },
+          {
+            "t": 600,
+            "value": 100.0
+          },
+          {
+            "t": 720,
+            "value": 85.0
+          },
+          {
+            "t": 1320,
+            "value": 100.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "recovery_after_alarm",
+      "description": "A matured high-direction fault clears immediately when PV returns to setpoint at t=1800 s.",
+      "inputs": {
+        "vfd_speed": 100.0,
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 115.0
+          },
+          {
+            "t": 1800,
+            "value": 100.0
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1740,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "speed_threshold_chatter_resets_delay",
+      "description": "Speed alternates on opposite sides of the 97% ceiling every minute while PV remains high. The candidate repeatedly resets and never survives 900 seconds.",
+      "inputs": {
+        "vfd_speed": [
+          {
+            "t": 0,
+            "value": 97.1
+          },
+          {
+            "t": 60,
+            "value": 96.9
+          },
+          {
+            "t": 120,
+            "value": 97.1
+          },
+          {
+            "t": 180,
+            "value": 96.9
+          },
+          {
+            "t": 240,
+            "value": 97.1
+          },
+          {
+            "t": 300,
+            "value": 96.9
+          },
+          {
+            "t": 360,
+            "value": 97.1
+          },
+          {
+            "t": 420,
+            "value": 96.9
+          },
+          {
+            "t": 480,
+            "value": 97.1
+          },
+          {
+            "t": 540,
+            "value": 96.9
+          },
+          {
+            "t": 600,
+            "value": 97.1
+          },
+          {
+            "t": 660,
+            "value": 96.9
+          },
+          {
+            "t": 720,
+            "value": 97.1
+          },
+          {
+            "t": 780,
+            "value": 96.9
+          },
+          {
+            "t": 840,
+            "value": 97.1
+          },
+          {
+            "t": 900,
+            "value": 96.9
+          },
+          {
+            "t": 960,
+            "value": 97.1
+          },
+          {
+            "t": 1020,
+            "value": 96.9
+          },
+          {
+            "t": 1080,
+            "value": 97.1
+          },
+          {
+            "t": 1140,
+            "value": 96.9
+          },
+          {
+            "t": 1200,
+            "value": 97.1
+          },
+          {
+            "t": 1260,
+            "value": 96.9
+          },
+          {
+            "t": 1320,
+            "value": 97.1
+          },
+          {
+            "t": 1380,
+            "value": 96.9
+          },
+          {
+            "t": 1440,
+            "value": 97.1
+          },
+          {
+            "t": 1500,
+            "value": 96.9
+          },
+          {
+            "t": 1560,
+            "value": 97.1
+          },
+          {
+            "t": 1620,
+            "value": 96.9
+          },
+          {
+            "t": 1680,
+            "value": 97.1
+          },
+          {
+            "t": 1740,
+            "value": 96.9
+          },
+          {
+            "t": 1800,
+            "value": 97.1
+          },
+          {
+            "t": 1860,
+            "value": 96.9
+          },
+          {
+            "t": 1920,
+            "value": 97.1
+          },
+          {
+            "t": 1980,
+            "value": 96.9
+          },
+          {
+            "t": 2040,
+            "value": 97.1
+          },
+          {
+            "t": 2100,
+            "value": 96.9
+          },
+          {
+            "t": 2160,
+            "value": 97.1
+          },
+          {
+            "t": 2220,
+            "value": 96.9
+          },
+          {
+            "t": 2280,
+            "value": 97.1
+          },
+          {
+            "t": 2340,
+            "value": 96.9
+          },
+          {
+            "t": 2400,
+            "value": 97.1
+          },
+          {
+            "t": 2460,
+            "value": 96.9
+          },
+          {
+            "t": 2520,
+            "value": 97.1
+          },
+          {
+            "t": 2580,
+            "value": 96.9
+          },
+          {
+            "t": 2640,
+            "value": 97.1
+          },
+          {
+            "t": 2700,
+            "value": 96.9
+          },
+          {
+            "t": 2760,
+            "value": 97.1
+          },
+          {
+            "t": 2820,
+            "value": 96.9
+          },
+          {
+            "t": 2880,
+            "value": 97.1
+          },
+          {
+            "t": 2940,
+            "value": 96.9
+          },
+          {
+            "t": 3000,
+            "value": 97.1
+          },
+          {
+            "t": 3060,
+            "value": 96.9
+          },
+          {
+            "t": 3120,
+            "value": 97.1
+          },
+          {
+            "t": 3180,
+            "value": 96.9
+          },
+          {
+            "t": 3240,
+            "value": 97.1
+          },
+          {
+            "t": 3300,
+            "value": 96.9
+          },
+          {
+            "t": 3360,
+            "value": 97.1
+          },
+          {
+            "t": 3420,
+            "value": 96.9
+          },
+          {
+            "t": 3480,
+            "value": 97.1
+          },
+          {
+            "t": 3540,
+            "value": 96.9
+          }
+        ],
+        "vfd_process_value": 115.0,
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "process_threshold_chatter_resets_delay",
+      "description": "PV alternates just inside and outside the high-error threshold every minute at maximum speed; the strict candidate never persists long enough to fault.",
+      "inputs": {
+        "vfd_speed": 100.0,
+        "vfd_process_value": [
+          {
+            "t": 0,
+            "value": 110.1
+          },
+          {
+            "t": 60,
+            "value": 109.9
+          },
+          {
+            "t": 120,
+            "value": 110.1
+          },
+          {
+            "t": 180,
+            "value": 109.9
+          },
+          {
+            "t": 240,
+            "value": 110.1
+          },
+          {
+            "t": 300,
+            "value": 109.9
+          },
+          {
+            "t": 360,
+            "value": 110.1
+          },
+          {
+            "t": 420,
+            "value": 109.9
+          },
+          {
+            "t": 480,
+            "value": 110.1
+          },
+          {
+            "t": 540,
+            "value": 109.9
+          },
+          {
+            "t": 600,
+            "value": 110.1
+          },
+          {
+            "t": 660,
+            "value": 109.9
+          },
+          {
+            "t": 720,
+            "value": 110.1
+          },
+          {
+            "t": 780,
+            "value": 109.9
+          },
+          {
+            "t": 840,
+            "value": 110.1
+          },
+          {
+            "t": 900,
+            "value": 109.9
+          },
+          {
+            "t": 960,
+            "value": 110.1
+          },
+          {
+            "t": 1020,
+            "value": 109.9
+          },
+          {
+            "t": 1080,
+            "value": 110.1
+          },
+          {
+            "t": 1140,
+            "value": 109.9
+          },
+          {
+            "t": 1200,
+            "value": 110.1
+          },
+          {
+            "t": 1260,
+            "value": 109.9
+          },
+          {
+            "t": 1320,
+            "value": 110.1
+          },
+          {
+            "t": 1380,
+            "value": 109.9
+          },
+          {
+            "t": 1440,
+            "value": 110.1
+          },
+          {
+            "t": 1500,
+            "value": 109.9
+          },
+          {
+            "t": 1560,
+            "value": 110.1
+          },
+          {
+            "t": 1620,
+            "value": 109.9
+          },
+          {
+            "t": 1680,
+            "value": 110.1
+          },
+          {
+            "t": 1740,
+            "value": 109.9
+          },
+          {
+            "t": 1800,
+            "value": 110.1
+          },
+          {
+            "t": 1860,
+            "value": 109.9
+          },
+          {
+            "t": 1920,
+            "value": 110.1
+          },
+          {
+            "t": 1980,
+            "value": 109.9
+          },
+          {
+            "t": 2040,
+            "value": 110.1
+          },
+          {
+            "t": 2100,
+            "value": 109.9
+          },
+          {
+            "t": 2160,
+            "value": 110.1
+          },
+          {
+            "t": 2220,
+            "value": 109.9
+          },
+          {
+            "t": 2280,
+            "value": 110.1
+          },
+          {
+            "t": 2340,
+            "value": 109.9
+          },
+          {
+            "t": 2400,
+            "value": 110.1
+          },
+          {
+            "t": 2460,
+            "value": 109.9
+          },
+          {
+            "t": 2520,
+            "value": 110.1
+          },
+          {
+            "t": 2580,
+            "value": 109.9
+          },
+          {
+            "t": 2640,
+            "value": 110.1
+          },
+          {
+            "t": 2700,
+            "value": 109.9
+          },
+          {
+            "t": 2760,
+            "value": 110.1
+          },
+          {
+            "t": 2820,
+            "value": 109.9
+          },
+          {
+            "t": 2880,
+            "value": 110.1
+          },
+          {
+            "t": 2940,
+            "value": 109.9
+          },
+          {
+            "t": 3000,
+            "value": 110.1
+          },
+          {
+            "t": 3060,
+            "value": 109.9
+          },
+          {
+            "t": 3120,
+            "value": 110.1
+          },
+          {
+            "t": 3180,
+            "value": 109.9
+          },
+          {
+            "t": 3240,
+            "value": 110.1
+          },
+          {
+            "t": 3300,
+            "value": 109.9
+          },
+          {
+            "t": 3360,
+            "value": 110.1
+          },
+          {
+            "t": 3420,
+            "value": 109.9
+          },
+          {
+            "t": 3480,
+            "value": 110.1
+          },
+          {
+            "t": 3540,
+            "value": 109.9
+          }
+        ],
+        "vfd_process_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

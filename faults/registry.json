@@ -856,6 +856,30 @@
       "method": "rule",
       "status": "verified",
       "legacy_id": "VFD-FC-051"
+    },
+    {
+      "id": "VFD-0003",
+      "family": "vfd",
+      "name": "At maximum speed with load unsatisfied",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "VFD-0004",
+      "family": "vfd",
+      "name": "VFD process-loop hunting",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "VFD-0005",
+      "family": "vfd",
+      "name": "VFD not in remote automatic control",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
     }
   ]
 }
