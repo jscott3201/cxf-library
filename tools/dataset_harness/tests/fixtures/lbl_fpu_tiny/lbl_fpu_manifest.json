@@ -1,0 +1,96 @@
+{
+  "schema": "cxf-library/dataset-manifest/lbl-fpu/v1",
+  "dataset": {
+    "name": "Original tiny LBNL-FPU adapter fixture",
+    "doi": "10.25984/1881324",
+    "version": "original-synthetic-fixture-v1",
+    "inventory": "Synthetic test manifest modeled on the public inventory contract; contains no source records"
+  },
+  "cases": [
+    {
+      "id": "pfpu_fault_free_tiny",
+      "file": "pfpu_fault_free.csv",
+      "subtype": "parallel",
+      "label": "fault_free",
+      "fault_class": null,
+      "severity": null,
+      "expected_rules": [],
+      "step_s": 60,
+      "timestamp_column": "timestamp",
+      "startup_lead_s": 120,
+      "mappings": {
+          "fan_cmd": {"column": "fan_cmd", "unit": "bool", "true_values": ["1"], "false_values": ["0"], "inventory_evidence": "Original synthetic fixture field; not source data."},
+          "fan_status": {"column": "fan_proof", "unit": "bool", "true_values": ["1"], "false_values": ["0"], "inventory_evidence": "Original synthetic fixture field; independent of fan_cmd."},
+          "primary_airflow": {"column": "primary_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture field; primary inlet stream."},
+          "primary_airflow_sp": {"column": "primary_sp_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture field; active primary target."},
+          "rht_vlv_cmd": {"column": "valve_fraction", "unit": "fraction", "inventory_evidence": "Original synthetic fixture field; final valve command."},
+          "rht_coil_entering_temp": {"column": "coil_in_f", "unit": "degF", "inventory_evidence": "Original synthetic fixture field; coil-local inlet."},
+          "rht_coil_leaving_temp": {"column": "coil_out_f", "unit": "degF", "inventory_evidence": "Original synthetic fixture field; coil-local outlet."},
+          "fan_airflow": {"column": "fan_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture field; subtype-correct fan path."},
+          "fan_airflow_expected": {
+            "column": "fan_expected_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture known-good expected flow.",
+            "readiness": {"method": "fixture constant lookup", "version": "fixture-v1", "inputs": ["subtype", "fan_cmd"], "known_good_basis": "invented healthy fixture values", "validation_error": "fixture-only; no empirical claim", "update_policy": "frozen"}
+          },
+          "primary_airflow_reference": {
+            "column": "primary_ref_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture independent reference.", "independent": true, "derived_from": [],
+            "readiness": {"method": "independent fixture truth channel", "version": "fixture-v1", "inputs": [], "known_good_basis": "original independent fixture channel", "validation_error": "fixture-only; no empirical claim", "update_policy": "frozen"}
+          },
+          "rht_delta_t_expected": {
+            "column": "expected_dt_f", "unit": "delta_degF", "inventory_evidence": "Original synthetic fixture known-good expected coil rise.",
+            "readiness": {"method": "fixture constant lookup", "version": "fixture-v1", "inputs": ["fan_airflow", "valve_fraction"], "known_good_basis": "invented healthy fixture values", "validation_error": "fixture-only; no empirical claim", "update_policy": "frozen"}
+          }
+        },
+      "gates": {
+          "occupied": {"column": "occupied", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture occupancy gate."},
+          "enabled": {"column": "enabled", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture controller-enabled gate."},
+          "airflow_established": {"column": "airflow_ok", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0002", "FPB-0003", "FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture airflow-established gate."},
+          "stable": {"column": "stable", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0002", "FPB-0003", "FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture mode/setpoint stability gate."},
+          "baseline_ready": {"column": "baseline_ready", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture expected/reference readiness gate."},
+          "point_valid": {"column": "point_valid", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture freshness and point-validity gate."}
+        }
+    },
+    {
+      "id": "sfpu_restricted_fan_tiny",
+      "file": "sfpu_restricted_fan.csv",
+      "subtype": "series",
+      "label": "faulted",
+      "fault_class": "restricted_terminal_fan_flow",
+      "severity": "synthetic-high",
+      "expected_rules": ["FPB-0004"],
+      "fault_start": "2026-01-02T00:00:00Z",
+      "step_s": 60,
+      "timestamp_column": "timestamp",
+      "startup_lead_s": 0,
+      "mappings": {
+          "fan_cmd": {"column": "fan_cmd", "unit": "bool", "true_values": ["1"], "false_values": ["0"], "inventory_evidence": "Original synthetic fixture field; not source data."},
+          "fan_status": {"column": "fan_proof", "unit": "bool", "true_values": ["1"], "false_values": ["0"], "inventory_evidence": "Original synthetic fixture field; independent of fan_cmd."},
+          "primary_airflow": {"column": "primary_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture field; primary inlet stream."},
+          "primary_airflow_sp": {"column": "primary_sp_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture field; active primary target."},
+          "rht_vlv_cmd": {"column": "valve_fraction", "unit": "fraction", "inventory_evidence": "Original synthetic fixture field; final valve command."},
+          "rht_coil_entering_temp": {"column": "coil_in_f", "unit": "degF", "inventory_evidence": "Original synthetic fixture field; coil-local inlet."},
+          "rht_coil_leaving_temp": {"column": "coil_out_f", "unit": "degF", "inventory_evidence": "Original synthetic fixture field; coil-local outlet."},
+          "fan_airflow": {"column": "fan_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture field; subtype-correct fan path."},
+          "fan_airflow_expected": {
+            "column": "fan_expected_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture known-good expected flow.",
+            "readiness": {"method": "fixture constant lookup", "version": "fixture-v1", "inputs": ["subtype", "fan_cmd"], "known_good_basis": "invented healthy fixture values", "validation_error": "fixture-only; no empirical claim", "update_policy": "frozen"}
+          },
+          "primary_airflow_reference": {
+            "column": "primary_ref_cfm", "unit": "cfm", "inventory_evidence": "Original synthetic fixture independent reference.", "independent": true, "derived_from": [],
+            "readiness": {"method": "independent fixture truth channel", "version": "fixture-v1", "inputs": [], "known_good_basis": "original independent fixture channel", "validation_error": "fixture-only; no empirical claim", "update_policy": "frozen"}
+          },
+          "rht_delta_t_expected": {
+            "column": "expected_dt_f", "unit": "delta_degF", "inventory_evidence": "Original synthetic fixture known-good expected coil rise.",
+            "readiness": {"method": "fixture constant lookup", "version": "fixture-v1", "inputs": ["fan_airflow", "valve_fraction"], "known_good_basis": "invented healthy fixture values", "validation_error": "fixture-only; no empirical claim", "update_policy": "frozen"}
+          }
+        },
+      "gates": {
+          "occupied": {"column": "occupied", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture occupancy gate."},
+          "enabled": {"column": "enabled", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture controller-enabled gate."},
+          "airflow_established": {"column": "airflow_ok", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0002", "FPB-0003", "FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture airflow-established gate."},
+          "stable": {"column": "stable", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0002", "FPB-0003", "FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture mode/setpoint stability gate."},
+          "baseline_ready": {"column": "baseline_ready", "true_values": ["1"], "false_values": ["0"], "applies_to": ["FPB-0004", "FPB-0005", "FPB-0006"], "description": "Fixture expected/reference readiness gate."},
+          "point_valid": {"column": "point_valid", "true_values": ["1"], "false_values": ["0"], "applies_to": ["*"], "description": "Fixture freshness and point-validity gate."}
+        }
+    }
+  ]
+}

@@ -4,11 +4,12 @@
 //! `vectors.json` inputs tick by tick, and check every assertion window. Exit code 0 only if every
 //! scenario of every fault passes.
 
+use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 use std::process::ExitCode;
 
 use oce_api::{Engine, PointDirection, PointValueType, Value};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 mod lint;
 
@@ -50,6 +51,30 @@ struct InputEvent {
     t: f64,
     path: String,
     value: Value,
+}
+
+#[derive(Serialize)]
+struct TraceDocument {
+    schema: &'static str,
+    clock: TraceClock,
+    scenarios: Vec<TraceScenario>,
+}
+
+#[derive(Serialize)]
+struct TraceClock {
+    step_s: f64,
+}
+
+#[derive(Serialize)]
+struct TraceScenario {
+    name: String,
+    samples: Vec<TraceSample>,
+}
+
+#[derive(Serialize)]
+struct TraceSample {
+    t: f64,
+    outputs: BTreeMap<String, serde_json::Value>,
 }
 
 /// Convert a JSON literal to an engine `Value`, coerced to the destination point's declared
@@ -120,34 +145,50 @@ fn fmt_value(v: &Value) -> String {
     }
 }
 
-fn run_scenario(
+fn value_to_json(v: &Value) -> Result<serde_json::Value, String> {
+    match v {
+        Value::Boolean(b) => Ok(serde_json::Value::Bool(*b)),
+        Value::Real(r) => serde_json::Number::from_f64(*r)
+            .map(serde_json::Value::Number)
+            .ok_or_else(|| format!("cannot serialize non-finite output {r}")),
+        Value::Integer(i) => Ok(serde_json::Value::Number((*i).into())),
+        other => Err(format!("unsupported trace output value {other:?}")),
+    }
+}
+
+fn boundary_name(path: &str) -> String {
+    path.rsplit_once(['.', '#'])
+        .map_or_else(|| path.to_string(), |(_, name)| name.to_string())
+}
+
+fn prepare_scenario(
     rule_bytes: &[u8],
-    clock: &Clock,
     scenario: &Scenario,
-) -> Result<(), String> {
+) -> Result<
+    (
+        Engine,
+        Vec<(String, PointDirection, PointValueType)>,
+        Vec<InputEvent>,
+    ),
+    String,
+> {
     let mut engine = Engine::in_memory();
     let report = engine
         .load_cxf(rule_bytes)
         .map_err(|e| format!("load_cxf failed: {e}"))?;
-    for w in &report.warnings {
-        eprintln!("      load warning: {w:?}");
+    for warning in &report.warnings {
+        eprintln!("      load warning: {warning:?}");
     }
-
     let mut points: Vec<(String, PointDirection, PointValueType)> = engine
         .point_list(None)
         .map_err(|e| format!("point_list failed: {e}"))?
         .into_iter()
         .map(|p| (p.path, p.direction, p.value_type))
         .collect();
-    // Root-declared boundary outputs are read aliases for their driving connectors — they appear
-    // in `topology()`, not `point_list()`. `get_output` accepts the declared spelling directly.
-    // `DeclaredOutput` carries no value type; the placeholder is never consulted because
-    // `json_to_value` coercion only applies to staged inputs.
     for declared in engine.topology().boundary_outputs {
         points.push((declared.path, PointDirection::Out, PointValueType::Real));
     }
 
-    // Flatten the input map into a time-sorted event list.
     let mut events: Vec<InputEvent> = Vec::new();
     for (name, spec) in &scenario.inputs {
         let (path, value_type) = resolve_point(&points, name, PointDirection::In)?;
@@ -178,6 +219,15 @@ fn run_scenario(
         }
     }
     events.sort_by(|a, b| a.t.total_cmp(&b.t));
+    Ok((engine, points, events))
+}
+
+fn run_scenario(
+    rule_bytes: &[u8],
+    clock: &Clock,
+    scenario: &Scenario,
+) -> Result<(), String> {
+    let (mut engine, points, events) = prepare_scenario(rule_bytes, scenario)?;
 
     // Pre-resolve assertion outputs.
     let mut expects: Vec<(String, &Expect)> = Vec::new();
@@ -217,6 +267,72 @@ fn run_scenario(
         }
     }
     Ok(())
+}
+
+fn trace_scenario(
+    rule_bytes: &[u8],
+    clock: &Clock,
+    scenario: &Scenario,
+) -> Result<TraceScenario, String> {
+    let (mut engine, _points, events) = prepare_scenario(rule_bytes, scenario)?;
+    let outputs: Vec<(String, String)> = engine
+        .topology()
+        .boundary_outputs
+        .into_iter()
+        .map(|declared| (boundary_name(&declared.path), declared.path))
+        .collect();
+    let n_ticks = (clock.horizon_s / clock.step_s).floor() as u64;
+    let mut next_event = 0usize;
+    let mut samples = Vec::with_capacity(n_ticks as usize + 1);
+    for k in 0..=n_ticks {
+        let t = k as f64 * clock.step_s;
+        while next_event < events.len() && events[next_event].t <= t {
+            let ev = &events[next_event];
+            engine
+                .set_input(&ev.path, ev.value.clone())
+                .map_err(|e| format!("set_input({}) failed: {e}", ev.path))?;
+            next_event += 1;
+        }
+        engine
+            .tick(t)
+            .map_err(|e| format!("tick({t}) failed: {e}"))?;
+        let mut values = BTreeMap::new();
+        for (name, path) in &outputs {
+            let value = engine
+                .get_output(path)
+                .map_err(|e| format!("get_output({path}) failed: {e}"))?;
+            values.insert(name.clone(), value_to_json(&value)?);
+        }
+        samples.push(TraceSample { t, outputs: values });
+    }
+    Ok(TraceScenario {
+        name: scenario.name.clone(),
+        samples,
+    })
+}
+
+fn trace_vectors(fault_dir: &Path, vectors_path: &Path) -> Result<TraceDocument, String> {
+    let rule_path = fault_dir.join("rule.cxf.jsonld");
+    let rule_bytes =
+        std::fs::read(&rule_path).map_err(|e| format!("{}: {e}", rule_path.display()))?;
+    let vectors: Vectors = serde_json::from_slice(
+        &std::fs::read(vectors_path).map_err(|e| format!("{}: {e}", vectors_path.display()))?,
+    )
+    .map_err(|e| format!("{}: {e}", vectors_path.display()))?;
+    if vectors.schema != "cxf-library/vectors/v1" {
+        return Err(format!("unsupported vectors schema `{}`", vectors.schema));
+    }
+    let mut scenarios = Vec::with_capacity(vectors.scenarios.len());
+    for scenario in &vectors.scenarios {
+        scenarios.push(trace_scenario(&rule_bytes, &vectors.clock, scenario)?);
+    }
+    Ok(TraceDocument {
+        schema: "cxf-library/replay-trace/v1",
+        clock: TraceClock {
+            step_s: vectors.clock.step_s,
+        },
+        scenarios,
+    })
 }
 
 fn verify_fault_dir(dir: &Path, replay_only: bool) -> Result<bool, String> {
@@ -321,7 +437,30 @@ fn discover_fault_dirs(faults_root: &Path) -> Result<Vec<PathBuf>, String> {
 }
 
 fn main() -> ExitCode {
-    let mut args: Vec<PathBuf> = std::env::args_os().skip(1).map(PathBuf::from).collect();
+    let raw_args: Vec<std::ffi::OsString> = std::env::args_os().skip(1).collect();
+    if raw_args.first().is_some_and(|arg| arg == "--trace-json") {
+        if raw_args.len() != 3 {
+            eprintln!("usage: cxf-verify --trace-json <fault-dir> <vectors.json>");
+            return ExitCode::from(2);
+        }
+        match trace_vectors(Path::new(&raw_args[1]), Path::new(&raw_args[2])) {
+            Ok(trace) => match serde_json::to_string(&trace) {
+                Ok(json) => {
+                    println!("{json}");
+                    return ExitCode::SUCCESS;
+                }
+                Err(e) => {
+                    eprintln!("trace serialization failed: {e}");
+                    return ExitCode::from(2);
+                }
+            },
+            Err(e) => {
+                eprintln!("trace replay failed: {e}");
+                return ExitCode::from(2);
+            }
+        }
+    }
+    let mut args: Vec<PathBuf> = raw_args.into_iter().map(PathBuf::from).collect();
     let replay_only = args.iter().any(|a| a.as_os_str() == "--replay-only");
     if replay_only && args.iter().any(|a| a.as_os_str() == "--all") {
         eprintln!("--replay-only is only valid with explicit generated replay directories");
@@ -339,7 +478,9 @@ fn main() -> ExitCode {
         println!("discovered {} fault dirs", args.len());
     }
     if args.is_empty() {
-        eprintln!("usage: cxf-verify [--replay-only] (--all | <fault-dir>…) (each containing rule.cxf.jsonld + vectors.json)");
+        eprintln!(
+            "usage: cxf-verify [--replay-only] (--all | <fault-dir>…) (each containing rule.cxf.jsonld + vectors.json)\n       cxf-verify --trace-json <fault-dir> <vectors.json>"
+        );
         return ExitCode::from(2);
     }
     let mut ok = true;

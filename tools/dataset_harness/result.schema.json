@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-control-library.example/schemas/dataset-validation-v1.json",
+  "title": "Open Control Library external-dataset validation result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "adapter", "dataset", "selection", "summary", "results", "notes"],
+  "properties": {
+    "schema": {"const": "cxf-library/dataset-validation/v1"},
+    "adapter": {"type": "string", "minLength": 1},
+    "dataset": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "doi", "inventory", "version", "local_fingerprint", "cases"],
+      "properties": {
+        "name": {"type": "string"},
+        "doi": {"type": "string"},
+        "inventory": {"type": "string"},
+        "version": {"type": "string"},
+        "local_fingerprint": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+        "cases": {"type": "integer", "minimum": 1}
+      }
+    },
+    "selection": {
+      "type": "object",
+      "required": ["rules", "cases", "subtype", "case_kind", "severity", "start", "end"],
+      "properties": {
+        "rules": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+        "cases": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+        "subtype": {"type": ["string", "null"]},
+        "case_kind": {"type": ["string", "null"]},
+        "severity": {"type": ["string", "null"]},
+        "start": {"type": ["string", "null"]},
+        "end": {"type": ["string", "null"]}
+      }
+    },
+    "summary": {"$ref": "#/$defs/metricsSummary"},
+    "results": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/result"}
+    },
+    "notes": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "nullableNumber": {"type": ["number", "null"]},
+    "metricsSummary": {
+      "type": "object",
+      "required": [
+        "results",
+        "evaluable_samples",
+        "fault_free_alarm_samples",
+        "fault_free_alarm_episodes",
+        "faulted_detected_cases",
+        "faulted_total_cases",
+        "median_detection_latency_s"
+      ],
+      "properties": {
+        "results": {"type": "integer", "minimum": 0},
+        "evaluable_samples": {"type": "integer", "minimum": 0},
+        "fault_free_alarm_samples": {"type": "integer", "minimum": 0},
+        "fault_free_alarm_episodes": {"type": "integer", "minimum": 0},
+        "faulted_detected_cases": {"type": "integer", "minimum": 0},
+        "faulted_total_cases": {"type": "integer", "minimum": 0},
+        "median_detection_latency_s": {"$ref": "#/$defs/nullableNumber"}
+      }
+    },
+    "result": {
+      "type": "object",
+      "required": [
+        "case",
+        "rule",
+        "subtype",
+        "label",
+        "fault_class",
+        "severity",
+        "mapping",
+        "gating",
+        "metrics",
+        "notes"
+      ],
+      "properties": {
+        "case": {"type": "string"},
+        "rule": {"type": "string", "pattern": "^FPB-[0-9]{4}$"},
+        "subtype": {"enum": ["parallel", "series"]},
+        "label": {"enum": ["fault_free", "faulted"]},
+        "fault_class": {"type": ["string", "null"]},
+        "severity": {"type": ["string", "null"]},
+        "mapping": {
+          "type": "object",
+          "required": ["canonical_to_source", "binding_details", "proxies", "unit_conversions"],
+          "properties": {
+            "canonical_to_source": {"type": "object", "additionalProperties": {"type": ["string", "null"]}},
+            "binding_details": {"type": "object", "additionalProperties": {"type": ["object", "null"]}},
+            "proxies": {"type": "array", "items": {"type": "object"}},
+            "unit_conversions": {"type": "array", "items": {"type": "object"}}
+          }
+        },
+        "gating": {
+          "type": "object",
+          "required": ["description", "definitions", "startup_lead_s", "evaluable_samples", "segments", "source_timeline"],
+          "properties": {
+            "description": {"type": "string"},
+            "definitions": {"type": "array", "items": {"type": "object"}},
+            "startup_lead_s": {"type": "integer", "minimum": 0},
+            "evaluable_samples": {"type": "integer", "minimum": 0},
+            "segments": {"type": "integer", "minimum": 0},
+            "source_timeline": {"type": "object"}
+          }
+        },
+        "metrics": {
+          "type": "object",
+          "required": [
+            "evaluable_samples",
+            "alarm_samples",
+            "alarm_episodes",
+            "fault_free_alarm_samples",
+            "fault_free_alarm_episodes",
+            "fault_free_evaluable_samples",
+            "fault_free_alarm_sample_rate",
+            "faulted_detected_cases",
+            "faulted_total_cases",
+            "median_detection_latency_s"
+          ],
+          "properties": {
+            "evaluable_samples": {"type": "integer", "minimum": 0},
+            "alarm_samples": {"type": "integer", "minimum": 0},
+            "alarm_episodes": {"type": "integer", "minimum": 0},
+            "fault_free_alarm_samples": {"type": "integer", "minimum": 0},
+            "fault_free_alarm_episodes": {"type": "integer", "minimum": 0},
+            "fault_free_evaluable_samples": {"type": "integer", "minimum": 0},
+            "fault_free_alarm_sample_rate": {"$ref": "#/$defs/nullableNumber"},
+            "faulted_detected_cases": {"type": "integer", "minimum": 0},
+            "faulted_total_cases": {"type": "integer", "minimum": 0},
+            "median_detection_latency_s": {"$ref": "#/$defs/nullableNumber"}
+          }
+        },
+        "notes": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}
