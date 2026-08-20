@@ -1,0 +1,829 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 3600
+  },
+  "scenarios": [
+    {
+      "name": "zero_stages_at_low_load",
+      "description": "A stopped plant at low load exposes only the low-load diagnostic and is not over-staged.",
+      "inputs": {
+        "boiler_stage_count": 0,
+        "hw_plant_load_fraction": 0.1
+      },
+      "expect": [
+        {
+          "output": "yLowLoad",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yExcessStages",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "one_stage_at_low_load",
+      "description": "One firing boiler is the shipped allowance below the low-load threshold.",
+      "inputs": {
+        "boiler_stage_count": 1,
+        "hw_plant_load_fraction": 0.2
+      },
+      "expect": [
+        {
+          "output": "yLowLoad",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yExcessStages",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "two_stages_at_low_load_initialization",
+      "description": "Two firing boilers at low load assert both diagnostics immediately: yFault is clear one tick before 900 s, asserts exactly at 900 s, and remains true after the full delay.",
+      "inputs": {
+        "boiler_stage_count": 2,
+        "hw_plant_load_fraction": 0.2
+      },
+      "expect": [
+        {
+          "output": "yLowLoad",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yExcessStages",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 900,
+          "to_s": 900,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "multiple_stages_at_high_load",
+      "description": "Multiple boilers are appropriate above the configured low-load region.",
+      "inputs": {
+        "boiler_stage_count": 3,
+        "hw_plant_load_fraction": 0.8
+      },
+      "expect": [
+        {
+          "output": "yLowLoad",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yExcessStages",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "load_exact_threshold_clear",
+      "description": "Exactly 0.35 is not low load under the strict comparator.",
+      "inputs": {
+        "boiler_stage_count": 2,
+        "hw_plant_load_fraction": 0.35
+      },
+      "expect": [
+        {
+          "output": "yLowLoad",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yExcessStages",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "load_just_below_threshold",
+      "description": "One thousandth below the load threshold activates the low-load branch.",
+      "inputs": {
+        "boiler_stage_count": 1,
+        "hw_plant_load_fraction": 0.349
+      },
+      "expect": [
+        {
+          "output": "yLowLoad",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yExcessStages",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "stage_count_exact_threshold_clear",
+      "description": "Exactly one firing stage is not excess under the integer comparison.",
+      "inputs": {
+        "boiler_stage_count": 1,
+        "hw_plant_load_fraction": 0.1
+      },
+      "expect": [
+        {
+          "output": "yLowLoad",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yExcessStages",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "both_just_beyond_boundaries",
+      "description": "Two stages and 0.349 load are the nearest representable faulting values on both branches.",
+      "inputs": {
+        "boiler_stage_count": 2,
+        "hw_plant_load_fraction": 0.349
+      },
+      "expect": [
+        {
+          "output": "yLowLoad",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yExcessStages",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "load_zero_endpoint_is_valid",
+      "description": "Zero is an inclusive valid load endpoint and can support an over-staging finding.",
+      "inputs": {
+        "boiler_stage_count": 2,
+        "hw_plant_load_fraction": 0.0
+      },
+      "expect": [
+        {
+          "output": "yLowLoad",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yExcessStages",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "load_one_endpoint_is_valid",
+      "description": "One is an inclusive valid load endpoint and is outside the low-load region.",
+      "inputs": {
+        "boiler_stage_count": 2,
+        "hw_plant_load_fraction": 1.0
+      },
+      "expect": [
+        {
+          "output": "yLowLoad",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yExcessStages",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "stage_overlap_ends_one_tick_before_persistence",
+      "description": "A second stage drops out one evaluator step before 900 seconds and never alarms.",
+      "inputs": {
+        "boiler_stage_count": [
+          {
+            "t": 0,
+            "value": 2
+          },
+          {
+            "t": 840,
+            "value": 1
+          }
+        ],
+        "hw_plant_load_fraction": 0.2
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "mature_alarm_clears_when_stage_drops",
+      "description": "A mature over-staging alarm clears immediately when the extra boiler stops firing.",
+      "inputs": {
+        "boiler_stage_count": [
+          {
+            "t": 0,
+            "value": 2
+          },
+          {
+            "t": 1800,
+            "value": 1
+          }
+        ],
+        "hw_plant_load_fraction": 0.2
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1740,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yExcessStages",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "mature_alarm_clears_when_load_rises",
+      "description": "A real load increase clears the low-load premise even while two boilers continue firing.",
+      "inputs": {
+        "boiler_stage_count": 2,
+        "hw_plant_load_fraction": [
+          {
+            "t": 0,
+            "value": 0.2
+          },
+          {
+            "t": 1800,
+            "value": 0.5
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1740,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLowLoad",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "two_short_overlaps_do_not_accumulate",
+      "description": "Separated transient stage overlaps each receive a fresh timer.",
+      "inputs": {
+        "boiler_stage_count": [
+          {
+            "t": 0,
+            "value": 2
+          },
+          {
+            "t": 600,
+            "value": 1
+          },
+          {
+            "t": 900,
+            "value": 2
+          },
+          {
+            "t": 1500,
+            "value": 1
+          }
+        ],
+        "hw_plant_load_fraction": 0.2
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "load_rise_resets_timer",
+      "description": "A temporary load rise resets persistence before the original low-load condition returns.",
+      "inputs": {
+        "boiler_stage_count": 2,
+        "hw_plant_load_fraction": [
+          {
+            "t": 0,
+            "value": 0.2
+          },
+          {
+            "t": 600,
+            "value": 0.5
+          },
+          {
+            "t": 900,
+            "value": 0.2
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "stage_drop_resets_timer",
+      "description": "A one-stage interval resets persistence before the second stage returns.",
+      "inputs": {
+        "boiler_stage_count": [
+          {
+            "t": 0,
+            "value": 2
+          },
+          {
+            "t": 600,
+            "value": 1
+          },
+          {
+            "t": 900,
+            "value": 2
+          }
+        ],
+        "hw_plant_load_fraction": 0.2
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "load_threshold_chatter_resets_delay",
+      "description": "Load alternating around 0.35 never stays low for the full delay.",
+      "inputs": {
+        "boiler_stage_count": 2,
+        "hw_plant_load_fraction": [
+          {
+            "t": 0,
+            "value": 0.349
+          },
+          {
+            "t": 180,
+            "value": 0.351
+          },
+          {
+            "t": 360,
+            "value": 0.349
+          },
+          {
+            "t": 540,
+            "value": 0.351
+          },
+          {
+            "t": 720,
+            "value": 0.349
+          },
+          {
+            "t": 900,
+            "value": 0.351
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "stage_count_chatter_resets_delay",
+      "description": "A second stage repeatedly entering and leaving below the proof duration never matures.",
+      "inputs": {
+        "boiler_stage_count": [
+          {
+            "t": 0,
+            "value": 2
+          },
+          {
+            "t": 180,
+            "value": 1
+          },
+          {
+            "t": 360,
+            "value": 2
+          },
+          {
+            "t": 540,
+            "value": 1
+          },
+          {
+            "t": 720,
+            "value": 2
+          },
+          {
+            "t": 900,
+            "value": 1
+          }
+        ],
+        "hw_plant_load_fraction": 0.2
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "negative_load_is_not_evaluable",
+      "description": "A negative derived load is numerically low, but the in-graph range gate blocks the alarm and exposes NO_EVAL.",
+      "inputs": {
+        "boiler_stage_count": 2,
+        "hw_plant_load_fraction": -0.1
+      },
+      "expect": [
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLowLoad",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yExcessStages",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "load_above_one_is_not_evaluable",
+      "description": "A derived load above one is invalid; yLoadOk prevents a false healthy interpretation even though low-load is false.",
+      "inputs": {
+        "boiler_stage_count": 2,
+        "hw_plant_load_fraction": 1.1
+      },
+      "expect": [
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLowLoad",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yExcessStages",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "enabled_count_misbinding_raw_false_positive",
+      "description": "Counting enabled or available boilers instead of firing machines can create this raw alarm; the derivation contract must reject that binding.",
+      "inputs": {
+        "boiler_stage_count": 2,
+        "hw_plant_load_fraction": 0.1
+      },
+      "expect": [
+        {
+          "output": "yLowLoad",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yExcessStages",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "redundancy_warmup_is_host_excluded",
+      "description": "Two firing boilers during an emergency-redundancy or warm-up interval are raw over-staging but explicitly outside normal automatic sequencing.",
+      "inputs": {
+        "boiler_stage_count": 2,
+        "hw_plant_load_fraction": 0.2
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}

@@ -586,6 +586,30 @@
       "legacy_id": null
     },
     {
+      "id": "HW-0010",
+      "family": "hw",
+      "name": "Hot-water supply temperature tracking failure",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "HW-0011",
+      "family": "hw",
+      "name": "Hot-water temperature-control hunting",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "HW-0012",
+      "family": "hw",
+      "name": "Excess boiler stages at low plant load",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
       "id": "PMP-0001",
       "family": "pmp",
       "name": "Pump commanded on, no flow detected",

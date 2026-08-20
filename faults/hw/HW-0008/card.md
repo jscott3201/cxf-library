@@ -20,7 +20,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [HW-0006, CHW-0002, AHU-0023]
+related: [HW-0006, HW-0010, CHW-0002, AHU-0023]
 playbooks: [missing-reset, hot-water-plant-faults]
 operating_states: "Heating season — boiler plant enabled and serving the loop for the bulk of the evaluation window"
 preconditions: "hws_temp_sp must be the active setpoint the boilers track — the plant controller's live value, not a design figure in a schedule table or a boiler's local panel setting that the BAS overrides. On a multi-boiler plant bind the plant-level setpoint; an individual boiler's leaving-water setpoint is set by staging logic and reads flat while the plant resets. oat must be a trustworthy outdoor reading: the whole evaluability test rests on it, and the same sensor that HW-0003's diagnosis 5 warns about (in the sun, above a warm roof, or dead at its last value) feeds this rule too. A plant that must hold a fixed supply temperature for a domestic hot water load has a legitimate reason to keep the setpoint flat — Legionella control sets a floor no reset may cross — and combined heating/DHW plants must either be excluded, be bound to a heating-only boiler where the plant has one, or be gated host-side on the DHW load. The plant must be running for most of the window; a boiler off for the season holds the setpoint still for reasons this rule cannot see. Evaluability is signalled in-rule by yOatVaried: when it is false the verdict is NO_EVAL, not healthy."

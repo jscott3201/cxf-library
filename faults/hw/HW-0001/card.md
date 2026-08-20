@@ -18,7 +18,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [HW-0002, HW-0003, RTU-0001, AHU-0004]
+related: [HW-0002, HW-0003, HW-0011, HW-0012, RTU-0001, AHU-0004]
 playbooks: [hot-water-plant-faults]
 operating_states: "heating season / HW plant enabled"
 preconditions: "The host must report NO_EVAL for the first count_window (1 h) after engine start. While the moving average's window fills, its divisor is elapsed time rather than the window, so the count reports an extrapolated pace instead of a completed-hour tally, and alarm_delay (15 min) is far too short to cover the hour on its own — `warmup_pace_asserts_on_two_starts` shows a verdict reached at 1200 s on the strength of two starts. The plant must be enabled and in heating season: a boiler idle because nothing is calling for heat produces zero starts, and reporting that as healthy cycling is the opposite of information. boiler_status must be the burner's FIRING (flame) status, not the boiler's enable status — an enable that stays true across an entire morning hides every burner cycle inside it, which is the point dictionary's warning on this point. Bind it per boiler: on a multi-boiler plant the OR of the statuses never falls while any boiler is firing, so every lag-boiler start is invisible and each boiler's own cycling is undercounted. The host tick interval must sit inside the band the count arithmetic and the edge counter jointly allow — 57.15 s ≤ dt < 360 s — with count_scale retuned to match (see Deviations). When any gate is unmet the verdict is NO_EVAL, not healthy."

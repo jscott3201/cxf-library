@@ -154,13 +154,17 @@ entry — never a silent all-states default.
 
 `--mode plant` maps CHW/HW plant loops instead of air loops: loop
 supply/return node temperatures and setpoints from `PlantLoop`, chiller/
-boiler part-load ratios for load and status, pump electricity for
+boiler part-load ratios for load and status, same-loop pump mass flow for
 `hw_pump_status`, and `hw_pump_vfd_speed` as a pump mass-flow fraction
-(affinity-law proxy). DOE prototype IDFs enter via the E+ transition chain
+(affinity-law proxy). Boiler and pump fleet membership is traversed from each
+`PlantLoop` supply-side `BranchList`; name matching is not accepted because it
+can silently include equipment on another loop. DOE prototype IDFs enter via the E+ transition chain
 (`PreProcess/IDFVersionUpdater`, e.g. 22.1 → 25.1 in six steps) +
 `ConvertInputFormat`. Rules replay per family with rule-specific gates
-(`PLANT_GATE`: CHW-0004 needs chiller load > 40%; boiler rules need the
-boiler active; unnecessary-operation rules replay ungated — gating on the
+(`PLANT_GATE`: CHW-0004 needs chiller load > 40%; boiler rules need both a
+firing-status proxy and same-loop circulation; HW-0010 additionally splits
+windows on active-setpoint changes and applies an 1800 s settling margin;
+unnecessary-operation rules replay ungated — gating on the
 equipment they accuse would mask them). `PLANT_EXCLUDE` names the
 baseline-fitted, reset-class, and by-construction rules with reasons.
 

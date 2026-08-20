@@ -62,5 +62,68 @@ relative/replay/TOWER-0005__two
         })
 
 
+class PlantTopologyTests(unittest.TestCase):
+    def test_hw_fleet_comes_only_from_target_supply_branches(self):
+        model = {
+            "PlantLoop": {
+                "HeatSys1": {
+                    "fluid_type": "Water",
+                    "plant_side_outlet_node_name": "out",
+                    "plant_side_inlet_node_name": "in",
+                    "loop_temperature_setpoint_node_name": "sp",
+                    "plant_side_branch_list_name": "heat branches",
+                }
+            },
+            "BranchList": {
+                "heat branches": {
+                    "branches": [{"branch_name": "heat equipment"}]
+                }
+            },
+            "Branch": {
+                "heat equipment": {
+                    "components": [
+                        {"component_object_type": "Pump:VariableSpeed",
+                         "component_name": "Heat Pump"},
+                        {"component_object_type": "Boiler:HotWater",
+                         "component_name": "Heat Boiler"},
+                    ]
+                },
+                "other equipment": {
+                    "components": [
+                        {"component_object_type": "Boiler:HotWater",
+                         "component_name": "Dummy Boiler"}
+                    ]
+                },
+            },
+            "Boiler:HotWater": {"Heat Boiler": {}, "Dummy Boiler": {}},
+            "Pump:VariableSpeed": {"Heat Pump": {}},
+        }
+        nodes = harness.plant_nodes(model)
+        self.assertEqual(nodes["hw"]["boilers"], ["Heat Boiler"])
+        self.assertEqual(nodes["hw"]["pumps"], ["Heat Pump"])
+
+    def test_tracking_gate_requires_boiler_pump_and_stable_setpoint(self):
+        old_step = harness.STEP_S
+        old_lead = harness.OS_LEAD_S
+        harness.STEP_S = 60
+        harness.OS_LEAD_S = 120
+        try:
+            pts = {
+                "boiler_status": [True] * 70,
+                "hw_pump_status": [True] * 70,
+                "hws_temp_sp": [60.0] * 35 + [55.0] * 35,
+            }
+            self.assertEqual(
+                harness.plant_gate_windows("hw_tracking", pts, 70),
+                [(120, 2040), (2220, 4140)],
+            )
+            pts["hw_pump_status"] = [False] * 70
+            self.assertEqual(
+                harness.plant_gate_windows("hw_tracking", pts, 70), [])
+        finally:
+            harness.STEP_S = old_step
+            harness.OS_LEAD_S = old_lead
+
+
 if __name__ == "__main__":
     unittest.main()
