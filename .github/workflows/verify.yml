@@ -40,4 +40,21 @@ jobs:
 
       - name: Lint and verify fault library
         working-directory: cxf-library
-        run: cargo run --manifest-path tools/verify/Cargo.toml -- --all
+        run: |
+          cargo test --manifest-path tools/verify/Cargo.toml
+          cargo run --manifest-path tools/verify/Cargo.toml -- --all
+
+      - name: Test external dataset harness
+        working-directory: cxf-library
+        run: python3 -m unittest discover -s tools/dataset_harness/tests -v
+
+      - name: Replay original tiny FPU fixture through pinned engine
+        working-directory: cxf-library
+        run: |
+          python3 tools/dataset_harness/harness.py replay \
+            --adapter lbl-fpu \
+            --dataset tools/dataset_harness/tests/fixtures/lbl_fpu_tiny \
+            --rules FPB-0001,FPB-0002,FPB-0003,FPB-0004,FPB-0005,FPB-0006 \
+            --verifier tools/verify/target/debug/cxf-verify \
+            --output target/dataset-harness/ci-lbl-fpu-results.json
+          python3 -c 'import json; p="target/dataset-harness/ci-lbl-fpu-results.json"; d=json.load(open(p)); assert d["schema"] == "cxf-library/dataset-validation/v1"; assert d["summary"]["fault_free_alarm_samples"] == 0; assert d["summary"]["target_declared_rule_case_pairs"] == 1; assert d["summary"]["target_detected_rule_case_pairs"] == 1'

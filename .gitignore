@@ -1,5 +1,6 @@
 .DS_Store
 tools/verify/target/
+/target/
 __pycache__/
 
 # generated mdBook content (tools/book/generate.py + mdbook build)
