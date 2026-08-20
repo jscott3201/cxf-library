@@ -23,10 +23,12 @@ Point dictionary: [`points/rtu.points.json`](../../points/rtu.points.json).
 | RTU-0008 | Refrigerant undercharge — superheat/subcooling divergence | 3 | rule | **verified** |
 | RTU-0009 | Refrigerant overcharge — high liquid subcooling | 3 | rule | **verified** |
 | RTU-0010 | RTU supply-fan proof-of-operation failure | 2 | rule | **verified** |
+| RTU-0011 | RTU supply-air temperature tracking failure | 3 | rule | **verified** |
 
 Severity and method for RTU-0001..009 follow the reference's ch.11 cards (its
 §5.8.3 index carries no severity column); RTU-0010 is a severity-2 library
-proof-of-operation adaptation. RTU-0007 shipped once the host-fitted-baseline
+proof-of-operation adaptation and RTU-0011 is a library tracking adaptation.
+RTU-0007 shipped once the host-fitted-baseline
 convention resolved its two-variable (stage AND outdoor temperature) curve
 as the derived point `cond_split_baseline`; its remaining constraint is the
 condenser leaving-air temperature sensor most packaged units lack, declared
@@ -47,3 +49,7 @@ on the card as a retrofit gate rather than a deferral.
   Read its direction before RTU-0001..006 and RTU-0008/0009: fail-to-start
   contests their running/airflow premise or evidence quality, while unexpected
   operation does not make their physical evidence invalid by itself.
+- **RTU-0011** compares discharge temperature with the final active mode-specific
+  target while fan and mechanical delivery are proven. Its warm/cold direction
+  leads investigation across capacity, airflow, economizer, refrigerant, and
+  control findings; proof rules remain related rather than unconditional suppressors.

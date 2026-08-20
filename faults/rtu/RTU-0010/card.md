@@ -18,7 +18,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [RTU-0001, RTU-0002, RTU-0003, RTU-0004, RTU-0005, RTU-0006, RTU-0008, RTU-0009]
+related: [RTU-0001, RTU-0002, RTU-0003, RTU-0004, RTU-0005, RTU-0006, RTU-0008, RTU-0009, RTU-0011]
 playbooks: [proof-of-operation]
 operating_states: "all states in which the final RTU supply-fan command and independent proof for that same fan are authoritative"
 preconditions: "Bind sf_cmd to the final supply-fan command after smoke, freeze, heat-exchanger, post-heat fan-delay, and safety logic; unit enable is valid only when it demonstrably is that final command. A commanded post-heat run must keep sf_cmd true. Bind sf_status to independent electrical, airflow, speed, rotation, or auxiliary-contact proof for the same fan. Exclude purge, smoke control, ventilation override, service, local hand mode, and any fan-delay state omitted from sf_cmd. The 120 s stop timer must exceed normal mechanical coast and proof dropout, not conceal an upstream command. Inputs must be fresh and aligned; unmet obligations are NO_EVAL, not healthy."

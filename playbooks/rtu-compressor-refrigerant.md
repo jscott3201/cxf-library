@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | RTU-0001, RTU-0002, RTU-0007, RTU-0008, RTU-0009 |
+| **Applies to** | RTU-0001, RTU-0002, RTU-0007, RTU-0008, RTU-0009, RTU-0011 |
 | **Fix complexity** | On-site service required |
 | **Typical time** | 1–4 h on-site |
 | **Typical cost** | $100–$500 (cleaning/filter) / $500–$2,000 (capacitor/charge) / $2,000–$8,000 (compressor) |
@@ -19,21 +19,26 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 168–169).
    must keep the final command true; purge, smoke control, and local hand modes
    omitted from the command are host NO_EVAL, not timer exceptions. Follow the
    [proof-of-operation](proof-of-operation.md) playbook for the mismatch itself.
-2. **Compressor short-cycling (RTU-0001):** pull the compressor run status
+2. **SAT tracking (RTU-0011):** confirm `sat_sp` is the final active
+   mode-specific target, then verify stable supply-fan proof and mechanical
+   heating/cooling status. Exclude startup, setpoint/mode steps, defrost,
+   post-heat, demand response, normal DX off-cycles, and OEM limiting. Use
+   `yTooWarm`/`yTooCold` only as direction evidence, not a root-cause verdict.
+3. **Compressor short-cycling (RTU-0001):** pull the compressor run status
    trend and count starts per hour — more than 6 starts/hr indicates
    short-cycling. Check minimum on-time per cycle: less than 5 minutes is
    abnormal. (Albayati et al. 2023 achieved 95.7% accuracy on RTU fault
    classification with semi-supervised learning; the trend check remains the
    ground truth.)
-3. **Evaporator fouling (RTU-0002):** calculate the temperature split
+4. **Evaporator fouling (RTU-0002):** calculate the temperature split
    RAT − SAT during steady-state cooling and compare to the baseline split
    for the current compressor stage. A 25% or greater reduction indicates
    fouling. Typical baselines: 8 °C (14 °F) at stage 1, 12 °C (22 °F) at
    stage 2.
-4. **Condenser fouling (RTU-0007):** measure condenser leaving air
+5. **Condenser fouling (RTU-0007):** measure condenser leaving air
    temperature minus OAT and compare to baseline for the current stage and
    OAT. A 30% or greater increase indicates fouling.
-5. **Refrigerant charge (RTU-0008/0009):** with the compressor settled at a
+6. **Refrigerant charge (RTU-0008/0009):** with the compressor settled at a
    steady stage, measure suction superheat and liquid subcooling at the
    service ports and compare to the unit's charging chart for the current
    conditions. High superheat with low subcooling indicates undercharge;
@@ -51,6 +56,9 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 168–169).
 3. Correct only verified BAS binding or sequence defects. Never bypass smoke,
    freeze, condensate, high/low-pressure, electrical, or OEM safeties, and do
    not repeatedly reset compressor or fan lockouts.
+4. For RTU-0011, compare the tracking direction with economizer command,
+   compressor/heating stage, fan proof, and OEM limit history before changing
+   setpoints or tuning. A bad active-target binding is not a capacity fault.
 
 ## Step 3 — On-site service
 
@@ -103,5 +111,8 @@ approaching belts, capacitors, contactors, fans, or compressors.
 4. **Supply fan:** through a normal controller-owned cycle, verify the final
    command and independent proof agree after commissioned pickup/dropout times.
    Do not force operation or bypass an interlock.
-5. Schedule preventive maintenance: quarterly filter changes, annual coil
+5. **SAT tracking:** after the causal repair, trend final active setpoint, SAT,
+   fan proof, and conditioning proof across normal heating/cooling cycles. The
+   error should remain inside the commissioned band once settled.
+6. Schedule preventive maintenance: quarterly filter changes, annual coil
    cleaning. For multi-RTU sites, service all units in the same visit.

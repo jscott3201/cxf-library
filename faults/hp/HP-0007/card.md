@@ -18,7 +18,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [HP-0001, HP-0002, HP-0003, HP-0004, HP-0005, HP-0006, RTU-0001]
+related: [HP-0001, HP-0002, HP-0003, HP-0004, HP-0005, HP-0006, RTU-0001, HP-0008]
 playbooks: [proof-of-operation, heat-pump-faults]
 operating_states: "all states in which a final per-compressor command and independent proof for that same compressor or circuit are authoritative"
 preconditions: "Bind comp_cmd downstream of anti-short-cycle delay, safety lockouts, staging, demand response, and OEM permissives; an upstream heating/cooling demand is not a final compressor command. Bind comp_status to actual compressor electrical, inverter, pressure, or auxiliary proof, not demand or command echo. Instantiate per compressor/circuit where possible. An OR command/status pair proves only that some compressor runs and cannot detect a failed lag compressor while the lead remains on. Exclude defrost transitions, pump-down, crankcase or oil-management sequences, emergency heat, service, and manufacturer restart delays not represented in the final command. Inputs must be fresh and aligned; unmet obligations are NO_EVAL, not healthy."

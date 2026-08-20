@@ -1,0 +1,629 @@
+{
+  "@context": {
+    "S231": "http://data.ashrae.org/S231P#",
+    "base": "urn:cxf-library:rtu-0011#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011",
+      "@type": "S231:Block",
+      "S231:label": "rtu_0011",
+      "S231:containsBlock": [
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.temperatureError"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.negateError"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarmRaw"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooColdRaw"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.conditioningActive"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.fanConditioning"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.errorAny"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarm"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooCold"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.candidate"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.persist"
+        }
+      ],
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.sat"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.sat_sp"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.sf_status"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.comp_status"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.htg_status"
+        }
+      ],
+      "S231:hasOutput": [
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.yFault"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.yTooWarm"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.yTooCold"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.yConditioningActive"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.temperatureError",
+      "@type": "urn:cxf-library:rtu-0011#Buildings.Controls.OBC.CDL.Reals.Subtract",
+      "S231:label": "temperatureError",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.temperatureError.u1"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.temperatureError.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.temperatureError.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.temperatureError.u1",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.temperatureError.u2",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.temperatureError.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarmRaw.u"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.negateError.u"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.negateError",
+      "@type": "urn:cxf-library:rtu-0011#Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter",
+      "S231:label": "negateError",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.negateError.k"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.negateError.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.negateError.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.negateError.k",
+      "S231:value": {
+        "@value": "-1.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.negateError.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.negateError.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooColdRaw.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarmRaw",
+      "@type": "urn:cxf-library:rtu-0011#Buildings.Controls.OBC.CDL.Reals.GreaterThreshold",
+      "S231:label": "tooWarmRaw",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarmRaw.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarmRaw.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarmRaw.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarmRaw.t",
+      "S231:value": {
+        "@value": "2.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarmRaw.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarmRaw.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.errorAny.u1"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarm.u2"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooColdRaw",
+      "@type": "urn:cxf-library:rtu-0011#Buildings.Controls.OBC.CDL.Reals.GreaterThreshold",
+      "S231:label": "tooColdRaw",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooColdRaw.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooColdRaw.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooColdRaw.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooColdRaw.t",
+      "S231:value": {
+        "@value": "2.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooColdRaw.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooColdRaw.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.errorAny.u2"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooCold.u2"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.conditioningActive",
+      "@type": "urn:cxf-library:rtu-0011#Buildings.Controls.OBC.CDL.Logical.Or",
+      "S231:label": "conditioningActive",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.conditioningActive.u1"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.conditioningActive.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.conditioningActive.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.conditioningActive.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.conditioningActive.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.conditioningActive.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.fanConditioning.u2"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.yConditioningActive"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.fanConditioning",
+      "@type": "urn:cxf-library:rtu-0011#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "fanConditioning",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.fanConditioning.u1"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.fanConditioning.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.fanConditioning.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.fanConditioning.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.fanConditioning.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.fanConditioning.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.candidate.u1"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarm.u1"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooCold.u1"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.errorAny",
+      "@type": "urn:cxf-library:rtu-0011#Buildings.Controls.OBC.CDL.Logical.Or",
+      "S231:label": "errorAny",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.errorAny.u1"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.errorAny.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.errorAny.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.errorAny.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.errorAny.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.errorAny.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.candidate.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarm",
+      "@type": "urn:cxf-library:rtu-0011#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "tooWarm",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarm.u1"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarm.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarm.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarm.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarm.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooWarm.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.yTooWarm"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooCold",
+      "@type": "urn:cxf-library:rtu-0011#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "tooCold",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooCold.u1"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooCold.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooCold.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooCold.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooCold.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.tooCold.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.yTooCold"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.candidate",
+      "@type": "urn:cxf-library:rtu-0011#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "candidate",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.candidate.u1"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.candidate.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.candidate.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.candidate.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.candidate.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.candidate.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.persist.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.persist",
+      "@type": "urn:cxf-library:rtu-0011#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "persist",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.persist.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:rtu-0011#rtu_0011.persist.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.persist.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.persist.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.persist.delayTime",
+      "S231:value": {
+        "@value": "900.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.persist.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.persist.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.persist.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.yFault"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.sat",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.temperatureError.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.sat_sp",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.temperatureError.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.sf_status",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.fanConditioning.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.comp_status",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.conditioningActive.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.htg_status",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:rtu-0011#rtu_0011.conditioningActive.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.yFault",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.yTooWarm",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.yTooCold",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:rtu-0011#rtu_0011.yConditioningActive",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    }
+  ]
+}

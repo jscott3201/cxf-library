@@ -23,7 +23,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "Heat pump point dictionary. Air-side and compressor points carry from the AHU/RTU dictionaries. Thermal power is canonically a host-derived Function output; active electrical power uses the meter pattern. Mode command remains Brick-only until a deployment models its custom enumeration, and defrost status remains provisional. Owning equipment: the packaged heat pump unit. EXPANSION 2026-08-17: refrigerant-side points added for the future charge-fault family (NIST SP 1087 grounding); the two saturation temperatures are HOST-DERIVED virtual points per SCHEMA.md's virtual-point convention. ASHRAE 223 mappings are pinned to the public-review artifact 223p-1.0.0-ppr2.1.ttl (owl:versionInfo 1.0.0-ppr.2.1; SHA-256 1f156f9938c0be430d2216e01e31bb183c438ba318d8d4a23d2f074ebcd6f573), not an inferred final 2026 release. That artifact imports QUDT 3.1.8; the quantity-kind and unit local names here were independently checked against the repository-declared QUDT 3.1.4 artifacts.",
+  "notes": "Heat pump point dictionary. Air-side and compressor points carry from the AHU/RTU dictionaries. Thermal power is canonically a host-derived Function output; active electrical power uses the meter pattern. Mode command remains Brick-only until a deployment models its custom enumeration, and defrost status remains provisional. Owning equipment: the packaged heat pump unit. EXPANSION 2026-08-17: refrigerant-side points added for the refrigerant-side HP-0004/0005/0006 family (NIST SP 1087 grounding); the two saturation temperatures are HOST-DERIVED virtual points per SCHEMA.md's virtual-point convention. ASHRAE 223 mappings are pinned to the public-review artifact 223p-1.0.0-ppr2.1.ttl (owl:versionInfo 1.0.0-ppr.2.1; SHA-256 1f156f9938c0be430d2216e01e31bb183c438ba318d8d4a23d2f074ebcd6f573), not an inferred final 2026 release. That artifact imports QUDT 3.1.8; the quantity-kind and unit local names here were independently checked against the repository-declared QUDT 3.1.4 artifacts.",
   "points": [
     {
       "name": "thermal_power",
@@ -139,6 +139,25 @@
       },
       "provisional": true,
       "notes": "Brick 1.4.4 On_Off_Status and Compressor are exact generic classes; PPR2.1 EnumeratedObservableProperty and Binary-OnOff are exact, but no public compressor-property instance was found, so the attachment remains provisional. Default to one compressor/circuit. An aggregate OR is allowed only as an explicit matched command/status scope and hides a lag failure while another compressor remains on."
+    },
+    {
+      "name": "aux_heat_status",
+      "description": "Independent active-production status for the explicitly classified auxiliary heat source",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Heating_Start_Stop_Status",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty with Binary-OnOff on explicitly classified auxiliary heating Equipment such as an ElectricResistanceElement or Furnace; Role-Heating and containment/topology establish scope",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": true,
+      "notes": "brick:Heating_Start_Stop_Status and the generic PPR2.1 heating/status terms are exact, but neither ontology has an exact auxiliary role. Deployment must identify separate auxiliary equipment and independent current, fuel-flow, thermal, contactor, or local-stage proof that it is actively producing heat. Do not bind availability, demand, command echo, crankcase heat, base-pan heat, or defrost heat."
     },
     {
       "name": "defrost_status",

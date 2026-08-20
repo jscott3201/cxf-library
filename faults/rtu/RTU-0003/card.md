@@ -18,7 +18,7 @@ g36: null
 clusters: []
 suppresses: [RTU-0002, RTU-0004]
 suppressed_by: []
-related: [RTU-0002, RTU-0004, AHU-0028, RTU-0010]
+related: [RTU-0002, RTU-0004, AHU-0028, RTU-0010, RTU-0011]
 playbooks: [sensor-drift]
 operating_states: "all active modes — idle, mechanical cooling, and heating each get their own test"
 preconditions: "Supply fan running and both sensors present; with the fan off there is no air to measure and the verdict is NO_EVAL, not healthy. The host must also hold evaluation off for min_stage_runtime (10 min) after any compressor or heater stage change, while the coil or heat exchanger is still coming up to temperature and the two sensors legitimately disagree with the new state."

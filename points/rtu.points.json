@@ -46,6 +46,26 @@
       "notes": "Brick Discharge_Air_Temperature_Sensor is brick:aliasOf this class. 223P pattern verbatim from reference instance MultipleZoneAhu-sa-temp; medium comes from hasMedium on the owning ConnectionPoint. [RTU dictionary] Brick point class and 223P property pattern are equipment-independent and carried from the AHU dictionary, where instance-level verification was done against the AHU reference model; here the owning equipment is brick:Rooftop_Unit (alias RTU, verified in Brick 1.4.4) and no packaged-unit reference instance has been checked, so treat the 223P attachment as pattern guidance."
     },
     {
+      "name": "sat_sp",
+      "description": "Active supply (discharge) air temperature setpoint used by this RTU",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": "Supply_Air_Temperature_Setpoint",
+      "s223": {
+        "pattern": "QuantifiableActuatableProperty linked from the observed supply-air temperature property via hasSetpoint",
+        "property_class": "QuantifiableActuatableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Air",
+        "aspects": [
+          "Aspect-Setpoint"
+        ]
+      },
+      "provisional": false,
+      "notes": "Supply_Air_Temperature_Setpoint is exact in Brick 1.4.4. PPR2.1 QuantifiableActuatableProperty, Temperature, DEG_C, Fluid-Air, Aspect-Setpoint, and hasSetpoint are exact and follow the public G36 supply-air-temperature setpoint pattern. Bind the final active mode-specific RTU target; an occupied default or cooling-only constant is invalid during heating."
+    },
+    {
       "name": "mat",
       "description": "Mixed air temperature (after OA and RA mix)",
       "kind": "real",

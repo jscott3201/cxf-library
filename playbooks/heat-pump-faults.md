@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | HP-0001 (COP degradation), HP-0002 (defrost anomaly), HP-0003 (reversing valve), HP-0004 (undercharge), HP-0005 (overcharge), HP-0006 (valve internal leakage), HP-0007 (compressor proof) |
+| **Applies to** | HP-0001 (COP degradation), HP-0002 (defrost anomaly), HP-0003 (reversing valve), HP-0004 (undercharge), HP-0005 (overcharge), HP-0006 (valve internal leakage), HP-0007 (compressor proof), HP-0008 (auxiliary heat above lockout) |
 | **Fix complexity** | On-site service required |
 | **Typical time** | 2–6 h on-site |
 | **Typical cost** | $200–$1,500 (refrigerant/defrost) / $500–$3,000 (reversing valve) / $3,000–$8,000 (compressor) |
@@ -18,17 +18,23 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 169–170).
    safety status. If any of those states can withhold operation, they must be
    reflected in the final command or make the rule NO_EVAL; do not use an
    upstream thermostat demand or fleet request as the command.
-2. **COP degradation (HP-0001):** calculate measured COP as thermal output
+2. **Auxiliary heat above lockout (HP-0008):** prove the point represents an
+   explicitly classified auxiliary source actively producing space heat, not
+   availability, demand, crankcase/base-pan heat, or defrost heat. Verify
+   heating and defrost/emergency state, the installed lockout/balance point or
+   dual-fuel switchover, compressor proof, and whether concurrent operation is
+   actually prohibited by the OEM/site strategy.
+3. **COP degradation (HP-0001):** calculate measured COP as thermal output
    divided by electrical input and compare it to the baseline regression model
    (COP vs. OAT). A 15% or greater drop below the baseline curve indicates
    degradation. Evaluate heating and cooling modes separately — degradation may
    appear in only one mode. Ensure the baseline R² > 0.6 before trusting the
    comparison.
-3. **Defrost anomaly (HP-0002):** count defrost cycles per hour — more than
+4. **Defrost anomaly (HP-0002):** count defrost cycles per hour — more than
    4/hr is excessive. Check individual defrost duration — more than 15 minutes
    per cycle is abnormal. Check for defrost initiating when OAT is above 7 °C
    (45 °F); defrost should not be needed at mild temperatures.
-4. **Reversing valve (HP-0003):** after a mode change command, wait 10
+5. **Reversing valve (HP-0003):** after a mode change command, wait 10
    minutes for the system to settle. In cooling mode, SAT should be well below
    RAT — if SAT > RAT, the valve has not switched. In heating mode, SAT should
    be well above RAT — if SAT < RAT, the valve has not switched. This is a
@@ -44,6 +50,9 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 169–170).
 3. Correct only verified BAS binding or sequence defects. Never bypass smoke,
    freeze, condensate, high/low-pressure, electrical, or OEM safeties, and do
    not repeatedly reset a compressor lockout.
+4. For HP-0008, inspect thermostat/OEM staging, site OAT lockout, recovery and
+   demand-response modes, and OAT sensor quality. Never disable backup heat
+   until load, equipment safety, and the installed sequence have been verified.
 
 ## Step 3 — On-site service
 
@@ -85,6 +94,11 @@ rules before approaching capacitors, contactors, motors, or compressors.
       charge first.
    4. If the valve body has failed, replace the reversing valve ($500–$2,000
       plus refrigerant recovery).
+5. **Auxiliary heat:** with the unit under normal OEM control, verify the
+   auxiliary contactor/fuel valve and independent production proof, OAT input,
+   and configured lockout/switchover. Qualified personnel should correct only
+   the confirmed sensor, staging, or configuration defect; do not bypass
+   high/low-pressure, electrical, temperature, or defrost safeties.
 
 ## Step 4 — Confirm resolution
 
@@ -97,3 +111,6 @@ rules before approaching capacitors, contactors, motors, or compressors.
    fewer than 4 cycles/hr, less than 10 minutes each.
 4. **Reversing valve:** use manufacturer-approved operation to verify multiple
    mode changes and confirm SAT responds correctly each time.
+5. **Auxiliary heat:** monitor normal heating through representative OAT/load
+   conditions. Confirm required backup heat remains available below the
+   commissioned strategy and prohibited concurrent operation stays clear above it.
