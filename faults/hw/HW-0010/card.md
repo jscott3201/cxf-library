@@ -107,12 +107,18 @@ preserves persistence, while an in-band, boiler-off, or pump-off tick resets it.
 6. A real demand, reset, safety, emissions, or high-limit condition omitted
    from the host gate.
 
-## Energy and Emissions Impact
+## Energy Impact
 
 The finding is qualitative. Sustained over-temperature can increase pipe loss
 and keep a condensing plant above its efficient return-temperature region;
 under-temperature can increase terminal/pump effort or shift load to other heat.
 The graph has no fuel or delivered-load model, so it does not invent savings.
+
+## Emissions Impact
+
+Any scope-1 effect follows the change in boiler fuel use and cannot be inferred
+from error direction alone. Quantification requires measured fuel or a validated
+load-and-efficiency model; this rule reports no generic emissions reduction.
 
 ## Deviations
 
@@ -121,7 +127,12 @@ The graph has no fuel or delivered-load model, so it does not invent savings.
 - The shipped 2 K allowance is adopted and tunable; neither NIST nor LBNL
   publishes it as a portable boiler threshold.
 - The LBNL dataset is cited for point/fault coverage only. No LBNL replay was
-  available locally for this slice, so no TPR or FPR claim is recorded.
+  available locally for this slice, so no LBNL-derived TPR or FPR claim is
+  recorded; the frontmatter separately records limited healthy EnergyPlus FPR
+  evidence.
+- Confidence is MEDIUM rather than the brief's proposed HIGH because common-
+  header topology, sensor bias, and intentional plant limits remain material
+  confounders even with the stated host gates.
 - Direction flags include the active-plant gate. When the plant stops, they and
   `yFault` clear immediately; the host must report NO_EVAL outside the stated
   operating state.

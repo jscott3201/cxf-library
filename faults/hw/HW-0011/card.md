@@ -126,12 +126,18 @@ tick either diagnostic clears and uses `delayOnInit=true`.
 5. Lead/lag transfers or an invalid aggregate firing signal admitted by host.
 6. A real load/setpoint transition or safety/application limit not excluded.
 
-## Energy and Emissions Impact
+## Energy Impact
 
 The finding is qualitative. Hunting can add fuel and distribution loss through
 overshoot, increase purge/light-off loss if modulation becomes cycling, and add
 wear. The rule carries neither fuel nor useful-load data and cannot assign a
-savings percentage or emissions quantity from its rolling statistics.
+savings percentage from its rolling statistics.
+
+## Emissions Impact
+
+Scope-1 emissions may rise when hunting increases boiler fuel use, purge, or
+light-off loss. The graph has no fuel channel, so it cannot quantify that change
+or claim a portable emissions benefit.
 
 ## Deviations
 

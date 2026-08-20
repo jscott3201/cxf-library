@@ -108,13 +108,19 @@ Read `yLoadOk` first. A negative load makes raw `yLowLoad=true`, but it gates
 5. Boiler sizes/turndown make the adopted scalar stage rule invalid.
 6. Redundancy, exercise, freeze, emissions, or minimum-flow mode not excluded.
 
-## Energy and Emissions Impact
+## Energy Impact
 
 At the same useful load, excess firing machines can add jacket and standby loss,
 operate each burner below its efficient modulation region, and add purge or
 light-off cycles. Magnitude depends on equipment and sequence. Without measured
 fuel and a commissioned alternative staging model, the result remains
 qualitative and no generic savings percentage is claimed.
+
+## Emissions Impact
+
+Any scope-1 impact follows the site-specific fuel penalty of the actual staging
+sequence. This rule has neither a fuel measurement nor a counterfactual staging
+model, so it does not assign an emissions quantity.
 
 ## Deviations
 

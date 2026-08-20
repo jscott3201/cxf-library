@@ -75,7 +75,7 @@
     },
     {
       "name": "two_stages_at_low_load_initialization",
-      "description": "Two firing boilers at low load assert both diagnostics immediately and wait the full delay.",
+      "description": "Two firing boilers at low load assert both diagnostics immediately: yFault is clear one tick before 900 s, asserts exactly at 900 s, and remains true after the full delay.",
       "inputs": {
         "boiler_stage_count": 2,
         "hw_plant_load_fraction": 0.2
@@ -98,6 +98,12 @@
           "from_s": 0,
           "to_s": 840,
           "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 900,
+          "to_s": 900,
+          "equals": true
         },
         {
           "output": "yFault",

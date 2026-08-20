@@ -5695,7 +5695,7 @@
     },
     {
       "name": "warmup_burst_raw_behavior",
-      "description": "Eight tick-rate firing changes during partial-window fill can extrapolate above the crossing limit while HWS is unstable. The raw behavior is pinned; the host reports NO_EVAL through the first 1800 seconds.",
+      "description": "Eight tick-rate firing changes during partial-window fill can extrapolate above the crossing limit while HWS is unstable. Both raw diagnostics overlap from 960 s; yFault is clear at 1200 s, asserts exactly at the 1260 s persistence boundary, and remains true after it. The host reports NO_EVAL through the first 1800 seconds.",
       "inputs": {
         "boiler_firing_rate": [
           {
@@ -5988,8 +5988,20 @@
         },
         {
           "output": "yFault",
-          "from_s": 1440,
-          "to_s": 1680,
+          "from_s": 1260,
+          "to_s": 1320,
+          "equals": true
+        },
+        {
+          "output": "yFiringRateHunting",
+          "from_s": 960,
+          "to_s": 960,
+          "equals": true
+        },
+        {
+          "output": "yTemperatureUnstable",
+          "from_s": 960,
+          "to_s": 960,
           "equals": true
         },
         {
@@ -8161,7 +8173,7 @@
     },
     {
       "name": "diagnostic_overlap_shorter_than_persistence",
-      "description": "During host-excluded warm-up, both raw diagnostics overlap for less than the 300-second final persistence. The candidate clears before maturity and yFault never asserts.",
+      "description": "During host-excluded warm-up, both raw diagnostics are simultaneously true from 1680 through 1740 s, less than the 300-second final persistence. Firing hunting clears at 1800 s, so the candidate resets before maturity and yFault never asserts.",
       "inputs": {
         "boiler_firing_rate": [
           {
@@ -9092,6 +9104,18 @@
         },
         {
           "output": "yFiringRateHunting",
+          "from_s": 1680,
+          "to_s": 1740,
+          "equals": true
+        },
+        {
+          "output": "yFiringRateHunting",
+          "from_s": 1800,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFiringRateHunting",
           "from_s": 1860,
           "to_s": 14400,
           "equals": false
@@ -9099,6 +9123,12 @@
         {
           "output": "yTemperatureUnstable",
           "from_s": 1680,
+          "to_s": 1740,
+          "equals": true
+        },
+        {
+          "output": "yTemperatureUnstable",
+          "from_s": 1860,
           "to_s": 14400,
           "equals": true
         }
@@ -9106,7 +9136,7 @@
     },
     {
       "name": "stage_change_discontinuity_is_host_excluded",
-      "description": "Repeated lead/lag stage changes can make an aggregate firing-rate channel and header temperature alternate by construction. The raw graph alarms, so stable stage identity is a mandatory host gate.",
+      "description": "Repeated lead/lag stage changes can make an aggregate firing-rate channel and header temperature alternate by construction. After the settled input transition, temperature instability joins firing hunting at 5280 s; yFault is clear at 5520 s, asserts exactly at 5580 s after the 300 s delay, and remains true after it. The raw graph alarms, so stable stage identity is a mandatory host gate.",
       "inputs": {
         "boiler_firing_rate": [
           {
@@ -9491,6 +9521,36 @@
         "hws_temp_sp": 60.0
       },
       "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5520,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 5580,
+          "to_s": 5640,
+          "equals": true
+        },
+        {
+          "output": "yFiringRateHunting",
+          "from_s": 5280,
+          "to_s": 5280,
+          "equals": true
+        },
+        {
+          "output": "yTemperatureUnstable",
+          "from_s": 5220,
+          "to_s": 5220,
+          "equals": false
+        },
+        {
+          "output": "yTemperatureUnstable",
+          "from_s": 5280,
+          "to_s": 5280,
+          "equals": true
+        },
         {
           "output": "yFiringRateHunting",
           "from_s": 7200,

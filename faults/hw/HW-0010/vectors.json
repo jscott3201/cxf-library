@@ -67,7 +67,7 @@
     },
     {
       "name": "too_cold_at_initialization",
-      "description": "A standing cold-side violation exposes direction immediately and waits the full initialization-safe delay.",
+      "description": "A standing cold-side violation exposes direction immediately: yFault is clear one tick before 900 s, asserts exactly at 900 s, and remains true after the initialization-safe delay.",
       "inputs": {
         "hws_temp": 57.0,
         "hws_temp_sp": 60.0,
@@ -92,6 +92,12 @@
           "from_s": 0,
           "to_s": 840,
           "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 900,
+          "to_s": 900,
+          "equals": true
         },
         {
           "output": "yFault",

@@ -119,9 +119,9 @@
 <rect x="690" y="595" width="185" height="54" rx="8" class="blk"/>
 <text x="702" y="613" class="inst">temperatureMae</text>
 <text x="702" y="630" class="cls">MA · 1800 s</text>
-<rect x="925" y="595" width="190" height="54" rx="8" class="blk"/>
+<rect x="925" y="595" width="240" height="54" rx="8" class="blk"/>
 <text x="937" y="613" class="inst">temperatureBandHigh</text>
-<text x="937" y="630" class="cls">Greater · 1.5 K</text>
+<text x="937" y="630" class="cls">GreaterThreshold · 1.5 K</text>
 <rect x="2265" y="465" width="185" height="54" rx="8" class="blk"/>
 <text x="2277" y="483" class="inst">temperatureBoth</text>
 <text x="2277" y="500" class="cls">Logical.And</text>
