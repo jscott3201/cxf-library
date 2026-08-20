@@ -74,6 +74,37 @@
       ]
     },
     {
+      "name": "baseline_just_below_minimum",
+      "description": "A 2.9 K expected delta-T is just below the adoption-blocking floor and remains NO_EVAL.",
+      "inputs": {
+        "rht_vlv_cmd": 100.0,
+        "rht_coil_entering_temp": 20.0,
+        "rht_coil_leaving_temp": 20.0,
+        "rht_delta_t_expected": 2.9,
+        "fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yBaselineOk",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yTemperatureRiseLow",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2100,
+          "equals": false
+        }
+      ]
+    },
+    {
       "name": "baseline_exactly_at_minimum",
       "description": "Exactly 3 K is NO_EVAL under strict Greater.",
       "inputs": {

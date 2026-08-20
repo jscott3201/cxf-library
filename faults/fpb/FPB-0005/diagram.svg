@@ -5,11 +5,11 @@
 <text x="24" y="30" class="title">FPB-0005 block graph</text>
 <path d="M200 99 H250" class="wire"/>
 <path d="M200 99 H225 V202 H250" class="wire"/>
-<path d="M240 399 H225 V82 H250" class="wire"/>
-<path d="M240 399 H225 V202 H250" class="wire"/>
+<path d="M240 399 H245 V82 H250" class="wire"/>
+<path d="M240 399 H245 V202 H250" class="wire"/>
 <path d="M240 399 H250" class="wire"/>
-<path d="M240 399 H225 V342 H250" class="wire"/>
-<path d="M240 399 H225 V482 H250" class="wire"/>
+<path d="M240 399 H245 V342 H250" class="wire"/>
+<path d="M240 399 H245 V482 H250" class="wire"/>
 <path d="M450 82 H560" class="wire"/>
 <path d="M450 202 H560" class="wire"/>
 <path d="M470 342 H515 V82 H560" class="wire"/>
