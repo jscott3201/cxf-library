@@ -1,0 +1,207 @@
+{
+  "@context": {
+    "S231": "http://data.ashrae.org/S231P#",
+    "base": "urn:cxf-library:hx-0001#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001",
+      "@type": "S231:Block",
+      "S231:label": "hx_0001",
+      "S231:containsBlock": [
+        {
+          "@id": "urn:cxf-library:hx-0001#hx_0001.shortfall"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0001#hx_0001.shortfallHigh"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0001#hx_0001.persist"
+        }
+      ],
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hx-0001#hx_0001.effectiveness"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0001#hx_0001.effectiveness_expected"
+        }
+      ],
+      "S231:hasOutput": [
+        {
+          "@id": "urn:cxf-library:hx-0001#hx_0001.yFault"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0001#hx_0001.yEffectivenessLow"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001.shortfall",
+      "@type": "urn:cxf-library:hx-0001#Buildings.Controls.OBC.CDL.Reals.Subtract",
+      "S231:label": "shortfall",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hx-0001#hx_0001.shortfall.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0001#hx_0001.shortfall.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hx-0001#hx_0001.shortfall.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001.shortfall.u1",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001.shortfall.u2",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001.shortfall.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hx-0001#hx_0001.shortfallHigh.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001.shortfallHigh",
+      "@type": "urn:cxf-library:hx-0001#Buildings.Controls.OBC.CDL.Reals.GreaterThreshold",
+      "S231:label": "shortfallHigh",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:hx-0001#hx_0001.shortfallHigh.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hx-0001#hx_0001.shortfallHigh.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hx-0001#hx_0001.shortfallHigh.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001.shortfallHigh.t",
+      "S231:value": {
+        "@value": "0.125",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001.shortfallHigh.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001.shortfallHigh.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:hx-0001#hx_0001.persist.u"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0001#hx_0001.yEffectivenessLow"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001.persist",
+      "@type": "urn:cxf-library:hx-0001#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "persist",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:hx-0001#hx_0001.persist.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0001#hx_0001.persist.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hx-0001#hx_0001.persist.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hx-0001#hx_0001.persist.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001.persist.delayTime",
+      "S231:value": {
+        "@value": "900.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001.persist.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001.persist.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001.persist.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hx-0001#hx_0001.yFault"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001.effectiveness",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hx-0001#hx_0001.shortfall.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001.effectiveness_expected",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hx-0001#hx_0001.shortfall.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001.yFault",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0001#hx_0001.yEffectivenessLow",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    }
+  ]
+}

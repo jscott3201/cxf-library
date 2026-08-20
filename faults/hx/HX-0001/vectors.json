@@ -1,0 +1,458 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 3000
+  },
+  "scenarios": [
+    {
+      "name": "healthy_heating_effectiveness",
+      "description": "A commissioned heating point inside its expected-effectiveness allowance is healthy; direction is resolved before this sign-independent graph.",
+      "inputs": {
+        "effectiveness": 0.75,
+        "effectiveness_expected": 0.8
+      },
+      "expect": [
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "healthy_cooling_effectiveness",
+      "description": "Cooling service uses the same effectiveness comparison after the host reconciles negative signed heat transfer into a positive effectiveness.",
+      "inputs": {
+        "effectiveness": 0.72,
+        "effectiveness_expected": 0.8
+      },
+      "expect": [
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "sustained_effectiveness_degradation",
+      "description": "A 0.15 shortfall exceeds the 0.125 executable placeholder and matures with a one-step assertion margin.",
+      "inputs": {
+        "effectiveness": 0.65,
+        "effectiveness_expected": 0.8
+      },
+      "expect": [
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "shortfall_exactly_at_threshold",
+      "description": "Binary-exact 0.75 - 0.625 equals 0.125 and remains clear under strict Greater.",
+      "inputs": {
+        "effectiveness": 0.625,
+        "effectiveness_expected": 0.75
+      },
+      "expect": [
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "shortfall_just_above_threshold",
+      "description": "A 0.126 shortfall is just beyond the executable threshold.",
+      "inputs": {
+        "effectiveness": 0.624,
+        "effectiveness_expected": 0.75
+      },
+      "expect": [
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "actual_above_expected",
+      "description": "A negative shortfall is not degradation.",
+      "inputs": {
+        "effectiveness": 0.85,
+        "effectiveness_expected": 0.8
+      },
+      "expect": [
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "violation_ends_one_step_before_delay",
+      "description": "The candidate clears at 840 s, one evaluator step before 900 s, and never alarms.",
+      "inputs": {
+        "effectiveness": [
+          {
+            "t": 0,
+            "value": 0.6
+          },
+          {
+            "t": 840,
+            "value": 0.8
+          }
+        ],
+        "effectiveness_expected": 0.8
+      },
+      "expect": [
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 0,
+          "to_s": 780,
+          "equals": true
+        },
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 840,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_alarm_recovers",
+      "description": "A mature degradation clears immediately when effectiveness recovers.",
+      "inputs": {
+        "effectiveness": [
+          {
+            "t": 0,
+            "value": 0.6
+          },
+          {
+            "t": 1200,
+            "value": 0.8
+          }
+        ],
+        "effectiveness_expected": 0.8
+      },
+      "expect": [
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 0,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 1200,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1200,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_violations_reset",
+      "description": "Two sub-delay degradations separated by a healthy interval cannot accumulate.",
+      "inputs": {
+        "effectiveness": [
+          {
+            "t": 0,
+            "value": 0.6
+          },
+          {
+            "t": 600,
+            "value": 0.8
+          },
+          {
+            "t": 900,
+            "value": 0.6
+          },
+          {
+            "t": 1500,
+            "value": 0.8
+          }
+        ],
+        "effectiveness_expected": 0.8
+      },
+      "expect": [
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 600,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 900,
+          "to_s": 1440,
+          "equals": true
+        },
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 1500,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "initialization_violation_obeys_delay",
+      "description": "A violation present on the first tick is held by delayOnInit.",
+      "inputs": {
+        "effectiveness": 0.5,
+        "effectiveness_expected": 0.8
+      },
+      "expect": [
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "zero_expected_is_raw_host_no_eval",
+      "description": "A zero expected value is invalid host evidence; the raw graph stays clear and does not divide by it.",
+      "inputs": {
+        "effectiveness": 0.0,
+        "effectiveness_expected": 0.0
+      },
+      "expect": [
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "out_of_domain_expected_is_host_gate",
+      "description": "The raw graph can compare any finite scalars; an out-of-domain baseline must be NO_EVAL at the host, not silently normalized in CXF.",
+      "inputs": {
+        "effectiveness": 0.4,
+        "effectiveness_expected": 0.8
+      },
+      "expect": [
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "expected_model_not_ready_is_host_gate",
+      "description": "The raw graph has no readiness input and would alarm on these scalars; a baseline that is not frozen, fresh, and ready must be NO_EVAL at the host.",
+      "inputs": {
+        "effectiveness": 0.4,
+        "effectiveness_expected": 0.8
+      },
+      "expect": [
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "unbalanced_side_heat_rates_are_host_gate",
+      "description": "The raw graph cannot inspect the two side heat rates and would alarm on these derived scalars; a failed side-energy-balance check must prevent publication and force host NO_EVAL.",
+      "inputs": {
+        "effectiveness": 0.4,
+        "effectiveness_expected": 0.8
+      },
+      "expect": [
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "invalid_thermal_denominator_is_host_gate",
+      "description": "Zero flow or insufficient entering-temperature separation is not represented by these raw scalar ports; the host must withhold effectiveness and report NO_EVAL before the graph, which never divides.",
+      "inputs": {
+        "effectiveness": 0.4,
+        "effectiveness_expected": 0.8
+      },
+      "expect": [
+        {
+          "output": "yEffectivenessLow",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}

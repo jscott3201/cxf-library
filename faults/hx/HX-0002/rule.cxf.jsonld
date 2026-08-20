@@ -1,0 +1,420 @@
+{
+  "@context": {
+    "S231": "http://data.ashrae.org/S231P#",
+    "base": "urn:cxf-library:hx-0002#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002",
+      "@type": "S231:Block",
+      "S231:label": "hx_0002",
+      "S231:containsBlock": [
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.primaryLow"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.primaryCandidate"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.primaryHeld"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryLow"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryCandidate"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryHeld"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.anyMissing"
+        }
+      ],
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.exchange_cmd"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.primary_flow"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.secondary_flow"
+        }
+      ],
+      "S231:hasOutput": [
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.yFault"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.yPrimaryFlowMissing"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.ySecondaryFlowMissing"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.primaryLow",
+      "@type": "urn:cxf-library:hx-0002#Buildings.Controls.OBC.CDL.Reals.LessThreshold",
+      "S231:label": "primaryLow",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.primaryLow.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.primaryLow.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.primaryLow.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.primaryLow.t",
+      "S231:value": {
+        "@value": "1.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.primaryLow.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.primaryLow.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.primaryCandidate.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.primaryCandidate",
+      "@type": "urn:cxf-library:hx-0002#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "primaryCandidate",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.primaryCandidate.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.primaryCandidate.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.primaryCandidate.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.primaryCandidate.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.primaryCandidate.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.primaryCandidate.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.primaryHeld.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.primaryHeld",
+      "@type": "urn:cxf-library:hx-0002#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "primaryHeld",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.primaryHeld.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.primaryHeld.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.primaryHeld.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.primaryHeld.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.primaryHeld.delayTime",
+      "S231:value": {
+        "@value": "900.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.primaryHeld.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.primaryHeld.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.primaryHeld.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.anyMissing.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.yPrimaryFlowMissing"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryLow",
+      "@type": "urn:cxf-library:hx-0002#Buildings.Controls.OBC.CDL.Reals.LessThreshold",
+      "S231:label": "secondaryLow",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryLow.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryLow.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryLow.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryLow.t",
+      "S231:value": {
+        "@value": "1.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryLow.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryLow.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryCandidate.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryCandidate",
+      "@type": "urn:cxf-library:hx-0002#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "secondaryCandidate",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryCandidate.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryCandidate.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryCandidate.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryCandidate.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryCandidate.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryCandidate.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryHeld.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryHeld",
+      "@type": "urn:cxf-library:hx-0002#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "secondaryHeld",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryHeld.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryHeld.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryHeld.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryHeld.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryHeld.delayTime",
+      "S231:value": {
+        "@value": "900.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryHeld.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryHeld.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryHeld.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.anyMissing.u2"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.ySecondaryFlowMissing"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.anyMissing",
+      "@type": "urn:cxf-library:hx-0002#Buildings.Controls.OBC.CDL.Logical.Or",
+      "S231:label": "anyMissing",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.anyMissing.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.anyMissing.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.anyMissing.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.anyMissing.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.anyMissing.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.anyMissing.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.yFault"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.exchange_cmd",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.primaryCandidate.u1"
+        },
+        {
+          "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryCandidate.u1"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.primary_flow",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.primaryLow.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.secondary_flow",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:hx-0002#hx_0002.secondaryLow.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.yFault",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.yPrimaryFlowMissing",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:hx-0002#hx_0002.ySecondaryFlowMissing",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    }
+  ]
+}

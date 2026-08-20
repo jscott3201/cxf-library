@@ -1,0 +1,253 @@
+{
+  "schema": "cxf-library/points/v1",
+  "equipment": "hx",
+  "namespaces": {
+    "brick": {
+      "iri": "https://brickschema.org/schema/Brick#",
+      "verified_version": "1.4.4"
+    },
+    "s223": {
+      "iri": "http://data.ashrae.org/standard223#",
+      "verified_version": "1.0.0-ppr.2.1"
+    },
+    "s223_g36": {
+      "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#",
+      "verified_version": "1.0.0-ppr.2.1"
+    },
+    "quantitykind": {
+      "iri": "http://qudt.org/vocab/quantitykind/",
+      "verified_version": "QUDT 3.1.4"
+    },
+    "unit": {
+      "iri": "http://qudt.org/vocab/unit/",
+      "verified_version": "QUDT 3.1.4"
+    }
+  },
+  "notes": "Indirect liquid-to-liquid hydronic heat-exchanger dictionary. One instance is one physical four-port exchanger with fixed primary and secondary sides and paired inlet/outlet connection points. Brick 1.4.4 has exact generic Heat_Exchanger but no Plate_Heat_Exchanger; primary/secondary identity remains topology-dependent. ASHRAE 223 terms were checked against public-review artifact 223p-1.0.0-ppr2.1.ttl (owl:versionInfo 1.0.0-ppr.2.1; SHA-256 1f156f9938c0be430d2216e01e31bb183c438ba318d8d4a23d2f074ebcd6f573), which has exact HydronicHeatExchanger, four-port pairing, and Role-Primary/Role-Secondary. Brick 1.4.4 was checked against Brick.ttl SHA-256 b65720b7b9b64c646745c689777e6138c0d59ce0088df0aeb78fbd444d04d8e7. The public-review 223 artifact imports QUDT 3.1.8; terms here were independently checked against repository-declared QUDT 3.1.4. Steam, air, refrigerant, direct-contact, potable-water, and incoherently aggregated HX instances are outside this initial contract.",
+  "points": [
+    {
+      "name": "primary_entering_temp",
+      "description": "Primary-side liquid temperature at this heat exchanger's inlet",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": "Entering_Water_Temperature_Sensor",
+      "s223": {
+        "pattern": "TemperatureSensor observes a QuantifiableObservableProperty at the HydronicHeatExchanger primary InletConnectionPoint; the paired connection points carry Role-Primary",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Water",
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "brick:Entering_Water_Temperature_Sensor is exact, but Brick's point class does not distinguish the two HX sides; preserve primary identity in topology and binding evidence. PPR2.1 represents entering location with InletConnectionPoint and Role-Primary on the connection-point pair, not property aspects. Use a more specific water medium at deployment when known. Host derivation input for effectiveness and signed heat transfer."
+    },
+    {
+      "name": "primary_leaving_temp",
+      "description": "Primary-side liquid temperature at this heat exchanger's outlet",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": "Heat_Exchanger_Leaving_Water_Temperature_Sensor",
+      "s223": {
+        "pattern": "TemperatureSensor observes a QuantifiableObservableProperty at the paired HydronicHeatExchanger primary OutletConnectionPoint",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Water",
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "brick:Heat_Exchanger_Leaving_Water_Temperature_Sensor is active and exact in Brick 1.4.4; deprecated supply/discharge HX temperature classes must not be used. The primary-side identity still depends on topology. Pair this outlet with primary_entering_temp on the same branch."
+    },
+    {
+      "name": "secondary_entering_temp",
+      "description": "Secondary-side liquid temperature at this heat exchanger's inlet",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": "Entering_Water_Temperature_Sensor",
+      "s223": {
+        "pattern": "TemperatureSensor observes a QuantifiableObservableProperty at the HydronicHeatExchanger secondary InletConnectionPoint; the paired connection points carry Role-Secondary",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Water",
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "Same exact generic Brick class and side-identity caveat as primary_entering_temp. PPR2.1 topology distinguishes the secondary inlet. Host derivation input for effectiveness and signed heat transfer."
+    },
+    {
+      "name": "secondary_leaving_temp",
+      "description": "Secondary-side liquid temperature at this heat exchanger's outlet",
+      "kind": "real",
+      "unit": "°C",
+      "qudt_unit": "DEG_C",
+      "brick": "Heat_Exchanger_Leaving_Water_Temperature_Sensor",
+      "s223": {
+        "pattern": "TemperatureSensor observes a QuantifiableObservableProperty at the paired HydronicHeatExchanger secondary OutletConnectionPoint",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Water",
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "Exact active Brick class with topology-dependent secondary identity. Pair with secondary_entering_temp on the same physical branch and timestamp basis."
+    },
+    {
+      "name": "primary_flow",
+      "description": "Individual primary-branch liquid volume flow, nonnegative in the declared inlet-to-outlet direction",
+      "kind": "real",
+      "unit": "L/s",
+      "qudt_unit": "L-PER-SEC",
+      "brick": "Entering_Water_Flow_Sensor",
+      "s223": {
+        "pattern": "FlowSensor observes a QuantifiableObservableProperty at the HydronicHeatExchanger primary connection-point pair",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "VolumeFlowRate",
+        "unit": "L-PER-SEC",
+        "medium": "Fluid-Water",
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "The Brick flow class is exact; primary identity is topology-dependent. Bind one individual HX branch, never a common header or fleet total. Required directly by HX-0002 and by the host's HX-0001/HX-0003 thermal derivations. Mass-flow telemetry must be converted using the configured fluid density before binding."
+    },
+    {
+      "name": "secondary_flow",
+      "description": "Individual secondary-branch liquid volume flow, nonnegative in the declared inlet-to-outlet direction",
+      "kind": "real",
+      "unit": "L/s",
+      "qudt_unit": "L-PER-SEC",
+      "brick": "Entering_Water_Flow_Sensor",
+      "s223": {
+        "pattern": "FlowSensor observes a QuantifiableObservableProperty at the HydronicHeatExchanger secondary connection-point pair",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "VolumeFlowRate",
+        "unit": "L-PER-SEC",
+        "medium": "Fluid-Water",
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "Same individual-branch and conversion contract as primary_flow, with Role-Secondary topology. A primary/common-loop meter duplicated here makes HX-0002 structurally blind and invalidates both thermal derived points."
+    },
+    {
+      "name": "exchange_cmd",
+      "description": "Final downstream command state meaning both heat-exchanger branches are expected to flow",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Enable_Command",
+      "s223": {
+        "pattern": "EnumeratedActuatableProperty with Binary-OnOff on the HydronicHeatExchanger or final exchange sequence",
+        "property_class": "EnumeratedActuatableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": true,
+      "notes": "brick:Enable_Command and the PPR2.1 Boolean property terms are exact, but no public reference instance establishes a portable final HX-command attachment. Bind after temperature feasibility, anti-cycle, local/HAND, freeze, pressure, valve, and pump sequence logic. Availability, an upstream plant enable, or Heat_Exchanger_System_Enable_Status is invalid unless it truly means both branch flows are currently expected."
+    },
+    {
+      "name": "control_valve_cmd",
+      "description": "Final physical command for the valve intended to stop all exchange through this HX path, 0 closed to 100 open",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": "Valve_Position_Command",
+      "s223": {
+        "pattern": "QuantifiableActuatableProperty with Binary-Position on the adjacent hydronic Valve that isolates the monitored HX path",
+        "property_class": "QuantifiableActuatableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
+        "medium": null,
+        "aspects": [
+          "Binary-Position"
+        ]
+      },
+      "provisional": true,
+      "notes": "The property/valve terms are exact, but which valve isolates the whole path is deployment topology. Bind the final actuator output after exercise, minimum-position, local, and protective logic. A secondary valve that leaves a bypass or parallel path open cannot support HX-0003."
+    },
+    {
+      "name": "control_valve_position",
+      "description": "Optional independent position feedback for the valve intended to stop all exchange through this HX path, 0 closed to 100 open",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": "Valve_Position_Sensor",
+      "s223": {
+        "pattern": "QuantifiableObservableProperty with Binary-Position on the same adjacent hydronic Valve as control_valve_cmd",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
+        "medium": null,
+        "aspects": [
+          "Binary-Position"
+        ]
+      },
+      "provisional": true,
+      "notes": "Optional HX-0003 playbook evidence, not a rule input in the initial batch. The terms are exact, but the deployment must prove this feedback belongs to the same isolating valve and is independent of command echo. It distinguishes an actuator that never closed from transfer through a valve that reports closed; it does not by itself prove seat tightness or eliminate a parallel path."
+    },
+    {
+      "name": "effectiveness",
+      "description": "Actual sign-independent thermal effectiveness of this HX after denominator and side-energy-balance validation",
+      "kind": "real",
+      "unit": "1",
+      "qudt_unit": "UNITLESS",
+      "brick": null,
+      "s223": {
+        "pattern": "Host calculation represented as a Function whose hasOutput is a QuantifiableProperty for DimensionlessRatio in UNITLESS",
+        "property_class": "QuantifiableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "UNITLESS",
+        "medium": null,
+        "aspects": []
+      },
+      "derived": true,
+      "provisional": true,
+      "notes": "HOST-DERIVED. Compute abs(reconciled heat transfer)/(min(rho*cp*flow on both sides)*abs(primary entering-secondary entering)). Publish only with positive finite capacity rates and denominator, sufficient inlet separation, aligned valid inputs, configured fluid properties, and side heat-rate balance within uncertainty. The CXF graph deliberately performs no Divide. Record every source point, fluid-property basis, uncertainty test, and readiness/domain state."
+    },
+    {
+      "name": "effectiveness_expected",
+      "description": "Frozen clean/design expected effectiveness for this HX at the current valid operating condition",
+      "kind": "real",
+      "unit": "1",
+      "qudt_unit": "UNITLESS",
+      "brick": null,
+      "s223": {
+        "pattern": "Frozen host model represented as a Function whose hasOutput is a QuantifiableProperty for DimensionlessRatio in UNITLESS",
+        "property_class": "QuantifiableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "UNITLESS",
+        "medium": null,
+        "aspects": []
+      },
+      "derived": true,
+      "provisional": true,
+      "notes": "HOST-DERIVED SITE_FITTED or commissioned/design curve. Condition on flow-capacity ratio, entering temperatures, mode, and other declared model inputs. Record fit/commissioning interval, version, validation error, domain, readiness, and freeze/update policy. Never fit on the scored fault interval or consume actual effectiveness as a direct target alias."
+    },
+    {
+      "name": "heat_transfer_rate",
+      "description": "Signed reconciled heat-transfer rate for this HX, positive from primary to secondary",
+      "kind": "real",
+      "unit": "kW",
+      "qudt_unit": "KiloW",
+      "brick": null,
+      "s223": {
+        "pattern": "Host calculation represented as a Function whose hasOutput is a QuantifiableProperty for HeatFlowRate in KiloW",
+        "property_class": "QuantifiableProperty",
+        "quantitykind": "HeatFlowRate",
+        "unit": "KiloW",
+        "medium": null,
+        "aspects": []
+      },
+      "derived": true,
+      "provisional": true,
+      "notes": "HOST-DERIVED signed value. Primary-side estimate is rho*cp*flow*(primary entering-primary leaving); secondary-side estimate is rho*cp*flow*(secondary leaving-secondary entering). Reconcile only after timestamp, fluid-property, flow, and energy-balance checks; otherwise report NO_EVAL. HX-0003 uses the absolute magnitude, so heating and cooling are symmetric."
+    }
+  ]
+}

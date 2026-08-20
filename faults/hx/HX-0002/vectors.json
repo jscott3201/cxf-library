@@ -1,0 +1,624 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 3000
+  },
+  "scenarios": [
+    {
+      "name": "disabled_with_no_flow",
+      "description": "A disabled exchanger is healthy even though both raw flows are below their floors.",
+      "inputs": {
+        "exchange_cmd": false,
+        "primary_flow": 0.0,
+        "secondary_flow": 0.0
+      },
+      "expect": [
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "active_with_both_flows",
+      "description": "Both individual branches deliver flow while exchange is commanded active.",
+      "inputs": {
+        "exchange_cmd": true,
+        "primary_flow": 10.0,
+        "secondary_flow": 9.5
+      },
+      "expect": [
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "primary_flow_missing",
+      "description": "Only the primary lane matures when its branch remains below the configured floor.",
+      "inputs": {
+        "exchange_cmd": true,
+        "primary_flow": 0.0,
+        "secondary_flow": 10.0
+      },
+      "expect": [
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "secondary_flow_missing",
+      "description": "Only the secondary lane matures when its branch remains below the configured floor.",
+      "inputs": {
+        "exchange_cmd": true,
+        "primary_flow": 10.0,
+        "secondary_flow": 0.0
+      },
+      "expect": [
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "both_sides_missing",
+      "description": "A valid final exchange command with neither branch flowing matures both diagnostic lanes.",
+      "inputs": {
+        "exchange_cmd": true,
+        "primary_flow": 0.0,
+        "secondary_flow": 0.0
+      },
+      "expect": [
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "flows_exactly_at_threshold",
+      "description": "Exactly 1.0 L/s is safe under strict Less on both lanes.",
+      "inputs": {
+        "exchange_cmd": true,
+        "primary_flow": 1.0,
+        "secondary_flow": 1.0
+      },
+      "expect": [
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "primary_just_below_threshold",
+      "description": "Primary flow at 0.9 L/s is one test increment below the threshold.",
+      "inputs": {
+        "exchange_cmd": true,
+        "primary_flow": 0.9,
+        "secondary_flow": 10.0
+      },
+      "expect": [
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "secondary_just_below_threshold",
+      "description": "Secondary flow at 0.9 L/s is one test increment below the threshold.",
+      "inputs": {
+        "exchange_cmd": true,
+        "primary_flow": 10.0,
+        "secondary_flow": 0.9
+      },
+      "expect": [
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "primary_violation_ends_one_step_before_delay",
+      "description": "The primary candidate ends at 840 s and never matures.",
+      "inputs": {
+        "exchange_cmd": true,
+        "primary_flow": [
+          {
+            "t": 0,
+            "value": 0.0
+          },
+          {
+            "t": 840,
+            "value": 10.0
+          }
+        ],
+        "secondary_flow": 10.0
+      },
+      "expect": [
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_primary_alarm_recovers",
+      "description": "A mature primary missing-flow alarm clears immediately on restored branch flow.",
+      "inputs": {
+        "exchange_cmd": true,
+        "primary_flow": [
+          {
+            "t": 0,
+            "value": 0.0
+          },
+          {
+            "t": 1200,
+            "value": 10.0
+          }
+        ],
+        "secondary_flow": 10.0
+      },
+      "expect": [
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 960,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 1200,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1200,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_primary_dropouts_reset",
+      "description": "Two short primary-flow dropouts separated by recovery do not accumulate elapsed time.",
+      "inputs": {
+        "exchange_cmd": true,
+        "primary_flow": [
+          {
+            "t": 0,
+            "value": 0.0
+          },
+          {
+            "t": 600,
+            "value": 10.0
+          },
+          {
+            "t": 900,
+            "value": 0.0
+          },
+          {
+            "t": 1500,
+            "value": 10.0
+          }
+        ],
+        "secondary_flow": 10.0
+      },
+      "expect": [
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "missing_side_reversal_resets_timer",
+      "description": "A primary miss recovers as a secondary miss begins; independent timers create a clear gap rather than inheriting the primary elapsed time.",
+      "inputs": {
+        "exchange_cmd": true,
+        "primary_flow": [
+          {
+            "t": 0,
+            "value": 0.0
+          },
+          {
+            "t": 1200,
+            "value": 10.0
+          }
+        ],
+        "secondary_flow": [
+          {
+            "t": 0,
+            "value": 10.0
+          },
+          {
+            "t": 1200,
+            "value": 0.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 960,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 1200,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 0,
+          "to_s": 2040,
+          "equals": false
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 2160,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1200,
+          "to_s": 2040,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 2160,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "initial_primary_miss_obeys_delay",
+      "description": "A primary miss present at initialization still waits for persistence.",
+      "inputs": {
+        "exchange_cmd": true,
+        "primary_flow": 0.0,
+        "secondary_flow": 10.0
+      },
+      "expect": [
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "upstream_enable_misbound_raw_false_positive",
+      "description": "An upstream enable held true while a healthy controller intentionally requests no flow will alarm; this pins why exchange_cmd must be the final both-flow expectation.",
+      "inputs": {
+        "exchange_cmd": true,
+        "primary_flow": 0.0,
+        "secondary_flow": 0.0
+      },
+      "expect": [
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yPrimaryFlowMissing",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "ySecondaryFlowMissing",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}

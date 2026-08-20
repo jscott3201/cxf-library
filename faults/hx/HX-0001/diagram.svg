@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1460" height="340" viewBox="0 0 1460 340">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#718096"/></marker></defs>
+<style>.title{font:700 20px monospace;fill:#172033}.port{font:600 12px monospace;fill:#172033}.inst{font:700 11px monospace;fill:#172033}.cls{font:9px monospace;fill:#4b5563}.wire{stroke:#718096;stroke-width:2;fill:none;marker-end:url(#arrow)}.in{fill:#dbeafe;stroke:#2563eb;stroke-width:1.5}.out{fill:#fee2e2;stroke:#dc2626;stroke-width:1.5}.blk{fill:#f8fafc;stroke:#64748b;stroke-width:1.5}.note{font:11px monospace;fill:#4b5563}</style>
+<text x="24" y="30" class="title">HX-0001 block graph</text>
+<path d="M230 99 H280 V143 H320" class="wire"/>
+<path d="M230 199 H280 V167 H320" class="wire"/>
+<path d="M520 155 H620" class="wire"/>
+<path d="M820 155 H920" class="wire"/>
+<path d="M1120 155 H1270 V199 H1290" class="wire"/>
+<path d="M820 155 H1230 V99 H1290" class="wire"/>
+<rect x="20" y="82" width="210" height="34" rx="17" class="in"/>
+<text x="125" y="104" text-anchor="middle" class="port">effectiveness_expected</text>
+<rect x="20" y="182" width="210" height="34" rx="17" class="in"/>
+<text x="125" y="204" text-anchor="middle" class="port">effectiveness</text>
+<rect x="320" y="128" width="200" height="54" rx="8" class="blk"/>
+<text x="332" y="147" class="inst">shortfall</text>
+<text x="332" y="166" class="cls">Reals.Subtract</text>
+<rect x="620" y="128" width="200" height="54" rx="8" class="blk"/>
+<text x="632" y="147" class="inst">shortfallHigh</text>
+<text x="632" y="166" class="cls">GreaterThreshold · 1/8</text>
+<rect x="920" y="128" width="200" height="54" rx="8" class="blk"/>
+<text x="932" y="147" class="inst">persist</text>
+<text x="932" y="166" class="cls">TrueDelay · 900 s</text>
+<rect x="1290" y="82" width="150" height="34" rx="17" class="out"/>
+<text x="1365" y="104" text-anchor="middle" class="port">yEffectivenessLow</text>
+<rect x="1290" y="182" width="150" height="34" rx="17" class="out"/>
+<text x="1365" y="204" text-anchor="middle" class="port">yFault</text>
+<text x="730" y="316" text-anchor="middle" class="note">Baseline/domain, denominator, energy-balance, settling, and point-validity gates are host-side.</text>
+</svg>
