@@ -429,6 +429,96 @@
       ]
     },
     {
+      "name": "violation_ends_one_step_before_persistence",
+      "description": "A warm violation clearing one evaluator step before 900 seconds never matures.",
+      "inputs": {
+        "chwst": [
+          {
+            "t": 0,
+            "value": 8.0
+          },
+          {
+            "t": 840,
+            "value": 6.0
+          }
+        ],
+        "chwst_sp": 6.0,
+        "chiller_status": true,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 780,
+          "equals": true
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 900,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_fault_clears_on_recovery",
+      "description": "A matured tracking alarm clears immediately after leaving-water temperature recovers into band.",
+      "inputs": {
+        "chwst": [
+          {
+            "t": 0,
+            "value": 8.0
+          },
+          {
+            "t": 1200,
+            "value": 6.0
+          }
+        ],
+        "chwst_sp": 6.0,
+        "chiller_status": true,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1260,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 1260,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
       "name": "setpoint_step_then_recovery",
       "description": "A setpoint reset step creates a short raw error that recovers before persistence; hosts should also exclude unsettled ramps.",
       "inputs": {

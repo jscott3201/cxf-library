@@ -11,7 +11,7 @@ category: PROTECTIVE
 confidence: HIGH
 estimation_method: PROXY_ESTIMATION
 source:
-  - "EPA Facilities Manual, Volume 2, ch.9 Table 9-3 — chiller BAS monitoring includes per-equipment start/stop and failure"
+  - "EPA Facilities Manual, Volume 2, ch.9 Table 9-2 — chiller BAS monitoring includes per-equipment start/stop and failure"
   - "Library proof-of-operation precedents PMP-0003 and HW-0009 — independent command/status mismatch lanes with separate initialization-safe timers"
   - "Library-authored chiller timing adaptation; no cited source publishes 300 s start proof and 120 s stop proof as portable limits"
 g36: null

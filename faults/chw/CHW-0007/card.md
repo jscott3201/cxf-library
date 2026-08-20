@@ -11,8 +11,8 @@ category: COMFORT_ENERGY
 confidence: MEDIUM
 estimation_method: QUALITATIVE_ONLY
 source:
-  - "PNNL-29078, Building Re-Tuning Training Guide: Central Utility Plant Heating and Cooling Control Guide, PDF pp.90 and 95 (§10) — the plant maintains a chilled-water supply target and should trend supply temperature during operation"
-  - "EPA Facilities Manual, Volume 2, ch.9 Table 9-3 — chiller BAS monitoring includes leaving-water setpoint, start/stop, failure, and chilled-water temperature above setpoint"
+  - "PNNL-29078, Building Re-Tuning Training Guide: Central Utility Plant Heating and Cooling Control Guide, PDF pp.91 and 96 (§10) — the plant maintains a chilled-water supply target and should trend supply temperature during operation"
+  - "EPA Facilities Manual, Volume 2, ch.9 Table 9-2 — chiller BAS monitoring includes leaving-water setpoint, start/stop, failure, and chilled-water temperature above setpoint"
   - "Library-authored executable adaptation of AHU-0033's strict mirrored tracking-error topology; no source publishes the shipped 1 K / 20% / 900 s combination as portable"
 g36: null
 clusters: []
