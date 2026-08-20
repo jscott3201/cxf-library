@@ -24,7 +24,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [VAV-0003, VAV-0007, VAV-0008, FCU-0002]
+related: [VAV-0003, VAV-0007, VAV-0008, FCU-0002, FPB-0003]
 playbooks: [vav-min-flow-reheat]
 operating_states: "occupied with the reheat coil commanded off, both gated in-graph. While the schedule is unoccupied, for exclusion_time after it goes occupied, or while rht_vlv_cmd is at/above reheat_closed_threshold, the accumulators are forced to zero. yOccupiedOk and yReheatOk publish the two gates separately."
 preconditions: "Five host obligations. (1) This is the one VPACC channel that needs a discharge-air sensor: many-but-not-all boxes have one (points/vav.points.json vav_dat), and a box without it runs the source's reduced two-channel VPACC (VAV-0007/VAV-0008) rather than a substitute signal. (2) `sat` is the serving AHU's supply-air temperature broadcast to the box, standing in for entering-air per §5.1.4's own workaround — bind the loop actually serving this box; the committed harness method measured the approximation bias below 0.005 °C in simulation, but a long or leaky duct run raises the healthy baseline, which is what error_mean absorbs and why it is commissioned per box. (3) rht_vlv_cmd is the COMMAND, not position feedback — a leak with the valve commanded open is invisible here by construction and belongs to VAV-0003. (4) Tick on the sample_period grid; both unit delays advance on that clock. (5) error_mean, error_sigma, slack_k and alarm_limit_h are per-box-type commissioning values (§5.1.5); the shipped set is one simulated medium-office box plus the source's Iowa campaign. yOccupiedOk and yReheatOk are evaluability flags: either false means NO_EVAL, not healthy."

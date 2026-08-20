@@ -1,0 +1,606 @@
+{
+  "@context": {
+    "S231": "http://data.ashrae.org/S231P#",
+    "base": "urn:cxf-library:fpb-0002#"
+  },
+  "@graph": [
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002",
+      "@type": "S231:Block",
+      "S231:label": "fpb_0002",
+      "S231:containsBlock": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.setpointOk"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.allowedError"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.highResidual"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowResidual"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.highRaw"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowRaw"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.errorAny"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowHigh"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowLow"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.candidate"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.persist"
+        }
+      ],
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.primary_airflow"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.primary_airflow_sp"
+        }
+      ],
+      "S231:hasOutput": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.yFault"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.ySetpointOk"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.yFlowLow"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.yFlowHigh"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.setpointOk",
+      "@type": "urn:cxf-library:fpb-0002#Buildings.Controls.OBC.CDL.Reals.GreaterThreshold",
+      "S231:label": "setpointOk",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.setpointOk.t"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.setpointOk.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.setpointOk.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.setpointOk.t",
+      "S231:value": {
+        "@value": "50.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.setpointOk.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.setpointOk.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowHigh.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowLow.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.candidate.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.ySetpointOk"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.allowedError",
+      "@type": "urn:cxf-library:fpb-0002#Buildings.Controls.OBC.CDL.Reals.MultiplyByParameter",
+      "S231:label": "allowedError",
+      "S231:hasParameter": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.allowedError.k"
+      },
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.allowedError.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.allowedError.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.allowedError.k",
+      "S231:value": {
+        "@value": "0.2",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.allowedError.u",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.allowedError.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.highRaw.u2"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowRaw.u2"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.highResidual",
+      "@type": "urn:cxf-library:fpb-0002#Buildings.Controls.OBC.CDL.Reals.Subtract",
+      "S231:label": "highResidual",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.highResidual.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.highResidual.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.highResidual.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.highResidual.u1",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.highResidual.u2",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.highResidual.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.highRaw.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowResidual",
+      "@type": "urn:cxf-library:fpb-0002#Buildings.Controls.OBC.CDL.Reals.Subtract",
+      "S231:label": "lowResidual",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowResidual.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowResidual.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowResidual.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowResidual.u1",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowResidual.u2",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowResidual.y",
+      "@type": "S231:RealOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowRaw.u1"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.highRaw",
+      "@type": "urn:cxf-library:fpb-0002#Buildings.Controls.OBC.CDL.Reals.Greater",
+      "S231:label": "highRaw",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.highRaw.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.highRaw.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.highRaw.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.highRaw.u1",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.highRaw.u2",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.highRaw.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.errorAny.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowHigh.u2"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowRaw",
+      "@type": "urn:cxf-library:fpb-0002#Buildings.Controls.OBC.CDL.Reals.Greater",
+      "S231:label": "lowRaw",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowRaw.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowRaw.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowRaw.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowRaw.u1",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowRaw.u2",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowRaw.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.errorAny.u2"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowLow.u2"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.errorAny",
+      "@type": "urn:cxf-library:fpb-0002#Buildings.Controls.OBC.CDL.Logical.Or",
+      "S231:label": "errorAny",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.errorAny.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.errorAny.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.errorAny.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.errorAny.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.errorAny.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.errorAny.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.candidate.u2"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowHigh",
+      "@type": "urn:cxf-library:fpb-0002#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "flowHigh",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowHigh.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowHigh.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowHigh.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowHigh.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowHigh.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowHigh.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.yFlowHigh"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowLow",
+      "@type": "urn:cxf-library:fpb-0002#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "flowLow",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowLow.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowLow.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowLow.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowLow.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowLow.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.flowLow.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.yFlowLow"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.candidate",
+      "@type": "urn:cxf-library:fpb-0002#Buildings.Controls.OBC.CDL.Logical.And",
+      "S231:label": "candidate",
+      "S231:hasInput": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.candidate.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.candidate.u2"
+        }
+      ],
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.candidate.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.candidate.u1",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.candidate.u2",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.candidate.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.persist.u"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.persist",
+      "@type": "urn:cxf-library:fpb-0002#Buildings.Controls.OBC.CDL.Logical.TrueDelay",
+      "S231:label": "persist",
+      "S231:hasParameter": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.persist.delayTime"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.persist.delayOnInit"
+        }
+      ],
+      "S231:hasInput": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.persist.u"
+      },
+      "S231:hasOutput": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.persist.y"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.persist.delayTime",
+      "S231:value": {
+        "@value": "600.0",
+        "@type": "http://www.w3.org/2001/XMLSchema#double"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.persist.delayOnInit",
+      "S231:value": {
+        "@value": "true",
+        "@type": "http://www.w3.org/2001/XMLSchema#boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.persist.u",
+      "@type": "S231:BooleanInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.persist.y",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      },
+      "S231:isConnectedTo": {
+        "@id": "urn:cxf-library:fpb-0002#fpb_0002.yFault"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.primary_airflow",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.highResidual.u1"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowResidual.u2"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.primary_airflow_sp",
+      "@type": "S231:RealInput",
+      "S231:isOfDataType": {
+        "@id": "S231:Real"
+      },
+      "S231:isConnectedTo": [
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.setpointOk.u"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.allowedError.u"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.highResidual.u2"
+        },
+        {
+          "@id": "urn:cxf-library:fpb-0002#fpb_0002.lowResidual.u1"
+        }
+      ]
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.yFault",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.ySetpointOk",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.yFlowLow",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    },
+    {
+      "@id": "urn:cxf-library:fpb-0002#fpb_0002.yFlowHigh",
+      "@type": "S231:BooleanOutput",
+      "S231:isOfDataType": {
+        "@id": "S231:Boolean"
+      }
+    }
+  ]
+}

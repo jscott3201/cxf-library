@@ -19,7 +19,7 @@ g36: null
 clusters: [CLU-02]
 suppresses: []
 suppressed_by: []
-related: [AHU-0024, AHU-0001]
+related: [AHU-0024, AHU-0001, FPB-0002]
 playbooks: [missing-reset]
 operating_states: "Occupied, fan running"
 preconditions: "AHU serves multiple zones; zone damper feedback available and aggregated by the host into zone_dmpr_pos_max, as AHU-0024. When zone damper data is missing or stale, the verdict is NO_EVAL, not healthy."

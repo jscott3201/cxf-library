@@ -19,7 +19,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [AHU-0020, VAV-0001, VAV-0005]
+related: [AHU-0020, VAV-0001, VAV-0005, FPB-0002]
 playbooks: [stuck-actuator]
 operating_states: "all (fan running)"
 preconditions: "AHU fan running — a box cannot track a setpoint with no branch pressure behind it, and every zone on a stopped fan would report this fault. Airflow sensor and active setpoint both available and fresh; a stale setpoint held at its last value while the measurement moves reads as a tracking error that is really a communication fault. The evaluability gate is signalled in-rule by ySetpointOk: when it is false the verdict is NO_EVAL, not healthy. Boxes commissioned with the airflow sensor disabled (pressure-independent boxes converted to pressure-dependent control) must be excluded host-side — there is no setpoint to track."

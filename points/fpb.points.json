@@ -1,0 +1,161 @@
+{
+  "schema": "cxf-library/points/v1",
+  "equipment": "fpb",
+  "namespaces": {
+    "brick": {
+      "iri": "https://brickschema.org/schema/Brick#",
+      "verified_version": "1.4.4"
+    },
+    "s223": {
+      "iri": "http://data.ashrae.org/standard223#",
+      "verified_version": "1.0.0-ppr.2.1"
+    },
+    "s223_g36": {
+      "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#",
+      "verified_version": "1.0.0-ppr.2.1"
+    },
+    "quantitykind": {
+      "iri": "http://qudt.org/vocab/quantitykind/",
+      "verified_version": "QUDT 3.1.4"
+    },
+    "unit": {
+      "iri": "http://qudt.org/vocab/unit/",
+      "verified_version": "QUDT 3.1.4"
+    }
+  },
+  "notes": "Fan-powered-terminal point dictionary for series (SFPU) and parallel (PFPU) VAV terminal units. Brick 1.4.4 has generic Terminal_Unit but no exact fan-powered subtype; model a Terminal_Unit containing the exact Fan/Reheat_Valve/coil points and topology. ASHRAE 223 PPR2.1 has exact FanPoweredTerminal and Role-Primary; series/parallel remains deployment topology. ASHRAE 223 local names were checked against public-review artifact 223p-1.0.0-ppr2.1.ttl (owl:versionInfo 1.0.0-ppr.2.1; SHA-256 1f156f9938c0be430d2216e01e31bb183c438ba318d8d4a23d2f074ebcd6f573), not an inferred final 2026 release. That artifact imports QUDT 3.1.8; quantity-kind and unit names were independently checked against repository-declared QUDT 3.1.4. Brick 1.4.4 was checked against Brick.ttl SHA-256 b65720b7b9b64c646745c689777e6138c0d59ce0088df0aeb78fbd444d04d8e7.",
+  "points": [
+    {
+      "name": "fan_cmd",
+      "description": "Final command requesting operation of this fan-powered terminal's fan",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Start_Stop_Command",
+      "s223": {
+        "pattern": "EnumeratedActuatableProperty with Binary-OnOff on the Fan contained by the FanPoweredTerminal via hasProperty",
+        "property_class": "EnumeratedActuatableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": false,
+      "notes": "Attach brick:Start_Stop_Command to the contained brick:Fan, not the terminal or AHU enable. PPR2.1 s223:FanPoweredTerminal requires a contained s223:Fan and the Boolean property terms are exact. Bind after subtype sequence ownership, intentional delays, and normal interlocks."
+    },
+    {
+      "name": "fan_status",
+      "description": "Independent run proof for this fan-powered terminal's fan",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Fan_On_Off_Status",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty with Binary-OnOff on the same Fan contained by the FanPoweredTerminal via hasProperty",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": false,
+      "notes": "Attach brick:Fan_On_Off_Status to the same contained fan as fan_cmd. Require independent current, speed/rotation, airflow/pressure, or auxiliary-contact proof; command echo is invalid. For PFPU rules the proof must establish airflow through the fan/reheat branch."
+    },
+    {
+      "name": "primary_airflow",
+      "description": "Measured AHU-fed primary air entering the fan-powered terminal, excluding induced/plenum branch flow",
+      "kind": "real",
+      "unit": "L/s",
+      "qudt_unit": "L-PER-SEC",
+      "brick": "Supply_Air_Flow_Sensor",
+      "s223": {
+        "pattern": "FlowSensor observes a QuantifiableObservableProperty at the FanPoweredTerminal primary inlet ConnectionPoint whose hasRole is Role-Primary",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "VolumeFlowRate",
+        "unit": "L-PER-SEC",
+        "medium": "Fluid-Air",
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "brick:Supply_Air_Flow_Sensor is exact for the AHU-fed supply/primary stream. PPR2.1 FanPoweredTerminal, FlowSensor, VolumeFlowRate, L-PER-SEC, Fluid-Air and Role-Primary are exact; Role-Primary belongs on the ConnectionPoint via hasRole, not in this property's aspects array. Do not bind total discharge or the PFPU induced branch."
+    },
+    {
+      "name": "primary_airflow_sp",
+      "description": "Final active primary-airflow setpoint after occupancy, ventilation, and heating/cooling logic",
+      "kind": "real",
+      "unit": "L/s",
+      "qudt_unit": "L-PER-SEC",
+      "brick": "Supply_Air_Flow_Setpoint",
+      "s223": {
+        "pattern": "QuantifiableActuatableProperty with Aspect-Setpoint linked by hasSetpoint from the primary inlet airflow property of the FanPoweredTerminal",
+        "property_class": "QuantifiableActuatableProperty",
+        "quantitykind": "VolumeFlowRate",
+        "unit": "L-PER-SEC",
+        "medium": "Fluid-Air",
+        "aspects": [
+          "Aspect-Setpoint"
+        ]
+      },
+      "provisional": false,
+      "notes": "Brick and PPR2.1 setpoint/property terms are exact. Bind the active delivered target, not design minimum or maximum unless it is currently selected. Primary scope is established by the paired property and inlet ConnectionPoint topology."
+    },
+    {
+      "name": "rht_vlv_cmd",
+      "description": "Hydronic reheat valve command, 0 closed to 100 fully open",
+      "kind": "real",
+      "unit": "%",
+      "qudt_unit": "PERCENT",
+      "brick": "Valve_Position_Command",
+      "s223": {
+        "pattern": "QuantifiableActuatableProperty with Binary-Position on the hydronic reheat Valve; actuator and Role-Heating/topology identify the coil branch",
+        "property_class": "QuantifiableActuatableProperty",
+        "quantitykind": "DimensionlessRatio",
+        "unit": "PERCENT",
+        "medium": null,
+        "aspects": [
+          "Binary-Position"
+        ]
+      },
+      "provisional": false,
+      "notes": "brick:Valve_Position_Command and brick:Reheat_Valve are exact in Brick 1.4.4. PPR2.1 QuantifiableActuatableProperty, DimensionlessRatio, PERCENT, Binary-Position, Valve, and Role-Heating are exact; equipment role/topology is not serialized as a property aspect. Electric-reheat-only terminals cannot bind this point."
+    },
+    {
+      "name": "rht_coil_entering_temp",
+      "description": "Air temperature immediately entering the hydronic reheat coil",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": "Air_Temperature_Sensor",
+      "s223": {
+        "pattern": "TemperatureSensor observes a QuantifiableObservableProperty of Fluid-Air at the reheat coil inlet ConnectionPoint: downstream of the SFPU fan or inside the PFPU fan/reheat branch",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Air",
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "Brick 1.4.4 has only generic Air_Temperature_Sensor for this coil-local location. PPR2.1 temperature terms are exact, but series/parallel topology and the branch-local sensor attachment require deployment evidence. AHU SAT or plenum temperature is only a documented proxy when bias is characterized."
+    },
+    {
+      "name": "rht_coil_leaving_temp",
+      "description": "Air temperature immediately leaving the hydronic reheat coil before downstream mixing",
+      "kind": "real",
+      "unit": "degC",
+      "qudt_unit": "DEG_C",
+      "brick": "Air_Temperature_Sensor",
+      "s223": {
+        "pattern": "TemperatureSensor observes a QuantifiableObservableProperty of Fluid-Air at the reheat coil outlet ConnectionPoint before downstream mixing",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "Temperature",
+        "unit": "DEG_C",
+        "medium": "Fluid-Air",
+        "aspects": []
+      },
+      "provisional": true,
+      "notes": "Brick provides only the generic class and PPR2.1 location is topology. For PFPU bind inside the fan/reheat branch before primary/branch mixing; mixed zone discharge is not equivalent unless a validated host Function derives the coil-leaving estimate. For SFPU bind immediately at coil outlet."
+    }
+  ]
+}
