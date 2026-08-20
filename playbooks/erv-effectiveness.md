@@ -40,7 +40,8 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 166–167).
 2. Compare the measured offset with the design pressure strategy. Normalize an
    intentional offset before treating the residual as imbalance.
 3. Inspect filters, outdoor/exhaust openings, dampers, fan belts/speeds, and the
-   recovery core for the high-resistance side identified by ERV-0005.
+   recovery core on both streams. Use ERV-0005's direction only as evidence of
+   which measured flow is higher; it does not isolate restriction or sensor cause.
 
 ## Step 4 — Verify temperature effectiveness
 
@@ -77,5 +78,5 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 166–167).
 2. Confirm frost mode engages and releases at the commissioned boundaries.
 3. Rebalance/normalize both streams and verify ERV-0005 stays clear through a
    full operating transition.
-4. Recalculate effectiveness. Target: return to within 15% of commissioning or
-   rated value.
+4. Recalculate effectiveness. Target: return to within 15 percentage points of
+   the commissioning or rated value.

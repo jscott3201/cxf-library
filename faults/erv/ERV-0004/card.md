@@ -14,7 +14,7 @@ source:
   - "Library-authored active-recovery application of the command/status proof family established by AHU-0039, PMP-0003, and HW-0009"
   - "Buildings.Controls.OBC.CDL.Logical.Proof (Hu & Wetter, March 2023), available at engine pin e2ff2f8; the library uses the proven two-direction vocabulary but composes independent timers because the packaged block cannot express this card's required behavior"
   - "points/erv.points.json erv_recovery_cmd and erv_recovery_status — final-command and independent-physical-proof contracts for wheels, runaround pumps, and other active recovery devices"
-  - "Greenheck ERV controller IOM 484118, p.10 — public manufacturer documentation for wheel-rotation sensing, VFD/wheel checks, and automatic wheel jog; supports available independent proof and the final-command/jog binding caveat, not the 120 s defaults"
+  - "Greenheck ERV controller IOM 484118, pp.5 and 11 — the controller I/O identifies a wheel-rotation alarm and the menu documents automatic wheel jog; supports available independent proof and the final-command/jog binding caveat, not the 120 s defaults"
 g36: null
 clusters: []
 suppresses: []

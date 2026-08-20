@@ -8,11 +8,11 @@
     },
     "s223": {
       "iri": "http://data.ashrae.org/standard223#",
-      "verified_version": "v1.0.0-2026"
+      "verified_version": "1.0.0-ppr.2.1"
     },
     "s223_g36": {
       "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#",
-      "verified_version": "v1.0.0-2026"
+      "verified_version": "1.0.0-ppr.2.1"
     },
     "quantitykind": {
       "iri": "http://qudt.org/vocab/quantitykind/",
@@ -23,7 +23,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "Energy recovery ventilator point dictionary. Exhaust-side, supply/exhaust airflow, and generic command/status classes verified in Brick 1.4.4; the post-recovery outdoor-air temperature and technology-specific active-recovery attachments are provisional. ERV-0001 uses three ERV-local temperatures; ERV-0002/0003 use the site OAT and actual frost state; ERV-0004 requires a final command plus independent physical proof; ERV-0005 requires comparable post-recovery supply and building-exhaust flow measurements.",
+  "notes": "Energy recovery ventilator point dictionary. Exhaust-side, supply/exhaust airflow, and generic command/status classes verified in Brick 1.4.4. ASHRAE 223 terms were checked against ontology artifact 223p-1.0.0-ppr2.1.ttl (owl:versionInfo 1.0.0-ppr.2.1; SHA-256 1f156f9938c0be430d2216e01e31bb183c438ba318d8d4a23d2f074ebcd6f573), not an inferred final 2026 release label. The post-recovery outdoor-air temperature and technology-specific active-recovery attachments are provisional. ERV-0001 uses three ERV-local temperatures; ERV-0002/0003 use the site OAT and actual frost state; ERV-0004 requires a final command plus independent physical proof; ERV-0005 requires comparable post-recovery supply and building-exhaust flow measurements.",
   "points": [
     {
       "name": "erv_oa_entering_temp",

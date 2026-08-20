@@ -57,8 +57,8 @@
       ]
     },
     {
-      "name": "warm_frost_mode_asserts_at_the_delay",
-      "description": "OAT is just above the release line from initialization. delayOnInit serves the full 900 s: false through 870, true from 900.",
+      "name": "warm_frost_mode_asserts_after_the_delay",
+      "description": "OAT is just above the release line from initialization. The assertions leave one 30 s step unbound at the 900 s timer edge, as required by the vector contract.",
       "inputs": {
         "oat": 5.1,
         "erv_frost_prot": true,
@@ -73,7 +73,7 @@
         },
         {
           "output": "yFault",
-          "from_s": 900,
+          "from_s": 930,
           "to_s": 2400,
           "equals": true
         }
@@ -111,7 +111,7 @@
     },
     {
       "name": "warm_excursion_asserts_after_crossing",
-      "description": "The candidate begins at t=300 and matures exactly 900 s later at t=1200.",
+      "description": "The candidate begins at t=300. The true assertion starts one 30 s step after the 900 s timer edge.",
       "inputs": {
         "oat": [
           {
@@ -135,7 +135,7 @@
         },
         {
           "output": "yFault",
-          "from_s": 1200,
+          "from_s": 1230,
           "to_s": 2400,
           "equals": true
         }
@@ -143,7 +143,7 @@
     },
     {
       "name": "frost_flag_clear_restarts_persistence",
-      "description": "The frost flag clears for 300 s during a warm spell, resetting the clock; the second active interval matures at t=2100.",
+      "description": "The frost flag clears for 300 s during a warm spell, resetting the clock; the true assertion begins one step after the second interval's timer edge.",
       "inputs": {
         "oat": 10.0,
         "erv_frost_prot": [
@@ -175,7 +175,7 @@
         },
         {
           "output": "yFault",
-          "from_s": 2100,
+          "from_s": 2130,
           "to_s": 2400,
           "equals": true
         }
@@ -253,7 +253,7 @@
         },
         {
           "output": "yFault",
-          "from_s": 900,
+          "from_s": 930,
           "to_s": 1170,
           "equals": true
         },
@@ -266,12 +266,12 @@
       ]
     },
     {
-      "name": "oat_returns_to_release_on_the_maturity_tick",
-      "description": "OAT clears at exactly t=900. Inputs stage before the timer evaluates that tick, so the alarm never flashes.",
+      "name": "oat_returns_to_release_one_step_before_maturity",
+      "description": "OAT clears at t=870, one 30 s step before the 900 s timer edge, so the alarm never matures.",
       "inputs": {
         "oat": [
           { "t": 0, "value": 5.1 },
-          { "t": 900, "value": 5.0 }
+          { "t": 870, "value": 5.0 }
         ],
         "erv_frost_prot": true,
         "erv_enabled": true
@@ -281,20 +281,20 @@
       ]
     },
     {
-      "name": "frost_releases_one_tick_after_maturity",
-      "description": "The violation survives through t=900 and clears at t=930, producing exactly one alarmed sample on the 30 s clock.",
+      "name": "frost_releases_two_steps_after_maturity",
+      "description": "The violation remains active two steps beyond the 900 s edge. Assertions skip the boundary tick, prove the alarm one step later, and prove immediate recovery at t=960.",
       "inputs": {
         "oat": 5.1,
         "erv_frost_prot": [
           { "t": 0, "value": true },
-          { "t": 930, "value": false }
+          { "t": 960, "value": false }
         ],
         "erv_enabled": true
       },
       "expect": [
         { "output": "yFault", "from_s": 0, "to_s": 870, "equals": false },
-        { "output": "yFault", "from_s": 900, "to_s": 900, "equals": true },
-        { "output": "yFault", "from_s": 930, "to_s": 2400, "equals": false }
+        { "output": "yFault", "from_s": 930, "to_s": 930, "equals": true },
+        { "output": "yFault", "from_s": 960, "to_s": 2400, "equals": false }
       ]
     }
   ]

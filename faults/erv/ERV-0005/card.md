@@ -15,7 +15,6 @@ source:
   - "Library precedents: ERV-0001 (device-local recovery boundaries and evaluability), SYS-0008 (two directional air-balance findings with per-condition persistence), and CHW-0005 (MultiplyByParameter plus Greater for a dynamic threshold)"
   - "points/erv.points.json erv_supply_airflow and erv_exhaust_airflow — Brick 1.4.4 / ASHRAE 223 / QUDT-grounded stream and unit contract"
   - "NREL Standard Work Specification 6.0303.1p and PNNL Building America balanced-ventilation guidance — public support for balancing incoming/outgoing ERV flow for recovery and pressure control"
-  - "NREL/TP-5500-65147 p.42 — a scoped 10% residential balancing criterion; cited to show context-specific evidence, not to make this card's 15% a transcribed commercial default"
   - "DOE/NREL Ventilation Integrated Comfort System report pp.28-29 — public example of frost prevention intentionally unbalancing core-path airflow, requiring the host frost-mode exclusion"
 g36: null
 clusters: []

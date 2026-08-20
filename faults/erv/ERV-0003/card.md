@@ -15,7 +15,7 @@ source:
   - "Library precedent: ERV-0002 (oat / erv_frost_prot / erv_enabled point contract and strict frost-state watchdog), ERV-0001 (recovery lost intentionally during frost protection), and the repository's 900 s transient-rejection convention"
   - "points/erv.points.json oat, erv_frost_prot, and erv_enabled — the binding distinction between an active sequence state and a permissive/advisory flag"
   - "PNNL-19004 p.55 and DOE/NREL Ventilation Integrated Comfort System report pp.28-29 — public examples whose frost controls use exhaust-leaving/core-entering conditions rather than one portable OAT release threshold, supporting site configuration rather than transcription"
-  - "Greenheck ERV controller IOM 484118, p.10 — manufacturer example combining a device-specific OAT permissive with wheel differential pressure; evidence that technology/controller logic varies, not support for the shipped +5 °C"
+  - "Greenheck ERV controller IOM 484118, p.4 — manufacturer example combining a device-specific OAT permissive with wheel differential pressure; evidence that technology/controller logic varies, not support for the shipped +5 °C"
 g36: null
 clusters: []
 suppresses: []
@@ -87,11 +87,11 @@ alarm and discards elapsed time immediately.
 ## Possible Diagnoses
 
 1. Frost-mode software latch, timer, or state machine failed to release
-2. OAT sensor biased high/low, stale, or installed where it does not represent
-   the ERV intake
+2. OAT sensor biased high (false alarm), biased low (missed finding), stale, or
+   installed where it does not represent the ERV intake
 3. Preheat valve/relay, bypass damper, or wheel-speed command left overridden
 4. BAS point bound to a frost permissive rather than the sequence's active state
-5. `release_oat` configured above the installed sequence's true release point
+5. `release_oat` configured below the installed sequence's true release point
 
 ## Energy Impact
 

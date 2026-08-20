@@ -75,7 +75,7 @@
         },
         {
           "output": "yFault",
-          "from_s": 900,
+          "from_s": 930,
           "to_s": 2700,
           "equals": true
         }
@@ -116,7 +116,7 @@
         },
         {
           "output": "yFault",
-          "from_s": 900,
+          "from_s": 930,
           "to_s": 2700,
           "equals": true
         }
@@ -180,7 +180,7 @@
         },
         {
           "output": "yFault",
-          "from_s": 900,
+          "from_s": 930,
           "to_s": 2700,
           "equals": true
         }
@@ -279,7 +279,7 @@
         },
         {
           "output": "yFault",
-          "from_s": 900,
+          "from_s": 930,
           "to_s": 2700,
           "equals": true
         }
@@ -349,7 +349,7 @@
         },
         {
           "output": "yFault",
-          "from_s": 900,
+          "from_s": 930,
           "to_s": 2700,
           "equals": true
         }
@@ -400,7 +400,7 @@
     },
     {
       "name": "direction_reversal_restarts_persistence",
-      "description": "The unit is continuously imbalanced but flips direction at t=600. Separate direction timers discard the first lane and the exhaust lane matures at t=1500.",
+      "description": "The unit is continuously imbalanced but flips direction at t=600. Separate direction timers discard the first lane; the true assertion starts one step after the exhaust lane's timer edge.",
       "inputs": {
         "erv_supply_airflow": [
           {
@@ -457,7 +457,7 @@
         },
         {
           "output": "yFault",
-          "from_s": 1500,
+          "from_s": 1530,
           "to_s": 2700,
           "equals": true
         }
@@ -527,7 +527,7 @@
         },
         {
           "output": "yFault",
-          "from_s": 900,
+          "from_s": 930,
           "to_s": 1170,
           "equals": true
         },
@@ -580,7 +580,7 @@
         },
         {
           "output": "yFault",
-          "from_s": 900,
+          "from_s": 930,
           "to_s": 1170,
           "equals": true
         },
@@ -703,43 +703,43 @@
       ]
     },
     {
-      "name": "imbalance_clears_on_the_maturity_tick",
-      "description": "Both streams rebalance at exactly t=900. The input change is processed before the timer, so yFault never asserts.",
+      "name": "imbalance_clears_one_step_before_maturity",
+      "description": "Both streams rebalance at t=870, one 30 s step before the 900 s timer edge, so yFault never matures.",
       "inputs": {
         "erv_supply_airflow": [
           { "t": 0, "value": 1200.0 },
-          { "t": 900, "value": 1000.0 }
+          { "t": 870, "value": 1000.0 }
         ],
         "erv_exhaust_airflow": [
           { "t": 0, "value": 800.0 },
-          { "t": 900, "value": 1000.0 }
+          { "t": 870, "value": 1000.0 }
         ],
         "erv_enabled": true
       },
       "expect": [
         { "output": "yFault", "from_s": 0, "to_s": 2700, "equals": false },
-        { "output": "ySupplyHigh", "from_s": 0, "to_s": 870, "equals": true },
-        { "output": "ySupplyHigh", "from_s": 900, "to_s": 2700, "equals": false }
+        { "output": "ySupplyHigh", "from_s": 0, "to_s": 840, "equals": true },
+        { "output": "ySupplyHigh", "from_s": 870, "to_s": 2700, "equals": false }
       ]
     },
     {
-      "name": "imbalance_clears_one_tick_after_maturity",
-      "description": "The direction survives through t=900 and clears at t=930, producing a single alarmed sample.",
+      "name": "imbalance_clears_two_steps_after_maturity",
+      "description": "The direction remains active two steps beyond the 900 s edge. Assertions skip the boundary tick, prove yFault at t=930, and prove recovery at t=960.",
       "inputs": {
         "erv_supply_airflow": [
           { "t": 0, "value": 1200.0 },
-          { "t": 930, "value": 1000.0 }
+          { "t": 960, "value": 1000.0 }
         ],
         "erv_exhaust_airflow": [
           { "t": 0, "value": 800.0 },
-          { "t": 930, "value": 1000.0 }
+          { "t": 960, "value": 1000.0 }
         ],
         "erv_enabled": true
       },
       "expect": [
         { "output": "yFault", "from_s": 0, "to_s": 870, "equals": false },
-        { "output": "yFault", "from_s": 900, "to_s": 900, "equals": true },
-        { "output": "yFault", "from_s": 930, "to_s": 2700, "equals": false }
+        { "output": "yFault", "from_s": 930, "to_s": 930, "equals": true },
+        { "output": "yFault", "from_s": 960, "to_s": 2700, "equals": false }
       ]
     }
   ]

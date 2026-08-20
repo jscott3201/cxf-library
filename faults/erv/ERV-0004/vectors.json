@@ -60,8 +60,8 @@
       ]
     },
     {
-      "name": "fail_to_start_asserts_at_start_proof_time",
-      "description": "The command rises at t=300 and proof never follows. The start branch asserts exactly 120 s later.",
+      "name": "fail_to_start_asserts_after_start_proof_time",
+      "description": "The command rises at t=300 and proof never follows. Assertions leave the exact 120 s timer edge unbound and prove the start branch one step later.",
       "inputs": {
         "erv_recovery_cmd": [
           {
@@ -84,13 +84,13 @@
         },
         {
           "output": "yFailToStart",
-          "from_s": 420,
+          "from_s": 450,
           "to_s": 1800,
           "equals": true
         },
         {
           "output": "yFault",
-          "from_s": 420,
+          "from_s": 450,
           "to_s": 1800,
           "equals": true
         },
@@ -103,8 +103,8 @@
       ]
     },
     {
-      "name": "unexpected_run_asserts_at_stop_proof_time",
-      "description": "Status rises against an off command at t=300. The unexpected-run branch asserts at t=420.",
+      "name": "unexpected_run_asserts_after_stop_proof_time",
+      "description": "Status rises against an off command at t=300. Assertions leave the timer edge unbound and prove unexpected run one step later.",
       "inputs": {
         "erv_recovery_cmd": false,
         "erv_recovery_status": [
@@ -127,13 +127,13 @@
         },
         {
           "output": "yUnexpectedRun",
-          "from_s": 420,
+          "from_s": 450,
           "to_s": 1800,
           "equals": true
         },
         {
           "output": "yFault",
-          "from_s": 420,
+          "from_s": 450,
           "to_s": 1800,
           "equals": true
         },
@@ -239,7 +239,7 @@
     },
     {
       "name": "command_chatter_restarts_the_start_timer",
-      "description": "A one-sample command drop resets the start clock. The alarm moves from t=420 to t=600.",
+      "description": "A one-sample command drop resets the start clock. The true assertion moves to one step after the restarted timer edge.",
       "inputs": {
         "erv_recovery_cmd": [
           {
@@ -270,7 +270,7 @@
         },
         {
           "output": "yFailToStart",
-          "from_s": 600,
+          "from_s": 630,
           "to_s": 1800,
           "equals": true
         }
@@ -365,7 +365,7 @@
       "expect": [
         {
           "output": "yFailToStart",
-          "from_s": 120,
+          "from_s": 150,
           "to_s": 570,
           "equals": true
         },
@@ -383,13 +383,13 @@
         },
         {
           "output": "yUnexpectedRun",
-          "from_s": 720,
+          "from_s": 750,
           "to_s": 1800,
           "equals": true
         },
         {
           "output": "yFault",
-          "from_s": 120,
+          "from_s": 150,
           "to_s": 570,
           "equals": true
         },
@@ -401,7 +401,7 @@
         },
         {
           "output": "yFault",
-          "from_s": 720,
+          "from_s": 750,
           "to_s": 1800,
           "equals": true
         }
@@ -423,7 +423,7 @@
         },
         {
           "output": "yUnexpectedRun",
-          "from_s": 120,
+          "from_s": 150,
           "to_s": 1800,
           "equals": true
         }
@@ -454,7 +454,7 @@
         },
         {
           "output": "yFailToStart",
-          "from_s": 120,
+          "from_s": 150,
           "to_s": 570,
           "equals": true
         },
@@ -497,7 +497,7 @@
         },
         {
           "output": "yUnexpectedRun",
-          "from_s": 120,
+          "from_s": 150,
           "to_s": 570,
           "equals": true
         },
@@ -522,37 +522,21 @@
       ]
     },
     {
-      "name": "start_proof_arrives_on_the_boundary",
-      "description": "Independent proof arrives at exactly t=120. The input update is staged before TrueDelay on that tick, so no one-sample alarm appears.",
+      "name": "start_proof_arrives_two_steps_after_the_boundary",
+      "description": "Proof arrives at t=180. Assertions skip the exact t=120 timer edge, prove the mismatch at t=150, then prove immediate recovery.",
       "inputs": {
         "erv_recovery_cmd": true,
         "erv_recovery_status": [
           { "t": 0, "value": false },
-          { "t": 120, "value": true }
-        ]
-      },
-      "expect": [
-        { "output": "yFault", "from_s": 0, "to_s": 1800, "equals": false },
-        { "output": "yFailToStart", "from_s": 0, "to_s": 1800, "equals": false },
-        { "output": "yUnexpectedRun", "from_s": 0, "to_s": 1800, "equals": false }
-      ]
-    },
-    {
-      "name": "start_proof_arrives_one_tick_after_the_boundary",
-      "description": "Proof arrives at t=150. The fail-to-start and roll-up outputs are true only on the t=120 sample, then clear immediately.",
-      "inputs": {
-        "erv_recovery_cmd": true,
-        "erv_recovery_status": [
-          { "t": 0, "value": false },
-          { "t": 150, "value": true }
+          { "t": 180, "value": true }
         ]
       },
       "expect": [
         { "output": "yFailToStart", "from_s": 0, "to_s": 90, "equals": false },
-        { "output": "yFailToStart", "from_s": 120, "to_s": 120, "equals": true },
-        { "output": "yFailToStart", "from_s": 150, "to_s": 1800, "equals": false },
-        { "output": "yFault", "from_s": 120, "to_s": 120, "equals": true },
-        { "output": "yFault", "from_s": 150, "to_s": 1800, "equals": false },
+        { "output": "yFailToStart", "from_s": 150, "to_s": 150, "equals": true },
+        { "output": "yFailToStart", "from_s": 180, "to_s": 1800, "equals": false },
+        { "output": "yFault", "from_s": 150, "to_s": 150, "equals": true },
+        { "output": "yFault", "from_s": 180, "to_s": 1800, "equals": false },
         { "output": "yUnexpectedRun", "from_s": 0, "to_s": 1800, "equals": false }
       ]
     }

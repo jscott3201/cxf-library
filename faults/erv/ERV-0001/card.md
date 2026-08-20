@@ -235,7 +235,7 @@ with operating/frost state, proves any active recovery device, and compares the
 two air streams before recalculating effectiveness or cleaning the core. That
 order avoids condemning heat-transfer media for a stopped wheel, intentional
 frost sequence, bypass condition, or airflow problem. Its resolution target is
-effectiveness back within 15% of the commissioned value, the same 15 points this
-rule alarms at, so a device restored just inside the alarm point has met the
-target by exactly the margin that clears the alarm and is worth re-measuring
-next season.
+effectiveness back within 15 percentage points of the commissioned value, the
+same absolute 0.15 shortfall this rule alarms at. A device restored just inside
+the alarm point has therefore met the target by exactly the margin that clears
+the alarm and is worth re-measuring next season.
