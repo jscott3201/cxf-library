@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | FCU-0001 (cycling), FCU-0002 (SAT low heating), FCU-0003 (SAT high cooling), FCU-0004 (cooling leak), FCU-0005 (heating leak), FCU-0006 (fan proof) |
+| **Applies to** | FCU-0001 (cycling), FCU-0002 (SAT low heating), FCU-0003 (SAT high cooling), FCU-0004 (cooling leak), FCU-0005 (heating leak), FCU-0006 (fan proof), FCU-0007 (simultaneous commands) |
 | **Fix complexity** | Remote fix (cycling/leak detection) · On-site (valve replacement) |
 | **Typical time** | 15 min remote / 1–2 h on-site per unit |
 | **Typical cost** | $0 remote / $150–$600 per valve replacement |
@@ -16,13 +16,17 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 171–172).
    the final fan command with independent current, airflow, speed, rotation, or
    auxiliary proof. Check occupancy/mode ownership, condensate and freeze
    interlocks, service state, and local hand control before condemning the fan.
-2. **Excessive cycling (FCU-0001):** count operating state transitions per
+2. **Simultaneous commands (FCU-0007):** trend both physical valve commands
+   from the same FCU. Verify the deployed thresholds/duration, then exclude
+   intentional dehumidification/reheat, freeze protection, valve exercise, and
+   commissioning before treating the overlap as a control conflict.
+3. **Excessive cycling (FCU-0001):** count operating state transitions per
    hour — more than 7/hr indicates a problem. The most common cause is a
    narrow deadband between the heating and cooling setpoints.
-3. **SAT deviations (FCU-0002/FCU-0003):** confirm SAT is below setpoint at full
+4. **SAT deviations (FCU-0002/FCU-0003):** confirm SAT is below setpoint at full
    heating (FC-002) or above setpoint at full cooling (FC-003). Rule out
    plant-side issues first — is the HW/CHW supply temperature adequate?
-4. **Leaking valves (FCU-0004/FCU-0005):** with the valve commanded to 0%,
+5. **Leaking valves (FCU-0004/FCU-0005):** with the valve commanded to 0%,
    measure the temperature drop (cooling) or rise (heating) across the coil.
    Any measurable temperature change when the valve is commanded closed
    confirms a leak. In multi-story buildings, check gravity circulation: hot
@@ -43,6 +47,10 @@ Adapted from HVAC FDD Reference v1.0, Remediation Playbooks (pp. 171–172).
    opposite season (e.g. lock out the heating valve in summer). This
    eliminates the simultaneous heating and cooling effect while the valve
    awaits replacement.
+4. **Simultaneous commands:** after confirming no intentional cooling-plus-reheat
+   requirement, correct overlapping loop deadbands, priority-array overrides,
+   mode transitions, or the ordinary heating/cooling interlock. Do not defeat
+   humidity, freeze, condensate, or equipment-protection logic.
 
 ## Step 3 — On-site service
 
@@ -62,6 +70,9 @@ freeze, or electrical protection to clear an FDD finding.
    Replace the worst offenders first.
 5. **Fan proof:** verify the proof switch before replacing equipment, then
    inspect the motor/ECM, wheel, bearings, contactor, and wiring under LOTO.
+6. **Simultaneous commands:** if command logic is correct, verify each actuator
+   and valve position independently; use FCU-0004/0005 temperature evidence to
+   distinguish command conflict from a valve that leaks when commanded closed.
 
 ## Step 4 — Confirm resolution
 
@@ -70,4 +81,6 @@ freeze, or electrical protection to clear an FDD finding.
 2. For cycling: verify state transitions drop below 7/hr.
 3. For fan proof, use an OEM/site-approved safe stop/start test and confirm
    final command and independent status agree within both configured windows.
-4. Monitor for 48 hours before closing the fault.
+4. For FCU-0007, verify no above-threshold overlap during ordinary modes and
+   confirm any designed dehumidification/reheat mode still operates correctly.
+5. Monitor for 48 hours before closing the fault.

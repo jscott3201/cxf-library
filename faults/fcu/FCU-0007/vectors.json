@@ -1,0 +1,417 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 720
+  },
+  "scenarios": [
+    {
+      "name": "both_closed",
+      "description": "Ordinary idle operation keeps both direction flags and the alarm clear.",
+      "inputs": {
+        "htg_vlv_cmd": 0.0,
+        "clg_vlv_cmd": 0.0
+      },
+      "expect": [
+        {
+          "output": "yHeatingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        },
+        {
+          "output": "yCoolingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "heating_only",
+      "description": "A material heating command without cooling is valid single-mode operation.",
+      "inputs": {
+        "htg_vlv_cmd": 40.0,
+        "clg_vlv_cmd": 0.0
+      },
+      "expect": [
+        {
+          "output": "yHeatingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yCoolingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "cooling_only",
+      "description": "A material cooling command without heating is valid single-mode operation.",
+      "inputs": {
+        "htg_vlv_cmd": 0.0,
+        "clg_vlv_cmd": 40.0
+      },
+      "expect": [
+        {
+          "output": "yHeatingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        },
+        {
+          "output": "yCoolingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "both_exactly_at_threshold",
+      "description": "Strict comparisons keep equality clear on both lanes.",
+      "inputs": {
+        "htg_vlv_cmd": 10.0,
+        "clg_vlv_cmd": 10.0
+      },
+      "expect": [
+        {
+          "output": "yHeatingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        },
+        {
+          "output": "yCoolingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "one_just_above_one_at_threshold",
+      "description": "One active lane cannot mature a simultaneous-command fault.",
+      "inputs": {
+        "htg_vlv_cmd": 10.1,
+        "clg_vlv_cmd": 10.0
+      },
+      "expect": [
+        {
+          "output": "yHeatingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yCoolingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "both_just_above_sustained",
+      "description": "One representable increment above both thresholds matures only after persistence.",
+      "inputs": {
+        "htg_vlv_cmd": 10.1,
+        "clg_vlv_cmd": 10.1
+      },
+      "expect": [
+        {
+          "output": "yHeatingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yCoolingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 720,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "overlap_ends_one_step_before_persistence",
+      "description": "A conflict ending one evaluator step before 300 s never matures.",
+      "inputs": {
+        "htg_vlv_cmd": 25.0,
+        "clg_vlv_cmd": [
+          {
+            "t": 0,
+            "value": 25.0
+          },
+          {
+            "t": 240,
+            "value": 0.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        },
+        {
+          "output": "yHeatingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yCoolingActive",
+          "from_s": 0,
+          "to_s": 180,
+          "equals": true
+        },
+        {
+          "output": "yCoolingActive",
+          "from_s": 240,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_overlap_recovers_when_cooling_clears",
+      "description": "A mature fault clears immediately when either material command clears.",
+      "inputs": {
+        "htg_vlv_cmd": 25.0,
+        "clg_vlv_cmd": [
+          {
+            "t": 0,
+            "value": 25.0
+          },
+          {
+            "t": 420,
+            "value": 0.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 360,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 420,
+          "to_s": 720,
+          "equals": false
+        },
+        {
+          "output": "yHeatingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yCoolingActive",
+          "from_s": 0,
+          "to_s": 360,
+          "equals": true
+        },
+        {
+          "output": "yCoolingActive",
+          "from_s": 420,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_overlaps_reset",
+      "description": "Two sub-duration conflicts separated by either valve clearing do not accumulate time.",
+      "inputs": {
+        "htg_vlv_cmd": 25.0,
+        "clg_vlv_cmd": [
+          {
+            "t": 0,
+            "value": 25.0
+          },
+          {
+            "t": 180,
+            "value": 0.0
+          },
+          {
+            "t": 300,
+            "value": 25.0
+          },
+          {
+            "t": 480,
+            "value": 0.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "initialization_overlap_serves_full_delay",
+      "description": "delayOnInit prevents an immediate alarm when the evaluator starts inside a conflict.",
+      "inputs": {
+        "htg_vlv_cmd": 30.0,
+        "clg_vlv_cmd": 30.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yHeatingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yCoolingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "heating_reset_then_cooling_overlap",
+      "description": "Clearing the heating lane resets the timer before a later overlap.",
+      "inputs": {
+        "htg_vlv_cmd": [
+          {
+            "t": 0,
+            "value": 25.0
+          },
+          {
+            "t": 180,
+            "value": 0.0
+          },
+          {
+            "t": 360,
+            "value": 25.0
+          }
+        ],
+        "clg_vlv_cmd": 25.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 720,
+          "to_s": 720,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "intentional_dehumidification_raw_case",
+      "description": "The raw graph alarms on intentional cooling-plus-reheat; the host must exclude that mode or not instantiate this rule.",
+      "inputs": {
+        "htg_vlv_cmd": 35.0,
+        "clg_vlv_cmd": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yHeatingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yCoolingActive",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1420" height="360" viewBox="0 0 1420 360">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#718096"/></marker></defs>
+<style>.title{font:700 20px monospace;fill:#172033}.port{font:600 12px monospace;fill:#172033}.inst{font:700 11px monospace;fill:#172033}.cls{font:9px monospace;fill:#4b5563}.wire{stroke:#718096;stroke-width:2;fill:none;marker-end:url(#arrow)}.in{fill:#dbeafe;stroke:#2563eb;stroke-width:1.5}.out{fill:#fee2e2;stroke:#dc2626;stroke-width:1.5}.blk{fill:#f8fafc;stroke:#64748b;stroke-width:1.5}</style>
+<text x="24" y="30" class="title">FCU-0007 block graph</text>
+<path d="M200 99 H250" class="wire"/>
+<path d="M200 259 H250" class="wire"/>
+<path d="M470 99 H515 V179 H560" class="wire"/>
+<path d="M470 259 H515 V179 H560" class="wire"/>
+<path d="M470 99 H1240 V89 H1240" class="wire"/>
+<path d="M470 259 H1240 V249 H1240" class="wire"/>
+<path d="M740 179 H830" class="wire"/>
+<path d="M1040 179 H1240" class="wire"/>
+<rect x="20" y="82" width="180" height="34" rx="17" class="in"/>
+<text x="110" y="104" text-anchor="middle" class="port">htg_vlv_cmd</text>
+<rect x="20" y="242" width="180" height="34" rx="17" class="in"/>
+<text x="110" y="264" text-anchor="middle" class="port">clg_vlv_cmd</text>
+<rect x="250" y="72" width="220" height="54" rx="8" class="blk"/>
+<text x="262" y="91" class="inst">heatingActive</text>
+<text x="262" y="110" class="cls">GreaterThreshold · 10%</text>
+<rect x="250" y="232" width="220" height="54" rx="8" class="blk"/>
+<text x="262" y="251" class="inst">coolingActive</text>
+<text x="262" y="270" class="cls">GreaterThreshold · 10%</text>
+<rect x="560" y="152" width="180" height="54" rx="8" class="blk"/>
+<text x="572" y="171" class="inst">bothActive</text>
+<text x="572" y="190" class="cls">Logical.And</text>
+<rect x="830" y="152" width="210" height="54" rx="8" class="blk"/>
+<text x="842" y="171" class="inst">persist</text>
+<text x="842" y="190" class="cls">TrueDelay · 300 s</text>
+<rect x="1240" y="72" width="150" height="34" rx="17" class="out"/>
+<text x="1315" y="94" text-anchor="middle" class="port">yHeatingActive</text>
+<rect x="1240" y="152" width="150" height="34" rx="17" class="out"/>
+<text x="1315" y="174" text-anchor="middle" class="port">yFault</text>
+<rect x="1240" y="232" width="150" height="34" rx="17" class="out"/>
+<text x="1315" y="254" text-anchor="middle" class="port">yCoolingActive</text>
+</svg>

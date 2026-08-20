@@ -1,0 +1,561 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 720
+  },
+  "scenarios": [
+    {
+      "name": "cooling_mode",
+      "description": "Concurrent heat in the cooling code is diagnostically visible but outside the heating-mode candidate.",
+      "inputs": {
+        "aux_heat_status": true,
+        "oat": 6.0,
+        "mode_command": 2,
+        "defrost_status": false,
+        "comp_status": true
+      },
+      "expect": [
+        {
+          "output": "yHeatingMode",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        },
+        {
+          "output": "yAboveLockout",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yConcurrentHeat",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "heating_below_lockout",
+      "description": "Auxiliary support below the configured lockout is permitted by this rule.",
+      "inputs": {
+        "aux_heat_status": true,
+        "oat": 4.9,
+        "mode_command": 1,
+        "defrost_status": false,
+        "comp_status": true
+      },
+      "expect": [
+        {
+          "output": "yHeatingMode",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yAboveLockout",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        },
+        {
+          "output": "yConcurrentHeat",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "heating_above_lockout_without_auxiliary",
+      "description": "Compressor heating above lockout is healthy when the auxiliary source is inactive.",
+      "inputs": {
+        "aux_heat_status": false,
+        "oat": 6.0,
+        "mode_command": 1,
+        "defrost_status": false,
+        "comp_status": true
+      },
+      "expect": [
+        {
+          "output": "yHeatingMode",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yAboveLockout",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yConcurrentHeat",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "auxiliary_above_lockout_compressor_off",
+      "description": "Auxiliary heat without compressor proof may be emergency operation and is not this concurrent-energy signature.",
+      "inputs": {
+        "aux_heat_status": true,
+        "oat": 6.0,
+        "mode_command": 1,
+        "defrost_status": false,
+        "comp_status": false
+      },
+      "expect": [
+        {
+          "output": "yHeatingMode",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yAboveLockout",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yConcurrentHeat",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "concurrent_heat_above_lockout_sustained",
+      "description": "The complete avoidable-energy signature matures only after persistence.",
+      "inputs": {
+        "aux_heat_status": true,
+        "oat": 6.0,
+        "mode_command": 1,
+        "defrost_status": false,
+        "comp_status": true
+      },
+      "expect": [
+        {
+          "output": "yHeatingMode",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yAboveLockout",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yConcurrentHeat",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 720,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "concurrent_heat_during_defrost",
+      "description": "Defrost explicitly removes the alarm candidate while leaving diagnostic subconditions visible.",
+      "inputs": {
+        "aux_heat_status": true,
+        "oat": 6.0,
+        "mode_command": 1,
+        "defrost_status": true,
+        "comp_status": true
+      },
+      "expect": [
+        {
+          "output": "yHeatingMode",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yAboveLockout",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yConcurrentHeat",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "exact_oat_lockout_is_clear",
+      "description": "The exact configured OAT threshold is clear under strict greater-than semantics.",
+      "inputs": {
+        "aux_heat_status": true,
+        "oat": 5.0,
+        "mode_command": 1,
+        "defrost_status": false,
+        "comp_status": true
+      },
+      "expect": [
+        {
+          "output": "yHeatingMode",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yAboveLockout",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        },
+        {
+          "output": "yConcurrentHeat",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "unsupported_mode_code",
+      "description": "An unmapped integer mode cannot accidentally satisfy the heating-mode gate.",
+      "inputs": {
+        "aux_heat_status": true,
+        "oat": 6.0,
+        "mode_command": 0,
+        "defrost_status": false,
+        "comp_status": true
+      },
+      "expect": [
+        {
+          "output": "yHeatingMode",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        },
+        {
+          "output": "yAboveLockout",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yConcurrentHeat",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "auxiliary_stage_ends_one_step_before_persistence",
+      "description": "An auxiliary stage ending one evaluator step before 300 s never matures.",
+      "inputs": {
+        "aux_heat_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 240,
+            "value": false
+          }
+        ],
+        "oat": 6.0,
+        "mode_command": 1,
+        "defrost_status": false,
+        "comp_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        },
+        {
+          "output": "yConcurrentHeat",
+          "from_s": 0,
+          "to_s": 180,
+          "equals": true
+        },
+        {
+          "output": "yConcurrentHeat",
+          "from_s": 240,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_fault_recovers_when_auxiliary_clears",
+      "description": "A mature alarm clears immediately when the auxiliary source stops producing heat.",
+      "inputs": {
+        "aux_heat_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 420,
+            "value": false
+          }
+        ],
+        "oat": 6.0,
+        "mode_command": 1,
+        "defrost_status": false,
+        "comp_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 360,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 420,
+          "to_s": 720,
+          "equals": false
+        },
+        {
+          "output": "yConcurrentHeat",
+          "from_s": 0,
+          "to_s": 360,
+          "equals": true
+        },
+        {
+          "output": "yConcurrentHeat",
+          "from_s": 420,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_auxiliary_episodes_reset",
+      "description": "Two short stages separated by a reset do not accumulate timer age.",
+      "inputs": {
+        "aux_heat_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 180,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 480,
+            "value": false
+          }
+        ],
+        "oat": 6.0,
+        "mode_command": 1,
+        "defrost_status": false,
+        "comp_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "initialization_violation_serves_full_delay",
+      "description": "delayOnInit prevents an immediate alarm when evaluation starts inside the complete signature.",
+      "inputs": {
+        "aux_heat_status": true,
+        "oat": 6.0,
+        "mode_command": 1,
+        "defrost_status": false,
+        "comp_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yHeatingMode",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yAboveLockout",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yConcurrentHeat",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "defrost_interval_resets_candidate",
+      "description": "A defrost interval between two auxiliary stages resets persistence even though the other subconditions remain true.",
+      "inputs": {
+        "aux_heat_status": true,
+        "oat": 6.0,
+        "mode_command": 1,
+        "defrost_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 180,
+            "value": true
+          },
+          {
+            "t": 300,
+            "value": false
+          },
+          {
+            "t": 480,
+            "value": true
+          }
+        ],
+        "comp_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "emergency_or_recovery_raw_case",
+      "description": "The raw graph alarms on sustained concurrent recovery/emergency heat; the host must exclude an authorized mode.",
+      "inputs": {
+        "aux_heat_status": true,
+        "oat": 6.0,
+        "mode_command": 1,
+        "defrost_status": false,
+        "comp_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yHeatingMode",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yAboveLockout",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        },
+        {
+          "output": "yConcurrentHeat",
+          "from_s": 0,
+          "to_s": 720,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}

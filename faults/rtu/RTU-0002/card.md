@@ -18,7 +18,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: [RTU-0003]
-related: [RTU-0003, RTU-0007, RTU-0010]
+related: [RTU-0003, RTU-0007, RTU-0010, RTU-0011]
 playbooks: [rtu-compressor-refrigerant]
 operating_states: "mechanical cooling, one or two compressor stages"
 preconditions: "The compressor must have run at its current stage for min_runtime_for_eval (15 min) before the split is read; the coil is still pulling down after a start or a stage change and reads falsely degraded. sat must pass its integrity gate: RTU-0003 (see suppressed_by) checks it against mat and silences this rule while it is active. Nothing validates rat on its own, so a drifted return-air sensor biases the split with no other symptom. Stage evaluability is signalled in-rule by yStageOk; when it is false the verdict is NO_EVAL, not healthy."

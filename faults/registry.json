@@ -474,6 +474,14 @@
       "legacy_id": null
     },
     {
+      "id": "FCU-0007",
+      "family": "fcu",
+      "name": "Simultaneous heating and cooling commands",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
       "id": "HP-0001",
       "family": "hp",
       "name": "COP degradation vs baseline",
@@ -525,6 +533,14 @@
       "id": "HP-0007",
       "family": "hp",
       "name": "Heat-pump compressor proof-of-operation failure",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "HP-0008",
+      "family": "hp",
+      "name": "Auxiliary heat active above lockout with compressor running",
       "method": "rule",
       "status": "verified",
       "legacy_id": null
@@ -749,6 +765,14 @@
       "id": "RTU-0010",
       "family": "rtu",
       "name": "RTU supply-fan proof-of-operation failure",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "RTU-0011",
+      "family": "rtu",
+      "name": "RTU supply-air temperature tracking failure",
       "method": "rule",
       "status": "verified",
       "legacy_id": null

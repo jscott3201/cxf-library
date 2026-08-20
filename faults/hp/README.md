@@ -19,17 +19,19 @@ Point dictionary: [`points/hp.points.json`](../../points/hp.points.json).
 | HP-0005 | Refrigerant overcharge (subcooling high) | 3 | rule | **verified** |
 | HP-0006 | Reversing-valve internal bypass leakage | 3 | rule | **verified** |
 | HP-0007 | Heat-pump compressor proof-of-operation failure | 2 | rule | **verified** |
+| HP-0008 | Auxiliary heat active above lockout with compressor running | 2 | rule | **verified** |
 
 Severity and method for HP-0001..006 follow the reference's ch.11 cards (its
 §5.8.4 index carries no severity column); HP-0007 is a severity-2 library
-proof-of-operation adaptation. HP-0001's COP-vs-OAT baseline is host-fitted:
+proof-of-operation adaptation and HP-0008 is a library excess-energy adaptation.
+HP-0001's COP-vs-OAT baseline is host-fitted:
 the host runs the 14-day learning regression and writes the slope/intercept as rule
 parameters via `set_param` (R² > 0.6 precondition); the graph evaluates the
 fitted line — the library's first host-learned baseline.
 
 ## Relationships
 
-- HP-0001..007 share the heat-pump-faults playbook.
+- HP-0001..008 share the heat-pump-faults playbook.
 - RTU-0001 (compressor short-cycling) applies to HP equipment per its
   reference card. HP-0007 now supplies the per-compressor command/proof pair;
   defrost, pump-down, OEM permissives, and restart logic remain explicit host
@@ -37,6 +39,9 @@ fitted line — the library's first host-learned baseline.
 - HP-0007 is related to every HP performance/refrigerant rule, but does not
   suppress them as a whole: fail-to-start can remove the running premise,
   while unexpected operation can leave their measurements meaningful.
+- HP-0008 evaluates concurrent compressor and independently proven auxiliary
+  heat only against the configured site lockout. HP-0001/0002/0007 lead the
+  capacity, defrost, and proof branches without automatically silencing it.
 
 ## Refrigerant-side family (library-authored, batch 17)
 

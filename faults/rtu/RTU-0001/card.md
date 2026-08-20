@@ -18,7 +18,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [RTU-0002, RTU-0010, HP-0007]
+related: [RTU-0002, RTU-0010, RTU-0011, HP-0007]
 playbooks: [rtu-compressor-refrigerant]
 operating_states: "all active modes (any cooling or heating call)"
 preconditions: "The host must report NO_EVAL for the first count_window (1 h) after engine start: while the moving average's window fills, its divisor is elapsed time, so the output is an extrapolated rate rather than a completed-hour count. Unlike AHU-0004 this gate is load-bearing — alarm_delay (15 min) is shorter than count_window, so delayOnInit does not cover the warm-up window and two starts inside the first few minutes can reach a verdict (`warmup_rate_asserts` pins it). The unit must be enabled and calling for cooling or heating: a compressor idle because there is no load produces zero starts, and reporting that as healthy cycling is the opposite of information. comp_status must be bound per compressor — on a two-compressor unit the OR of both statuses hides every start that happens while the other circuit is already running, and undercounts the cycling of each. Host tick interval must lie in [57.2 s, 300 s) with count_scale set to match (see Deviations). When any gate is unmet the verdict is NO_EVAL, not healthy."

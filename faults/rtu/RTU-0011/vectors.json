@@ -1,0 +1,652 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 1500
+  },
+  "scenarios": [
+    {
+      "name": "fan_off_with_large_error",
+      "description": "Temperature error without proven supply airflow is not evaluable.",
+      "inputs": {
+        "sat": 20.0,
+        "sat_sp": 15.0,
+        "sf_status": false,
+        "comp_status": true,
+        "htg_status": false
+      },
+      "expect": [
+        {
+          "output": "yConditioningActive",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": true
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "fan_on_without_mechanical_conditioning",
+      "description": "A running fan alone does not establish the mechanical-delivery premise.",
+      "inputs": {
+        "sat": 20.0,
+        "sat_sp": 15.0,
+        "sf_status": true,
+        "comp_status": false,
+        "htg_status": false
+      },
+      "expect": [
+        {
+          "output": "yConditioningActive",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "active_on_setpoint",
+      "description": "Stable mechanical operation at the active target is healthy.",
+      "inputs": {
+        "sat": 15.0,
+        "sat_sp": 15.0,
+        "sf_status": true,
+        "comp_status": true,
+        "htg_status": false
+      },
+      "expect": [
+        {
+          "output": "yConditioningActive",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": true
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "cooling_status_too_warm",
+      "description": "Cooling proof with SAT above its target drives the warm diagnostic and matures the alarm.",
+      "inputs": {
+        "sat": 17.1,
+        "sat_sp": 15.0,
+        "sf_status": true,
+        "comp_status": true,
+        "htg_status": false
+      },
+      "expect": [
+        {
+          "output": "yConditioningActive",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": true
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": true
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1500,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "heating_status_too_cold",
+      "description": "Heating-only proof with SAT below target exercises the independent cold direction.",
+      "inputs": {
+        "sat": 12.9,
+        "sat_sp": 15.0,
+        "sf_status": true,
+        "comp_status": false,
+        "htg_status": true
+      },
+      "expect": [
+        {
+          "output": "yConditioningActive",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": true
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1500,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "exact_warm_error_is_clear",
+      "description": "The +2 K boundary is clear under the strict comparison.",
+      "inputs": {
+        "sat": 17.0,
+        "sat_sp": 15.0,
+        "sf_status": true,
+        "comp_status": true,
+        "htg_status": false
+      },
+      "expect": [
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "exact_cold_error_is_clear",
+      "description": "The -2 K boundary is clear under the mirrored strict comparison.",
+      "inputs": {
+        "sat": 13.0,
+        "sat_sp": 15.0,
+        "sf_status": true,
+        "comp_status": true,
+        "htg_status": false
+      },
+      "expect": [
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "both_conditioning_statuses_active_raw_case",
+      "description": "The graph intentionally treats either or both mechanical statuses as active; host mode validation remains external.",
+      "inputs": {
+        "sat": 17.1,
+        "sat_sp": 15.0,
+        "sf_status": true,
+        "comp_status": true,
+        "htg_status": true
+      },
+      "expect": [
+        {
+          "output": "yConditioningActive",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": true
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": true
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1500,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "normal_dx_off_cycle_resets_timer",
+      "description": "A normal compressor-off interval removes evaluability and resets an immature error episode.",
+      "inputs": {
+        "sat": 18.0,
+        "sat_sp": 15.0,
+        "sf_status": true,
+        "comp_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          },
+          {
+            "t": 900,
+            "value": true
+          }
+        ],
+        "htg_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 600,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 900,
+          "to_s": 1500,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "violation_ends_one_step_before_persistence",
+      "description": "An error ending one evaluator step before 900 s never matures.",
+      "inputs": {
+        "sat": [
+          {
+            "t": 0,
+            "value": 18.0
+          },
+          {
+            "t": 840,
+            "value": 15.0
+          }
+        ],
+        "sat_sp": 15.0,
+        "sf_status": true,
+        "comp_status": true,
+        "htg_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 780,
+          "equals": true
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 840,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_warm_fault_recovers",
+      "description": "A mature alarm and its direction clear immediately when SAT returns to band.",
+      "inputs": {
+        "sat": [
+          {
+            "t": 0,
+            "value": 18.0
+          },
+          {
+            "t": 1080,
+            "value": 15.0
+          }
+        ],
+        "sat_sp": 15.0,
+        "sf_status": true,
+        "comp_status": true,
+        "htg_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1020,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1080,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 1020,
+          "equals": true
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 1080,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_error_episodes_reset",
+      "description": "Two sub-duration violations separated by an in-band interval cannot accumulate persistence.",
+      "inputs": {
+        "sat": [
+          {
+            "t": 0,
+            "value": 18.0
+          },
+          {
+            "t": 480,
+            "value": 15.0
+          },
+          {
+            "t": 720,
+            "value": 18.0
+          },
+          {
+            "t": 1200,
+            "value": 15.0
+          }
+        ],
+        "sat_sp": 15.0,
+        "sf_status": true,
+        "comp_status": true,
+        "htg_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "initialization_violation_serves_full_delay",
+      "description": "delayOnInit requires the full tracking interval after evaluator startup.",
+      "inputs": {
+        "sat": 18.0,
+        "sat_sp": 15.0,
+        "sf_status": true,
+        "comp_status": true,
+        "htg_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1500,
+          "equals": true
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": true
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "sampled_direction_handoff_preserves_persistence",
+      "description": "A direct sampled warm-to-cold handoff stays continuously outside the symmetric band and preserves timer age.",
+      "inputs": {
+        "sat": [
+          {
+            "t": 0,
+            "value": 18.0
+          },
+          {
+            "t": 480,
+            "value": 12.0
+          }
+        ],
+        "sat_sp": 15.0,
+        "sf_status": true,
+        "comp_status": true,
+        "htg_status": false
+      },
+      "expect": [
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 420,
+          "equals": true
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 480,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 420,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 480,
+          "to_s": 1500,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1500,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "setpoint_step_raw_transient",
+      "description": "An unexcluded active-setpoint step can create raw error, but this short case resets before alarm maturity.",
+      "inputs": {
+        "sat": 15.0,
+        "sat_sp": [
+          {
+            "t": 0,
+            "value": 15.0
+          },
+          {
+            "t": 300,
+            "value": 12.0
+          },
+          {
+            "t": 720,
+            "value": 15.0
+          }
+        ],
+        "sf_status": true,
+        "comp_status": true,
+        "htg_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 300,
+          "to_s": 660,
+          "equals": true
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 720,
+          "to_s": 1500,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 1500,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}
