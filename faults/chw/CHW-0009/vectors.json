@@ -1,0 +1,485 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 14400
+  },
+  "scenarios": [
+    {
+      "name": "no_starts",
+      "description": "A stopped machine produces no rising edges.",
+      "inputs": {
+        "chiller_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "first_sample_true_is_inert",
+      "description": "Status true at engine initialization creates zero edge area and no counted start.",
+      "inputs": {
+        "chiller_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "one_normal_start",
+      "description": "One start after a completed warm-up window stays below the three-start allowance.",
+      "inputs": {
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 4200,
+            "value": true
+          },
+          {
+            "t": 6000,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "exactly_three_starts_clear",
+      "description": "The strict comparison leaves exactly the commissioned allowance clear.",
+      "inputs": {
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 4200,
+            "value": true
+          },
+          {
+            "t": 4320,
+            "value": false
+          },
+          {
+            "t": 4800,
+            "value": true
+          },
+          {
+            "t": 4920,
+            "value": false
+          },
+          {
+            "t": 5400,
+            "value": true
+          },
+          {
+            "t": 5520,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "half_open_window_boundary_clear",
+      "description": "The fourth start arrives exactly one window after the first; that oldest pulse has left and only three remain.",
+      "inputs": {
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 3600,
+            "value": true
+          },
+          {
+            "t": 3720,
+            "value": false
+          },
+          {
+            "t": 4800,
+            "value": true
+          },
+          {
+            "t": 4920,
+            "value": false
+          },
+          {
+            "t": 6000,
+            "value": true
+          },
+          {
+            "t": 6120,
+            "value": false
+          },
+          {
+            "t": 7200,
+            "value": true
+          },
+          {
+            "t": 7320,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "four_starts_fault",
+      "description": "One observed start over the allowance raises the raw rolling-count verdict.",
+      "inputs": {
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 4200,
+            "value": true
+          },
+          {
+            "t": 4320,
+            "value": false
+          },
+          {
+            "t": 4680,
+            "value": true
+          },
+          {
+            "t": 4800,
+            "value": false
+          },
+          {
+            "t": 5160,
+            "value": true
+          },
+          {
+            "t": 5280,
+            "value": false
+          },
+          {
+            "t": 5640,
+            "value": true
+          },
+          {
+            "t": 5760,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 5580,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 5760,
+          "to_s": 7740,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 7980,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "oldest_start_ages_out",
+      "description": "After four starts raise the verdict, it clears when the oldest contributing pulse leaves the trailing hour.",
+      "inputs": {
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 3600,
+            "value": true
+          },
+          {
+            "t": 3720,
+            "value": false
+          },
+          {
+            "t": 4200,
+            "value": true
+          },
+          {
+            "t": 4320,
+            "value": false
+          },
+          {
+            "t": 4800,
+            "value": true
+          },
+          {
+            "t": 4920,
+            "value": false
+          },
+          {
+            "t": 5400,
+            "value": true
+          },
+          {
+            "t": 5520,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 5520,
+          "to_s": 7140,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 7380,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "status_chatter_counts_rising_edges",
+      "description": "Eight status transitions are four starts, not eight; proof chatter is indistinguishable from real cycling to this graph.",
+      "inputs": {
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 4200,
+            "value": true
+          },
+          {
+            "t": 4260,
+            "value": false
+          },
+          {
+            "t": 4440,
+            "value": true
+          },
+          {
+            "t": 4500,
+            "value": false
+          },
+          {
+            "t": 4680,
+            "value": true
+          },
+          {
+            "t": 4740,
+            "value": false
+          },
+          {
+            "t": 4920,
+            "value": true
+          },
+          {
+            "t": 4980,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 5040,
+          "to_s": 7620,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "warmup_single_start_asserts_raw",
+      "description": "Partial-window extrapolation makes one early start look faster than three per hour; the host must report NO_EVAL for the first full window.",
+      "inputs": {
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 420,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 420,
+          "to_s": 1080,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1260,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "warmup_four_starts_assert_raw",
+      "description": "A burst during history warm-up raises the raw graph but remains host-NO_EVAL until one full window is available.",
+      "inputs": {
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 360,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          },
+          {
+            "t": 660,
+            "value": false
+          },
+          {
+            "t": 900,
+            "value": true
+          },
+          {
+            "t": 960,
+            "value": false
+          },
+          {
+            "t": 1200,
+            "value": true
+          },
+          {
+            "t": 1260,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 1320,
+          "to_s": 3780,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 3960,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "reload_running_loses_prior_history",
+      "description": "A fresh engine loaded while a chiller is already running cannot reconstruct starts that happened before reload.",
+      "inputs": {
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          },
+          {
+            "t": 4200,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "subtick_cycle_aliases_clear",
+      "description": "A complete off-on-off cycle between evaluator ticks is invisible, pinning the sampling obligation.",
+      "inputs": {
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 10,
+            "value": true
+          },
+          {
+            "t": 20,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 14400,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1700" height="260" viewBox="0 0 1700 260">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#718096"/></marker></defs>
+<style>.title{font:700 20px sans-serif;fill:#172033}.port{font:600 13px sans-serif;fill:#172033}.inst{font:700 12px sans-serif;fill:#172033}.cls{font:9px sans-serif;fill:#4b5563}.wire{stroke:#718096;stroke-width:2;fill:none;marker-end:url(#arrow)}.in{fill:#dbeafe;stroke:#2563eb;stroke-width:1.5}.out{fill:#fee2e2;stroke:#dc2626;stroke-width:1.5}.blk{fill:#f8fafc;stroke:#64748b;stroke-width:1.5}</style>
+<text x="24" y="30" class="title">CHW-0009 block graph</text>
+<path d="M185 129 H205 V129 H225" class="wire"/>
+<path d="M375 129 H395 V129 H415" class="wire"/>
+<path d="M575 129 H595 V129 H615" class="wire"/>
+<path d="M775 129 H795 V129 H815" class="wire"/>
+<path d="M1015 129 H1035 V129 H1055" class="wire"/>
+<path d="M1265 129 H1285 V129 H1305" class="wire"/>
+<path d="M1490 129 H1510 V129 H1530" class="wire"/>
+<rect x="20" y="112" width="165" height="34" rx="17" class="in"/>
+<text x="102.5" y="134" text-anchor="middle" class="port">chiller_status</text>
+<rect x="225" y="102" width="150" height="54" rx="8" class="blk"/>
+<text x="237" y="120" class="inst">start</text>
+<text x="237" y="137" class="cls">Logical.Edge</text>
+<rect x="415" y="102" width="160" height="54" rx="8" class="blk"/>
+<text x="427" y="120" class="inst">pulseInt</text>
+<text x="427" y="137" class="cls">BooleanToInteger</text>
+<rect x="615" y="102" width="160" height="54" rx="8" class="blk"/>
+<text x="627" y="120" class="inst">pulseReal</text>
+<text x="627" y="137" class="cls">IntegerToReal</text>
+<rect x="815" y="102" width="200" height="54" rx="8" class="blk"/>
+<text x="827" y="120" class="inst">rate</text>
+<text x="827" y="137" class="cls">MovingAverage · 3600 s</text>
+<rect x="1055" y="102" width="210" height="54" rx="8" class="blk"/>
+<text x="1067" y="120" class="inst">count</text>
+<text x="1067" y="137" class="cls">MultiplyByParameter · 60</text>
+<rect x="1305" y="102" width="185" height="54" rx="8" class="blk"/>
+<text x="1317" y="120" class="inst">cntHigh</text>
+<text x="1317" y="137" class="cls">GreaterThreshold · 3</text>
+<rect x="1530" y="112" width="140" height="34" rx="17" class="out"/>
+<text x="1600" y="134" text-anchor="middle" class="port">yFault</text>
+</svg>

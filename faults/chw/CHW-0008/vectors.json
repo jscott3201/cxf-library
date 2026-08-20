@@ -1,0 +1,557 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 1800
+  },
+  "scenarios": [
+    {
+      "name": "agreement_stopped",
+      "description": "Command and proof both false are healthy agreement.",
+      "inputs": {
+        "chiller_cmd": false,
+        "chiller_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "agreement_running",
+      "description": "Command and independent run proof both true are healthy agreement.",
+      "inputs": {
+        "chiller_cmd": true,
+        "chiller_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "fail_to_start_at_initialization",
+      "description": "A standing start mismatch serves the full 300-second initialization-safe delay.",
+      "inputs": {
+        "chiller_cmd": true,
+        "chiller_status": false
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 360,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "unexpected_run_at_initialization",
+      "description": "A standing stop mismatch serves the independent 120-second delay.",
+      "inputs": {
+        "chiller_cmd": false,
+        "chiller_status": true
+      },
+      "expect": [
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 60,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 180,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 60,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 180,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "normal_delayed_start_and_stop",
+      "description": "Oil-pump/permissive startup and normal unload/coast-down both complete inside their own windows.",
+      "inputs": {
+        "chiller_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 900,
+            "value": false
+          }
+        ],
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 540,
+            "value": true
+          },
+          {
+            "t": 960,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "start_recovers_on_timer_boundary",
+      "description": "Run proof arriving exactly at the 300-second boundary clears the candidate before evaluation and never alarms.",
+      "inputs": {
+        "chiller_cmd": true,
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "stop_recovers_on_timer_boundary",
+      "description": "Status clearing exactly at the 120-second boundary prevents an unexpected-run alarm.",
+      "inputs": {
+        "chiller_cmd": false,
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 120,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "run_proof_lost_midcycle",
+      "description": "A normally running machine that loses proof begins the start-direction timer at the loss event.",
+      "inputs": {
+        "chiller_cmd": true,
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 960,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "command_chatter_resets_start_timer",
+      "description": "A start request that drops and returns restarts the continuous 300-second proof window.",
+      "inputs": {
+        "chiller_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 180,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          }
+        ],
+        "chiller_status": false
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 660,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "pending_direction_reversal_uses_new_timer",
+      "description": "A start mismatch reverses to an unexpected-run mismatch before maturity; the old lane resets and the new lane serves 120 seconds.",
+      "inputs": {
+        "chiller_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 180,
+            "value": false
+          }
+        ],
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 180,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 360,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_direction_reversal_reserves_new_window",
+      "description": "A mature unexpected-run alarm clears when the mismatch flips; fail-to-start then waits its separate 300 seconds.",
+      "inputs": {
+        "chiller_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          }
+        ],
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 180,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 660,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 180,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 960,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "status_chatter_never_matures",
+      "description": "A proof signal alternating every minute never leaves either mismatch continuous for its timer.",
+      "inputs": {
+        "chiller_cmd": true,
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 60,
+            "value": false
+          },
+          {
+            "t": 120,
+            "value": true
+          },
+          {
+            "t": 180,
+            "value": false
+          },
+          {
+            "t": 240,
+            "value": true
+          },
+          {
+            "t": 300,
+            "value": false
+          },
+          {
+            "t": 360,
+            "value": true
+          },
+          {
+            "t": 420,
+            "value": false
+          },
+          {
+            "t": 480,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mismatch_recovery_clears_alarm",
+      "description": "A matured fail-to-start output clears immediately when independent status proves run.",
+      "inputs": {
+        "chiller_cmd": true,
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 900,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 360,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 960,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

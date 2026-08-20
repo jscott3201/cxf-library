@@ -1,0 +1,666 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 3600
+  },
+  "scenarios": [
+    {
+      "name": "running_loaded_on_setpoint",
+      "description": "A loaded running chiller exactly on its active leaving-water target is evaluable and clear.",
+      "inputs": {
+        "chwst": 6.0,
+        "chwst_sp": 6.0,
+        "chiller_status": true,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "too_warm_at_initialization",
+      "description": "Insufficient cooling is exposed immediately but delayOnInit serves the complete 900-second persistence window.",
+      "inputs": {
+        "chwst": 7.1,
+        "chwst_sp": 6.0,
+        "chiller_status": true,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "too_cold_at_initialization",
+      "description": "Overcooling follows the mirrored diagnostic lane and the same persistence window.",
+      "inputs": {
+        "chwst": 4.9,
+        "chwst_sp": 6.0,
+        "chiller_status": true,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "warm_exact_boundary_clear",
+      "description": "Exactly +1.0 K is clear under the strict comparator.",
+      "inputs": {
+        "chwst": 7.0,
+        "chwst_sp": 6.0,
+        "chiller_status": true,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "cold_exact_boundary_clear",
+      "description": "Exactly -1.0 K is clear under the mirrored strict comparator.",
+      "inputs": {
+        "chwst": 5.0,
+        "chwst_sp": 6.0,
+        "chiller_status": true,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "warm_just_beyond_boundary",
+      "description": "One test increment beyond the warm allowance asserts direction and then the fault.",
+      "inputs": {
+        "chwst": 7.01,
+        "chwst_sp": 6.0,
+        "chiller_status": true,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "cold_just_beyond_boundary",
+      "description": "One test increment beyond the cold allowance follows the independent cold lane.",
+      "inputs": {
+        "chwst": 4.99,
+        "chwst_sp": 6.0,
+        "chiller_status": true,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "load_below_floor_not_evaluable",
+      "description": "A large temperature error below the load floor produces neither direction nor fault.",
+      "inputs": {
+        "chwst": 9.0,
+        "chwst_sp": 6.0,
+        "chiller_status": true,
+        "chiller_load": 19.9
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "load_exact_floor_not_evaluable",
+      "description": "Exactly minimum_load is not evaluable because the load comparator is strict.",
+      "inputs": {
+        "chwst": 9.0,
+        "chwst_sp": 6.0,
+        "chiller_status": true,
+        "chiller_load": 20.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "load_just_above_floor_evaluable",
+      "description": "One increment above the floor opens the load gate while an on-target machine remains clear.",
+      "inputs": {
+        "chwst": 6.0,
+        "chwst_sp": 6.0,
+        "chiller_status": true,
+        "chiller_load": 20.1
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "chiller_off_large_error",
+      "description": "A stopped chiller has no tracking verdict even if a warm header and stale setpoint create a large raw error.",
+      "inputs": {
+        "chwst": 12.0,
+        "chwst_sp": 6.0,
+        "chiller_status": false,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        },
+        {
+          "output": "yLoadOk",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "startup_transient_shorter_than_delay",
+      "description": "A loaded startup pull-down reaches the band before 900 seconds and never alarms.",
+      "inputs": {
+        "chwst": [
+          {
+            "t": 0,
+            "value": 9.0
+          },
+          {
+            "t": 600,
+            "value": 6.0
+          }
+        ],
+        "chwst_sp": 6.0,
+        "chiller_status": true,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "setpoint_step_then_recovery",
+      "description": "A setpoint reset step creates a short raw error that recovers before persistence; hosts should also exclude unsettled ramps.",
+      "inputs": {
+        "chwst": 6.0,
+        "chwst_sp": [
+          {
+            "t": 0,
+            "value": 6.0
+          },
+          {
+            "t": 600,
+            "value": 4.5
+          },
+          {
+            "t": 1200,
+            "value": 6.0
+          }
+        ],
+        "chiller_status": true,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "intermittent_error_resets_timer",
+      "description": "A compliant interval resets persistence; the second warm episode must serve a fresh 900 seconds.",
+      "inputs": {
+        "chwst": [
+          {
+            "t": 0,
+            "value": 8.0
+          },
+          {
+            "t": 600,
+            "value": 6.0
+          },
+          {
+            "t": 900,
+            "value": 8.0
+          }
+        ],
+        "chwst_sp": 6.0,
+        "chiller_status": true,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "load_gate_drop_resets_timer",
+      "description": "Dropping below the evaluability floor clears direction and resets persistence even while temperature remains warm.",
+      "inputs": {
+        "chwst": 8.0,
+        "chwst_sp": 6.0,
+        "chiller_status": true,
+        "chiller_load": [
+          {
+            "t": 0,
+            "value": 60.0
+          },
+          {
+            "t": 600,
+            "value": 10.0
+          },
+          {
+            "t": 900,
+            "value": 60.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "status_gate_drop_resets_timer",
+      "description": "A stopped interval resets timing; restart into the same error requires the full duration again.",
+      "inputs": {
+        "chwst": 8.0,
+        "chwst_sp": 6.0,
+        "chiller_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          },
+          {
+            "t": 900,
+            "value": true
+          }
+        ],
+        "chiller_load": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "direct_direction_handoff_keeps_timer",
+      "description": "A sampled warm-to-cold handoff changes diagnostic direction but the out-of-band OR never falls, so persistence continues.",
+      "inputs": {
+        "chwst": [
+          {
+            "t": 0,
+            "value": 8.0
+          },
+          {
+            "t": 600,
+            "value": 4.0
+          }
+        ],
+        "chwst_sp": 6.0,
+        "chiller_status": true,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        {
+          "output": "yTooWarm",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yTooCold",
+          "from_s": 660,
+          "to_s": 3600,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3600,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "threshold_chatter_never_persists",
+      "description": "Alternating inside and outside the warm allowance exposes chatter but never accumulates 900 continuous seconds.",
+      "inputs": {
+        "chwst": [
+          {
+            "t": 0,
+            "value": 6.9
+          },
+          {
+            "t": 120,
+            "value": 7.1
+          },
+          {
+            "t": 240,
+            "value": 6.9
+          },
+          {
+            "t": 360,
+            "value": 7.1
+          },
+          {
+            "t": 480,
+            "value": 6.9
+          },
+          {
+            "t": 600,
+            "value": 7.1
+          },
+          {
+            "t": 720,
+            "value": 6.9
+          }
+        ],
+        "chwst_sp": 6.0,
+        "chiller_status": true,
+        "chiller_load": 60.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3600,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

@@ -8,11 +8,11 @@
     },
     "s223": {
       "iri": "http://data.ashrae.org/standard223#",
-      "verified_version": "v1.0.0-2026"
+      "verified_version": "1.0.0-ppr.2.1"
     },
     "s223_g36": {
       "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#",
-      "verified_version": "v1.0.0-2026"
+      "verified_version": "1.0.0-ppr.2.1"
     },
     "quantitykind": {
       "iri": "http://qudt.org/vocab/quantitykind/",
@@ -23,7 +23,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "Chilled water plant point dictionary (reference ch.13, CHW-0001..053). Owning equipment: brick:Chiller / brick:Chilled_Water_Loop (both verified in Brick 1.4.4). Plant-level rules: on multi-chiller plants, bind kW/tons/load per chiller instance and the loop temperatures/setpoints per loop. The reference expresses chiller output in tons; the dictionary keeps that unit so the kW/ton quantity matches the trade convention (1 ton = 3.517 kW thermal — conversion belongs at binding, not in the graph).",
+  "notes": "Chilled-water plant point dictionary. Owning equipment: brick:Chiller / brick:Chilled_Water_Loop (both verified in Brick 1.4.4). On multi-chiller plants, machine rules require a coherent per-chiller identity; loop-common temperature/setpoint points are valid only where the card explicitly permits them. ASHRAE 223 mappings were checked against 223p-1.0.0-ppr2.1.ttl (owl:versionInfo 1.0.0-ppr.2.1; SHA-256 1f156f9938c0be430d2216e01e31bb183c438ba318d8d4a23d2f074ebcd6f573), replacing the former unverified v1.0.0-2026 label. The reference expresses chiller output in tons; 1 ton = 3.517 kW thermal and conversion belongs at binding, not in the graph.",
   "points": [
     {
       "name": "chiller_kw",
@@ -60,6 +60,44 @@
       },
       "provisional": true,
       "notes": "brick:Thermal_Power_Sensor grep-verified, but marked provisional for the unit: the reference (and the kW/ton convention) uses refrigeration tons while most BAS trend kW thermal or derive tons from flow x deltaT. Binding must land on tons (1 ton = 3.517 kW) or CHW-0001's kW/ton and its baseline coefficients are silently wrong together. Often a host-derived point (flow x deltaT x cp)."
+    },
+    {
+      "name": "chiller_cmd",
+      "description": "Final individual-chiller run command (true = this machine is requested to operate)",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Start_Stop_Command",
+      "s223": {
+        "pattern": "EnumeratedActuatableProperty on the Chiller via hasProperty",
+        "property_class": "EnumeratedActuatableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": false,
+      "notes": "brick:Start_Stop_Command is exact and equipment-agnostic in Brick 1.4.4; attach it via isPointOf to this brick:Chiller. Bind the final stage command downstream of plant enable, lead/lag selection, and ordinary anti-recycle/interlock logic. A plant enable, cooling demand, availability, or fleet request is invalid for CHW-0008. ASHRAE 223 uses a Binary-OnOff EnumeratedActuatableProperty on s223:Chiller."
+    },
+    {
+      "name": "chiller_status",
+      "description": "Independent individual-chiller run proof (true = this machine is actually operating)",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Run_Status",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty on the Chiller via hasProperty",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": false,
+      "notes": "brick:Run_Status is exact in Brick 1.4.4; attach it to this brick:Chiller. Bind proof of capacity-producing operation or compressor run, not availability, enable-ready, alarm-free, an echoed command, or a fleet OR. Define the rule-instance boundary explicitly for modular or multi-circuit equipment. ASHRAE 223 uses a Binary-OnOff EnumeratedObservableProperty on s223:Chiller."
     },
     {
       "name": "cwst",
@@ -99,7 +137,7 @@
         ]
       },
       "provisional": false,
-      "notes": "brick:Leaving_Chilled_Water_Temperature_Sensor grep-verified. Consumed by CHW-0001 (baseline regressor) and CHW-0004 (delta-T)."
+      "notes": "brick:Leaving_Chilled_Water_Temperature_Sensor verified in Brick 1.4.4. For CHW-0007 prefer the individual chiller evaporator/barrel outlet. A common mixed-header value is acceptable only when the active staged machine(s) genuinely control that same header target; it is not a per-machine proxy by name alone. CHW-0001 may use the fitted model's documented machine/plant boundary; CHW-0004 intentionally uses loop supply."
     },
     {
       "name": "chwrt",
@@ -137,7 +175,7 @@
         "aspects": []
       },
       "provisional": true,
-      "notes": "Brick 1.4.4 has no chiller-percent-load class (defrost_status precedent for a null mapping). Typical sources: the chiller's own RLA%/load output, or host-derived tons/design_tons. Evaluability floor for CHW-0001 (30%) and CHW-0004 (40%); range regressor for CHW-0002."
+      "notes": "Brick 1.4.4 has no chiller-percent-load class, so the Brick mapping is null and the 223 pattern is provisional. Typical per-machine sources are the chiller controller's PLR/RLA% or host-derived tons/design_tons. CHW-0001 and CHW-0007 require the same individual machine as their other inputs. CHW-0004 deliberately uses a plant-loaded proxy; CHW-0002 may use an explicitly documented plant range. A fleet maximum is not per-machine load."
     },
     {
       "name": "chwst_sp",
@@ -158,7 +196,7 @@
         ]
       },
       "provisional": false,
-      "notes": "brick:Leaving_Chilled_Water_Temperature_Setpoint grep-verified. CHW-0002 watches this point's RANGE over the evaluation window — the reset detector reads the setpoint, never the measured temperature (AHU-0023 sat_sp precedent)."
+      "notes": "brick:Leaving_Chilled_Water_Temperature_Setpoint verified in Brick 1.4.4. CHW-0002 watches the loop setpoint range. CHW-0007 requires the final active target controlling its bound chwst: prefer the individual chiller's delivered target, or use a common header setpoint only when the staged machines truly control that same mixed-header point. A supervisory request upstream of local reset, demand, or safety limits is not the active target."
     },
     {
       "name": "dp_sp",

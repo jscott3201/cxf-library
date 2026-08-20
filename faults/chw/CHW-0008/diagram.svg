@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1430" height="520" viewBox="0 0 1430 520">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#718096"/></marker></defs>
+<style>.title{font:700 20px sans-serif;fill:#172033}.port{font:600 13px sans-serif;fill:#172033}.inst{font:700 12px sans-serif;fill:#172033}.cls{font:9px sans-serif;fill:#4b5563}.wire{stroke:#718096;stroke-width:2;fill:none;marker-end:url(#arrow)}.in{fill:#dbeafe;stroke:#2563eb;stroke-width:1.5}.out{fill:#fee2e2;stroke:#dc2626;stroke-width:1.5}.blk{fill:#f8fafc;stroke:#64748b;stroke-width:1.5}</style>
+<text x="24" y="30" class="title">CHW-0008 block graph</text>
+<path d="M180 319 H205 V229 H230" class="wire"/>
+<path d="M180 119 H317.5 V129 H455" class="wire"/>
+<path d="M390 229 H422.5 V129 H455" class="wire"/>
+<path d="M625 129 H662.5 V129 H700" class="wire"/>
+<path d="M180 119 H205 V409 H230" class="wire"/>
+<path d="M390 409 H422.5 V329 H455" class="wire"/>
+<path d="M180 319 H317.5 V329 H455" class="wire"/>
+<path d="M625 329 H662.5 V329 H700" class="wire"/>
+<path d="M900 129 H940 V229 H980" class="wire"/>
+<path d="M900 329 H940 V229 H980" class="wire"/>
+<path d="M900 129 H1060 V129 H1220" class="wire"/>
+<path d="M900 329 H1060 V329 H1220" class="wire"/>
+<path d="M1150 229 H1185 V229 H1220" class="wire"/>
+<rect x="20" y="102" width="160" height="34" rx="17" class="in"/>
+<text x="100" y="124" text-anchor="middle" class="port">chiller_cmd</text>
+<rect x="20" y="302" width="160" height="34" rx="17" class="in"/>
+<text x="100" y="324" text-anchor="middle" class="port">chiller_status</text>
+<rect x="230" y="202" width="160" height="54" rx="8" class="blk"/>
+<text x="242" y="220" class="inst">notSts</text>
+<text x="242" y="237" class="cls">Logical.Not</text>
+<rect x="230" y="382" width="160" height="54" rx="8" class="blk"/>
+<text x="242" y="400" class="inst">notCmd</text>
+<text x="242" y="417" class="cls">Logical.Not</text>
+<rect x="455" y="102" width="170" height="54" rx="8" class="blk"/>
+<text x="467" y="120" class="inst">failCond</text>
+<text x="467" y="137" class="cls">Logical.And</text>
+<rect x="455" y="302" width="170" height="54" rx="8" class="blk"/>
+<text x="467" y="320" class="inst">runCond</text>
+<text x="467" y="337" class="cls">Logical.And</text>
+<rect x="700" y="102" width="200" height="54" rx="8" class="blk"/>
+<text x="712" y="120" class="inst">startProof</text>
+<text x="712" y="137" class="cls">TrueDelay · 300 s</text>
+<rect x="700" y="302" width="200" height="54" rx="8" class="blk"/>
+<text x="712" y="320" class="inst">stopProof</text>
+<text x="712" y="337" class="cls">TrueDelay · 120 s</text>
+<rect x="980" y="202" width="170" height="54" rx="8" class="blk"/>
+<text x="992" y="220" class="inst">anyDir</text>
+<text x="992" y="237" class="cls">Logical.Or</text>
+<rect x="1220" y="112" width="180" height="34" rx="17" class="out"/>
+<text x="1310" y="134" text-anchor="middle" class="port">yFailToStart</text>
+<rect x="1220" y="312" width="180" height="34" rx="17" class="out"/>
+<text x="1310" y="334" text-anchor="middle" class="port">yUnexpectedRun</text>
+<rect x="1220" y="212" width="180" height="34" rx="17" class="out"/>
+<text x="1310" y="234" text-anchor="middle" class="port">yFault</text>
+</svg>

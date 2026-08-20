@@ -155,6 +155,27 @@ prototype's constant-HWST-at-low-load operation (excluded by-construction);
 Atlanta January never crosses CHW-0004's 40% chiller-load floor — season
 selection matters per family.
 
+PR 04 adds a separate **per-chiller adapter** for CHW-0007/CHW-0009 instead
+of reusing the plant `max(PLR)` and mixed-header temperature. Each chiller
+keeps its own part-load ratio, electricity rate, and direct evaporator outlet
+temperature. `chiller_status` is disclosed as strictly positive machine
+electricity; PLR × 100 is the per-machine load proxy. CHW-0007 compares the
+individual outlet with the prototype's common supply setpoint only because its
+parallel constant-flow chillers share that EnergyPlus plant target, and its FPR
+windows begin 1800 s after the same machine is both running and above 20% load.
+CHW-0009 copies are retuned to `count_scale=3600/300=12`; 300 s is inside the
+rule's legal ring/count band but misses cycles completed inside ten minutes.
+CHW-0008 is not replayed: EnergyPlus exposes operating outputs but no
+independent final BAS per-chiller stage command, and deriving command from
+status would make proof-of-operation tautological. In the Denver OfficeLarge
+campaign, CHW-0007 is clean for both chillers in July's evaluable loaded
+windows; January has no evaluable loaded windows. CHW-0009 is clear for both
+machines in January but alarms on both in July. The underlying per-machine PLR
+and power series confirm repeated OFF/ON operation—four sampled starts inside
+45 minutes for each machine during low/moderate-load periods—so these two
+failed healthy-baseline expectations are classified as real prototype cycling,
+not hidden as unexplained FPR or tuned away.
+
 PR 03 adds a separate **per-pump adapter** for PMP-0004/PMP-0005 instead of
 reusing those aggregate HW proxies. Each `Pump:VariableSpeed` instance keeps its
 own series: `pump_status` is disclosed as strictly positive pump active power
