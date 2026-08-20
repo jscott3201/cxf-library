@@ -339,6 +339,7 @@ def emit_and_replay(building: str, loops_pts: dict, rules: dict, out: Path):
 PLANT_EXCLUDE = {
     "CHW-0001": "host-fitted kW/ton baseline placeholders — needs a per-plant fit first",
     "CHW-0002": "reset-class: prototype uses a constant scheduled CHW setpoint, fires by construction",
+    "CHW-0008": "no independent final per-chiller BAS stage command; deriving command from status would make proof tautological",
     "HW-0001": "host-fitted baseline placeholders — needs a per-plant fit first",
     "HW-0002": "host-fitted baseline placeholders — needs a per-plant fit first",
     "HW-0008": "reset-class: constant scheduled HW setpoint, fires by construction",
@@ -349,6 +350,7 @@ PLANT_MAPPED = {"chwst", "chwrt", "chwst_sp", "chiller_load", "boiler_status",
                 "hw_pump_status", "hws_temp", "hwr_temp", "hws_temp_sp",
                 "hw_pump_vfd_speed", "oat"}
 PMP_MAPPED = {"pump_status", "pump_flow", "pump_kw"}
+CHW_MACHINE_MAPPED = {"chwst", "chwst_sp", "chiller_status", "chiller_load"}
 # rule -> gate key; rules absent here replay ungated (lead margin only):
 # unnecessary-operation rules must NOT be gated on the equipment they accuse.
 PLANT_GATE = {"CHW-0004": "chw_load40", "HW-0004": "hw_on", "HW-0007": "hw_on"}
@@ -400,6 +402,8 @@ def patch_plant(b: dict, pn: dict, begin, end) -> dict:
         req(c["sp_node"], "System Node Setpoint Temperature")
         for ch in c["chillers"]:
             req(ch, "Chiller Part Load Ratio")
+            req(ch, "Chiller Electricity Rate")
+            req(ch, "Chiller Evaporator Outlet Temperature")
     if "tower" in pn:
         tw = pn["tower"]
         req("Environment", "Site Outdoor Air Wetbulb Temperature")
@@ -429,14 +433,34 @@ def extract_plant(csv_path: Path, pn: dict, b: dict) -> dict:
     if "chw" in pn:
         c = pn["chw"]
         plrs = [series(data, col(header, ch, "Chiller Part Load Ratio")) for ch in c["chillers"]]
+        powers = [series(data, col(header, ch, "Chiller Electricity Rate")) for ch in c["chillers"]]
+        leaving = [series(data, col(header, ch, "Chiller Evaporator Outlet Temperature"))
+                   for ch in c["chillers"]]
+        loop_chwst = series(data, col(header, c["out_node"], "System Node Temperature"))
+        loop_sp = series(data, col(header, c["sp_node"], "System Node Setpoint Temperature"))
         fams["chw"] = {
             "oat": oat,
-            "chwst": series(data, col(header, c["out_node"], "System Node Temperature")),
+            "chwst": loop_chwst,
             "chwrt": series(data, col(header, c["in_node"], "System Node Temperature")),
-            "chwst_sp": series(data, col(header, c["sp_node"], "System Node Setpoint Temperature")),
+            "chwst_sp": loop_sp,
             # plant chiller_load proxy: max PLR across chillers x100 — the
             # loaded chiller's PLR, the quantity the delta-T floor gates on
             "chiller_load": [round(max(v) * 100.0, ROUND) for v in zip(*plrs)],
+        }
+        fams["_chillers"] = {
+            ch: {
+                # EnergyPlus exposes no independent BAS final stage command.
+                # Strictly positive machine electricity is disclosed as run
+                # proof; it is never copied back into a fabricated command.
+                "chiller_status": [v > 0.0 for v in power],
+                "chiller_load": [round(v * 100.0, ROUND) for v in plr],
+                # Direct per-machine evaporator leaving temperature. The
+                # common supply setpoint is accepted only for this prototype,
+                # whose parallel chillers share that plant control target.
+                "chwst": lwt,
+                "chwst_sp": loop_sp,
+            }
+            for ch, plr, power, lwt in zip(c["chillers"], plrs, powers, leaving)
         }
     if "tower" in pn:
         tw = pn["tower"]
@@ -487,7 +511,7 @@ def extract_plant(csv_path: Path, pn: dict, b: dict) -> dict:
 def write_plant_rule_copy(rule_dir: Path, target: Path, rid: str) -> None:
     """Copy a rule graph and apply replay-cadence parameter coupling."""
     graph = json.loads((rule_dir / "rule.cxf.jsonld").read_text())
-    if rid == "PMP-0004":
+    if rid in {"PMP-0004", "CHW-0009"}:
         expected = 3600.0 / STEP_S
         matches = [n for n in graph["@graph"]
                    if n.get("@id", "").endswith(".count.k")]
@@ -502,6 +526,9 @@ def plant_gate_windows(key: str | None, pts: dict, n: int) -> list:
         return [(GATE_LEAD_S, (n - 1) * STEP_S)]
     if key == "chw_load40":
         ok = [v > 40.0 for v in pts["chiller_load"]]
+    elif key == "chiller_loaded20":
+        ok = [s and load > 20.0 for s, load in
+              zip(pts["chiller_status"], pts["chiller_load"])]
     elif key == "hw_on":
         ok = pts["boiler_status"]
     else:
@@ -659,6 +686,7 @@ def main():
             print(f"plant loops: {list(pn)}; running EnergyPlus…")
             csv_path = run_energyplus(pj, epw, out / "ep")
         fams = extract_plant(csv_path, pn, b)
+        chillers = fams.pop("_chillers", {})
         pumps = fams.pop("_pumps", {})
         if "tower" in fams:
             tp = fams.pop("tower")
@@ -697,7 +725,13 @@ def main():
             if rid in PLANT_EXCLUDE:
                 print(f"  excluded {rid}: {PLANT_EXCLUDE[rid]}")
                 pump_rules.pop(rid)
+        chiller_rules = {
+            rid: rule for rid, rule in
+            eligible_rules(families=("chw",), mapped=CHW_MACHINE_MAPPED).items()
+            if rid in {"CHW-0007", "CHW-0009"}
+        }
         print(f"eligible plant rules: {sorted(rules)}")
+        print(f"eligible per-chiller rules: {sorted(chiller_rules)} across {len(chillers)} chiller(s)")
         print(f"eligible per-pump rules: {sorted(pump_rules)} across {len(pumps)} pump(s)")
         replay = out / "replay"
         if replay.exists():
@@ -728,6 +762,46 @@ def main():
                 "clock": {"step_s": STEP_S, "horizon_s": (n - 1) * STEP_S},
                 "scenarios": [scen]}, indent=1))
             dirs.append(d)
+        for rid, r in chiller_rules.items():
+            for chiller_name, pts in chillers.items():
+                n = len(pts["chiller_status"])
+                gate = "chiller_loaded20" if rid == "CHW-0007" else None
+                wins = plant_gate_windows(gate, pts, n)
+                if not wins:
+                    print(f"  {rid}/{chiller_name}: no gated windows this period")
+                    continue
+                safe_name = re.sub(r"[^a-z0-9]+", "_", chiller_name.lower()).strip("_")
+                d = replay / f"{rid}__{safe_name}"
+                d.mkdir(parents=True)
+                write_plant_rule_copy(r["dir"], d / "rule.cxf.jsonld", rid)
+                if rid == "CHW-0009":
+                    rule_note = (
+                        f"The copied count graph uses count_scale={3600.0 / STEP_S:g} at the "
+                        f"{STEP_S}s replay tick; sub-10-minute cycles remain unobservable."
+                    )
+                else:
+                    rule_note = (
+                        "Tracking expectations are limited to intervals beginning 1800 s after this "
+                        "same machine is both running and above the 20% load floor."
+                    )
+                scen = {
+                    "name": f"{bdir.name}_{safe_name}".replace("-", "_").replace(".", "_").lower(),
+                    "description": (
+                        f"Healthy-baseline EnergyPlus week ({bdir.name}), individual chiller {chiller_name}; "
+                        "strictly positive chiller electricity is a disclosed run-status proxy, PLR is the "
+                        "per-machine load proxy, and direct evaporator outlet temperature is compared with "
+                        f"the prototype's shared plant outlet setpoint. {rule_note} "
+                        "No final chiller command is fabricated."
+                    ),
+                    "inputs": {p: to_steps(pts[p]) for p in r["points"]},
+                    "expect": [{"output": "yFault", "from_s": a, "to_s": b_,
+                                "equals": False} for a, b_ in wins],
+                }
+                (d / "vectors.json").write_text(json.dumps({
+                    "schema": "cxf-library/vectors/v1",
+                    "clock": {"step_s": STEP_S, "horizon_s": (n - 1) * STEP_S},
+                    "scenarios": [scen]}, indent=1))
+                dirs.append(d)
         for rid, r in pump_rules.items():
             for pump_name, pts in pumps.items():
                 n = len(pts["pump_status"])

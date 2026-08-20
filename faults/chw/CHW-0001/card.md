@@ -18,7 +18,7 @@ g36: null
 clusters: [CLU-06]
 suppresses: []
 suppressed_by: []
-related: [CHW-0002, CHW-0004, CHW-0005, HP-0001]
+related: [CHW-0002, CHW-0004, CHW-0005, CHW-0007, CHW-0009, HP-0001]
 playbooks: [chiller-efficiency]
 operating_states: "chiller running and loaded above min_chiller_load, past the start transient — one rule instance per chiller, each carrying that machine's fitted coefficients"
 preconditions: "The host owns the baseline. It runs the learning_period_days (30 d) Ridge regression of kW/ton against load, CWST and CHWST for THIS machine, confirms the fit is good enough to hold the plant to, and writes the four coefficients in with set_param; until it has, the rule is comparing against the shipped placeholders and means nothing (see Deviations). chiller_tons MUST be bound in refrigeration tons — the point dictionary flags this as its main hazard, because kW/ton and the fitted coefficients go wrong together and silently if the host feeds kW thermal instead. On most plants chiller_tons is a host-computed virtual point (flow × delta-T × cp), so its provenance is part of the baseline precondition rather than separate from it: a tons figure derived from a drifting flow meter moves the quotient and the fit together. The chiller must also have settled after a start or a capacity step before the quotient means anything; a machine still pulling down reads degraded on physics. The regressors must lie inside the range the fit was taken over — the graph extrapolates the plane forever and knows nothing about where the fit stops being physical. Evaluability is signalled in-rule by two outputs: yLoadOk (the reference's min_chiller_load gate) and yTonsOk (the divide guard). When either is false the verdict is NO_EVAL, not healthy."

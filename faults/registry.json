@@ -362,6 +362,30 @@
       "legacy_id": null
     },
     {
+      "id": "CHW-0007",
+      "family": "chw",
+      "name": "Chilled-water supply temperature tracking failure",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "CHW-0008",
+      "family": "chw",
+      "name": "Chiller proof-of-operation failure",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "CHW-0009",
+      "family": "chw",
+      "name": "Chiller short-cycling",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
       "id": "ERV-0001",
       "family": "erv",
       "name": "Sensible effectiveness degradation",

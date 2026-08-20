@@ -18,7 +18,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [CHW-0003, AHU-0023, AHU-0024]
+related: [CHW-0003, CHW-0007, AHU-0023, AHU-0024]
 playbooks: [missing-reset]
 operating_states: "Chiller plant enabled and producing chilled water for the bulk of the evaluation window"
 preconditions: "chwst_sp and chiller_load must belong to the same plant: bind the setpoint the chillers actually track (the plant controller's active CHWST setpoint, not a schedule table entry) and a load signal from the same loop. On a multi-chiller plant, bind the lead chiller or a plant-level load — a lagging machine's own load percentage is pinned by staging, not by the building, and reads flat while the plant swings. The plant must be running for most of the window: a chiller off for days holds both signals still, and only yLoadVaried stands between that and a false alarm. Evaluability is signalled in-rule by yLoadVaried: when it is false the verdict is NO_EVAL, not healthy. The host must also confirm the setpoint point is not simply unwritten — a BAS that trends the reset output only while the reset is enabled will show a flat last-known value that no plant is following."
