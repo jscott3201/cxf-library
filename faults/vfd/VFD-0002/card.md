@@ -16,11 +16,11 @@ source:
 g36: null
 clusters: []
 suppresses: []
-suppressed_by: [VFD-0001]
-related: [VFD-0001]
+suppressed_by: [VFD-0001, VFD-0005]
+related: [VFD-0001, VFD-0003, VFD-0004, VFD-0005]
 playbooks: [vfd-pump-faults]
 operating_states: "drive enabled and its control loop active"
-preconditions: "The drive must be enabled and its loop in automatic. A drive stopped, in hand, or overridden sits at or below minimum speed with the process variable wherever the building left it, which is this rule's exact signature and none of its meaning; the host owns that exclusion. vfd_process_value and vfd_process_sp must come from the same loop in the same units, and pv_error_threshold must have been retuned into those units — the shipped 10.0 is a placeholder, not a site value (see Deviations). vfd_speed is the drive's own feedback, so a drive that is not tracking its command undermines the minimum-speed premise: VFD-0001 (see suppressed_by) silences this rule while that is true. A loop whose setpoint is being reset by a trim-and-respond sequence must have a settled setpoint bound here, since a setpoint moving faster than the loop can follow produces a standing error at any speed."
+preconditions: "The drive must be enabled and its loop in automatic. A drive stopped, in hand, or overridden sits at or below minimum speed with the process variable wherever the building left it, which is this rule's exact signature and none of its meaning; the host owns that exclusion, and VFD-0005 suppresses this rule while remote automatic control is absent. vfd_process_value and vfd_process_sp must come from the same loop in the same units, and pv_error_threshold must have been retuned into those units — the shipped 10.0 is a placeholder, not a site value (see Deviations). vfd_speed is the drive's own feedback, so a drive that is not tracking its command undermines the minimum-speed premise: VFD-0001 (see suppressed_by) silences this rule while that is true. A loop whose setpoint is being reset by a trim-and-respond sequence must have a settled setpoint bound here, since a setpoint moving faster than the loop can follow produces a standing error at any speed."
 points:
   - vfd_speed
   - vfd_process_value
@@ -185,11 +185,11 @@ once the corrected minimum is known.
   Contrast VFD-0001's `yCmdOk` and ERV-0001's `yTempDeltaOk`, which are
   derived. The exclusions that matter here — drive disabled, loop in hand,
   setpoint still ramping — are operating-state gating and live in frontmatter.
-- **`suppressed_by: [VFD-0001]` is an authored relationship**, not the
-  reference's. This rule infers from `vfd_speed` that the loop is pinned at its
-  floor, and a drive not tracking its command breaks that inference in the worst
-  way: a feedback point reading low while the machine runs fast produces exactly
-  this rule's signature. VFD-0001 carries the matching `suppresses`.
+- **`suppressed_by: [VFD-0001, VFD-0005]` is authored**, not the reference's.
+  This rule infers from `vfd_speed` that an automatic loop is pinned at its
+  floor. Bad command/feedback tracking breaks the speed premise, while local or
+  bypass operation breaks the automatic-loop premise. Both suppressors carry
+  matching relationships and must be instance-scoped to this drive.
 - **A stopped drive satisfies the speed term trivially, and nothing in the graph
   stops it.** Feedback of 0% is below any positive floor, so a stopped machine
   under an off-setpoint loop alarms — and since a stopped machine is usually

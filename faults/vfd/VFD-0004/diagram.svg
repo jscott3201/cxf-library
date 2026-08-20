@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1540 690" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="7">
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#7d8590"/></marker></defs>
+  <g fill="#dbeafe" stroke="#3b82f6"><rect x="12" y="120" width="115" height="30" rx="15"/><rect x="12" y="430" width="170" height="30" rx="15"/><rect x="12" y="560" width="145" height="30" rx="15"/></g>
+  <g fill="#1e3a8a" text-anchor="middle"><text x="69" y="139">vfd_speed</text><text x="97" y="449">vfd_process_value</text><text x="84" y="579">vfd_process_sp</text></g>
+  <g fill="#f6f8fa" stroke="#57606a">
+    <rect x="205" y="65" width="165" height="58" rx="6"/><rect x="420" y="65" width="180" height="58" rx="6"/><rect x="650" y="65" width="190" height="58" rx="6"/><rect x="890" y="65" width="175" height="58" rx="6"/>
+    <rect x="420" y="175" width="180" height="58" rx="6"/><rect x="650" y="175" width="190" height="58" rx="6"/><rect x="890" y="175" width="175" height="58" rx="6"/><rect x="1115" y="120" width="155" height="58" rx="6"/>
+    <rect x="205" y="415" width="165" height="58" rx="6"/><rect x="420" y="360" width="180" height="58" rx="6"/><rect x="650" y="360" width="190" height="58" rx="6"/><rect x="890" y="360" width="175" height="58" rx="6"/>
+    <rect x="420" y="500" width="180" height="58" rx="6"/><rect x="650" y="500" width="190" height="58" rx="6"/><rect x="890" y="500" width="175" height="58" rx="6"/><rect x="1115" y="430" width="155" height="58" rx="6"/>
+    <rect x="1300" y="275" width="105" height="58" rx="6"/><rect x="1430" y="275" width="95" height="58" rx="6"/>
+  </g>
+  <g fill="#24292f" font-weight="bold" text-anchor="middle">
+    <text x="287" y="88">muSpeed</text><text x="510" y="88">above + flip</text><text x="745" y="88">pulse conversions</text><text x="977" y="88">crossRate/count</text>
+    <text x="510" y="198">speedDev + Abs</text><text x="745" y="198">speedMad</text><text x="977" y="198">crossHigh + ampHigh</text><text x="1192" y="143">speedBoth</text>
+    <text x="287" y="438">pvErr</text><text x="510" y="383">muProcess + flip</text><text x="745" y="383">pulse conversions</text><text x="977" y="383">process count</text>
+    <text x="510" y="523">absPvErr</text><text x="745" y="523">pvMae</text><text x="977" y="523">countHigh + bandHigh</text><text x="1192" y="453">processBoth</text>
+    <text x="1352" y="298">candidate</text><text x="1477" y="298">persist</text>
+  </g>
+  <g fill="#57606a" font-size="6" text-anchor="middle">
+    <text x="287" y="107">MovingAverage · 900 s</text><text x="510" y="107">Greater · Change</text><text x="745" y="107">Bool→Int→Real</text><text x="977" y="107">MA × 15</text>
+    <text x="510" y="217">Subtract · Abs</text><text x="745" y="217">MovingAverage · 900 s</text><text x="977" y="217">&gt;6 · &gt;5%</text><text x="1192" y="162">Logical.And</text>
+    <text x="287" y="457">PV − SP</text><text x="510" y="402">MA · Greater · Change</text><text x="745" y="402">Bool→Int→Real</text><text x="977" y="402">MA × 15</text>
+    <text x="510" y="542">Absolute error</text><text x="745" y="542">MovingAverage · 900 s</text><text x="977" y="542">&gt;6 · &gt;10 units</text><text x="1192" y="472">Logical.And</text>
+    <text x="1352" y="317">Logical.And</text><text x="1477" y="317">300 s</text>
+  </g>
+  <g fill="#fee2e2" stroke="#dc2626"><rect x="1160" y="220" width="160" height="30" rx="15"/><rect x="1145" y="530" width="175" height="30" rx="15"/><rect x="1430" y="385" width="95" height="30" rx="15"/></g>
+  <g fill="#7f1d1d" text-anchor="middle"><text x="1240" y="239">ySpeedHunting</text><text x="1232" y="549">yProcessUnstable</text><text x="1477" y="404">yFault</text></g>
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M127 135 H190 V94 H201"/><path d="M127 135 H405 V94 H416"/><path d="M370 94 H416"/><path d="M600 94 H646"/><path d="M840 94 H886"/>
+    <path d="M127 135 H405 V204 H416"/><path d="M370 94 H390 V204 H416"/><path d="M600 204 H646"/><path d="M840 204 H886"/><path d="M1065 149 H1111"/><path d="M1065 204 H1090 V169 H1111"/><path d="M1192 178 V216"/>
+    <path d="M182 445 H201"/><path d="M157 575 H190 V460 H201"/><path d="M370 444 H405 V389 H416"/><path d="M600 389 H646"/><path d="M840 389 H886"/>
+    <path d="M370 444 H405 V529 H416"/><path d="M600 529 H646"/><path d="M840 529 H886"/><path d="M1065 389 H1090 V445 H1111"/><path d="M1065 529 H1090 V473 H1111"/><path d="M1192 488 V526"/>
+    <path d="M1270 149 H1280 V289 H1296"/><path d="M1270 459 H1280 V319 H1296"/><path d="M1405 304 H1426"/><path d="M1477 333 V381"/>
+  </g>
+  <text x="260" y="650" fill="#7d8590" font-size="9">Both lanes require &gt;6 rolling-mean crossings plus material magnitude; only their overlap is delayed.</text>
+</svg>

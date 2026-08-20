@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 560" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="7">
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#7d8590"/></marker></defs>
+  <g fill="#dbeafe" stroke="#3b82f6">
+    <rect x="12" y="50" width="115" height="30" rx="15"/><rect x="12" y="310" width="170" height="30" rx="15"/><rect x="12" y="455" width="145" height="30" rx="15"/>
+  </g>
+  <g fill="#1e3a8a" text-anchor="middle"><text x="69" y="69">vfd_speed</text><text x="97" y="329">vfd_process_value</text><text x="84" y="474">vfd_process_sp</text></g>
+  <g fill="#f6f8fa" stroke="#57606a">
+    <rect x="180" y="105" width="170" height="58" rx="6"/><rect x="180" y="185" width="170" height="58" rx="6"/><rect x="430" y="145" width="150" height="58" rx="6"/><rect x="660" y="50" width="130" height="58" rx="6"/>
+    <rect x="255" y="285" width="150" height="58" rx="6"/><rect x="480" y="285" width="200" height="58" rx="6"/><rect x="255" y="425" width="150" height="58" rx="6"/><rect x="480" y="425" width="200" height="58" rx="6"/>
+    <rect x="820" y="345" width="115" height="58" rx="6"/><rect x="1010" y="200" width="120" height="58" rx="6"/><rect x="1200" y="200" width="165" height="58" rx="6"/>
+  </g>
+  <g fill="#24292f" font-weight="bold" text-anchor="middle">
+    <text x="265" y="128">maxSpd</text><text x="265" y="208">tol</text><text x="505" y="168">speedCeiling</text><text x="725" y="73">atMax</text>
+    <text x="330" y="308">errHigh</text><text x="580" y="308">processHigh</text><text x="330" y="448">errLow</text><text x="580" y="448">processLow</text>
+    <text x="877" y="368">anyError</text><text x="1070" y="223">candidate</text><text x="1282" y="223">persist</text>
+  </g>
+  <g fill="#57606a" font-size="7" text-anchor="middle">
+    <text x="265" y="147">Constant · 100%</text><text x="265" y="227">Constant · 3%</text><text x="505" y="187">Subtract</text><text x="725" y="92">Greater</text>
+    <text x="330" y="327">PV − SP</text><text x="580" y="327">GreaterThreshold · 10</text><text x="330" y="467">SP − PV</text><text x="580" y="467">GreaterThreshold · 10</text>
+    <text x="877" y="387">Logical.Or</text><text x="1070" y="242">Logical.And</text><text x="1282" y="242">TrueDelay · 900 s</text>
+  </g>
+  <g fill="#fee2e2" stroke="#dc2626"><rect x="1325" y="300" width="100" height="30" rx="15"/><rect x="705" y="285" width="145" height="30" rx="15"/><rect x="705" y="425" width="135" height="30" rx="15"/></g>
+  <g fill="#7f1d1d" text-anchor="middle"><text x="1375" y="319">yFault</text><text x="777" y="304">yProcessHigh</text><text x="772" y="444">yProcessLow</text></g>
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M127 65 H656"/><path d="M350 134 H426"/><path d="M350 214 H410 V190 H426"/><path d="M580 174 H620 V94 H656"/>
+    <path d="M182 325 H251"/><path d="M157 470 H210 V337 H251"/><path d="M405 314 H476"/><path d="M680 314 H701"/>
+    <path d="M157 470 H251"/><path d="M182 325 H210 V477 H251"/><path d="M405 454 H476"/><path d="M680 454 H701"/>
+    <path d="M680 314 H780 V360 H816"/><path d="M680 454 H780 V388 H816"/><path d="M935 374 H970 V244 H1006"/><path d="M790 79 H970 V214 H1006"/>
+    <path d="M1130 229 H1196"/><path d="M1282 258 V285 H1375 V296"/>
+  </g>
+  <text x="360" y="535" fill="#7d8590" font-size="9">Direction outputs are immediate raw diagnostics; only atMax AND either direction is persisted.</text>
+</svg>

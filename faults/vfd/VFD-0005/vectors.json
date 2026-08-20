@@ -1,0 +1,816 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 1800
+  },
+  "scenarios": [
+    {
+      "name": "boolean_matrix_enable_false_auto_false_bypass_false",
+      "description": "Truth-table case: enable=false, auto=false, bypass=false. Direction outputs are gated by the final enable command, and only an enabled nonautomatic/bypassed drive can mature the timer.",
+      "inputs": {
+        "vfd_enable_cmd": false,
+        "vfd_auto_status": false,
+        "vfd_bypass_status": false
+      },
+      "expect": [
+        {
+          "output": "yNotAuto",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yBypass",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "boolean_matrix_enable_false_auto_false_bypass_true",
+      "description": "Truth-table case: enable=false, auto=false, bypass=true. Direction outputs are gated by the final enable command, and only an enabled nonautomatic/bypassed drive can mature the timer.",
+      "inputs": {
+        "vfd_enable_cmd": false,
+        "vfd_auto_status": false,
+        "vfd_bypass_status": true
+      },
+      "expect": [
+        {
+          "output": "yNotAuto",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yBypass",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "boolean_matrix_enable_false_auto_true_bypass_false",
+      "description": "Truth-table case: enable=false, auto=true, bypass=false. Direction outputs are gated by the final enable command, and only an enabled nonautomatic/bypassed drive can mature the timer.",
+      "inputs": {
+        "vfd_enable_cmd": false,
+        "vfd_auto_status": true,
+        "vfd_bypass_status": false
+      },
+      "expect": [
+        {
+          "output": "yNotAuto",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yBypass",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "boolean_matrix_enable_false_auto_true_bypass_true",
+      "description": "Truth-table case: enable=false, auto=true, bypass=true. Direction outputs are gated by the final enable command, and only an enabled nonautomatic/bypassed drive can mature the timer.",
+      "inputs": {
+        "vfd_enable_cmd": false,
+        "vfd_auto_status": true,
+        "vfd_bypass_status": true
+      },
+      "expect": [
+        {
+          "output": "yNotAuto",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yBypass",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "boolean_matrix_enable_true_auto_false_bypass_false",
+      "description": "Truth-table case: enable=true, auto=false, bypass=false. Direction outputs are gated by the final enable command, and only an enabled nonautomatic/bypassed drive can mature the timer.",
+      "inputs": {
+        "vfd_enable_cmd": true,
+        "vfd_auto_status": false,
+        "vfd_bypass_status": false
+      },
+      "expect": [
+        {
+          "output": "yNotAuto",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yBypass",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "boolean_matrix_enable_true_auto_false_bypass_true",
+      "description": "Truth-table case: enable=true, auto=false, bypass=true. Direction outputs are gated by the final enable command, and only an enabled nonautomatic/bypassed drive can mature the timer.",
+      "inputs": {
+        "vfd_enable_cmd": true,
+        "vfd_auto_status": false,
+        "vfd_bypass_status": true
+      },
+      "expect": [
+        {
+          "output": "yNotAuto",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yBypass",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "boolean_matrix_enable_true_auto_true_bypass_false",
+      "description": "Truth-table case: enable=true, auto=true, bypass=false. Direction outputs are gated by the final enable command, and only an enabled nonautomatic/bypassed drive can mature the timer.",
+      "inputs": {
+        "vfd_enable_cmd": true,
+        "vfd_auto_status": true,
+        "vfd_bypass_status": false
+      },
+      "expect": [
+        {
+          "output": "yNotAuto",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yBypass",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "boolean_matrix_enable_true_auto_true_bypass_true",
+      "description": "Truth-table case: enable=true, auto=true, bypass=true. Direction outputs are gated by the final enable command, and only an enabled nonautomatic/bypassed drive can mature the timer.",
+      "inputs": {
+        "vfd_enable_cmd": true,
+        "vfd_auto_status": true,
+        "vfd_bypass_status": true
+      },
+      "expect": [
+        {
+          "output": "yNotAuto",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yBypass",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "bypass_exactly_settle_time",
+      "description": "Bypass is active from t=600 through just before t=900. The staged release is applied before the 300-second boundary tick, so no fault asserts.",
+      "inputs": {
+        "vfd_enable_cmd": true,
+        "vfd_auto_status": true,
+        "vfd_bypass_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          },
+          {
+            "t": 900,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yBypass",
+          "from_s": 660,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yBypass",
+          "from_s": 960,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "local_mode_transient_shorter_than_settle",
+      "description": "The enabled drive leaves remote auto for four minutes, then returns before the 300-second settle timer matures.",
+      "inputs": {
+        "vfd_enable_cmd": true,
+        "vfd_auto_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          },
+          {
+            "t": 840,
+            "value": true
+          }
+        ],
+        "vfd_bypass_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yNotAuto",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yNotAuto",
+          "from_s": 660,
+          "to_s": 780,
+          "equals": true
+        },
+        {
+          "output": "yNotAuto",
+          "from_s": 900,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "transition_into_and_out_of_bypass",
+      "description": "Bypass enters at t=600 s, persists long enough to alarm, and clears immediately when bypass proof drops at t=1200 s.",
+      "inputs": {
+        "vfd_enable_cmd": true,
+        "vfd_auto_status": true,
+        "vfd_bypass_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          },
+          {
+            "t": 1200,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1260,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yBypass",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yBypass",
+          "from_s": 660,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yBypass",
+          "from_s": 1260,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "direct_local_to_bypass_switch_keeps_candidate_true",
+      "description": "An enabled drive changes directly from not-auto to bypass at t=600 s. Direction flags swap, but the OR candidate never releases and the already-matured fault remains active.",
+      "inputs": {
+        "vfd_enable_cmd": true,
+        "vfd_auto_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          }
+        ],
+        "vfd_bypass_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yNotAuto",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yNotAuto",
+          "from_s": 660,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yBypass",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yBypass",
+          "from_s": 660,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "enable_release_clears_fault_and_diagnostics",
+      "description": "A startup-local drive alarms after settling; removing the final enable at t=900 s drops yFault and both enable-gated direction outputs immediately.",
+      "inputs": {
+        "vfd_enable_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 900,
+            "value": false
+          }
+        ],
+        "vfd_auto_status": false,
+        "vfd_bypass_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yNotAuto",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yNotAuto",
+          "from_s": 960,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yBypass",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yBypass",
+          "from_s": 960,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "auto_status_chatter_resets_timer",
+      "description": "The enabled drive alternates auto/not-auto every minute. yNotAuto follows the raw mode, but no episode survives the five-minute settle timer.",
+      "inputs": {
+        "vfd_enable_cmd": true,
+        "vfd_auto_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 60,
+            "value": true
+          },
+          {
+            "t": 120,
+            "value": false
+          },
+          {
+            "t": 180,
+            "value": true
+          },
+          {
+            "t": 240,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 360,
+            "value": false
+          },
+          {
+            "t": 420,
+            "value": true
+          },
+          {
+            "t": 480,
+            "value": false
+          },
+          {
+            "t": 540,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          },
+          {
+            "t": 660,
+            "value": true
+          },
+          {
+            "t": 720,
+            "value": false
+          },
+          {
+            "t": 780,
+            "value": true
+          },
+          {
+            "t": 840,
+            "value": false
+          },
+          {
+            "t": 900,
+            "value": true
+          },
+          {
+            "t": 960,
+            "value": false
+          },
+          {
+            "t": 1020,
+            "value": true
+          },
+          {
+            "t": 1080,
+            "value": false
+          },
+          {
+            "t": 1140,
+            "value": true
+          },
+          {
+            "t": 1200,
+            "value": false
+          },
+          {
+            "t": 1260,
+            "value": true
+          },
+          {
+            "t": 1320,
+            "value": false
+          },
+          {
+            "t": 1380,
+            "value": true
+          },
+          {
+            "t": 1440,
+            "value": false
+          },
+          {
+            "t": 1500,
+            "value": true
+          },
+          {
+            "t": 1560,
+            "value": false
+          },
+          {
+            "t": 1620,
+            "value": true
+          },
+          {
+            "t": 1680,
+            "value": false
+          },
+          {
+            "t": 1740,
+            "value": true
+          }
+        ],
+        "vfd_bypass_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "enable_drop_resets_timer",
+      "description": "A not-auto drive is enabled for four minutes, disabled long enough to clear all flags, then re-enabled. Only the fresh second interval may mature the full timer.",
+      "inputs": {
+        "vfd_enable_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 240,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          }
+        ],
+        "vfd_auto_status": false,
+        "vfd_bypass_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yNotAuto",
+          "from_s": 300,
+          "to_s": 540,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "simultaneous_branches_recover_one_at_a_time",
+      "description": "Both direction flags start active. Restoring auto at t=600 clears only yNotAuto; bypass keeps the candidate and fault active until bypass itself clears at t=1200.",
+      "inputs": {
+        "vfd_enable_cmd": true,
+        "vfd_auto_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          }
+        ],
+        "vfd_bypass_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 1200,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1260,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yNotAuto",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yNotAuto",
+          "from_s": 660,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yBypass",
+          "from_s": 0,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yBypass",
+          "from_s": 1260,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "approved_bypass_raw_behavior_host_gated",
+      "description": "Approved maintenance bypass has the same raw values as an accidental bypass and therefore alarms after settling. The host must report NO_EVAL during the approved interval.",
+      "inputs": {
+        "vfd_enable_cmd": true,
+        "vfd_auto_status": true,
+        "vfd_bypass_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 360,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yBypass",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}
