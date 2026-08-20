@@ -17,7 +17,7 @@ g36: null
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [HX-0001, PMP-0001, PMP-0003]
+related: [HX-0001, HX-0003, PMP-0001, PMP-0003]
 playbooks: [hydronic-heat-exchanger-faults]
 operating_states: "A controlled liquid-to-liquid HX in a final automatic state that presently expects both individual branches to flow"
 preconditions: "exchange_cmd must be the final downstream both-flow expectation after temperature feasibility, pump/valve ownership, anti-cycle, local/HAND, freeze, pressure, minimum-flow, and other normal sequence logic. Availability, an upstream plant enable, or a supervisory status that permits zero flow is invalid. Both meters must be individual branches on the same HX, fresh, nonnegative in the declared inlet-to-outlet direction, and correctly converted to L/s; common-header, fleet, or duplicated flow is invalid. Configure each threshold above meter zero/noise but below the minimum legitimate established flow, and configure alarm_delay above the slowest permitted start/transport latency. Passive/uncontrolled exchangers and sequences that intentionally flow one side only while armed are NO_EVAL. Exclude maintenance, flushing, fill/purge, drain-down, exercise, and sensor invalidity."
