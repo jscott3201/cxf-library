@@ -5982,6 +5982,30 @@
       "expect": [
         {
           "output": "yFault",
+          "from_s": 0,
+          "to_s": 600,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 720,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "ySpeedHunting",
+          "from_s": 300,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yProcessUnstable",
+          "from_s": 420,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yFault",
           "from_s": 3000,
           "to_s": 7200,
           "equals": false

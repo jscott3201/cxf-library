@@ -73,8 +73,10 @@ approved operating and electrical-safety procedure.
 
 ## Step 4 — Inspect hunting (VFD-0004)
 
-1. Trend speed, process value, and setpoint together at 60 seconds or faster;
-   change-of-value logs can hide crossings.
+1. Acquire speed, process value, and setpoint together at 60 seconds or faster;
+   resample faster acquisition to the rule's legal fixed evaluator interval
+   (14.3–150 seconds at the defaults, 60 seconds recommended). Change-of-value
+   logs can hide crossings.
 2. If only speed hunts, inspect command, feedback, drive limits, and mechanical
    backlash. If only the process hunts, inspect its sensor and external load.
 3. If both hunt, compare phase before retuning: process movement leading speed
