@@ -1,0 +1,582 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 1800
+  },
+  "scenarios": [
+    {
+      "name": "tracking_normally",
+      "description": "Measured primary airflow equals its active target.",
+      "inputs": {
+        "primary_airflow": 100.0,
+        "primary_airflow_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "ySetpointOk",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFlowLow",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFlowHigh",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "sustained_low_flow",
+      "description": "A 20.1% deficit drives only the low diagnostic and matures after the 600 s persistence margin.",
+      "inputs": {
+        "primary_airflow": 79.9,
+        "primary_airflow_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "ySetpointOk",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFlowLow",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFlowHigh",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "sustained_high_flow",
+      "description": "A 20.1% excess drives only the high diagnostic and matures independently.",
+      "inputs": {
+        "primary_airflow": 120.1,
+        "primary_airflow_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "ySetpointOk",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFlowLow",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFlowHigh",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "low_error_exactly_at_threshold",
+      "description": "At exactly 80 L/s against 100 L/s, residual equals allowance and the strict comparison is clear.",
+      "inputs": {
+        "primary_airflow": 80.0,
+        "primary_airflow_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "ySetpointOk",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFlowLow",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFlowHigh",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "high_error_exactly_at_threshold",
+      "description": "At exactly 120 L/s against 100 L/s, residual equals allowance and the strict comparison is clear.",
+      "inputs": {
+        "primary_airflow": 120.0,
+        "primary_airflow_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "ySetpointOk",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFlowLow",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFlowHigh",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "setpoint_below_minimum",
+      "description": "A 49.9 L/s target is below the evaluability floor; all diagnostic and fault outputs stay false.",
+      "inputs": {
+        "primary_airflow": 0.0,
+        "primary_airflow_sp": 49.9
+      },
+      "expect": [
+        {
+          "output": "ySetpointOk",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFlowLow",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFlowHigh",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "setpoint_exactly_at_minimum",
+      "description": "The strict floor leaves exactly 50 L/s non-evaluable.",
+      "inputs": {
+        "primary_airflow": 0.0,
+        "primary_airflow_sp": 50.0
+      },
+      "expect": [
+        {
+          "output": "ySetpointOk",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFlowLow",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFlowHigh",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "setpoint_just_above_minimum",
+      "description": "One representable increment above the floor is numerically evaluable when flow tracks it.",
+      "inputs": {
+        "primary_airflow": 50.1,
+        "primary_airflow_sp": 50.1
+      },
+      "expect": [
+        {
+          "output": "ySetpointOk",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFlowLow",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFlowHigh",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "zero_setpoint_zero_flow",
+      "description": "The zero/zero case cannot divide because this graph has no Divide block; the floor reports NO_EVAL.",
+      "inputs": {
+        "primary_airflow": 0.0,
+        "primary_airflow_sp": 0.0
+      },
+      "expect": [
+        {
+          "output": "ySetpointOk",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFlowLow",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFlowHigh",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "violation_ends_one_step_before_persistence",
+      "description": "A deficit clears at 540 s, one evaluator step before 600 s, and never matures.",
+      "inputs": {
+        "primary_airflow": [
+          {
+            "t": 0,
+            "value": 70.0
+          },
+          {
+            "t": 540,
+            "value": 100.0
+          }
+        ],
+        "primary_airflow_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFlowLow",
+          "from_s": 0,
+          "to_s": 480,
+          "equals": true
+        },
+        {
+          "output": "yFlowLow",
+          "from_s": 540,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFlowHigh",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_low_fault_recovers",
+      "description": "A mature low-flow alarm clears immediately when measured flow returns to target.",
+      "inputs": {
+        "primary_airflow": [
+          {
+            "t": 0,
+            "value": 70.0
+          },
+          {
+            "t": 900,
+            "value": 100.0
+          }
+        ],
+        "primary_airflow_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFlowLow",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yFlowLow",
+          "from_s": 900,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFlowHigh",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 900,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_episodes_reset",
+      "description": "Two four-minute deficits separated by compliant tracking cannot accumulate age.",
+      "inputs": {
+        "primary_airflow": [
+          {
+            "t": 0,
+            "value": 70.0
+          },
+          {
+            "t": 240,
+            "value": 100.0
+          },
+          {
+            "t": 480,
+            "value": 70.0
+          },
+          {
+            "t": 720,
+            "value": 100.0
+          }
+        ],
+        "primary_airflow_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "sampled_direction_handoff_preserves_age",
+      "description": "A direct sampled low-to-high handoff stays continuously outside the band, so the shared persistence timer keeps its age while direction flags swap.",
+      "inputs": {
+        "primary_airflow": [
+          {
+            "t": 0,
+            "value": 70.0
+          },
+          {
+            "t": 300,
+            "value": 130.0
+          }
+        ],
+        "primary_airflow_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFlowLow",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": true
+        },
+        {
+          "output": "yFlowLow",
+          "from_s": 300,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFlowHigh",
+          "from_s": 0,
+          "to_s": 240,
+          "equals": false
+        },
+        {
+          "output": "yFlowHigh",
+          "from_s": 300,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "active_setpoint_ramp_raw_transient",
+      "description": "An unexcluded setpoint step creates a short raw deficit; the host must wait for the active target and controller to settle.",
+      "inputs": {
+        "primary_airflow": 60.0,
+        "primary_airflow_sp": [
+          {
+            "t": 0,
+            "value": 60.0
+          },
+          {
+            "t": 300,
+            "value": 100.0
+          },
+          {
+            "t": 780,
+            "value": 60.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "upstream_ahu_off_raw_false_positive",
+      "description": "With an active target left behind while the AHU is off, the raw graph alarms; the host must report NO_EVAL for unavailable upstream fan/static pressure.",
+      "inputs": {
+        "primary_airflow": 0.0,
+        "primary_airflow_sp": 100.0
+      },
+      "expect": [
+        {
+          "output": "ySetpointOk",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFlowLow",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFlowHigh",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}

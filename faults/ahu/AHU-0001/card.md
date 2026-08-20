@@ -17,7 +17,7 @@ g36: "§5.16.14 FC#1"
 clusters: []
 suppresses: []
 suppressed_by: []
-related: [AHU-0024, AHU-0031]
+related: [AHU-0024, AHU-0031, FPB-0002]
 playbooks: []
 operating_states: "OS 1–5 (all)"
 preconditions: "Supply fan running — with the fan off both the pressure reading and the speed feedback are meaningless. The unit must be a multi-zone VAV AHU under duct static pressure control; a constant-volume unit has no dsp_sp to compare against. The speed feedback must be a real VFD readback rather than the commanded speed echoed back, since a defeated or bypassed drive reports 100% while the fan turns at line speed or not at all. When any gate is unmet the verdict is NO_EVAL, not healthy."

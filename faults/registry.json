@@ -482,6 +482,30 @@
       "legacy_id": null
     },
     {
+      "id": "FPB-0001",
+      "family": "fpb",
+      "name": "Terminal fan proof-of-operation failure",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "FPB-0002",
+      "family": "fpb",
+      "name": "Primary airflow tracking failure",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "FPB-0003",
+      "family": "fpb",
+      "name": "Reheat valve closed with unintended temperature rise",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
       "id": "HP-0001",
       "family": "hp",
       "name": "COP degradation vs baseline",
