@@ -55,10 +55,10 @@ validation:
   - kind: simulation_fpr
     harness: simharness/v1
     date: 2026-08-20
-    fleet: "EnergyPlus 25.1 OfficeLarge STD2019 Denver, one July + one January week, one individual HW pump, plant mode"
+    fleet: "EnergyPlus 25.1 OfficeLarge STD2019 Denver, one July + one January week, one individual HW pump, plant mode at 60 s"
     scenarios: 2
     failures: 0
-    notes: "strictly positive pump active power is the disclosed status proxy; graph copy retuned to count_scale=12 at the native 300 s tick, which cannot observe cycles completed inside 10 minutes and has a six-start/hour ceiling"
+    notes: "single RunPeriod with timeline/cadence validation; strictly positive pump active power is the disclosed status proxy and the graph copy uses count_scale=60. Cycles completed inside 120 s remain unobservable"
 verified:
   engine_rev: e2ff2f8
   content_id: "cxf:fnv1a128:33ee395683a57a95cc32a753cedc0482"

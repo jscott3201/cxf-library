@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1505" height="570" viewBox="0 0 1505 570">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#718096"/></marker></defs>
+<style>.title{font:700 20px sans-serif;fill:#172033}.port{font:600 13px sans-serif;fill:#172033}.inst{font:700 12px sans-serif;fill:#172033}.cls{font:9px sans-serif;fill:#4b5563}.wire{stroke:#718096;stroke-width:2;fill:none;marker-end:url(#arrow)}.in{fill:#dbeafe;stroke:#2563eb;stroke-width:1.5}.out{fill:#fee2e2;stroke:#dc2626;stroke-width:1.5}.blk{fill:#f8fafc;stroke:#64748b;stroke-width:1.5}</style>
+<text x="24" y="30" class="title">TOWER-0006 block graph</text>
+<path d="M210 89 H240 V79 H270" class="wire"/>
+<path d="M210 209 H240 V199 H270" class="wire"/>
+<path d="M480 79 H515 V139 H550" class="wire"/>
+<path d="M480 199 H515 V139 H550" class="wire"/>
+<path d="M725 139 H757.5 V139 H790" class="wire"/>
+<path d="M250 489 H270 V479 H270" class="wire"/>
+<path d="M210 369 H380 V419 H550" class="wire"/>
+<path d="M450 479 H500 V419 H550" class="wire"/>
+<path d="M725 419 H757.5 V419 H790" class="wire"/>
+<path d="M1000 139 H1030 V279 H1060" class="wire"/>
+<path d="M980 419 H1020 V279 H1060" class="wire"/>
+<path d="M480 79 H880 V79 H1280" class="wire"/>
+<path d="M1000 139 H1140 V139 H1280" class="wire"/>
+<path d="M980 419 H1130 V419 H1280" class="wire"/>
+<path d="M1220 279 H1250 V279 H1280" class="wire"/>
+<rect x="20" y="72" width="190" height="34" rx="17" class="in"/>
+<text x="115" y="94" text-anchor="middle" class="port">oat</text>
+<rect x="20" y="192" width="190" height="34" rx="17" class="in"/>
+<text x="115" y="214" text-anchor="middle" class="port">tower_basin_temp</text>
+<rect x="20" y="352" width="190" height="34" rx="17" class="in"/>
+<text x="115" y="374" text-anchor="middle" class="port">tower_basin_heater_cmd</text>
+<rect x="20" y="472" width="230" height="34" rx="17" class="in"/>
+<text x="135" y="494" text-anchor="middle" class="port">tower_basin_heater_status</text>
+<rect x="270" y="52" width="210" height="54" rx="8" class="blk"/>
+<text x="282" y="70" class="inst">freezeExposure</text>
+<text x="282" y="87" class="cls">LessThreshold · 2 °C</text>
+<rect x="270" y="172" width="210" height="54" rx="8" class="blk"/>
+<text x="282" y="190" class="inst">basinLow</text>
+<text x="282" y="207" class="cls">LessThreshold · 4 °C</text>
+<rect x="270" y="452" width="180" height="54" rx="8" class="blk"/>
+<text x="282" y="470" class="inst">notHeaterStatus</text>
+<text x="282" y="487" class="cls">Logical.Not</text>
+<rect x="550" y="112" width="175" height="54" rx="8" class="blk"/>
+<text x="562" y="130" class="inst">lowCondition</text>
+<text x="562" y="147" class="cls">Logical.And</text>
+<rect x="550" y="392" width="175" height="54" rx="8" class="blk"/>
+<text x="562" y="410" class="inst">heaterMismatch</text>
+<text x="562" y="427" class="cls">Logical.And</text>
+<rect x="790" y="112" width="210" height="54" rx="8" class="blk"/>
+<text x="802" y="130" class="inst">thermalProof</text>
+<text x="802" y="147" class="cls">TrueDelay · 1800 s</text>
+<rect x="790" y="392" width="190" height="54" rx="8" class="blk"/>
+<text x="802" y="410" class="inst">heaterProof</text>
+<text x="802" y="427" class="cls">TrueDelay · 120 s</text>
+<rect x="1060" y="252" width="160" height="54" rx="8" class="blk"/>
+<text x="1072" y="270" class="inst">anyFault</text>
+<text x="1072" y="287" class="cls">Logical.Or</text>
+<rect x="1280" y="62" width="190" height="34" rx="17" class="out"/>
+<text x="1375" y="84" text-anchor="middle" class="port">yFreezeExposure</text>
+<rect x="1280" y="122" width="185" height="34" rx="17" class="out"/>
+<text x="1372.5" y="144" text-anchor="middle" class="port">yLowBasinTemp</text>
+<rect x="1280" y="402" width="195" height="34" rx="17" class="out"/>
+<text x="1377.5" y="424" text-anchor="middle" class="port">yHeaterFailToRun</text>
+<rect x="1280" y="262" width="145" height="34" rx="17" class="out"/>
+<text x="1352.5" y="284" text-anchor="middle" class="port">yFault</text>
+</svg>

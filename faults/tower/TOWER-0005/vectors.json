@@ -1,0 +1,624 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 2400
+  },
+  "scenarios": [
+    {
+      "name": "on_setpoint_fan_loaded",
+      "description": "A loaded fan at the active leaving-water setpoint is not overcooling.",
+      "inputs": {
+        "tower_leaving_temp": 25.0,
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": true,
+        "tower_fan_speed": 50.0
+      },
+      "expect": [
+        {
+          "output": "yOvercooled",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFanLoaded",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "naturally_cold_fan_off",
+      "description": "Cold water with the fan proven off exposes temperature context but never raises the energy finding.",
+      "inputs": {
+        "tower_leaving_temp": 23.0,
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": false,
+        "tower_fan_speed": 0.0
+      },
+      "expect": [
+        {
+          "output": "yOvercooled",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFanLoaded",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "cold_fan_below_minimum",
+      "description": "A running fan below the strict diagnostic speed floor is not treated as materially loaded.",
+      "inputs": {
+        "tower_leaving_temp": 23.0,
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": true,
+        "tower_fan_speed": 20.0
+      },
+      "expect": [
+        {
+          "output": "yOvercooled",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFanLoaded",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "cold_loaded_at_initialization",
+      "description": "A standing violation serves the complete initialization-safe sustained duration.",
+      "inputs": {
+        "tower_leaving_temp": 23.0,
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": true,
+        "tower_fan_speed": 50.0
+      },
+      "expect": [
+        {
+          "output": "yOvercooled",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFanLoaded",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "temperature_exact_boundary_clear",
+      "description": "Exactly 1 K below setpoint is clear because the comparator is strict.",
+      "inputs": {
+        "tower_leaving_temp": 24.0,
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": true,
+        "tower_fan_speed": 50.0
+      },
+      "expect": [
+        {
+          "output": "yOvercooled",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "temperature_just_beyond_boundary",
+      "description": "One test increment beyond the adopted temperature allowance is overcooled.",
+      "inputs": {
+        "tower_leaving_temp": 23.99,
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": true,
+        "tower_fan_speed": 50.0
+      },
+      "expect": [
+        {
+          "output": "yOvercooled",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "speed_exact_boundary_clear",
+      "description": "Exactly 30 percent is clear because loaded-fan comparison is strict.",
+      "inputs": {
+        "tower_leaving_temp": 23.0,
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": true,
+        "tower_fan_speed": 30.0
+      },
+      "expect": [
+        {
+          "output": "yFanLoaded",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "speed_just_beyond_boundary",
+      "description": "One test increment above the speed floor is materially loaded.",
+      "inputs": {
+        "tower_leaving_temp": 23.0,
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": true,
+        "tower_fan_speed": 30.01
+      },
+      "expect": [
+        {
+          "output": "yFanLoaded",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "violation_ends_one_tick_before_persistence",
+      "description": "A 540-second candidate clears one evaluator tick before the 600-second delay and never alarms.",
+      "inputs": {
+        "tower_leaving_temp": [
+          {
+            "t": 0,
+            "value": 23.0
+          },
+          {
+            "t": 540,
+            "value": 25.0
+          }
+        ],
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": true,
+        "tower_fan_speed": 50.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_alarm_recovers",
+      "description": "An already-mature overcooling alarm clears immediately when leaving water returns to setpoint.",
+      "inputs": {
+        "tower_leaving_temp": [
+          {
+            "t": 0,
+            "value": 23.0
+          },
+          {
+            "t": 900,
+            "value": 25.0
+          }
+        ],
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": true,
+        "tower_fan_speed": 50.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 840,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 900,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "fan_unload_resets_timer",
+      "description": "Dropping below the loaded-fan floor resets persistence even while water remains cold.",
+      "inputs": {
+        "tower_leaving_temp": 23.0,
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": true,
+        "tower_fan_speed": [
+          {
+            "t": 0,
+            "value": 50.0
+          },
+          {
+            "t": 300,
+            "value": 20.0
+          },
+          {
+            "t": 600,
+            "value": 50.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1140,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1260,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "setpoint_change_resets_candidate",
+      "description": "A temporary active-setpoint increase creates a sub-duration candidate that clears when the setpoint returns.",
+      "inputs": {
+        "tower_leaving_temp": 25.0,
+        "tower_leaving_temp_sp": [
+          {
+            "t": 0,
+            "value": 25.0
+          },
+          {
+            "t": 300,
+            "value": 27.0
+          },
+          {
+            "t": 840,
+            "value": 25.0
+          }
+        ],
+        "tower_fan_status": true,
+        "tower_fan_speed": 50.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "status_false_blocks_high_speed",
+      "description": "A high speed value without independent run proof cannot satisfy the loaded-fan gate.",
+      "inputs": {
+        "tower_leaving_temp": 23.0,
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": false,
+        "tower_fan_speed": 100.0
+      },
+      "expect": [
+        {
+          "output": "yFanLoaded",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_episodes_do_not_accumulate",
+      "description": "Separated overcooling episodes each need a complete sustained duration.",
+      "inputs": {
+        "tower_leaving_temp": [
+          {
+            "t": 0,
+            "value": 23.0
+          },
+          {
+            "t": 300,
+            "value": 25.0
+          },
+          {
+            "t": 600,
+            "value": 23.0
+          },
+          {
+            "t": 900,
+            "value": 25.0
+          }
+        ],
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": true,
+        "tower_fan_speed": 50.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "threshold_chatter_never_matures",
+      "description": "Temperature chatter across the strict allowance repeatedly resets persistence.",
+      "inputs": {
+        "tower_leaving_temp": [
+          {
+            "t": 0,
+            "value": 23.99
+          },
+          {
+            "t": 120,
+            "value": 24.01
+          },
+          {
+            "t": 240,
+            "value": 23.99
+          },
+          {
+            "t": 360,
+            "value": 24.01
+          },
+          {
+            "t": 480,
+            "value": 23.99
+          },
+          {
+            "t": 600,
+            "value": 24.01
+          }
+        ],
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": true,
+        "tower_fan_speed": 50.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "startup_violation_uses_full_delay",
+      "description": "A candidate beginning after healthy initialization receives the same complete delay.",
+      "inputs": {
+        "tower_leaving_temp": [
+          {
+            "t": 0,
+            "value": 25.0
+          },
+          {
+            "t": 300,
+            "value": 23.0
+          }
+        ],
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": true,
+        "tower_fan_speed": 50.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "both_thresholds_just_beyond",
+      "description": "Temperature and speed one test increment beyond their strict boundaries mature the full finding.",
+      "inputs": {
+        "tower_leaving_temp": 23.99,
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": true,
+        "tower_fan_speed": 30.01
+      },
+      "expect": [
+        {
+          "output": "yOvercooled",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFanLoaded",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "speed_threshold_chatter_never_matures",
+      "description": "Speed chatter across the strict loaded threshold repeatedly resets persistence.",
+      "inputs": {
+        "tower_leaving_temp": 23.0,
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": true,
+        "tower_fan_speed": [
+          {
+            "t": 0,
+            "value": 30.01
+          },
+          {
+            "t": 120,
+            "value": 30.0
+          },
+          {
+            "t": 240,
+            "value": 30.01
+          },
+          {
+            "t": 360,
+            "value": 30.0
+          },
+          {
+            "t": 480,
+            "value": 30.01
+          },
+          {
+            "t": 600,
+            "value": 30.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "setpoint_changes_but_candidate_remains_true",
+      "description": "A setpoint change that leaves error above the allowance does not reset the Boolean candidate's timer.",
+      "inputs": {
+        "tower_leaving_temp": 23.0,
+        "tower_leaving_temp_sp": [
+          {
+            "t": 0,
+            "value": 25.0
+          },
+          {
+            "t": 300,
+            "value": 26.0
+          }
+        ],
+        "tower_fan_status": true,
+        "tower_fan_speed": 50.0
+      },
+      "expect": [
+        {
+          "output": "yOvercooled",
+          "from_s": 0,
+          "to_s": 2400,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "intentional_low_water_mode_is_host_excluded",
+      "description": "Intentional free-cooling or mandated low-condenser-water operation raises the raw graph; the host must report NO_EVAL for that mode.",
+      "inputs": {
+        "tower_leaving_temp": 23.0,
+        "tower_leaving_temp_sp": 25.0,
+        "tower_fan_status": true,
+        "tower_fan_speed": 50.0
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 660,
+          "to_s": 2400,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}

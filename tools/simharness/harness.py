@@ -35,16 +35,104 @@ apply to any conclusion drawn from proxied points.
 
 from __future__ import annotations
 import argparse, csv, json, os, re, shutil, subprocess, sys
+from datetime import datetime, timedelta
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 MAPPED_POINTS = {"sat", "sat_sp", "rat", "mat", "oat", "sf_status",
                  "clg_vlv_cmd", "oa_dmpr_cmd"}
-STEP_S = 300           # 12 E+ timesteps/hour
+STEP_S = 300           # configured by --step-s and written into the epJSON
 FAN_ON_W = 50.0
 ROUND = 3
 
 # ---------------------------------------------------------------- epJSON
+
+def configure_period_and_timestep(b: dict, begin, end) -> None:
+    """Select one run period and make the declared replay cadence real."""
+    periods = b.get("RunPeriod", {})
+    if periods:
+        name, rp = next(iter(periods.items()))
+    else:
+        name, rp = "simharness run period", {}
+    rp["begin_month"], rp["begin_day_of_month"] = begin
+    rp["end_month"], rp["end_day_of_month"] = end
+    b["RunPeriod"] = {name: rp}
+    tph = 3600 // STEP_S
+    timesteps = b.get("Timestep", {})
+    if timesteps:
+        name, ts = next(iter(timesteps.items()))
+        ts["number_of_timesteps_per_hour"] = tph
+        b["Timestep"] = {name: ts}
+    else:
+        b["Timestep"] = {"simharness timestep": {"number_of_timesteps_per_hour": tph}}
+
+
+def validate_csv_timeline(csv_path: Path, begin, end) -> dict:
+    """Validate cadence and prove that CSV dates match the requested period."""
+    with open(csv_path) as f:
+        rows = list(csv.reader(f))
+    if len(rows) < 3:
+        raise ValueError(f"{csv_path}: not enough rows to establish cadence")
+    period_start = datetime(2001, *begin)
+    period_end = datetime(2001, *end) + timedelta(days=1)
+    if period_end <= period_start:
+        period_end = period_end.replace(year=2002)
+    crosses_year = period_end.year > period_start.year
+    stamps = []
+    for row in rows[1:]:
+        m = re.match(r"\s*(\d{1,2})/(\d{1,2})\s+(\d{1,2}):(\d{2}):(\d{2})", row[0])
+        if not m:
+            raise ValueError(f"{csv_path}: cannot parse EnergyPlus Date/Time {row[0]!r}")
+        month, day, hour, minute, second = map(int, m.groups())
+        year = 2002 if crosses_year and (month, day) < tuple(begin) else 2001
+        stamp = datetime(year, month, day, hour % 24, minute, second)
+        if hour == 24:
+            stamp += timedelta(days=1)
+        stamps.append(stamp)
+    deltas = [int((b - a).total_seconds()) for a, b in zip(stamps, stamps[1:])]
+    bad = [(i + 1, d) for i, d in enumerate(deltas) if d != STEP_S]
+    if bad:
+        i, delta = bad[0]
+        reason = "environment/date reset" if delta <= 0 else "cadence mismatch"
+        raise ValueError(
+            f"{csv_path}: {reason} at data row {i + 1}: delta={delta}s, expected {STEP_S}s; "
+            "do not reuse this CSV for timer-based replay"
+        )
+    expected_first = period_start + timedelta(seconds=STEP_S)
+    expected_last = period_end
+    expected_samples = int((period_end - period_start).total_seconds()) // STEP_S
+    if stamps[0] != expected_first or stamps[-1] != expected_last or len(stamps) != expected_samples:
+        raise ValueError(
+            f"{csv_path}: observed period does not match requested "
+            f"{begin[0]}-{begin[1]}..{end[0]}-{end[1]} at {STEP_S}s: "
+            f"first={rows[1][0].strip()!r}, last={rows[-1][0].strip()!r}, "
+            f"samples={len(stamps)}; expected first={expected_first.isoformat()}, "
+            f"last={expected_last.isoformat()}, samples={expected_samples}; "
+            "do not relabel or reuse this CSV"
+        )
+    return {
+        "begin": f"{begin[0]}-{begin[1]}",
+        "end": f"{end[0]}-{end[1]}",
+        "observed_first": rows[1][0].strip(),
+        "observed_last": rows[-1][0].strip(),
+        "samples": len(stamps),
+    }
+
+
+def replay_results(log: str) -> dict[str, str]:
+    """Extract one PASS/FAIL outcome per replay directory from verifier output."""
+    results, current = {}, None
+    for line in log.splitlines():
+        path = re.search(r"(?:^|[\\/])replay[\\/]([^\s\\/]+)\s*$", line.strip())
+        if path:
+            current = path.group(1)
+            continue
+        if current and re.search(r"\bFAIL\b", line):
+            results[current] = "fail"
+        elif current and re.search(r"\bPASS\b", line) and current not in results:
+            results[current] = "pass"
+    return results
+
 
 def loop_nodes(b: dict) -> dict:
     """Per-air-loop node map derived from the epJSON topology."""
@@ -81,9 +169,7 @@ def loop_nodes(b: dict) -> dict:
 def patch(b: dict, loops: dict, begin=(7, 6), end=(7, 12)) -> dict:
     """Set the run period and add the Output:Variable requests."""
     b = json.loads(json.dumps(b))  # deep copy
-    for rp in b.get("RunPeriod", {}).values():
-        rp["begin_month"], rp["begin_day_of_month"] = begin
-        rp["end_month"], rp["end_day_of_month"] = end
+    configure_period_and_timestep(b, begin, end)
     b.setdefault("Output:Variable", {})
     def req(key, var):
         n = f"simharness {len(b['Output:Variable'])}"
@@ -212,7 +298,7 @@ def rule_os_set(rid: str, card: Path):
     return got
 
 
-SMOOTH_TICKS = 6   # 30 min any-window smoothing over DX/burner cycling
+SMOOTH_S = 1800   # 30 min smoothing over DX/burner cycling
 
 
 def derive_os(pts: dict) -> list:
@@ -225,8 +311,9 @@ def derive_os(pts: dict) -> list:
         # majority-of-window, not any-of-window: a single compressor blip
         # must not reclassify half an hour of economizing as OS#3
         # (fleet-sweep artifact: AHU-0011 false cluster, 2026-08-18)
-        return [sum(sig[max(0, i - SMOOTH_TICKS):i + 1]) * 2
-                > len(sig[max(0, i - SMOOTH_TICKS):i + 1])
+        smooth_ticks = max(1, SMOOTH_S // STEP_S)
+        return [sum(sig[max(0, i - smooth_ticks):i + 1]) * 2
+                > len(sig[max(0, i - smooth_ticks):i + 1])
                 for i in range(n)]
     clg, htg = smooth(raw_clg), smooth(raw_htg)
     os_ = []
@@ -328,9 +415,9 @@ def emit_and_replay(building: str, loops_pts: dict, rules: dict, out: Path):
             dirs.append(d)
     r = subprocess.run(
         ["cargo", "run", "--quiet", "--manifest-path",
-         str(REPO / "tools/verify/Cargo.toml"), "--", *map(str, dirs)],
+         str(REPO / "tools/verify/Cargo.toml"), "--", "--replay-only", *map(str, dirs)],
         capture_output=True, text=True, cwd=REPO)
-    return r.stdout + r.stderr
+    return r
 
 
 
@@ -351,6 +438,8 @@ PLANT_MAPPED = {"chwst", "chwrt", "chwst_sp", "chiller_load", "boiler_status",
                 "hw_pump_vfd_speed", "oat"}
 PMP_MAPPED = {"pump_status", "pump_flow", "pump_kw"}
 CHW_MACHINE_MAPPED = {"chwst", "chwst_sp", "chiller_status", "chiller_load"}
+TOWER_MAPPED = {"tower_leaving_temp", "tower_leaving_temp_sp",
+                "tower_fan_status", "tower_fan_speed"}
 # rule -> gate key; rules absent here replay ungated (lead margin only):
 # unnecessary-operation rules must NOT be gated on the equipment they accuse.
 PLANT_GATE = {"CHW-0004": "chw_load40", "HW-0004": "hw_on", "HW-0007": "hw_on"}
@@ -378,6 +467,8 @@ def plant_nodes(b: dict) -> dict:
     for name, cl in b.get("CondenserLoop", {}).items():
         out["tower"] = {"out_node": cl["condenser_side_outlet_node_name"],
                         "in_node": cl["condenser_side_inlet_node_name"],
+                        "sp_node": cl.get("condenser_loop_temperature_setpoint_node_name"),
+                        "t5_towers": list(b.get("CoolingTower:VariableSpeed", {})),
                         "towers": list(b.get("CoolingTower:VariableSpeed", {}))
                                   + list(b.get("CoolingTower:SingleSpeed", {}))
                                   + list(b.get("CoolingTower:TwoSpeed", {}))}
@@ -386,9 +477,7 @@ def plant_nodes(b: dict) -> dict:
 
 def patch_plant(b: dict, pn: dict, begin, end) -> dict:
     b = json.loads(json.dumps(b))
-    for rp in b.get("RunPeriod", {}).values():
-        rp["begin_month"], rp["begin_day_of_month"] = begin
-        rp["end_month"], rp["end_day_of_month"] = end
+    configure_period_and_timestep(b, begin, end)
     b.setdefault("Output:Variable", {})
     def req(key, var):
         n = f"simharness {len(b['Output:Variable'])}"
@@ -409,8 +498,17 @@ def patch_plant(b: dict, pn: dict, begin, end) -> dict:
         req("Environment", "Site Outdoor Air Wetbulb Temperature")
         req(tw["out_node"], "System Node Temperature")
         req(tw["in_node"], "System Node Temperature")
+        if tw.get("sp_node"):
+            req(tw["sp_node"], "System Node Setpoint Temperature")
         for c in tw["towers"]:
             req(c, "Cooling Tower Fan Electricity Rate")
+        for c in tw["t5_towers"]:
+            req(c, "Cooling Tower Outlet Temperature")
+            req(c, "Cooling Tower Air Flow Rate Ratio")
+            req(c, "Cooling Tower Fan Part Load Ratio")
+            req(c, "Cooling Tower Operating Cells Count")
+            req(c, "Cooling Tower Mass Flow Rate")
+            req(c, "Cooling Tower Heat Transfer Rate")
     if "hw" in pn:
         h = pn["hw"]
         req(h["out_node"], "System Node Temperature")
@@ -465,6 +563,9 @@ def extract_plant(csv_path: Path, pn: dict, b: dict) -> dict:
     if "tower" in pn:
         tw = pn["tower"]
         fan_w = [series(data, col(header, c, "Cooling Tower Fan Electricity Rate")) for c in tw["towers"]]
+        fan_by_tower = dict(zip(tw["towers"], fan_w))
+        loop_sp = series(data, col(header, tw["sp_node"], "System Node Setpoint Temperature")) \
+            if tw.get("sp_node") else None
         fams["tower"] = {
             "oat": oat,
             "oa_wetbulb": series(data, col(header, "Environment", "Site Outdoor Air Wetbulb Temperature")),
@@ -472,6 +573,36 @@ def extract_plant(csv_path: Path, pn: dict, b: dict) -> dict:
             "tower_entering_temp": series(data, col(header, tw["in_node"], "System Node Temperature")),
             "tower_fan_on": [max(v) > 100.0 for v in zip(*fan_w)],
         }
+        if loop_sp is not None:
+            fams["_towers"] = {
+                tower: {
+                    # Native per-object outlet temperature. The common
+                    # condenser-loop outlet setpoint is accepted only when the
+                    # parallel tower objects actually share this target.
+                    "tower_leaving_temp": series(
+                        data, col(header, tower, "Cooling Tower Outlet Temperature")),
+                    "tower_leaving_temp_sp": loop_sp,
+                    # Strictly positive native fan electricity is the
+                    # per-object run proof; free-convection airflow alone does
+                    # not satisfy this Boolean gate.
+                    "tower_fan_status": [v > 0.0 for v in watts],
+                    # Native effective airflow ratio, not mechanical VFD
+                    # feedback. It is preferable to inverting the cubic fan
+                    # power curve near the 30% rule threshold.
+                    "tower_fan_speed": series(
+                        data, col(header, tower, "Cooling Tower Air Flow Rate Ratio"), 100.0),
+                    "_fan_plr": series(
+                        data, col(header, tower, "Cooling Tower Fan Part Load Ratio")),
+                    "_cells": series(
+                        data, col(header, tower, "Cooling Tower Operating Cells Count")),
+                    "_mass_flow": series(
+                        data, col(header, tower, "Cooling Tower Mass Flow Rate")),
+                    "_heat_rejection": series(
+                        data, col(header, tower, "Cooling Tower Heat Transfer Rate")),
+                }
+                for tower in tw["t5_towers"]
+                for watts in [fan_by_tower[tower]]
+            }
     if "hw" in pn:
         h = pn["hw"]
         plrs = [series(data, col(header, bo, "Boiler Part Load Ratio")) for bo in h["boilers"]]
@@ -545,6 +676,37 @@ def plant_gate_windows(key: str | None, pts: dict, n: int) -> list:
     return wins
 
 
+def tower_0005_gate_windows(pts: dict, n: int) -> list:
+    """Settled, loaded, heat-rejecting windows for the tower-object replay."""
+    valid = [
+        status and speed > 30.0 and fan_plr >= 0.999 and cells > 0.0
+        and flow > 0.0 and heat > 0.0
+        for status, speed, fan_plr, cells, flow, heat in zip(
+            pts["tower_fan_status"], pts["tower_fan_speed"], pts["_fan_plr"],
+            pts["_cells"], pts["_mass_flow"], pts["_heat_rejection"]
+        )
+    ]
+    wins, start, state = [], None, None
+    for i in range(n + 1):
+        if i < n:
+            current = (round(pts["tower_leaving_temp_sp"][i], 3), pts["_cells"][i])
+            ok = valid[i]
+        else:
+            current, ok = None, False
+        if ok and (start is None or current != state):
+            if start is not None:
+                a, b_ = start * STEP_S + OS_LEAD_S, (i - 1) * STEP_S
+                if b_ - a >= 600:
+                    wins.append((a, b_))
+            start, state = i, current
+        elif not ok and start is not None:
+            a, b_ = start * STEP_S + OS_LEAD_S, (i - 1) * STEP_S
+            if b_ - a >= 600:
+                wins.append((a, b_))
+            start, state = None, None
+    return wins
+
+
 
 # ================================================================ vavcal
 
@@ -564,9 +726,7 @@ def vavcal(b, bdir, out, epw, begin, end, args):
         zones[name] = {"out_node": t["air_outlet_node_name"],
                        "rht_coil": t.get("reheat_coil_name")}
     stats_b = json.loads(json.dumps(b))
-    for rp in stats_b.get("RunPeriod", {}).values():
-        rp["begin_month"], rp["begin_day_of_month"] = begin
-        rp["end_month"], rp["end_day_of_month"] = end
+    configure_period_and_timestep(stats_b, begin, end)
     stats_b.setdefault("Output:Variable", {})
     def req(key, var):
         n = f"simharness {len(stats_b['Output:Variable'])}"
@@ -587,6 +747,7 @@ def vavcal(b, bdir, out, epw, begin, end, args):
     if not (args.reuse and csv_path.is_file()):
         print(f"vavcal: {len(zones)} terminals; running EnergyPlus…")
         csv_path = run_energyplus(pj, epw, out / "ep")
+    validate_csv_timeline(csv_path, begin, end)
     with open(csv_path) as f:
         rows = list(csv.reader(f))
     header, data = rows[0], rows[1:]
@@ -645,6 +806,7 @@ def vavcal(b, bdir, out, epw, begin, end, args):
 # ---------------------------------------------------------------- main
 
 def main():
+    global STEP_S
     ap = argparse.ArgumentParser()
     sub = ap.add_subparsers(dest="cmd", required=True)
     runp = sub.add_parser("run")
@@ -653,6 +815,8 @@ def main():
     runp.add_argument("--begin", default="7-6", help="run period start M-D")
     runp.add_argument("--end", default="7-12", help="run period end M-D")
     runp.add_argument("--mode", default="airloop", choices=["airloop", "plant", "vavcal"])
+    runp.add_argument("--step-s", type=int, default=300,
+                      help="EnergyPlus and replay cadence in seconds; must divide 3600 (60 recommended for TOWER-0005)")
     runp.add_argument("--reuse", action="store_true",
                       help="reuse an existing eplusout.csv instead of re-running EnergyPlus")
     runp.add_argument("--faultmodel", default=None, metavar="KIND=DELTA",
@@ -664,6 +828,9 @@ def main():
                       help="TPR mode: add DELTA to POINT in the replayed inputs "
                            "(faulted-sensor-as-seen-by-FDD); FAILs are DETECTIONS")
     args = ap.parse_args()
+    if args.step_s < 60 or 3600 % args.step_s:
+        ap.error("--step-s must be at least 60 and divide 3600 exactly")
+    STEP_S = args.step_s
 
     bdir = Path(args.building)
     out = Path(args.out) if args.out else bdir / "simharness_out"
@@ -685,9 +852,11 @@ def main():
         if not (args.reuse and csv_path.is_file()):
             print(f"plant loops: {list(pn)}; running EnergyPlus…")
             csv_path = run_energyplus(pj, epw, out / "ep")
+        timeline = validate_csv_timeline(csv_path, begin, end)
         fams = extract_plant(csv_path, pn, b)
         chillers = fams.pop("_chillers", {})
         pumps = fams.pop("_pumps", {})
+        towers = fams.pop("_towers", {})
         if "tower" in fams:
             tp = fams.pop("tower")
             on = tp["tower_fan_on"]
@@ -730,9 +899,15 @@ def main():
             eligible_rules(families=("chw",), mapped=CHW_MACHINE_MAPPED).items()
             if rid in {"CHW-0007", "CHW-0009"}
         }
+        tower_rules = {
+            rid: rule for rid, rule in
+            eligible_rules(families=("tower",), mapped=TOWER_MAPPED).items()
+            if rid == "TOWER-0005"
+        }
         print(f"eligible plant rules: {sorted(rules)}")
         print(f"eligible per-chiller rules: {sorted(chiller_rules)} across {len(chillers)} chiller(s)")
         print(f"eligible per-pump rules: {sorted(pump_rules)} across {len(pumps)} pump(s)")
+        print(f"eligible per-tower rules: {sorted(tower_rules)} across {len(towers)} tower object(s)")
         replay = out / "replay"
         if replay.exists():
             shutil.rmtree(replay)
@@ -830,14 +1005,79 @@ def main():
                     "clock": {"step_s": STEP_S, "horizon_s": (n - 1) * STEP_S},
                     "scenarios": [scen]}, indent=1))
                 dirs.append(d)
+        tower_validation = {
+            "schema": "cxf-library/simharness/tower-0005/v1",
+            "building": bdir.name,
+            "period": timeline,
+            "step_s": STEP_S,
+            "mapping": {
+                "tower_leaving_temp": "per-object Cooling Tower Outlet Temperature",
+                "tower_leaving_temp_sp": "condenser loop System Node Setpoint Temperature",
+                "tower_fan_status": "per-object Cooling Tower Fan Electricity Rate > 0 W",
+                "tower_fan_speed": "per-object Cooling Tower Air Flow Rate Ratio x 100 (effective-airflow proxy)",
+            },
+            "limits": [
+                "Per EnergyPlus tower object; internal physical cells are aggregate.",
+                "Healthy FPR only; no induced overcooling fault or causal TPR.",
+                "Native airflow ratio is not mechanical VFD feedback.",
+                "Windows require positive flow/heat rejection, continuous fan PLR, stable cell count/setpoint, and an 1800 s lead.",
+            ],
+            "tower_objects": {},
+        }
+        for rid, r in tower_rules.items():
+            for tower_name, pts in towers.items():
+                n = len(pts["tower_fan_status"])
+                wins = tower_0005_gate_windows(pts, n)
+                safe_name = re.sub(r"[^a-z0-9]+", "_", tower_name.lower()).strip("_")
+                tower_validation["tower_objects"][tower_name] = {
+                    "host_valid_windows": len(wins),
+                    "evaluated_ticks": sum((b_ - a) // STEP_S + 1 for a, b_ in wins),
+                    "minimum_speed_percent": 30.0,
+                }
+                if not wins:
+                    print(f"  {rid}/{tower_name}: no settled loaded windows this period")
+                    continue
+                d = replay / f"{rid}__{safe_name}"
+                d.mkdir(parents=True)
+                shutil.copy(r["dir"] / "rule.cxf.jsonld", d / "rule.cxf.jsonld")
+                scen = {
+                    "name": f"{bdir.name}_{safe_name}".replace("-", "_").replace(".", "_").lower(),
+                    "description": (
+                        f"Healthy-baseline EnergyPlus period ({bdir.name}), tower object {tower_name}; "
+                        "native per-object outlet temperature is compared with the prototype's shared "
+                        "condenser-loop outlet setpoint. Strictly positive fan electricity is run proof; "
+                        "native Air Flow Rate Ratio x100 is disclosed as effective-airflow, not mechanical "
+                        "VFD feedback. Expectations begin 1800 s after stable fan/cell/setpoint/plant state."
+                    ),
+                    "inputs": {p: to_steps(pts[p]) for p in r["points"]},
+                    "expect": [{"output": "yFault", "from_s": a, "to_s": b_, "equals": False}
+                               for a, b_ in wins],
+                }
+                (d / "vectors.json").write_text(json.dumps({
+                    "schema": "cxf-library/vectors/v1",
+                    "clock": {"step_s": STEP_S, "horizon_s": (n - 1) * STEP_S},
+                    "scenarios": [scen],
+                }, indent=1))
+                dirs.append(d)
         rr = subprocess.run(["cargo", "run", "--quiet", "--manifest-path",
-                             str(REPO / "tools/verify/Cargo.toml"), "--", *map(str, dirs)],
+                             str(REPO / "tools/verify/Cargo.toml"), "--", "--replay-only",
+                             *map(str, dirs)],
                             capture_output=True, text=True, cwd=REPO)
         log = rr.stdout + rr.stderr
         (out / "verify.log").write_text(log)
+        outcomes = replay_results(log)
+        for tower_name, result in tower_validation["tower_objects"].items():
+            safe_name = re.sub(r"[^a-z0-9]+", "_", tower_name.lower()).strip("_")
+            result["replay_result"] = outcomes.get(
+                f"TOWER-0005__{safe_name}", "not_evaluated")
+        (out / "tower_0005_validation.json").write_text(json.dumps(tower_validation, indent=1))
         for line in log.splitlines():
             if re.search(r"replay/|PASS|FAIL", line):
                 print(line if "replay/" not in line else "  " + line.split("replay/")[-1])
+        if rr.returncode:
+            print(f"verifier failed with exit status {rr.returncode}; see {out / 'verify.log'}",
+                  file=sys.stderr)
+            raise SystemExit(rr.returncode)
         return
 
     if args.mode == "vavcal":
@@ -864,6 +1104,7 @@ def main():
     if not (args.reuse and csv_path.is_file()):
         print(f"loops: {list(loops)}; running EnergyPlus…")
         csv_path = run_energyplus(pj, epw, out / "ep")
+    validate_csv_timeline(csv_path, begin, end)
     loops_pts = extract(csv_path, loops)
     if args.bias:
         pt, delta = args.bias.split("=")
@@ -874,7 +1115,8 @@ def main():
         print(f"TPR bias applied: {pt} += {delta} — FAILs below are DETECTIONS")
     rules = eligible_rules()
     print(f"eligible rules (points ⊆ mapped): {sorted(rules)}")
-    log = emit_and_replay(bdir.name, loops_pts, rules, out)
+    rr = emit_and_replay(bdir.name, loops_pts, rules, out)
+    log = rr.stdout + rr.stderr
     (out / "verify.log").write_text(log)
     # tally per rule (dir name carries RULE__LOOP)
     per_rule: dict = {}
@@ -896,6 +1138,8 @@ def main():
     for rid, lp, line in findings:
         print(f"  FP {rid} @ {lp}: {line.split('—')[-1].strip()}")
     print(f"full log: {out}/verify.log")
+    if rr.returncode:
+        raise SystemExit(rr.returncode)
 
 
 if __name__ == "__main__":

@@ -58,17 +58,11 @@ emissions:
 validation:
   - kind: simulation_fpr
     harness: simharness/v1
-    date: 2026-08-18
-    fleet: "DOE prototype OfficeLarge STD2019 x 4 climates (Miami 1A, Tucson 2B, Atlanta 3A, Buffalo 5A), one July + one January week each, plant mode"
-    scenarios: 8
-    failures: 0
-  - kind: simulation_fpr
-    harness: simharness/v1
-    date: 2026-08-18
-    fleet: "DOE prototype OfficeLarge STD2019 Atlanta (IDF 22.1 auto-transitioned to E+ 25.1), one July + one January week, plant mode"
+    date: 2026-08-20
+    fleet: "EnergyPlus 25.1 OfficeLarge STD2019 Denver, one July + one January week, plant mode at 60 s"
     scenarios: 2
     failures: 0
-    notes: "hw_pump_vfd_speed is a flow-fraction proxy (affinity-law approximation)"
+    notes: "single RunPeriod with timeline/cadence validation; hw_pump_vfd_speed is a flow-fraction proxy (affinity-law approximation)"
 verified:
   engine_rev: e2ff2f8
   content_id: "cxf:fnv1a128:6d35dff9c968ba4897bf8966d5555c16"

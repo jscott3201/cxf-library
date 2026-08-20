@@ -219,7 +219,7 @@ fn run_scenario(
     Ok(())
 }
 
-fn verify_fault_dir(dir: &Path) -> Result<bool, String> {
+fn verify_fault_dir(dir: &Path, replay_only: bool) -> Result<bool, String> {
     let rule_path = dir.join("rule.cxf.jsonld");
     let vectors_path = dir.join("vectors.json");
     let rule_bytes =
@@ -253,35 +253,40 @@ fn verify_fault_dir(dir: &Path) -> Result<bool, String> {
 
     let mut all_pass = true;
 
-    // Schema lint (SCHEMA.md conformance), including recorded-vs-actual content id.
-    let repo_root = dir
-        .canonicalize()
-        .ok()
-        .and_then(|d| d.parent().and_then(|p| p.parent()).and_then(|p| p.parent()).map(Path::to_path_buf))
-        .ok_or("cannot locate repo root from fault dir")?;
-    match lint::lint_fault_dir(dir, &repo_root) {
-        Ok(report) => {
-            let mut errors = report.errors;
-            if matches!(report.status.as_str(), "verified" | "adopted")
-                && let (Some(recorded), Some(actual)) = (&report.recorded_content_id, &content_id)
-                && recorded != actual
-            {
-                errors.push(format!(
-                    "verified.content_id `{recorded}` != engine export `{actual}` — re-verify and update the card"
-                ));
-            }
-            if errors.is_empty() {
-                println!("  LINT  ok");
-            } else {
-                all_pass = false;
-                for e in errors {
-                    println!("  LINT  {e}");
+    // Generated simulation replays contain only a graph plus transient vectors. Their source
+    // packages are linted separately; --replay-only makes the exit code describe replay success.
+    if replay_only {
+        println!("  LINT  skipped (generated replay)");
+    } else {
+        let repo_root = dir
+            .canonicalize()
+            .ok()
+            .and_then(|d| d.parent().and_then(|p| p.parent()).and_then(|p| p.parent()).map(Path::to_path_buf))
+            .ok_or("cannot locate repo root from fault dir")?;
+        match lint::lint_fault_dir(dir, &repo_root) {
+            Ok(report) => {
+                let mut errors = report.errors;
+                if matches!(report.status.as_str(), "verified" | "adopted")
+                    && let (Some(recorded), Some(actual)) = (&report.recorded_content_id, &content_id)
+                    && recorded != actual
+                {
+                    errors.push(format!(
+                        "verified.content_id `{recorded}` != engine export `{actual}` — re-verify and update the card"
+                    ));
+                }
+                if errors.is_empty() {
+                    println!("  LINT  ok");
+                } else {
+                    all_pass = false;
+                    for e in errors {
+                        println!("  LINT  {e}");
+                    }
                 }
             }
-        }
-        Err(e) => {
-            all_pass = false;
-            println!("  LINT  {e}");
+            Err(e) => {
+                all_pass = false;
+                println!("  LINT  {e}");
+            }
         }
     }
     for scenario in &vectors.scenarios {
@@ -317,6 +322,12 @@ fn discover_fault_dirs(faults_root: &Path) -> Result<Vec<PathBuf>, String> {
 
 fn main() -> ExitCode {
     let mut args: Vec<PathBuf> = std::env::args_os().skip(1).map(PathBuf::from).collect();
+    let replay_only = args.iter().any(|a| a.as_os_str() == "--replay-only");
+    if replay_only && args.iter().any(|a| a.as_os_str() == "--all") {
+        eprintln!("--replay-only is only valid with explicit generated replay directories");
+        return ExitCode::from(2);
+    }
+    args.retain(|a| a.as_os_str() != "--replay-only");
     if args.iter().any(|a| a.as_os_str() == "--all") {
         args = match discover_fault_dirs(Path::new("faults")) {
             Ok(dirs) => dirs,
@@ -328,12 +339,12 @@ fn main() -> ExitCode {
         println!("discovered {} fault dirs", args.len());
     }
     if args.is_empty() {
-        eprintln!("usage: cxf-verify --all | <fault-dir>… (each containing rule.cxf.jsonld + vectors.json)");
+        eprintln!("usage: cxf-verify [--replay-only] (--all | <fault-dir>…) (each containing rule.cxf.jsonld + vectors.json)");
         return ExitCode::from(2);
     }
     let mut ok = true;
     for dir in &args {
-        match verify_fault_dir(dir) {
+        match verify_fault_dir(dir, replay_only) {
             Ok(pass) => ok &= pass,
             Err(msg) => {
                 ok = false;

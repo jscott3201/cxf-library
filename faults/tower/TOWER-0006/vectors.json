@@ -1,0 +1,877 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 4200
+  },
+  "scenarios": [
+    {
+      "name": "warm_ambient_heater_off",
+      "description": "A warm wet tower with no heater request is healthy.",
+      "inputs": {
+        "oat": 10.0,
+        "tower_basin_temp": 10.0,
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yFreezeExposure",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "freeze_exposure_safe_basin",
+      "description": "Exposure alone is diagnostic context and does not alarm while basin temperature is safe.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": 6.0,
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yFreezeExposure",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": true
+        },
+        {
+          "output": "yLowBasinTemp",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "heater_mismatch_at_initialization",
+      "description": "A standing heater command/proof mismatch serves the full electrical proof delay.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": 6.0,
+        "tower_basin_heater_cmd": true,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yHeaterFailToRun",
+          "from_s": 0,
+          "to_s": 60,
+          "equals": false
+        },
+        {
+          "output": "yHeaterFailToRun",
+          "from_s": 180,
+          "to_s": 4200,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 60,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 180,
+          "to_s": 4200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "low_basin_at_initialization",
+      "description": "A cold basin during exposure serves the complete initialization-safe thermal delay.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": 3.0,
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yLowBasinTemp",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yLowBasinTemp",
+          "from_s": 1860,
+          "to_s": 4200,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 4200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "oat_exact_boundary_clear",
+      "description": "Exactly 2 C is outside the strict freeze-exposure condition.",
+      "inputs": {
+        "oat": 2.0,
+        "tower_basin_temp": 3.0,
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yFreezeExposure",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "oat_just_below_boundary",
+      "description": "One test increment below 2 C enters freeze exposure.",
+      "inputs": {
+        "oat": 1.99,
+        "tower_basin_temp": 6.0,
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yFreezeExposure",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "basin_exact_boundary_clear",
+      "description": "Exactly 4 C is outside the strict low-basin condition.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": 4.0,
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "basin_just_below_boundary",
+      "description": "One test increment below the site-configured minimum matures the thermal branch.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": 3.99,
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yLowBasinTemp",
+          "from_s": 1860,
+          "to_s": 4200,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 4200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "heater_mismatch_ends_one_tick_before_proof",
+      "description": "Independent proof arriving at 60 seconds prevents the 120-second timer from maturing.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": 6.0,
+        "tower_basin_heater_cmd": true,
+        "tower_basin_heater_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 60,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_heater_alarm_recovers",
+      "description": "A mature electrical proof alarm clears immediately when independent proof arrives.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": 6.0,
+        "tower_basin_heater_cmd": true,
+        "tower_basin_heater_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yHeaterFailToRun",
+          "from_s": 180,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 180,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 600,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "low_condition_ends_one_tick_before_thermal_proof",
+      "description": "A 1740-second cold-basin episode clears one evaluator tick before maturity.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": [
+          {
+            "t": 0,
+            "value": 3.0
+          },
+          {
+            "t": 1740,
+            "value": 6.0
+          }
+        ],
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_low_basin_alarm_recovers",
+      "description": "An already-mature thermal alarm clears when representative basin temperature recovers.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": [
+          {
+            "t": 0,
+            "value": 3.0
+          },
+          {
+            "t": 2400,
+            "value": 6.0
+          }
+        ],
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yLowBasinTemp",
+          "from_s": 1860,
+          "to_s": 2340,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 2340,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 2400,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "exposure_ends_before_thermal_duration",
+      "description": "Outdoor exposure ending at 1740 seconds resets the thermal candidate.",
+      "inputs": {
+        "oat": [
+          {
+            "t": 0,
+            "value": 0.0
+          },
+          {
+            "t": 1740,
+            "value": 5.0
+          }
+        ],
+        "tower_basin_temp": 3.0,
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "basin_recovers_before_thermal_duration",
+      "description": "Representative basin recovery before the duration prevents a protective alarm.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": [
+          {
+            "t": 0,
+            "value": 3.0
+          },
+          {
+            "t": 1200,
+            "value": 6.0
+          }
+        ],
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "heater_proven_but_basin_stays_low",
+      "description": "Electrical heater proof cannot mask a basin that remains thermally unsafe.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": 3.0,
+        "tower_basin_heater_cmd": true,
+        "tower_basin_heater_status": true
+      },
+      "expect": [
+        {
+          "output": "yHeaterFailToRun",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        },
+        {
+          "output": "yLowBasinTemp",
+          "from_s": 1860,
+          "to_s": 4200,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 4200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "uncommanded_heater_status_is_uncovered_hazard",
+      "description": "Command false and status true is intentionally silent in this graph but may be an uncontrolled-heater hazard; route it through the OEM/site safety workflow.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": 6.0,
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": true
+      },
+      "expect": [
+        {
+          "output": "yHeaterFailToRun",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "low_basin_without_exposure_clear",
+      "description": "A low reading without configured outdoor exposure does not enter the thermal protection lane.",
+      "inputs": {
+        "oat": 5.0,
+        "tower_basin_temp": 3.0,
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yFreezeExposure",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "both_branches_mature_independently",
+      "description": "Electrical proof and low-basin protection can both mature without masking one another.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": 3.0,
+        "tower_basin_heater_cmd": true,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yHeaterFailToRun",
+          "from_s": 180,
+          "to_s": 4200,
+          "equals": true
+        },
+        {
+          "output": "yLowBasinTemp",
+          "from_s": 1860,
+          "to_s": 4200,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 180,
+          "to_s": 4200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "heater_command_chatter_never_matures",
+      "description": "Short command/proof mismatches cannot accumulate across healthy intervals.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": 6.0,
+        "tower_basin_heater_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 60,
+            "value": false
+          },
+          {
+            "t": 180,
+            "value": true
+          },
+          {
+            "t": 240,
+            "value": false
+          }
+        ],
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_low_basin_episodes_do_not_accumulate",
+      "description": "Separated thermal episodes each require a complete 1800-second duration.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": [
+          {
+            "t": 0,
+            "value": 3.0
+          },
+          {
+            "t": 1200,
+            "value": 6.0
+          },
+          {
+            "t": 1800,
+            "value": 3.0
+          },
+          {
+            "t": 3000,
+            "value": 6.0
+          }
+        ],
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "heater_status_chatter_never_matures",
+      "description": "Independent proof repeatedly restores agreement before the electrical timer can mature.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": 6.0,
+        "tower_basin_heater_cmd": true,
+        "tower_basin_heater_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 60,
+            "value": true
+          },
+          {
+            "t": 180,
+            "value": false
+          },
+          {
+            "t": 240,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "oat_threshold_chatter_resets_thermal_lane",
+      "description": "Outdoor temperature alternating across the strict exposure threshold prevents continuous thermal maturity.",
+      "inputs": {
+        "oat": [
+          {
+            "t": 0,
+            "value": 1.99
+          },
+          {
+            "t": 600,
+            "value": 2.0
+          },
+          {
+            "t": 1200,
+            "value": 1.99
+          },
+          {
+            "t": 1800,
+            "value": 2.0
+          }
+        ],
+        "tower_basin_temp": 3.0,
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "basin_threshold_chatter_resets_thermal_lane",
+      "description": "Basin temperature alternating across the strict configured minimum prevents continuous maturity.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": [
+          {
+            "t": 0,
+            "value": 3.99
+          },
+          {
+            "t": 600,
+            "value": 4.0
+          },
+          {
+            "t": 1200,
+            "value": 3.99
+          },
+          {
+            "t": 1800,
+            "value": 4.0
+          }
+        ],
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "electrical_to_thermal_branch_handoff",
+      "description": "Heater proof clears a mature electrical alarm, then the independently pending cold-basin lane matures later.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": 3.0,
+        "tower_basin_heater_cmd": true,
+        "tower_basin_heater_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yHeaterFailToRun",
+          "from_s": 180,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 180,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 600,
+          "to_s": 1740,
+          "equals": false
+        },
+        {
+          "output": "yLowBasinTemp",
+          "from_s": 1860,
+          "to_s": 4200,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 4200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "mature_exposure_alarm_recovers",
+      "description": "A mature low-basin alarm clears when outdoor exposure ends even if the basin reading remains low.",
+      "inputs": {
+        "oat": [
+          {
+            "t": 0,
+            "value": 0.0
+          },
+          {
+            "t": 2400,
+            "value": 5.0
+          }
+        ],
+        "tower_basin_temp": 3.0,
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yLowBasinTemp",
+          "from_s": 1860,
+          "to_s": 2340,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 2340,
+          "equals": true
+        },
+        {
+          "output": "yFreezeExposure",
+          "from_s": 2400,
+          "to_s": 4200,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 2400,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_heater_alarm_clears_on_command_withdrawal",
+      "description": "The electrical lane clears when its final heater request is withdrawn.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": 6.0,
+        "tower_basin_heater_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          }
+        ],
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yHeaterFailToRun",
+          "from_s": 180,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 180,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 600,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "drained_tower_raw_false_positive",
+      "description": "A meaningless low basin reading on an intentionally drained tower matures the raw thermal graph; applicability gating must report NO_EVAL.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": 0.0,
+        "tower_basin_heater_cmd": false,
+        "tower_basin_heater_status": false
+      },
+      "expect": [
+        {
+          "output": "yLowBasinTemp",
+          "from_s": 1860,
+          "to_s": 4200,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1860,
+          "to_s": 4200,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "heater_command_echo_raw_blind_spot",
+      "description": "An echoed command presented as status keeps the electrical graph clear without proving current or heat; independent proof is mandatory.",
+      "inputs": {
+        "oat": 0.0,
+        "tower_basin_temp": 6.0,
+        "tower_basin_heater_cmd": true,
+        "tower_basin_heater_status": true
+      },
+      "expect": [
+        {
+          "output": "yHeaterFailToRun",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 4200,
+          "equals": false
+        }
+      ]
+    }
+  ]
+}

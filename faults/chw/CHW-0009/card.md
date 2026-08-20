@@ -55,10 +55,10 @@ validation:
   - kind: simulation_fpr
     harness: simharness/v1
     date: 2026-08-20
-    fleet: "EnergyPlus 25.1 OfficeLarge STD2019 Denver, July + January weeks, two individual parallel chillers, plant mode"
+    fleet: "EnergyPlus 25.1 OfficeLarge STD2019 Denver, July + January weeks, two individual parallel chillers, plant mode at 60 s"
     scenarios: 4
-    failures: 2
-    notes: "both January replays are clear; both July replays alarm. Inspection confirms real per-machine PLR/power OFF-ON sequences rather than an unexplained mapping FPR: each machine records four sampled starts inside 45 minutes during low/moderate-load operation, consistent with PNNL's low-load short-cycling mechanism. Graph copies use count_scale=12 at the native 300 s tick, so cycles completed inside 10 minutes remain invisible and no OEM damage claim is inferred"
+    failures: 1
+    notes: "single RunPeriod with timeline/cadence validation; graph copies use count_scale=60. Both January machines and one July machine are clear; the other July power-based status series contains repeated sampled starts and correctly raises the raw cycling finding. Cycles completed inside 120 s remain unobservable and no OEM damage claim is inferred"
 verified:
   engine_rev: e2ff2f8
   content_id: "cxf:fnv1a128:1d73386b26deb3b315e35f31e43ffbff"

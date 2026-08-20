@@ -1,0 +1,770 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 1800
+  },
+  "scenarios": [
+    {
+      "name": "agreement_stopped",
+      "description": "Final command and independent proof both false are healthy agreement.",
+      "inputs": {
+        "tower_fan_cmd": false,
+        "tower_fan_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "agreement_running",
+      "description": "Final command and independent proof both true are healthy agreement.",
+      "inputs": {
+        "tower_fan_cmd": true,
+        "tower_fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "fail_to_start_at_initialization",
+      "description": "A standing start mismatch serves the full initialization-safe proof time.",
+      "inputs": {
+        "tower_fan_cmd": true,
+        "tower_fan_status": false
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 60,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 180,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 60,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 180,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "unexpected_run_at_initialization",
+      "description": "A standing stop mismatch serves its own complete initialization-safe proof time.",
+      "inputs": {
+        "tower_fan_cmd": false,
+        "tower_fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 60,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 180,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 60,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 180,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "normal_delayed_start_and_stop",
+      "description": "Independent proof follows the final command inside both adopted windows.",
+      "inputs": {
+        "tower_fan_cmd": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 900,
+            "value": false
+          }
+        ],
+        "tower_fan_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 360,
+            "value": true
+          },
+          {
+            "t": 960,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "start_mismatch_ends_one_tick_before_proof",
+      "description": "A start mismatch clearing at 60 seconds cannot mature the 120-second timer.",
+      "inputs": {
+        "tower_fan_cmd": true,
+        "tower_fan_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 60,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "stop_mismatch_ends_one_tick_before_proof",
+      "description": "A stop mismatch clearing at 60 seconds cannot mature the independent timer.",
+      "inputs": {
+        "tower_fan_cmd": false,
+        "tower_fan_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 60,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_start_alarm_recovers",
+      "description": "An already-mature failure-to-start clears immediately when independent run proof arrives.",
+      "inputs": {
+        "tower_fan_cmd": true,
+        "tower_fan_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 180,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 180,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 600,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_stop_alarm_recovers",
+      "description": "An already-mature unexpected-run alarm clears when the fan stops.",
+      "inputs": {
+        "tower_fan_cmd": false,
+        "tower_fan_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 180,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 180,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 600,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "direction_reversal_restarts_timer",
+      "description": "A direct mismatch reversal clears the old lane and serves the new lane's complete timer.",
+      "inputs": {
+        "tower_fan_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 600,
+            "value": false
+          }
+        ],
+        "tower_fan_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 600,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 180,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 600,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 600,
+          "to_s": 660,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 780,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 780,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "command_chatter_never_matures",
+      "description": "Alternating command ownership resets both direction-specific candidates.",
+      "inputs": {
+        "tower_fan_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 60,
+            "value": false
+          },
+          {
+            "t": 120,
+            "value": true
+          },
+          {
+            "t": 180,
+            "value": false
+          },
+          {
+            "t": 240,
+            "value": true
+          },
+          {
+            "t": 300,
+            "value": false
+          }
+        ],
+        "tower_fan_status": false
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "status_chatter_never_matures",
+      "description": "Status chatter around a steady start command cannot accumulate across healthy samples.",
+      "inputs": {
+        "tower_fan_cmd": true,
+        "tower_fan_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 60,
+            "value": true
+          },
+          {
+            "t": 120,
+            "value": false
+          },
+          {
+            "t": 180,
+            "value": true
+          },
+          {
+            "t": 240,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_start_mismatches_do_not_accumulate",
+      "description": "Separated start-proof episodes each need their own complete duration.",
+      "inputs": {
+        "tower_fan_cmd": true,
+        "tower_fan_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 60,
+            "value": true
+          },
+          {
+            "t": 300,
+            "value": false
+          },
+          {
+            "t": 360,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "pending_direction_reversal_starts_fresh_lane",
+      "description": "A start mismatch reverses before maturity; the start lane never asserts and the stop lane receives a fresh timer.",
+      "inputs": {
+        "tower_fan_cmd": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 60,
+            "value": false
+          }
+        ],
+        "tower_fan_status": [
+          {
+            "t": 0,
+            "value": false
+          },
+          {
+            "t": 60,
+            "value": true
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 120,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 240,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 240,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "unexpected_run_chatter_never_matures",
+      "description": "Stop-lane status chatter repeatedly restores healthy agreement before its proof timer matures.",
+      "inputs": {
+        "tower_fan_cmd": false,
+        "tower_fan_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 60,
+            "value": false
+          },
+          {
+            "t": 180,
+            "value": true
+          },
+          {
+            "t": 240,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_stop_mismatches_do_not_accumulate",
+      "description": "Separated unexpected-run episodes each require their own complete duration.",
+      "inputs": {
+        "tower_fan_cmd": false,
+        "tower_fan_status": [
+          {
+            "t": 0,
+            "value": true
+          },
+          {
+            "t": 60,
+            "value": false
+          },
+          {
+            "t": 300,
+            "value": true
+          },
+          {
+            "t": 360,
+            "value": false
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "upstream_enable_raw_false_positive",
+      "description": "A plant enable misbound as this fan's final command raises the raw start alarm for an unselected cell; the host must report NO_EVAL.",
+      "inputs": {
+        "tower_fan_cmd": true,
+        "tower_fan_status": false
+      },
+      "expect": [
+        {
+          "output": "yFailToStart",
+          "from_s": 180,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 180,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "command_echo_raw_blind_spot",
+      "description": "An echoed command masquerading as status keeps the raw graph clear even when physical truth is unknown; independent proof is mandatory.",
+      "inputs": {
+        "tower_fan_cmd": true,
+        "tower_fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yFailToStart",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        },
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 0,
+          "to_s": 1800,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "manual_local_run_is_host_excluded",
+      "description": "A locally owned fan produces a raw unexpected-run alarm, but the host excludes the ownership window.",
+      "inputs": {
+        "tower_fan_cmd": false,
+        "tower_fan_status": true
+      },
+      "expect": [
+        {
+          "output": "yUnexpectedRun",
+          "from_s": 180,
+          "to_s": 1800,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 180,
+          "to_s": 1800,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}
