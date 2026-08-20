@@ -690,6 +690,30 @@
       "legacy_id": null
     },
     {
+      "id": "HX-0001",
+      "family": "hx",
+      "name": "Hydronic heat-exchanger effectiveness degradation",
+      "method": "statistical",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "HX-0002",
+      "family": "hx",
+      "name": "Heat exchanger active with one-side flow missing",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
+      "id": "HX-0003",
+      "family": "hx",
+      "name": "Heat transfer persists with control valve commanded closed",
+      "method": "rule",
+      "status": "verified",
+      "legacy_id": null
+    },
+    {
       "id": "PMP-0001",
       "family": "pmp",
       "name": "Pump commanded on, no flow detected",

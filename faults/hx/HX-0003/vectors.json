@@ -1,0 +1,514 @@
+{
+  "schema": "cxf-library/vectors/v1",
+  "clock": {
+    "step_s": 60,
+    "horizon_s": 3000
+  },
+  "scenarios": [
+    {
+      "name": "closed_valve_no_transfer",
+      "description": "A closed command with no measured transfer is healthy.",
+      "inputs": {
+        "control_valve_cmd": 0.0,
+        "heat_transfer_rate": 0.0
+      },
+      "expect": [
+        {
+          "output": "yValveClosed",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "open_valve_with_transfer",
+      "description": "Expected exchange with an open valve does not accuse the valve even though transfer is present.",
+      "inputs": {
+        "control_valve_cmd": 100.0,
+        "heat_transfer_rate": 20.0
+      },
+      "expect": [
+        {
+          "output": "yValveClosed",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "closed_positive_transfer",
+      "description": "Sustained primary-to-secondary heat transfer while closed matures a fault.",
+      "inputs": {
+        "control_valve_cmd": 0.0,
+        "heat_transfer_rate": 5.1
+      },
+      "expect": [
+        {
+          "output": "yValveClosed",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "closed_negative_transfer",
+      "description": "Cooling-direction transfer is equally unintended; Abs makes the signature symmetric.",
+      "inputs": {
+        "control_valve_cmd": 0.0,
+        "heat_transfer_rate": -5.1
+      },
+      "expect": [
+        {
+          "output": "yValveClosed",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "command_exactly_at_closed_limit",
+      "description": "Exactly 5% is not closed under strict Less.",
+      "inputs": {
+        "control_valve_cmd": 5.0,
+        "heat_transfer_rate": 20.0
+      },
+      "expect": [
+        {
+          "output": "yValveClosed",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "command_just_below_closed_limit",
+      "description": "A 4.9% final command counts as closed and can mature the transfer finding.",
+      "inputs": {
+        "control_valve_cmd": 4.9,
+        "heat_transfer_rate": 5.1
+      },
+      "expect": [
+        {
+          "output": "yValveClosed",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "transfer_exactly_at_limit",
+      "description": "Exactly 5.0 kW is clear under strict Greater.",
+      "inputs": {
+        "control_valve_cmd": 0.0,
+        "heat_transfer_rate": 5.0
+      },
+      "expect": [
+        {
+          "output": "yValveClosed",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "negative_transfer_exactly_at_limit",
+      "description": "The mirrored -5.0 kW boundary is also clear after Abs.",
+      "inputs": {
+        "control_valve_cmd": 0.0,
+        "heat_transfer_rate": -5.0
+      },
+      "expect": [
+        {
+          "output": "yValveClosed",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "transfer_just_above_limit",
+      "description": "5.1 kW is one test increment beyond the executable placeholder.",
+      "inputs": {
+        "control_valve_cmd": 0.0,
+        "heat_transfer_rate": 5.1
+      },
+      "expect": [
+        {
+          "output": "yValveClosed",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "thermal_soak_ends_one_step_before_delay",
+      "description": "A residual transfer episode that ends at 840 s never matures; the host soak exclusion remains independently required.",
+      "inputs": {
+        "control_valve_cmd": 0.0,
+        "heat_transfer_rate": [
+          {
+            "t": 0,
+            "value": 8.0
+          },
+          {
+            "t": 840,
+            "value": 0.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yValveClosed",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 0,
+          "to_s": 780,
+          "equals": true
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 840,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "mature_transfer_alarm_recovers",
+      "description": "A mature alarm clears immediately when transfer falls below the limit.",
+      "inputs": {
+        "control_valve_cmd": 0.0,
+        "heat_transfer_rate": [
+          {
+            "t": 0,
+            "value": 8.0
+          },
+          {
+            "t": 1200,
+            "value": 0.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yValveClosed",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 0,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 1200,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 1140,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 1200,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "two_short_transfer_episodes_reset",
+      "description": "Two short residual-transfer episodes separated by zero transfer do not accumulate.",
+      "inputs": {
+        "control_valve_cmd": 0.0,
+        "heat_transfer_rate": [
+          {
+            "t": 0,
+            "value": 8.0
+          },
+          {
+            "t": 600,
+            "value": 0.0
+          },
+          {
+            "t": 900,
+            "value": -8.0
+          },
+          {
+            "t": 1500,
+            "value": 0.0
+          }
+        ]
+      },
+      "expect": [
+        {
+          "output": "yValveClosed",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 0,
+          "to_s": 540,
+          "equals": true
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 600,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 900,
+          "to_s": 1440,
+          "equals": true
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 1500,
+          "to_s": 3000,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": false
+        }
+      ]
+    },
+    {
+      "name": "initial_transfer_obeys_delay",
+      "description": "A closed-and-transferring condition present at initialization waits for delayOnInit.",
+      "inputs": {
+        "control_valve_cmd": 0.0,
+        "heat_transfer_rate": 8.0
+      },
+      "expect": [
+        {
+          "output": "yValveClosed",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    },
+    {
+      "name": "natural_circulation_is_valid_finding",
+      "description": "Sustained thermosiphon transfer while the isolation command is closed is a real unintended path, even if the control valve itself later proves seated.",
+      "inputs": {
+        "control_valve_cmd": 0.0,
+        "heat_transfer_rate": -8.0
+      },
+      "expect": [
+        {
+          "output": "yValveClosed",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yTransferPresent",
+          "from_s": 0,
+          "to_s": 3000,
+          "equals": true
+        },
+        {
+          "output": "yFault",
+          "from_s": 0,
+          "to_s": 840,
+          "equals": false
+        },
+        {
+          "output": "yFault",
+          "from_s": 960,
+          "to_s": 3000,
+          "equals": true
+        }
+      ]
+    }
+  ]
+}

@@ -22,8 +22,8 @@ cxf-library/
 ├── tools/verify/                # Rust harness: loads each rule into the engine, runs vectors
 ```
 
-Equipment family keys: `ahu`, `vav`, `fpb`, `rtu`, `hp`, `fcu`, `chw`, `hw`, `erv`,
-`pmp`, `vfd`, `sys`, `tower`. Fault IDs live in a general namespace:
+Equipment family keys: `ahu`, `vav`, `fpb`, `rtu`, `hp`, `fcu`, `chw`, `hw`, `hx`,
+`erv`, `pmp`, `vfd`, `sys`, `tower`. Fault IDs live in a general namespace:
 `{EQUIP}-{NNNN}` — uppercase family key, four digits, contiguous from `0001`
 per family in authoring order. The folder name is the fault ID. The number
 carries no semantic meaning; provenance lives in each card's `source:` list.

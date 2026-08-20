@@ -40,10 +40,10 @@ Here's a real one — AHU-0016, simultaneous heating and cooling:
 
 ## What's inside
 
-- **134 verified fault rules** across thirteen equipment families — air handlers,
+- **137 verified fault rules** across fourteen equipment families — air handlers,
   VAV boxes, fan-powered terminals, rooftop units, heat pumps, chillers, cooling
-  towers, hot-water plants, fan coils, energy recovery ventilators, pumps, VFDs, and
-  cross-equipment sensor-health rules. The
+  towers, hot-water plants, hydronic heat exchangers, fan coils, energy recovery
+  ventilators, pumps, VFDs, and cross-equipment sensor-health rules. The
   [Fault Code Map](https://jscott3201.github.io/open-control-library/registry.html)
   lists them all.
 - **Point dictionaries** (`points/`) — every canonical point name grounded in
