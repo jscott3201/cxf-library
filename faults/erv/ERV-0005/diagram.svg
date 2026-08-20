@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2100 790" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="13">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7d8590"/>
+    </marker>
+  </defs>
+  <g>
+    <rect x="12" y="55" width="190" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="107" y="74" text-anchor="middle" fill="#1e3a8a">erv_supply_airflow</text>
+    <rect x="12" y="185" width="195" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="109" y="204" text-anchor="middle" fill="#1e3a8a">erv_exhaust_airflow</text>
+    <rect x="12" y="692" width="130" height="30" rx="15" fill="#dbeafe" stroke="#3b82f6"/>
+    <text x="77" y="711" text-anchor="middle" fill="#1e3a8a">erv_enabled</text>
+  </g>
+  <g fill="#f6f8fa" stroke="#57606a">
+    <rect x="260" y="35" width="160" height="54" rx="6"/><rect x="260" y="165" width="160" height="54" rx="6"/>
+    <rect x="480" y="100" width="140" height="54" rx="6"/><rect x="690" y="100" width="225" height="54" rx="6"/>
+    <rect x="930" y="55" width="170" height="54" rx="6"/>
+    <rect x="930" y="150" width="230" height="54" rx="6"/>
+    <rect x="470" y="320" width="230" height="54" rx="6"/><rect x="470" y="505" width="230" height="54" rx="6"/>
+    <rect x="930" y="320" width="170" height="54" rx="6"/><rect x="930" y="505" width="170" height="54" rx="6"/>
+    <rect x="1160" y="320" width="230" height="54" rx="6"/><rect x="1160" y="505" width="230" height="54" rx="6"/>
+    <rect x="1425" y="320" width="190" height="54" rx="6"/><rect x="1425" y="505" width="190" height="54" rx="6"/>
+    <rect x="1665" y="320" width="180" height="54" rx="6"/><rect x="1665" y="505" width="180" height="54" rx="6"/>
+    <rect x="1905" y="412" width="145" height="54" rx="6"/>
+  </g>
+  <g fill="#24292f" text-anchor="middle" font-weight="bold">
+    <text x="332" y="57" font-size="12">absSupply</text><text x="332" y="187" font-size="12">absExhaust</text><text x="550" y="122">flowSum</text>
+    <text x="803" y="122">meanFlow</text><text x="1015" y="77">flowOk</text><text x="1045" y="172">allowedDiff</text>
+    <text x="570" y="342" font-size="10">supplyMinusExhaust</text><text x="570" y="527" font-size="10">exhaustMinusSupply</text>
+    <text x="1007" y="342" font-size="11">supplyHigh</text><text x="1007" y="527" font-size="11">exhaustHigh</text>
+    <text x="1255" y="342" font-size="11">supplyEvaluable</text><text x="1255" y="527" font-size="11">exhaustEvaluable</text>
+    <text x="1510" y="342" font-size="12">supplyArmed</text><text x="1510" y="527" font-size="12">exhaustArmed</text>
+    <text x="1755" y="342">supplyHeld</text><text x="1755" y="527">exhaustHeld</text><text x="1977" y="434">anyHeld</text>
+  </g>
+  <g fill="#57606a" text-anchor="middle" font-size="11">
+    <text x="332" y="75">Reals.Abs</text><text x="332" y="205">Reals.Abs</text><text x="550" y="140">Reals.Add</text>
+    <text x="803" y="140" text-anchor="middle">MultiplyByParameter · 0.5</text><text x="1015" y="95">GreaterThreshold · 100 L/s</text>
+    <text x="1045" y="190" text-anchor="middle">MultiplyByParameter · 0.15</text><text x="570" y="360">Reals.Subtract</text><text x="570" y="545">Reals.Subtract</text>
+    <text x="1007" y="360" font-size="10">Reals.Greater</text><text x="1007" y="545" font-size="10">Reals.Greater</text>
+    <text x="1255" y="360">Logical.And</text><text x="1255" y="545">Logical.And</text>
+    <text x="1510" y="360">Logical.And</text><text x="1510" y="545">Logical.And</text>
+    <text x="1755" y="360" text-anchor="middle">TrueDelay · 900 s</text><text x="1755" y="545" text-anchor="middle">TrueDelay · 900 s</text><text x="1977" y="452">Logical.Or</text>
+  </g>
+  <g>
+    <rect x="1140" y="45" width="110" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/><text x="1195" y="64" text-anchor="middle" fill="#7f1d1d">yFlowOk</text>
+    <rect x="1450" y="270" width="140" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/><text x="1520" y="289" text-anchor="middle" fill="#7f1d1d">ySupplyHigh</text>
+    <rect x="1450" y="585" width="145" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/><text x="1522" y="604" text-anchor="middle" fill="#7f1d1d">yExhaustHigh</text>
+    <rect x="1990" y="525" width="85" height="30" rx="15" fill="#fee2e2" stroke="#dc2626"/><text x="2032" y="544" text-anchor="middle" fill="#7f1d1d">yFault</text>
+  </g>
+  <g stroke="#7d8590" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+    <path d="M 202 70 H 256"/><path d="M 207 200 H 256"/><path d="M 405 62 H 445 V 115 H 476"/><path d="M 405 192 H 445 V 139 H 476"/>
+    <path d="M 620 127 H 686"/><path d="M 860 127 H 890 V 82 H 926"/><path d="M 860 127 H 890 V 177 H 926"/><path d="M 1100 82 H 1136"/>
+    <path d="M 202 70 H 430 V 334 H 466"/><path d="M 207 200 H 440 V 360 H 466"/>
+    <path d="M 207 200 H 420 V 519 H 466"/><path d="M 202 70 H 410 V 545 H 466"/>
+    <path d="M 670 347 H 926"/><path d="M 670 532 H 926"/><path d="M 1120 177 H 1140 V 362 H 1125 V 532 H 1089"/>
+    <path d="M 1120 177 H 1135 V 362 H 1089"/>
+    <path d="M 1085 347 H 1156"/><path d="M 1085 532 H 1156"/>
+    <path d="M 1100 82 H 1125 V 333 H 1156"/><path d="M 1100 82 H 1115 V 518 H 1156"/>
+    <path d="M 1350 347 H 1421"/><path d="M 1350 347 H 1410 V 285 H 1446"/><path d="M 1350 532 H 1421"/><path d="M 1350 532 H 1410 V 600 H 1446"/>
+    <path d="M 142 707 H 1390 V 362 H 1421"/><path d="M 142 707 H 1400 V 547 H 1421"/>
+    <path d="M 1595 347 H 1661"/><path d="M 1595 532 H 1661"/><path d="M 1845 347 H 1880 V 426 H 1901"/><path d="M 1845 532 H 1880 V 452 H 1901"/>
+    <path d="M 1977 466 V 521"/>
+  </g>
+  <text x="260" y="758" fill="#7d8590" font-size="11">Cross-multiplication avoids divide-by-zero. Flow-gated direction flags remain immediate; each enabled direction must survive its own delay before the fault OR.</text>
+</svg>

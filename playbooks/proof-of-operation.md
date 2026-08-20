@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Applies to** | AHU-0039 (supply fan), PMP-0003 (pump), HW-0009 (boiler) |
+| **Applies to** | AHU-0039 (supply fan), PMP-0003 (pump), HW-0009 (boiler), ERV-0004 (active recovery device) |
 | **Fix complexity** | Remote (40%) · On-site (60%) |
 | **Typical time** | 5–15 min remote; 30 min–2 h on-site |
 | **Typical cost** | $0 remote / $100–$800 on-site (belt, contactor, overload reset; motor or drive repairs run higher) |
@@ -34,6 +34,10 @@ paraphrased.
    lockout code at the boiler. **Never bypass or repeatedly reset a
    safety lockout to clear an FDD alarm**; repeated lockout-retry cycles
    also surface as short-cycling (HW-0002).
+5. Active recovery (ERV-0004): identify the technology before interpreting
+   proof. Wheel speed/rotation can prove the media; motor current alone cannot
+   prove a belt. Runaround-loop pump proof has the same current/flow distinction
+   as PMP-0003. Passive plate cores have no proof rule.
 
 ## Step 2 — Remote fix
 

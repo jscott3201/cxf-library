@@ -8,11 +8,11 @@
     },
     "s223": {
       "iri": "http://data.ashrae.org/standard223#",
-      "verified_version": "v1.0.0-2026"
+      "verified_version": "1.0.0-ppr.2.1"
     },
     "s223_g36": {
       "iri": "http://data.ashrae.org/standard223/1.0/extensions/g36#",
-      "verified_version": "v1.0.0-2026"
+      "verified_version": "1.0.0-ppr.2.1"
     },
     "quantitykind": {
       "iri": "http://qudt.org/vocab/quantitykind/",
@@ -23,7 +23,7 @@
       "verified_version": "QUDT 3.1.4"
     }
   },
-  "notes": "Energy recovery ventilator point dictionary. Exhaust-side verified in Brick 1.4.4; the post-recovery outdoor-air temperature has no Brick class and is provisional. The sensible-effectiveness computation (ERV-0001) uses the three ERV-local temperatures; oat is the site sensor used by frost protection (ERV-0002) and typically coincides with erv_oa_entering_temp when the ERV inlet sensor is the site sensor.",
+  "notes": "Energy recovery ventilator point dictionary. Exhaust-side, supply/exhaust airflow, and generic command/status classes verified in Brick 1.4.4. ASHRAE 223 terms were checked against ontology artifact 223p-1.0.0-ppr2.1.ttl (owl:versionInfo 1.0.0-ppr.2.1; SHA-256 1f156f9938c0be430d2216e01e31bb183c438ba318d8d4a23d2f074ebcd6f573), not an inferred final 2026 release label. The post-recovery outdoor-air temperature and technology-specific active-recovery attachments are provisional. ERV-0001 uses three ERV-local temperatures; ERV-0002/0003 use the site OAT and actual frost state; ERV-0004 requires a final command plus independent physical proof; ERV-0005 requires comparable post-recovery supply and building-exhaust flow measurements.",
   "points": [
     {
       "name": "erv_oa_entering_temp",
@@ -134,6 +134,80 @@
       },
       "provisional": false,
       "notes": "brick:Enable_Status grep-verified in Brick 1.4.4."
+    },
+    {
+      "name": "erv_recovery_cmd",
+      "description": "Final command to operate the ERV's active recovery device",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "Start_Stop_Command",
+      "s223": {
+        "pattern": "EnumeratedActuatableProperty on the active recovery component via hasProperty",
+        "property_class": "EnumeratedActuatableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": true,
+      "notes": "brick:Start_Stop_Command is exact and equipment-agnostic in Brick 1.4.4, but the owning active component is technology-specific and therefore provisional here: attach to the wheel drive, runaround pump, or other commanded recovery component, not merely to the ERV enable. This is the FINAL command after frost, bypass, smoke, and safety logic; an upstream request can disagree with correct internal sequencing and manufacture ERV-0004. ASHRAE 223 uses an EnumeratedActuatableProperty with Binary-OnOff on that component."
+    },
+    {
+      "name": "erv_recovery_status",
+      "description": "Independent proof that the ERV's active recovery device is operating",
+      "kind": "bool",
+      "unit": "bool",
+      "qudt_unit": null,
+      "brick": "On_Off_Status",
+      "s223": {
+        "pattern": "EnumeratedObservableProperty on the active recovery component via hasProperty",
+        "property_class": "EnumeratedObservableProperty",
+        "quantitykind": null,
+        "unit": null,
+        "medium": null,
+        "aspects": [],
+        "enumerationkind": "Binary-OnOff"
+      },
+      "provisional": true,
+      "notes": "Brick 1.4.4 has no recovery-wheel run-status class; generic brick:On_Off_Status is the honest cross-technology mapping and the equipment attachment is provisional. Bind independent physical proof: wheel rotation/speed above its commissioned minimum, runaround-pump current/flow proof, or equivalent. A command echo or auxiliary point sourced from the same relay is not proof and makes ERV-0004 structurally blind."
+    },
+    {
+      "name": "erv_supply_airflow",
+      "description": "Post-recovery supply stream airflow through the energy-recovery device",
+      "kind": "real",
+      "unit": "L/s",
+      "qudt_unit": "L-PER-SEC",
+      "brick": "Supply_Air_Flow_Sensor",
+      "s223": {
+        "pattern": "FlowSensor observes QuantifiableObservableProperty at the ERV connection point with hasRole Role-Supply",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "VolumeFlowRate",
+        "unit": "L-PER-SEC",
+        "medium": "Fluid-Air",
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "brick:Supply_Air_Flow_Sensor is exact in Brick 1.4.4 for the post-recovery supply side. An upstream intake measurement is brick:Outside_Air_Flow_Sensor and is not interchangeable where bypass or leakage exists. In ASHRAE 223, location and Role-Supply live on the ERV connection point/topology (the role is not a property aspect); the FlowSensor observes a VolumeFlowRate property in L/s. Bind the stream actually traversing the recovery device, on the same averaging basis as erv_exhaust_airflow."
+    },
+    {
+      "name": "erv_exhaust_airflow",
+      "description": "Building exhaust stream airflow through the energy-recovery device",
+      "kind": "real",
+      "unit": "L/s",
+      "qudt_unit": "L-PER-SEC",
+      "brick": "Exhaust_Air_Flow_Sensor",
+      "s223": {
+        "pattern": "FlowSensor observes QuantifiableObservableProperty at the ERV connection point with hasRole Role-Exhaust",
+        "property_class": "QuantifiableObservableProperty",
+        "quantitykind": "VolumeFlowRate",
+        "unit": "L-PER-SEC",
+        "medium": "Fluid-Air",
+        "aspects": []
+      },
+      "provisional": false,
+      "notes": "brick:Exhaust_Air_Flow_Sensor is exact in Brick 1.4.4. In ASHRAE 223, location and Role-Exhaust live on the ERV connection point/topology (the role is not a property aspect). Bind the building-exhaust stream at a location comparable to erv_supply_airflow and with the same sign convention and averaging interval; ERV-0005 requires finite, nonnegative L/s values and does not repair reversed sensor polarity."
     }
   ]
 }

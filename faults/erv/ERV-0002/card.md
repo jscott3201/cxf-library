@@ -178,14 +178,10 @@ out of service, neither of which this rule can meter.
 
 ## Notes
 
-Remediation has no step list in the
-[erv-effectiveness](../../../playbooks/erv-effectiveness.md) playbook — that
-document is written around a fouled or stalled recovery device (ERV-0001) and
-the reference folds this fix into the same page. The order the four causes imply
-is: confirm the outdoor-air reading against a second sensor or the local weather
-station first, because a warm-reading OAT sensor is the cheapest cause and the
-one that makes every other test misleading; then check whether the sequence is
-enabled in the BAS at all; then command the frost output manually and watch the
-damper, valve, or wheel respond; then verify the preheat source has hot water or
-power. A unit that ran unprotected through a cold snap should have its core
-inspected for damage before it is trusted again.
+The [erv-effectiveness](../../../playbooks/erv-effectiveness.md) playbook now
+starts with a dedicated mode/frost-state check: verify the OAT against a second
+local sensor, confirm the point means active protection rather than a permissive,
+and exercise one safe transition through the installed sequence. Continue by
+checking the damper, valve, wheel, or preheat source that implements protection.
+A unit that ran unprotected through a cold snap should have its core inspected
+for damage before it is trusted again.
