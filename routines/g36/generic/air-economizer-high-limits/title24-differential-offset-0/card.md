@@ -1,8 +1,8 @@
-# Title 24 zone 2 differential dry-bulb economizer high limit
+# Title 24 zero-offset differential dry-bulb economizer high limit
 
 | Field | Value |
 |---|---|
-| Routine ID | `G36-GEN-AEHL__title24-differential-offset-1` |
+| Routine ID | `G36-GEN-AEHL__title24-differential-offset-0` |
 | Status | `source_evidenced` |
 | Evidence | E3 |
 | Runtime profile | `HostTick-v1` |
@@ -10,15 +10,15 @@
 ## Purpose
 
 This fixed specialization computes the outdoor-air economizer temperature
-cutoff for California Title 24 climate zone 2 with differential dry-bulb
-control. It is one executable variant of
-`Buildings.Controls.OBC.ASHRAE.G36.Generic.AirEconomizerHighLimits`.
+cutoff for the California Title 24 differential dry-bulb zero-offset bucket.
+The source groups climate zones 1, 3, 5, and 11 through 16 in this bucket. The
+fixture selects zone 1 as its representative fixed configuration.
 
 Fixed parameters:
 
 - `eneStd = Buildings.Controls.OBC.ASHRAE.G36.Types.EnergyStandard.California_Title_24`
 - `ecoHigLimCon = Buildings.Controls.OBC.ASHRAE.G36.Types.ControlEconomizer.DifferentialDryBulb`
-- `tit24CliZon = Buildings.Controls.OBC.ASHRAE.G36.Types.Title24ClimateZone.Zone_2`
+- `tit24CliZon = Buildings.Controls.OBC.ASHRAE.G36.Types.Title24ClimateZone.Zone_1`
 
 ## Interface and behavior
 
@@ -30,21 +30,23 @@ Fixed parameters:
 For this specialization:
 
 ```text
-TCut = TRet - 1 K
+TCut = TRet
 ```
 
-The fixture represents the selected zone 2/4/10 source branch with
-`Buildings.Controls.OBC.CDL.Reals.AddParameter(p=-1)`. It has no state,
-optional connectors, or host services beyond the tick call.
+The upstream zero-offset bucket selects the direct `TRet` branch. The donor
+fixture makes the reduced signal path explicit with
+`Buildings.Controls.OBC.CDL.Reals.AddParameter(p=0)`. That identity block is
+fixture-local; it is not part of the upstream branch topology. The routine has
+no state, optional connectors, or host services beyond the tick call.
 
 ![Signal flow](diagram.svg)
 
 ## Replay and evidence
 
 `vectors.json` replays all four donor reference rows with zero absolute
-tolerance: 289.25 → 288.25 K at 0 s, 293.15 → 292.15 K at 1 s, 297.5 →
-296.5 K at 2 s, and 301.75 → 300.75 K at 3 s. The graph and files under
-`golden/` are preserved from the donor and hash-locked in `provenance.json`.
+tolerance. At 0, 1, 2, and 3 seconds, `TRet` and `TCut` are equal: 289.25,
+293.15, 297.5, and 301.75 K. The graph and files under `golden/` are preserved
+from the donor and hash-locked in `provenance.json`.
 
 The stable routine ID names the human contract. The evaluator-derived content
 ID is recorded separately in `provenance.json`.
@@ -63,7 +65,9 @@ donor-set, or G36 coverage.
 
 Arrays, member lists, enum-domain inputs, optional or package connectors,
 state, controller traces, other climate-zone offsets, and fixed dry-bulb or
-other AirEconomizerHighLimits variants are outside this bundle. E4/E5,
+other AirEconomizerHighLimits variants are outside this bundle. Although the
+observable mapping equals the ASHRAE differential variant, the fixed
+parameters and source branch differ; the two routines are not aliases. E4/E5,
 Modelica execution, and EnergyPlus execution are not claimed.
 
 ## References
