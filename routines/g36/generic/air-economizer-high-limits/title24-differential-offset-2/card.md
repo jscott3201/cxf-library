@@ -53,7 +53,7 @@ ID is recorded separately in `provenance.json`.
 ## Completeness
 
 - Donor configuration: complete for this fixed variant.
-- Canonical class: partial; 4 of 12 donor variants are present.
+- Canonical class: partial; 5 of 12 donor variants are present.
 - Family package: not applicable to this leaf.
 - Declared guideline profile: partial.
 
@@ -64,8 +64,7 @@ donor-set, or G36 coverage.
 
 Arrays, member lists, enum-domain inputs, optional or package connectors,
 state, controller traces, other climate-zone offsets, and fixed dry-bulb or
-other AirEconomizerHighLimits variants are outside this bundle. The Title 24
-zone 7 offset-3 specialization is outside this bundle. E4/E5, Modelica
+other AirEconomizerHighLimits variants are outside this bundle. E4/E5, Modelica
 execution, and EnergyPlus execution are not claimed.
 
 ## References
