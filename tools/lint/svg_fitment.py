@@ -22,7 +22,7 @@ unchecked -- they have no box to overflow. An enclosed label must clear both
 rect edges by MIN_INSET px.
 
 Usage: `svg_fitment.py [path ...]`. With no arguments it lints the whole repo:
-faults/*/*/diagram.svg plus assets/*.svg. Exits 1 if any label overflows.
+fault diagrams, routine diagrams, and assets/*.svg. Exits 1 if any label overflows.
 """
 
 import html
@@ -36,7 +36,7 @@ TOLERANCE = 0.5  # px of slack before an overflow is worth reporting
 DEFAULT_FONT_SIZE = 13.0  # px, when no ancestor declares one
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-SCOPE = ("faults/*/*/diagram.svg", "assets/*.svg")
+SCOPE = ("faults/*/*/diagram.svg", "routines/**/diagram.svg", "assets/*.svg")
 
 TAG_RE = re.compile(r"<(/?)(svg|g|text|rect)\b([^>]*)>", re.S)
 ATTR_RE = re.compile(r'([\w:.-]+)\s*=\s*"([^"]*)"')

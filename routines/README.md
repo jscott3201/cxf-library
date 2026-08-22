@@ -1,11 +1,11 @@
 # Routine catalog
 
-Status: **zero executable routines**. Nothing in this namespace is implemented
-or verified yet.
+Status: **one executable routine**, source-evidenced at E3.
 
-`registry.json` is the executable routine inventory. It contains an empty
-`routines` array. `g36/coverage.json` records the non-claiming G36 profile
-zero-state; it is not a second inventory.
+`registry.json` is the executable routine inventory. `g36/coverage.json`
+records aggregate scope without duplicating that inventory. The current entry
+is one scalar specialization of G36 Generic AirEconomizerHighLimits; it does
+not establish class, family, donor-set, or guideline completeness.
 
 Revision ownership is explicit:
 
@@ -16,9 +16,15 @@ Revision ownership is explicit:
 
 The pin files are authoritative. See the routine catalog section in
 [`SCHEMA.md`](../SCHEMA.md) for row identities, allowed values, and path rules.
-Run `python3 tools/lint/routines.py` from the repository root to validate the
-catalog.
+Validate and replay the catalog from the repository root:
 
-Interface ABI, vectors, cards or frontmatter, provenance bundles, package
-acceptance, member-list or array support, and executable verification remain
-deferred.
+```sh
+python3 tools/lint/routines.py
+cargo run --manifest-path tools/verify/Cargo.toml -- --routines
+```
+
+Pass `--donor-root <open-control-checkout>` to compare copied artifacts
+byte-for-byte with that checkout. CI first verifies the checkout at `DONOR_PIN`.
+
+Arrays, member lists, enum domains, optional connectors, packages, controller
+traces, and E4/E5 evidence remain deferred.

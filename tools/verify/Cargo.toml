@@ -3,7 +3,7 @@ name = "cxf-verify"
 version = "0.1.0"
 edition = "2024"
 publish = false
-description = "Loads each fault rule's CXF into the open-control engine and replays its vectors.json scenarios"
+description = "Loads OCL CXF graphs into the open-control engine and replays their vector scenarios"
 
 [dependencies]
 oce-api = { path = "../../../open-control/crates/oce-api" }
