@@ -2,10 +2,10 @@
   "schema": "cxf-library/g36-coverage/v1",
   "profile": "G36-2021-private-audit",
   "completeness": {
-    "donor_configuration": "unknown",
-    "canonical_class": "unknown",
+    "donor_configuration": "partial",
+    "canonical_class": "partial",
     "family_package": "unknown",
-    "guideline_profile": "unknown"
+    "guideline_profile": "partial"
   },
   "areas": [],
   "claims": []

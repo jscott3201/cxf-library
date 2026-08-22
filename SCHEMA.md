@@ -18,9 +18,9 @@ cxf-library/
 ├── faults/<equip>/README.md     # chapter index and status table
 ├── playbooks/<slug>.md          # remediation playbooks (shared across faults)
 ├── clusters/clusters.json       # fault clusters (syndromes with shared root cause)
-├── routines/                    # routine catalog; no executable routines in this version
+├── routines/                    # executable control-routine catalog
 │   ├── registry.json            # executable routine inventory
-│   └── g36/                     # G36 source pins and coverage declaration
+│   └── g36/                     # G36 pins, coverage, and fixed-variant bundles
 ├── tools/verify/                # Rust harness: loads each rule into the engine, runs vectors
 ```
 
@@ -47,12 +47,10 @@ are allowed: they appear in prose and index tables marked planned/deferred,
 never in the registry, and the next authored rule in that family takes the
 next free number, honoring any reservation.
 
-## Routine catalog foundation
+## Routine catalog
 
-The routine catalog is an explicit zero-state. It defines identities,
-provenance pins, and validation boundaries, but contains no implemented or
-verified routines. These contracts do not change any fault contract or fault
-schema identifier.
+Routine contracts are independent of fault contracts. Nothing in this section
+changes a fault schema identifier or fault behavior.
 
 Pin ownership is split by purpose:
 
@@ -69,10 +67,9 @@ authoritative locations for these revisions.
 
 The registry is an object with exactly two keys: `schema` and `routines`.
 `schema` is `cxf-library/routine-registry/v1`; `routines` is an array. The
-registry owns the executable routine inventory. In this foundation version,
-the production array is empty.
+registry owns the executable routine inventory.
 
-Future rows have exactly these keys:
+Rows have exactly these keys:
 
 | Field | Type | Contract |
 |---|---|---|
@@ -102,6 +99,105 @@ Every `completeness` object has exactly these keys:
 `guideline_profile`. Each value is `complete`, `partial`, `not_applicable`, or
 `unknown`.
 
+### Executable variant bundle
+
+A registered path resolves below `routines/`. Each executable fixed-variant
+directory contains:
+
+- `card.md`: independently authored purpose, specialization, interface,
+  behavior, evidence, completeness, exclusions, and references;
+- `routine.cxf.jsonld`: the executable CXF graph;
+- `interface.json`: the scalar host interface;
+- `vectors.json`: deterministic scalar replay scenarios;
+- `diagram.svg`: an original signal-flow diagram;
+- `provenance.json`: pinned source, donor, runtime, and artifact evidence; and
+- optional `golden/` files preserved byte-for-byte from the donor.
+
+The registry and bundle directories MUST be a bijection. A registered bundle
+has every required file, and no unregistered directory contains
+`routine.cxf.jsonld`. Modelica-derived non-fragment bundles also carry the
+preserved Buildings license and a third-party notice.
+
+### `interface.json` (`cxf-library/routine-interface/v1`)
+
+The top-level object has exactly `schema`, `routine_id`, `tick_profile`, and
+`connectors`. `schema` is `cxf-library/routine-interface/v1`; `routine_id`
+matches the registry; `tick_profile` is `HostTick-v1`.
+
+This v1 interface defines only scalar Real connectors. Each connector has
+exactly `id`, `direction`, `value_type`, `unit`, `quantity`, and `shape`.
+`id` is a unique ASCII identifier, `direction` is `input` or `output`,
+`value_type` is `real`, `unit` and `quantity` are nonempty strings, and
+`shape` is `scalar`. Connector declarations MUST equal the root CXF input and
+output declarations, including direction, type, unit, and quantity.
+
+### `vectors.json` (`cxf-library/routine-vectors/v1`)
+
+The top-level object has exactly `schema`, `routine_id`, `clock`, and
+`scenarios`. `schema` is `cxf-library/routine-vectors/v1`, and `routine_id`
+matches the registry. `clock` has exactly positive finite `step_s` and finite
+non-negative `horizon_s` values.
+
+`scenarios` is a nonempty array. Each scenario has exactly `name`, `inputs`,
+and `expect`. Inputs use declared input connector IDs and are either finite
+scalar numbers or ordered steps of exactly `{t, value}`. Expectations have
+exactly `output`, `from_s`, `to_s`, `equals`, and `tolerance`; they use a
+declared output, finite scalar numbers, an inclusive window, and a
+non-negative absolute tolerance. Scenarios execute in fresh engines.
+
+Relative tolerance, CSV trace ingestion, non-scalar values, and controller
+trace semantics are not part of this contract.
+
+### `provenance.json` (`cxf-library/routine-provenance/v1`)
+
+The top-level object has exactly `schema`, `routine_id`, `runtime`, `donor`,
+`upstream`, `fixed_parameters`, `implementation`, `donor_columns`, `artifacts`,
+`evidence`, and `private_reference`.
+
+- `runtime` has exactly `repository`, `commit`, `tick_profile`, and
+  `content_id`. The commit equals `ENGINE_PIN`, the tick profile is
+  `HostTick-v1`, and `content_id` is the evaluator-derived identity. This
+  identity is separate from the stable human `routine_id`.
+- `donor` has exactly `repository` and `commit`; its commit equals `DONOR_PIN`.
+  `upstream` has exactly `repository`, `commit`, `canonical_class`, and
+  `source_file`. Its commit equals `SOURCE_PIN`, its canonical class equals the
+  registry row, and its source file is a safe nonempty upstream-relative path.
+- `fixed_parameters` is a nonempty object keyed by ASCII identifiers. Values
+  are JSON strings, numbers, booleans, or null; numbers MUST be finite. The
+  root CXF parameters MUST have the same keys and values.
+- `implementation` records a safe nonempty selected source branch and block
+  class. Its `parameters` object is keyed by ASCII identifiers and contains
+  finite scalar numbers. The root CXF contains exactly one block of that class
+  with exactly those parameters.
+- `donor_columns` has exactly `time` and `connectors`. `time` names the donor
+  reference time column. `connectors` maps every interface connector ID to one
+  unique donor column name, including mappings where donor and CXF names
+  differ. Column names are ASCII identifiers and the time column is distinct.
+- Each `artifacts` row has exactly `role`, `local_path`, `donor_path`, and
+  `sha256`. Roles are unique lowercase snake-case identifiers. Paths are safe
+  relative POSIX paths with no backslashes, empty or dot segments, or
+  traversal; paths within each column are unique. Local hashes MUST match the
+  files. When donor parity is requested, copied bytes MUST equal the files at
+  `donor_path`. E3 bundles include `graph`, `structural_oracle`, and
+  `donor_reference` roles plus at least one `provenance` or
+  `*_provenance` role. Exactly the `graph` artifact has local path
+  `routine.cxf.jsonld`; other artifact names and locations are bundle-owned.
+- The donor-reference artifact has one `# columns:` header and finite numeric
+  rows. Its mapped time values are non-negative and strictly increasing. It
+  contains the mapped time and every declared connector column. Routine
+  vectors MUST cover every mapped input and output value at every donor time;
+  donor-reference output expectations use point windows and zero tolerance.
+- `evidence` rows have exactly `tier`, `status`, and `artifact`. Evidence tiers
+  are ordered and contiguous from E0, statuses are `complete`, and artifact
+  paths are safe and present. The registry tier cannot exceed the highest
+  completed evidence tier.
+- `private_reference` has exactly `profile`, `audit_status`, and `sections`.
+  This scalar v1 requires `audit_status: not_used` and empty `sections`; no
+  private text or local path is recorded.
+
+Registry status, evidence tier, and completeness MUST not exceed the completed
+provenance evidence.
+
 ### `routines/g36/coverage.json` (`cxf-library/g36-coverage/v1`)
 
 Coverage declares profile scope and claims; it does not repeat the registry's
@@ -110,15 +206,15 @@ inventory. The top-level object has exactly `schema`, `profile`,
 `cxf-library/g36-coverage/v1`, and `profile` is a nonempty string.
 `completeness` uses the same exact four-axis object as a registry row.
 
-For this foundation version, `areas` and `claims` MUST be empty arrays. While
-the registry is empty, all four coverage completeness values MUST be
-`unknown`. Pin fields and an `implemented_variants` inventory do not belong in
-coverage.
+In this version, `areas` and `claims` MUST remain empty arrays. While the
+registry is empty, all four coverage completeness values MUST be `unknown`.
+For a nonempty registry, an aggregate axis may be `complete` only when every
+applicable registry row is `complete` for that axis. Pin fields and an
+`implemented_variants` inventory do not belong in coverage.
 
-The interface ABI, routine vector format, routine card or frontmatter,
-provenance bundle, package acceptance, member-list or array support, and
-executable verification are deferred. This version does not define those
-contracts.
+Arrays, vectors or member lists, enum-domain behavior, optional connectors,
+host services beyond `HostTick-v1`, package acceptance or composition, and E4
+or E5 claims are deferred.
 
 ## Design stance (why the pieces split this way)
 

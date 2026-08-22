@@ -24,6 +24,20 @@ jobs:
           ref: ${{ steps.pin.outputs.rev }}
           path: open-control
 
+      - name: Read routine donor pin
+        id: donor-pin
+        run: echo "rev=$(cat cxf-library/routines/g36/DONOR_PIN)" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout routine donor at pin
+        uses: actions/checkout@v4
+        with:
+          repository: jscott3201/open-control-engine
+          ref: ${{ steps.donor-pin.outputs.rev }}
+          path: open-control-donor
+
+      - name: Verify routine donor checkout
+        run: test "$(git -C open-control-donor rev-parse HEAD)" = "$(cat cxf-library/routines/g36/DONOR_PIN)"
+
       - name: svg fitment lint
         working-directory: cxf-library
         run: python3 tools/lint/svg_fitment.py
@@ -36,13 +50,17 @@ jobs:
         working-directory: cxf-library
         run: |
           python3 -m unittest discover -s tools/lint/tests -v
-          python3 tools/lint/routines.py
+          python3 tools/lint/routines.py --donor-root ../open-control-donor
 
       - uses: dtolnay/rust-toolchain@stable
 
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: cxf-library/tools/verify
+
+      - name: Verify routine library
+        working-directory: cxf-library
+        run: cargo run --manifest-path tools/verify/Cargo.toml -- --routines
 
       - name: Lint and verify fault library
         working-directory: cxf-library

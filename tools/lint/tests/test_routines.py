@@ -1,7 +1,9 @@
 import contextlib
 import copy
+import hashlib
 import io
 import json
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -9,6 +11,8 @@ from pathlib import Path
 from tools.lint import routines as routine_lint
 
 
+PRODUCT_ROOT = Path(__file__).resolve().parents[3]
+BUNDLE_PATH = "g36/generic/air-economizer-high-limits/ashrae-differential-dry-bulb"
 PINS = {
     "routines/g36/SOURCE_PIN": "a131864e4c4df22ebcd52bb8da439de0087ac365\n",
     "routines/g36/DONOR_PIN": "41e997fd130c5e454446b40bcc3ba576429876b4\n",
@@ -41,6 +45,7 @@ class RoutineLintTests(unittest.TestCase):
     def setUp(self):
         self.temporary_directory = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary_directory.name)
+        self.write_text("ENGINE_PIN", "e2ff2f84577d9be65a49e6cb5440c223f6126817\n")
         self.write_registry([])
         self.write_coverage()
         for relative_path, value in PINS.items():
@@ -83,6 +88,260 @@ class RoutineLintTests(unittest.TestCase):
             f"{expected!r} not found in {errors!r}",
         )
         return errors
+
+    def read_json(self, relative_path):
+        return json.loads((self.root / relative_path).read_text(encoding="utf-8"))
+
+    def install_production_bundle(self):
+        source = PRODUCT_ROOT / "routines" / BUNDLE_PATH
+        destination = self.root / "routines" / BUNDLE_PATH
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source, destination)
+        self.write_json(
+            "routines/registry.json",
+            json.loads((PRODUCT_ROOT / "routines/registry.json").read_text(encoding="utf-8")),
+        )
+        self.write_json(
+            "routines/g36/coverage.json",
+            json.loads(
+                (PRODUCT_ROOT / "routines/g36/coverage.json").read_text(encoding="utf-8")
+            ),
+        )
+        return destination
+
+    def make_matching_donor(self, bundle):
+        donor = self.root / "donor"
+        provenance = json.loads((bundle / "provenance.json").read_text(encoding="utf-8"))
+        for artifact in provenance["artifacts"]:
+            source = bundle / artifact["local_path"]
+            destination = donor / artifact["donor_path"]
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(source, destination)
+        return donor
+
+    def install_alternate_scalar_bundle(self):
+        path = "g36/example/alternate-scalar"
+        bundle = self.root / "routines" / path
+        bundle.mkdir(parents=True)
+        routine_id = "G36-EXAMPLE-SCALAR__alternate"
+        canonical_class = "Example.Controls.AlternateScalar"
+        root_id = "http://example.org#alternate.scalar"
+        block_id = f"{root_id}.offset"
+        graph = {
+            "@context": {
+                "S231": "http://data.ashrae.org/S231P#",
+                "base": "http://example.org#",
+            },
+            "@graph": [
+                {
+                    "@id": root_id,
+                    "@type": f"http://example.org#{canonical_class}",
+                    "S231:hasParameter": {"@id": f"{root_id}.mode"},
+                    "S231:hasInput": {"@id": f"{root_id}.uAlt"},
+                    "S231:hasOutput": {"@id": f"{root_id}.yAlt"},
+                    "S231:containsBlock": {"@id": block_id},
+                },
+                {
+                    "@id": f"{root_id}.mode",
+                    "@type": "S231:Parameter",
+                    "S231:value": "alternate",
+                },
+                {
+                    "@id": f"{root_id}.uAlt",
+                    "@type": "S231:RealInput",
+                    "S231:isOfDataType": {"@id": "S231:Real"},
+                    "S231:unit": "K",
+                    "S231:quantity": "ThermodynamicTemperature",
+                },
+                {
+                    "@id": f"{root_id}.yAlt",
+                    "@type": "S231:RealOutput",
+                    "S231:isOfDataType": {"@id": "S231:Real"},
+                    "S231:unit": "K",
+                    "S231:quantity": "ThermodynamicTemperature",
+                },
+                {
+                    "@id": block_id,
+                    "@type": "http://example.org#Example.Blocks.Offset",
+                    "S231:hasParameter": {"@id": f"{block_id}.delta"},
+                },
+                {
+                    "@id": f"{block_id}.delta",
+                    "@type": "S231:Parameter",
+                    "S231:value": 0.0,
+                },
+            ],
+        }
+        interface = {
+            "schema": "cxf-library/routine-interface/v1",
+            "routine_id": routine_id,
+            "tick_profile": "HostTick-v1",
+            "connectors": [
+                {
+                    "id": "uAlt",
+                    "direction": "input",
+                    "value_type": "real",
+                    "unit": "K",
+                    "quantity": "ThermodynamicTemperature",
+                    "shape": "scalar",
+                },
+                {
+                    "id": "yAlt",
+                    "direction": "output",
+                    "value_type": "real",
+                    "unit": "K",
+                    "quantity": "ThermodynamicTemperature",
+                    "shape": "scalar",
+                },
+            ],
+        }
+        vectors = {
+            "schema": "cxf-library/routine-vectors/v1",
+            "routine_id": routine_id,
+            "clock": {"step_s": 1.0, "horizon_s": 1.0},
+            "scenarios": [
+                {
+                    "name": "alternate_reference",
+                    "inputs": {
+                        "uAlt": [
+                            {"t": 0.0, "value": 280.0},
+                            {"t": 1.0, "value": 281.5},
+                        ]
+                    },
+                    "expect": [
+                        {
+                            "output": "yAlt",
+                            "from_s": 0.0,
+                            "to_s": 0.0,
+                            "equals": 280.0,
+                            "tolerance": 0.0,
+                        },
+                        {
+                            "output": "yAlt",
+                            "from_s": 1.0,
+                            "to_s": 1.0,
+                            "equals": 281.5,
+                            "tolerance": 0.0,
+                        },
+                    ],
+                }
+            ],
+        }
+        self.write_json(f"routines/{path}/routine.cxf.jsonld", graph)
+        self.write_json(f"routines/{path}/interface.json", interface)
+        self.write_json(f"routines/{path}/vectors.json", vectors)
+        self.write_text(f"routines/{path}/card.md", "# Alternate scalar\n\n![Flow](diagram.svg)\n")
+        self.write_text(
+            f"routines/{path}/diagram.svg",
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"></svg>\n',
+        )
+        self.write_text(f"routines/{path}/LICENSE-BUILDINGS.html", "test license\n")
+        self.write_text(f"routines/{path}/THIRD_PARTY_NOTICES.md", "test notice\n")
+        self.write_text(f"routines/{path}/evidence/structure.txt", "alternate structure\n")
+        self.write_text(
+            f"routines/{path}/evidence/reference.dat",
+            "# columns: time source_value result_value\n"
+            "double alternate_reference(2,3)\n"
+            "0.0 280.0 280.0\n"
+            "1.0 281.5 281.5\n",
+        )
+        self.write_json(f"routines/{path}/evidence/reference.prov.json", {"source": "test"})
+        artifact_specs = [
+            ("graph", "routine.cxf.jsonld", "fixtures/alternate.jsonld"),
+            ("structural_oracle", "evidence/structure.txt", "fixtures/alternate.txt"),
+            ("donor_reference", "evidence/reference.dat", "goldens/alternate/reference.dat"),
+            (
+                "reference_provenance",
+                "evidence/reference.prov.json",
+                "goldens/alternate/reference.prov.json",
+            ),
+        ]
+        artifacts = [
+            {
+                "role": role,
+                "local_path": local_path,
+                "donor_path": donor_path,
+                "sha256": hashlib.sha256((bundle / local_path).read_bytes()).hexdigest(),
+            }
+            for role, local_path, donor_path in artifact_specs
+        ]
+        provenance = {
+            "schema": "cxf-library/routine-provenance/v1",
+            "routine_id": routine_id,
+            "runtime": {
+                "repository": "https://github.com/jscott3201/open-control-engine",
+                "commit": "e2ff2f84577d9be65a49e6cb5440c223f6126817",
+                "tick_profile": "HostTick-v1",
+                "content_id": f"cxf:fnv1a128:{'1' * 32}",
+            },
+            "donor": {
+                "repository": "https://github.com/jscott3201/open-control-engine",
+                "commit": "41e997fd130c5e454446b40bcc3ba576429876b4",
+            },
+            "upstream": {
+                "repository": "https://github.com/lbl-srg/modelica-buildings",
+                "commit": "a131864e4c4df22ebcd52bb8da439de0087ac365",
+                "canonical_class": canonical_class,
+                "source_file": "Buildings/Controls/Example/AlternateScalar.mo",
+            },
+            "fixed_parameters": {"mode": "alternate"},
+            "implementation": {
+                "selected_branch": "alternate scalar branch",
+                "block_class": "Example.Blocks.Offset",
+                "parameters": {"delta": 0.0},
+            },
+            "donor_columns": {
+                "time": "time",
+                "connectors": {"uAlt": "source_value", "yAlt": "result_value"},
+            },
+            "artifacts": artifacts,
+            "evidence": [
+                {"tier": "E0", "status": "complete", "artifact": "interface.json"},
+                {"tier": "E1", "status": "complete", "artifact": "vectors.json"},
+                {"tier": "E2", "status": "complete", "artifact": "evidence/reference.dat"},
+                {
+                    "tier": "E3",
+                    "status": "complete",
+                    "artifact": "evidence/reference.prov.json",
+                },
+            ],
+            "private_reference": {
+                "profile": "G36-2021-private-audit",
+                "audit_status": "not_used",
+                "sections": [],
+            },
+        }
+        self.write_json(f"routines/{path}/provenance.json", provenance)
+        row = {
+            "id": routine_id,
+            "class_id": "G36-EXAMPLE-SCALAR",
+            "variant_id": "alternate",
+            "name": "Alternate scalar",
+            "family": "example",
+            "level": "leaf",
+            "status": "source_evidenced",
+            "path": path,
+            "canonical_class": canonical_class,
+            "evidence_tier": "E3",
+            "completeness": {
+                "donor_configuration": "complete",
+                "canonical_class": "partial",
+                "family_package": "not_applicable",
+                "guideline_profile": "partial",
+            },
+        }
+        registry = self.read_json("routines/registry.json")
+        rows = registry["routines"] + [row]
+        self.write_registry(sorted(rows, key=lambda item: item["id"]))
+        self.write_coverage(
+            completeness={
+                "donor_configuration": "partial",
+                "canonical_class": "partial",
+                "family_package": "unknown",
+                "guideline_profile": "partial",
+            }
+        )
+        return bundle
 
     def test_valid_zero_state(self):
         self.assertEqual(routine_lint.validate(self.root), [])
@@ -263,7 +522,8 @@ class RoutineLintTests(unittest.TestCase):
 
         row["canonical_class"] = None
         self.write_registry([row])
-        self.assertEqual(routine_lint.validate(self.root), [])
+        errors = routine_lint.validate(self.root)
+        self.assertFalse(any("routines[0].canonical_class" in error for error in errors))
 
     def test_coverage_profile_and_completeness_contract(self):
         self.write_coverage(profile=" ")
@@ -278,6 +538,22 @@ class RoutineLintTests(unittest.TestCase):
         completeness["canonical_class"] = "complete"
         self.write_coverage(completeness=completeness)
         self.assert_error("must be 'unknown' while the registry is empty")
+
+        self.install_production_bundle()
+        coverage = self.read_json("routines/g36/coverage.json")
+        coverage["completeness"]["canonical_class"] = "complete"
+        self.write_json("routines/g36/coverage.json", coverage)
+        self.assert_error("unless every applicable registry row is complete")
+
+        registry = self.read_json("routines/registry.json")
+        registry["routines"][0]["completeness"]["canonical_class"] = "complete"
+        self.write_json("routines/registry.json", registry)
+        self.assertFalse(
+            any(
+                "coverage.json: completeness.canonical_class" in error
+                for error in routine_lint.validate(self.root)
+            )
+        )
 
     def test_nonempty_areas_and_claims_are_rejected(self):
         for key in ("areas", "claims"):
@@ -305,6 +581,154 @@ class RoutineLintTests(unittest.TestCase):
             ],
         )
         self.assertNotIn("Traceback", output.getvalue())
+
+    def test_production_shaped_bundle_and_donor_parity(self):
+        bundle = self.install_production_bundle()
+        donor = self.make_matching_donor(bundle)
+        self.assertEqual(routine_lint.validate(self.root), [])
+        self.assertEqual(routine_lint.validate(self.root, donor), [])
+
+    def test_alternate_scalar_bundle_uses_manifest_contracts(self):
+        production_bundle = self.install_production_bundle()
+        alternate_bundle = self.install_alternate_scalar_bundle()
+        donor = self.make_matching_donor(production_bundle)
+        self.make_matching_donor(alternate_bundle)
+        self.assertEqual(routine_lint.validate(self.root), [])
+        self.assertEqual(routine_lint.validate(self.root, donor), [])
+
+    def test_registry_bundle_bijection_and_required_files(self):
+        bundle = self.install_production_bundle()
+        (bundle / "interface.json").unlink()
+        self.assert_error("interface.json: required bundle file is missing")
+
+        self.install_production_bundle_after_cleanup(bundle)
+        (bundle / "LICENSE-BUILDINGS.html").unlink()
+        self.assert_error("required Modelica attribution file is missing")
+
+        self.write_registry([])
+        self.write_coverage()
+        self.assert_error("bundle has no registry row")
+
+    def test_bundle_identity_and_strict_shapes(self):
+        bundle = self.install_production_bundle()
+        interface = self.read_json(f"routines/{BUNDLE_PATH}/interface.json")
+        interface["routine_id"] = "G36-GEN-AEHL__wrong"
+        interface["extra"] = True
+        self.write_json(f"routines/{BUNDLE_PATH}/interface.json", interface)
+        errors = self.assert_error("interface.json: routine_id must equal")
+        self.assertTrue(any("unexpected extra" in error for error in errors))
+
+        self.install_production_bundle_after_cleanup(bundle)
+        vectors = self.read_json(f"routines/{BUNDLE_PATH}/vectors.json")
+        vectors["routine_id"] = "G36-GEN-AEHL__wrong"
+        self.write_json(f"routines/{BUNDLE_PATH}/vectors.json", vectors)
+        self.assert_error("vectors.json: routine_id must equal")
+
+        self.install_production_bundle_after_cleanup(bundle)
+        provenance = self.read_json(f"routines/{BUNDLE_PATH}/provenance.json")
+        provenance["routine_id"] = "G36-GEN-AEHL__wrong"
+        self.write_json(f"routines/{BUNDLE_PATH}/provenance.json", provenance)
+        self.assert_error("provenance.json: routine_id must equal")
+
+    def install_production_bundle_after_cleanup(self, bundle):
+        shutil.rmtree(bundle)
+        return self.install_production_bundle()
+
+    def test_graph_connector_and_fixed_parameter_mismatch(self):
+        bundle = self.install_production_bundle()
+        interface = self.read_json(f"routines/{BUNDLE_PATH}/interface.json")
+        interface["connectors"][0]["unit"] = "Cel"
+        self.write_json(f"routines/{BUNDLE_PATH}/interface.json", interface)
+        self.assert_error("connector 'TRet' unit disagrees with interface.json")
+
+        self.install_production_bundle_after_cleanup(bundle)
+        provenance = self.read_json(f"routines/{BUNDLE_PATH}/provenance.json")
+        provenance["fixed_parameters"]["ashCliZon"] = "wrong"
+        self.write_json(f"routines/{BUNDLE_PATH}/provenance.json", provenance)
+        self.assert_error("fixed parameter 'ashCliZon' disagrees with provenance.json")
+
+    def test_provenance_source_and_implementation_are_strict(self):
+        self.install_production_bundle()
+        provenance = self.read_json(f"routines/{BUNDLE_PATH}/provenance.json")
+        provenance["upstream"]["source_file"] = "../private.mo"
+        provenance["fixed_parameters"] = {}
+        provenance["implementation"]["selected_branch"] = ""
+        provenance["implementation"]["parameters"]["p"] = "zero"
+        self.write_json(f"routines/{BUNDLE_PATH}/provenance.json", provenance)
+        errors = self.assert_error("upstream.source_file: parent traversal is forbidden")
+        self.assertTrue(any("fixed_parameters must be a nonempty object" in error for error in errors))
+        self.assertTrue(any("selected_branch must be a safe nonempty string" in error for error in errors))
+        self.assertTrue(any("implementation.parameters.p must be a finite number" in error for error in errors))
+
+    def test_vectors_reject_undeclared_connectors_and_incomplete_donor_coverage(self):
+        self.install_production_bundle()
+        vectors = self.read_json(f"routines/{BUNDLE_PATH}/vectors.json")
+        vectors["scenarios"][0]["inputs"]["unknown"] = 1.0
+        vectors["scenarios"][0]["expect"].pop()
+        self.write_json(f"routines/{BUNDLE_PATH}/vectors.json", vectors)
+        errors = self.assert_error("'unknown' is not a declared input")
+        self.assertTrue(
+            any("TCut zero-tolerance output expectations must cover" in error for error in errors)
+        )
+
+        provenance = self.read_json(f"routines/{BUNDLE_PATH}/provenance.json")
+        provenance["donor_columns"]["connectors"]["TCut"] = "missing_output"
+        self.write_json(f"routines/{BUNDLE_PATH}/provenance.json", provenance)
+        self.assert_error("mapped columns are missing: missing_output")
+
+    def test_artifact_hash_path_and_donor_drift(self):
+        bundle = self.install_production_bundle()
+        provenance = self.read_json(f"routines/{BUNDLE_PATH}/provenance.json")
+        provenance["artifacts"][0]["sha256"] = "f" * 63
+        provenance["artifacts"][1]["local_path"] = "../oracle.txt"
+        self.write_json(f"routines/{BUNDLE_PATH}/provenance.json", provenance)
+        errors = self.assert_error("sha256: must be lowercase 64-hex")
+        self.assertTrue(any("parent traversal is forbidden" in error for error in errors))
+
+        self.install_production_bundle_after_cleanup(bundle)
+        donor = self.make_matching_donor(bundle)
+        provenance = self.read_json(f"routines/{BUNDLE_PATH}/provenance.json")
+        donor_graph = donor / provenance["artifacts"][0]["donor_path"]
+        donor_graph.write_bytes(donor_graph.read_bytes() + b"\n")
+        errors = routine_lint.validate(self.root, donor)
+        self.assertTrue(any("donor bytes differ" in error for error in errors), errors)
+
+        self.install_production_bundle_after_cleanup(bundle)
+        provenance = self.read_json(f"routines/{BUNDLE_PATH}/provenance.json")
+        provenance["artifacts"] = [
+            artifact
+            for artifact in provenance["artifacts"]
+            if artifact["role"] != "structural_oracle"
+        ]
+        provenance["artifacts"][-1]["role"] = "donor_metadata"
+        self.write_json(f"routines/{BUNDLE_PATH}/provenance.json", provenance)
+        errors = self.assert_error("artifacts missing required roles structural_oracle")
+        self.assertTrue(any("require at least one provenance role" in error for error in errors))
+
+    def test_stale_local_artifact_and_private_path_leakage(self):
+        bundle = self.install_production_bundle()
+        reference = bundle / "golden/reference.csv"
+        reference.write_bytes(reference.read_bytes() + b"\n")
+        self.assert_error("sha256: does not match golden/reference.csv")
+
+        self.install_production_bundle_after_cleanup(bundle)
+        card = bundle / "card.md"
+        card.write_text(card.read_text(encoding="utf-8") + "\n/Users/name/private.pdf\n")
+        self.assert_error("private document, image, or local path leakage")
+
+    def test_registry_claims_cannot_exceed_provenance(self):
+        bundle = self.install_production_bundle()
+        provenance = self.read_json(f"routines/{BUNDLE_PATH}/provenance.json")
+        provenance["evidence"].pop()
+        self.write_json(f"routines/{BUNDLE_PATH}/provenance.json", provenance)
+        errors = self.assert_error("registry evidence_tier exceeds completed provenance evidence")
+        self.assertTrue(any("registry status exceeds" in error for error in errors))
+
+        self.install_production_bundle_after_cleanup(bundle)
+        registry = self.read_json("routines/registry.json")
+        registry["routines"][0]["completeness"]["guideline_profile"] = "complete"
+        self.write_json("routines/registry.json", registry)
+        self.assert_error("completeness.guideline_profile requires E5 evidence")
 
 
 if __name__ == "__main__":
