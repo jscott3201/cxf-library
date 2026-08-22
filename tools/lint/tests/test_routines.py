@@ -93,30 +93,42 @@ class RoutineLintTests(unittest.TestCase):
         return json.loads((self.root / relative_path).read_text(encoding="utf-8"))
 
     def install_production_bundle(self):
-        source = PRODUCT_ROOT / "routines" / BUNDLE_PATH
-        destination = self.root / "routines" / BUNDLE_PATH
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copytree(source, destination)
-        self.write_json(
-            "routines/registry.json",
-            json.loads((PRODUCT_ROOT / "routines/registry.json").read_text(encoding="utf-8")),
+        registry = json.loads(
+            (PRODUCT_ROOT / "routines/registry.json").read_text(encoding="utf-8")
         )
+        for row in registry["routines"]:
+            source = PRODUCT_ROOT / "routines" / row["path"]
+            destination = self.root / "routines" / row["path"]
+            if destination.is_symlink() or destination.is_file():
+                destination.unlink()
+            elif destination.exists():
+                shutil.rmtree(destination)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copytree(source, destination)
+        self.write_json("routines/registry.json", registry)
         self.write_json(
             "routines/g36/coverage.json",
             json.loads(
                 (PRODUCT_ROOT / "routines/g36/coverage.json").read_text(encoding="utf-8")
             ),
         )
-        return destination
+        return self.root / "routines" / BUNDLE_PATH
 
-    def make_matching_donor(self, bundle):
+    def make_matching_donor(self):
         donor = self.root / "donor"
-        provenance = json.loads((bundle / "provenance.json").read_text(encoding="utf-8"))
-        for artifact in provenance["artifacts"]:
-            source = bundle / artifact["local_path"]
-            destination = donor / artifact["donor_path"]
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(source, destination)
+        if donor.is_symlink() or donor.is_file():
+            donor.unlink()
+        elif donor.exists():
+            shutil.rmtree(donor)
+        registry = self.read_json("routines/registry.json")
+        for row in registry["routines"]:
+            bundle = self.root / "routines" / row["path"]
+            provenance = json.loads((bundle / "provenance.json").read_text(encoding="utf-8"))
+            for artifact in provenance["artifacts"]:
+                source = bundle / artifact["local_path"]
+                destination = donor / artifact["donor_path"]
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(source, destination)
         return donor
 
     def install_alternate_scalar_bundle(self):
@@ -546,7 +558,9 @@ class RoutineLintTests(unittest.TestCase):
         self.assert_error("unless every applicable registry row is complete")
 
         registry = self.read_json("routines/registry.json")
-        registry["routines"][0]["completeness"]["canonical_class"] = "complete"
+        for row in registry["routines"]:
+            if row["completeness"]["canonical_class"] != "not_applicable":
+                row["completeness"]["canonical_class"] = "complete"
         self.write_json("routines/registry.json", registry)
         self.assertFalse(
             any(
@@ -583,16 +597,15 @@ class RoutineLintTests(unittest.TestCase):
         self.assertNotIn("Traceback", output.getvalue())
 
     def test_production_shaped_bundle_and_donor_parity(self):
-        bundle = self.install_production_bundle()
-        donor = self.make_matching_donor(bundle)
+        self.install_production_bundle()
+        donor = self.make_matching_donor()
         self.assertEqual(routine_lint.validate(self.root), [])
         self.assertEqual(routine_lint.validate(self.root, donor), [])
 
     def test_alternate_scalar_bundle_uses_manifest_contracts(self):
-        production_bundle = self.install_production_bundle()
-        alternate_bundle = self.install_alternate_scalar_bundle()
-        donor = self.make_matching_donor(production_bundle)
-        self.make_matching_donor(alternate_bundle)
+        self.install_production_bundle()
+        self.install_alternate_scalar_bundle()
+        donor = self.make_matching_donor()
         self.assertEqual(routine_lint.validate(self.root), [])
         self.assertEqual(routine_lint.validate(self.root, donor), [])
 
@@ -686,7 +699,7 @@ class RoutineLintTests(unittest.TestCase):
         self.assertTrue(any("parent traversal is forbidden" in error for error in errors))
 
         self.install_production_bundle_after_cleanup(bundle)
-        donor = self.make_matching_donor(bundle)
+        donor = self.make_matching_donor()
         provenance = self.read_json(f"routines/{BUNDLE_PATH}/provenance.json")
         donor_graph = donor / provenance["artifacts"][0]["donor_path"]
         donor_graph.write_bytes(donor_graph.read_bytes() + b"\n")
