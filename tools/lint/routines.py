@@ -327,8 +327,6 @@ def _validate_interface(value, label, routine_id, errors):
             field = connector.get(key)
             if not isinstance(field, str) or not field.strip():
                 errors.append(f"{prefix}.{key}: must be a nonempty string")
-    if not any(row.get("direction") == "input" for row in connectors.values()):
-        errors.append(f"{label}: at least one input connector is required")
     if not any(row.get("direction") == "output" for row in connectors.values()):
         errors.append(f"{label}: at least one output connector is required")
     return connectors
@@ -786,7 +784,6 @@ def _validate_graph(value, label, row, connectors, provenance, errors):
         for node in nodes.values()
         if isinstance(node.get("@type"), str)
         and node["@type"].rsplit("#", 1)[-1] == canonical
-        and "S231:hasInput" in node
         and "S231:hasOutput" in node
     ]
     if len(roots) != 1:
