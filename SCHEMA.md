@@ -18,7 +18,9 @@ cxf-library/
 ├── faults/<equip>/README.md     # chapter index and status table
 ├── playbooks/<slug>.md          # remediation playbooks (shared across faults)
 ├── clusters/clusters.json       # fault clusters (syndromes with shared root cause)
-├── routines/                    # G36 routine enhancements (non-fault control programs)
+├── routines/                    # routine catalog; no executable routines in this version
+│   ├── registry.json            # executable routine inventory
+│   └── g36/                     # G36 source pins and coverage declaration
 ├── tools/verify/                # Rust harness: loads each rule into the engine, runs vectors
 ```
 
@@ -44,6 +46,79 @@ Reserved-but-unauthored IDs (a planned rule a README or card already names)
 are allowed: they appear in prose and index tables marked planned/deferred,
 never in the registry, and the next authored rule in that family takes the
 next free number, honoring any reservation.
+
+## Routine catalog foundation
+
+The routine catalog is an explicit zero-state. It defines identities,
+provenance pins, and validation boundaries, but contains no implemented or
+verified routines. These contracts do not change any fault contract or fault
+schema identifier.
+
+Pin ownership is split by purpose:
+
+- Root `ENGINE_PIN` is the runtime evaluator revision.
+- `routines/g36/DONOR_PIN` is the exact open-control-engine donor fixture and
+  golden revision.
+- `routines/g36/SOURCE_PIN` is the exact upstream Modelica Buildings source
+  revision.
+
+Each pin file contains one lowercase 40-hex Git commit. The pin files are the
+authoritative locations for these revisions.
+
+### `routines/registry.json` (`cxf-library/routine-registry/v1`)
+
+The registry is an object with exactly two keys: `schema` and `routines`.
+`schema` is `cxf-library/routine-registry/v1`; `routines` is an array. The
+registry owns the executable routine inventory. In this foundation version,
+the production array is empty.
+
+Future rows have exactly these keys:
+
+| Field | Type | Contract |
+|---|---|---|
+| `id` | string | `<class-id>__<variant-id>` |
+| `class_id` | string | `G36-<DOMAIN>-<SLUG>` |
+| `variant_id` | string | lowercase kebab case |
+| `name` | string | display name |
+| `family` | string | routine family |
+| `level` | enum | `leaf` \| `controller` \| `fragment` |
+| `status` | enum | `draft` \| `ported` \| `engine_verified` \| `source_evidenced` \| `adopted` \| `deprecated` |
+| `path` | string | safe repository-relative POSIX path below `g36/` |
+| `canonical_class` | string\|null | nonempty canonical class for non-fragments; null for fragments |
+| `evidence_tier` | enum | `E0` through `E5` |
+| `completeness` | object | four-axis completeness declaration |
+
+`<DOMAIN>` is one uppercase ASCII alphanumeric segment. `<SLUG>` is one or
+more uppercase ASCII alphanumeric segments separated by hyphens. Variant IDs
+contain lowercase ASCII alphanumeric segments separated by single hyphens.
+Routine IDs MUST equal the row's `<class_id>__<variant_id>`.
+
+Registry paths MUST start with `g36/`. Absolute paths, backslashes, empty
+segments, `.` segments, and `..` segments are invalid. IDs and paths MUST each
+be unique, and rows MUST be sorted by `id`.
+
+Every `completeness` object has exactly these keys:
+`donor_configuration`, `canonical_class`, `family_package`, and
+`guideline_profile`. Each value is `complete`, `partial`, `not_applicable`, or
+`unknown`.
+
+### `routines/g36/coverage.json` (`cxf-library/g36-coverage/v1`)
+
+Coverage declares profile scope and claims; it does not repeat the registry's
+inventory. The top-level object has exactly `schema`, `profile`,
+`completeness`, `areas`, and `claims`. `schema` is
+`cxf-library/g36-coverage/v1`, and `profile` is a nonempty string.
+`completeness` uses the same exact four-axis object as a registry row.
+
+For this foundation version, `areas` and `claims` MUST be empty arrays. While
+the registry is empty, all four coverage completeness values MUST be
+`unknown`. Pin fields and an `implemented_variants` inventory do not belong in
+coverage.
+
+The interface ABI, routine vector format, routine card or frontmatter,
+provenance bundle, package acceptance, member-list or array support, and
+executable verification are deferred. This version does not define those
+contracts.
 
 ## Design stance (why the pieces split this way)
 
