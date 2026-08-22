@@ -131,6 +131,11 @@ exactly `id`, `direction`, `value_type`, `unit`, `quantity`, and `shape`.
 `shape` is `scalar`. Connector declarations MUST equal the root CXF input and
 output declarations, including direction, type, unit, and quantity.
 
+`connectors` MUST be a nonempty array with at least one scalar Real output.
+Zero scalar Real inputs are valid. For an output-only interface, the CXF root
+omits `S231:hasInput`; each vector scenario uses an empty `inputs` object and
+retains a nonempty `expect` array.
+
 ### `vectors.json` (`cxf-library/routine-vectors/v1`)
 
 The top-level object has exactly `schema`, `routine_id`, `clock`, and

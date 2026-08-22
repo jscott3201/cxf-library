@@ -355,6 +355,241 @@ class RoutineLintTests(unittest.TestCase):
         )
         return bundle
 
+    def install_output_only_scalar_bundle(self):
+        path = "g36/example/output-only-scalar"
+        bundle = self.root / "routines" / path
+        bundle.mkdir(parents=True)
+        routine_id = "G36-EXAMPLE-SCALAR__output-only"
+        canonical_class = (
+            "Buildings.Controls.OBC.ASHRAE.G36.Generic.AirEconomizerHighLimits"
+        )
+        root_id = "http://example.org#g36.source.output_only_scalar"
+        block_id = f"{root_id}.con"
+        fixed_parameters = {
+            "eneStd": (
+                "Buildings.Controls.OBC.ASHRAE.G36.Types."
+                "EnergyStandard.ASHRAE90_1"
+            ),
+            "ecoHigLimCon": (
+                "Buildings.Controls.OBC.ASHRAE.G36.Types."
+                "ControlEconomizer.FixedDryBulb"
+            ),
+            "ashCliZon": (
+                "Buildings.Controls.OBC.ASHRAE.G36.Types."
+                "ASHRAEClimateZone.Zone_1B"
+            ),
+        }
+        graph = {
+            "@context": {
+                "S231": "http://data.ashrae.org/S231P#",
+                "base": "http://example.org#",
+            },
+            "@graph": [
+                {
+                    "@id": root_id,
+                    "@type": f"http://example.org#{canonical_class}",
+                    "S231:hasParameter": [
+                        {"@id": f"{root_id}.{name}"} for name in fixed_parameters
+                    ],
+                    "S231:hasOutput": {"@id": f"{root_id}.TCut"},
+                    "S231:containsBlock": {"@id": block_id},
+                },
+                *[
+                    {
+                        "@id": f"{root_id}.{name}",
+                        "@type": "S231:Parameter",
+                        "S231:value": value,
+                    }
+                    for name, value in fixed_parameters.items()
+                ],
+                {
+                    "@id": f"{root_id}.TCut",
+                    "@type": "S231:RealOutput",
+                    "S231:isOfDataType": {"@id": "S231:Real"},
+                    "S231:unit": "K",
+                    "S231:quantity": "ThermodynamicTemperature",
+                },
+                {
+                    "@id": block_id,
+                    "@type": (
+                        "http://example.org#Buildings.Controls.OBC.CDL."
+                        "Reals.Sources.Constant"
+                    ),
+                    "S231:hasParameter": {"@id": f"{block_id}.k"},
+                    "S231:hasOutput": {"@id": f"{block_id}.y"},
+                },
+                {
+                    "@id": f"{block_id}.k",
+                    "@type": "S231:Parameter",
+                    "S231:value": 297.15,
+                },
+                {
+                    "@id": f"{block_id}.y",
+                    "@type": "S231:RealOutput",
+                    "S231:isOfDataType": {"@id": "S231:Real"},
+                    "S231:isConnectedTo": {"@id": f"{root_id}.TCut"},
+                },
+            ],
+        }
+        interface = {
+            "schema": "cxf-library/routine-interface/v1",
+            "routine_id": routine_id,
+            "tick_profile": "HostTick-v1",
+            "connectors": [
+                {
+                    "id": "TCut",
+                    "direction": "output",
+                    "value_type": "real",
+                    "unit": "K",
+                    "quantity": "ThermodynamicTemperature",
+                    "shape": "scalar",
+                }
+            ],
+        }
+        vectors = {
+            "schema": "cxf-library/routine-vectors/v1",
+            "routine_id": routine_id,
+            "clock": {"step_s": 1.0, "horizon_s": 0.0},
+            "scenarios": [
+                {
+                    "name": "fixed_dry_bulb_reference",
+                    "inputs": {},
+                    "expect": [
+                        {
+                            "output": "TCut",
+                            "from_s": 0.0,
+                            "to_s": 0.0,
+                            "equals": 297.15,
+                            "tolerance": 0.0,
+                        }
+                    ],
+                }
+            ],
+        }
+        self.write_json(f"routines/{path}/routine.cxf.jsonld", graph)
+        self.write_json(f"routines/{path}/interface.json", interface)
+        self.write_json(f"routines/{path}/vectors.json", vectors)
+        self.write_text(
+            f"routines/{path}/card.md",
+            "# Output-only scalar\n\n![Flow](diagram.svg)\n",
+        )
+        self.write_text(
+            f"routines/{path}/diagram.svg",
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10"></svg>\n',
+        )
+        self.write_text(f"routines/{path}/LICENSE-BUILDINGS.html", "test license\n")
+        self.write_text(f"routines/{path}/THIRD_PARTY_NOTICES.md", "test notice\n")
+        self.write_text(f"routines/{path}/evidence/structure.txt", "constant output\n")
+        self.write_text(
+            f"routines/{path}/evidence/reference.dat",
+            "# columns: time temperature_cutoff\n"
+            "double output_only_reference(1,2)\n"
+            "0.0 297.15\n",
+        )
+        self.write_json(f"routines/{path}/evidence/reference.prov.json", {"source": "test"})
+        artifact_specs = [
+            ("graph", "routine.cxf.jsonld", "fixtures/output_only.jsonld"),
+            ("structural_oracle", "evidence/structure.txt", "fixtures/output_only.txt"),
+            (
+                "donor_reference",
+                "evidence/reference.dat",
+                "goldens/output_only/reference.dat",
+            ),
+            (
+                "reference_provenance",
+                "evidence/reference.prov.json",
+                "goldens/output_only/reference.prov.json",
+            ),
+        ]
+        artifacts = [
+            {
+                "role": role,
+                "local_path": local_path,
+                "donor_path": donor_path,
+                "sha256": hashlib.sha256((bundle / local_path).read_bytes()).hexdigest(),
+            }
+            for role, local_path, donor_path in artifact_specs
+        ]
+        provenance = {
+            "schema": "cxf-library/routine-provenance/v1",
+            "routine_id": routine_id,
+            "runtime": {
+                "repository": "https://github.com/jscott3201/open-control-engine",
+                "commit": "e2ff2f84577d9be65a49e6cb5440c223f6126817",
+                "tick_profile": "HostTick-v1",
+                "content_id": f"cxf:fnv1a128:{'2' * 32}",
+            },
+            "donor": {
+                "repository": "https://github.com/jscott3201/open-control-engine",
+                "commit": "41e997fd130c5e454446b40bcc3ba576429876b4",
+            },
+            "upstream": {
+                "repository": "https://github.com/lbl-srg/modelica-buildings",
+                "commit": "a131864e4c4df22ebcd52bb8da439de0087ac365",
+                "canonical_class": canonical_class,
+                "source_file": (
+                    "Buildings/Controls/OBC/ASHRAE/G36/Generic/"
+                    "AirEconomizerHighLimits.mo"
+                ),
+            },
+            "fixed_parameters": fixed_parameters,
+            "implementation": {
+                "selected_branch": "fixed dry-bulb constant cutoff",
+                "block_class": "Buildings.Controls.OBC.CDL.Reals.Sources.Constant",
+                "parameters": {"k": 297.15},
+            },
+            "donor_columns": {
+                "time": "time",
+                "connectors": {"TCut": "temperature_cutoff"},
+            },
+            "artifacts": artifacts,
+            "evidence": [
+                {"tier": "E0", "status": "complete", "artifact": "interface.json"},
+                {"tier": "E1", "status": "complete", "artifact": "vectors.json"},
+                {"tier": "E2", "status": "complete", "artifact": "evidence/reference.dat"},
+                {
+                    "tier": "E3",
+                    "status": "complete",
+                    "artifact": "evidence/reference.prov.json",
+                },
+            ],
+            "private_reference": {
+                "profile": "G36-2021-private-audit",
+                "audit_status": "not_used",
+                "sections": [],
+            },
+        }
+        self.write_json(f"routines/{path}/provenance.json", provenance)
+        row = {
+            "id": routine_id,
+            "class_id": "G36-EXAMPLE-SCALAR",
+            "variant_id": "output-only",
+            "name": "Output-only scalar",
+            "family": "example",
+            "level": "leaf",
+            "status": "source_evidenced",
+            "path": path,
+            "canonical_class": canonical_class,
+            "evidence_tier": "E3",
+            "completeness": {
+                "donor_configuration": "complete",
+                "canonical_class": "partial",
+                "family_package": "not_applicable",
+                "guideline_profile": "partial",
+            },
+        }
+        registry = self.read_json("routines/registry.json")
+        self.write_registry(sorted(registry["routines"] + [row], key=lambda item: item["id"]))
+        self.write_coverage(
+            completeness={
+                "donor_configuration": "partial",
+                "canonical_class": "partial",
+                "family_package": "unknown",
+                "guideline_profile": "partial",
+            }
+        )
+        return bundle
+
     def test_valid_zero_state(self):
         self.assertEqual(routine_lint.validate(self.root), [])
         output = io.StringIO()
@@ -608,6 +843,62 @@ class RoutineLintTests(unittest.TestCase):
         donor = self.make_matching_donor()
         self.assertEqual(routine_lint.validate(self.root), [])
         self.assertEqual(routine_lint.validate(self.root, donor), [])
+
+    def test_output_only_scalar_bundle_and_donor_parity(self):
+        bundle = self.install_output_only_scalar_bundle()
+        graph = self.read_json(
+            "routines/g36/example/output-only-scalar/routine.cxf.jsonld"
+        )
+        root = next(node for node in graph["@graph"] if node["@id"].endswith("output_only_scalar"))
+        interface = self.read_json("routines/g36/example/output-only-scalar/interface.json")
+        vectors = self.read_json("routines/g36/example/output-only-scalar/vectors.json")
+        reference = (bundle / "evidence/reference.dat").read_text(encoding="utf-8")
+
+        self.assertNotIn("S231:hasInput", root)
+        self.assertIn("S231:hasOutput", root)
+        self.assertEqual(
+            [(connector["id"], connector["direction"]) for connector in interface["connectors"]],
+            [("TCut", "output")],
+        )
+        self.assertEqual(vectors["scenarios"][0]["inputs"], {})
+        self.assertTrue(vectors["scenarios"][0]["expect"])
+        self.assertEqual(
+            next(line for line in reference.splitlines() if line.startswith("# columns:")).split()[2:],
+            ["time", "temperature_cutoff"],
+        )
+
+        donor = self.make_matching_donor()
+        self.assertEqual(routine_lint.validate(self.root), [])
+        self.assertEqual(routine_lint.validate(self.root, donor), [])
+
+    def test_output_connector_and_nonempty_array_remain_required(self):
+        self.install_output_only_scalar_bundle()
+        relative = "routines/g36/example/output-only-scalar/interface.json"
+        interface = self.read_json(relative)
+        interface["connectors"] = [
+            {
+                "id": "uOnly",
+                "direction": "input",
+                "value_type": "real",
+                "unit": "K",
+                "quantity": "ThermodynamicTemperature",
+                "shape": "scalar",
+            }
+        ]
+        self.write_json(relative, interface)
+        self.assert_error("at least one output connector is required")
+
+        interface["connectors"] = []
+        self.write_json(relative, interface)
+        self.assert_error("connectors must be a nonempty array")
+
+    def test_output_only_scenario_rejects_undeclared_input(self):
+        self.install_output_only_scalar_bundle()
+        relative = "routines/g36/example/output-only-scalar/vectors.json"
+        vectors = self.read_json(relative)
+        vectors["scenarios"][0]["inputs"] = {"uUnexpected": 1.0}
+        self.write_json(relative, vectors)
+        self.assert_error("'uUnexpected' is not a declared input")
 
     def test_registry_bundle_bijection_and_required_files(self):
         bundle = self.install_production_bundle()
